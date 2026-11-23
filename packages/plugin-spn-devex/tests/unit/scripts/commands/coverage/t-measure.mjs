@@ -395,8 +395,8 @@ console.log("=== coverage measure — the answer as a whole");
   const second = json(root);
   ok("an unchanged tree measures to the same digest", first.digest === second.digest && first.digest.startsWith("sha256:"), `${first.digest} ${second.digest}`);
   ok("the report path is the pocket's coverage-report.html, not written yet",
-    first.report.path === "docs/artifacts/reports/coverage-report.html" && first.report.exists === false, JSON.stringify(first.report));
-  ok("the proved side links the tests report it was read from", first.testsReport.path === "docs/artifacts/reports/tests-report.html", JSON.stringify(first.testsReport));
+    first.report.path === "docs/artifacts/private/reports/coverage-report.html" && first.report.exists === false, JSON.stringify(first.report));
+  ok("the proved side links the tests report it was read from", first.testsReport.path === "docs/artifacts/private/reports/tests-report.html", JSON.stringify(first.testsReport));
   const plain = measure(root);
   ok("the plain reading prints the per-package table and the totals",
     plain.includes("packages/store") && plain.includes("totals:") && plain.includes("MODULE_SERVER"), plain);

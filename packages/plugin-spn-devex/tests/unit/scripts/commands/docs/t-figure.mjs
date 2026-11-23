@@ -248,5 +248,20 @@ console.log("\n=== `--variant` narrows the pages `check` and `colour` read");
   one("[MKT.SCRIPTS.141] a path that names one file reads that file alone", oneFile.code === 1 && oneFile.out.includes("over 1 page") && !oneFile.out.includes("overview.html"));
 }
 
+console.log("\n=== a map is centred in its frame, and its wires stay inside the drawing");
+{
+  const { draw } = await import("../../../../../src/scripts/lib/draw.ts");
+  const spec = { kind: "map", title: "Three feed one, which feeds a fourth", boxes: ["a", "b", "c", "d", "e"].map((id) => ({ id, label: id.toUpperCase() })),
+    links: [{ from: "a", to: "d" }, { from: "b", to: "d" }, { from: "c", to: "d" }, { from: "d", to: "e" }] };
+  const { svg } = draw(spec);
+  const width = Number(/viewBox="0 0 ([\d.]+)/.exec(svg)[1]);
+  const boxes = [...svg.matchAll(/<rect class="dl-tile" x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)"/g)].map((m) => m.slice(1).map(Number));
+  const left = Math.min(...boxes.map((b) => b[0])), right = Math.max(...boxes.map((b) => b[0] + b[2])), top = Math.min(...boxes.map((b) => b[1]));
+  one("the drawing's left and right margins are equal (frame " + width + ", boxes " + left + " to " + right + ")", Math.abs(left - (width - right)) <= 1);
+  const xs = [...svg.matchAll(/<path class="dl-wire" d="([^"]+)"/g)].flatMap((m) => [...m[1].matchAll(/[ML]\s?([\d.]+)\s([\d.]+)/g)].map((q) => [Number(q[1]), Number(q[2])]));
+  one("no wire runs outside the boxes' own extent, so none loops round the drawing's edge", xs.length > 0 && xs.every(([x]) => x >= left && x <= right));
+  one("every wire's vertical run stays between the first row and the last box's bottom", xs.every(([, y]) => y >= top && y <= Math.max(...boxes.map((b) => b[1] + b[3]))));
+}
+
 console.log(failed ? `\n  ${failed} of ${n} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

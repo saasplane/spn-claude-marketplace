@@ -2,14 +2,14 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "section": "The approach document — a workstream's, never a repository's",
-      "seen": "bc0480c7"
+      "seen": "8afa1ec1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A card is only for what the rules leave open",
-      "seen": "ca6d2fed"
+      "seen": "db20f6a6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -24,7 +24,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "Questions are records, and every card is one rendered",
-      "seen": "bff98e0c"
+      "seen": "b5dc9396"
     }
   ]
 }
@@ -32,7 +32,7 @@
 # Decision cards — the shape, and where it is defined
 
 **The book owns this grammar.** It is stated in the foundation's
-`docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md`, under *The approach document — a workstream's, never a repository's* → `Open`, and
+`docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md`, under *The approach document — a workstream's, never a repository's* → `Open`, and
 several of its clauses are **MUST**. This file exists because the plugins ship without the
 book beside them. It restates the grammar for an agent that cannot open that chapter, and it
 must be kept in step with it. **When the two disagree, the book wins.**
@@ -133,7 +133,7 @@ workspace, a workstream that changes the agent may raise one, because there the 
 **The preview of a choice has one shape in the three places a choice is put to the developer.** A card carries what it is about, `CODE`, `FLOW` or `OTHER`, and each option's code with the recommended option marked. It carries a Today block only where real code exists and an option changes it, and then only the lines that differ; a flow's card shows the journey in steps, before and after. A suggestion's preview carries the same block, or a link only where a page already shows it. A recommendation in chat or in a report carries the same short block, at most about 15 lines, with real names and a name not yet defined marked as proposed. **Agent mechanics are the exception:** they show as a journey and an outcome, never as line-by-line plugin code. **A code card or a code suggestion with no preview is refused** at `question raise` and `suggestion add`; a card whose nearest construct is a `.ts`, `.tsx` or `.sql` file or a path under `/src/` is a `CODE` card whatever it says, and a card already stored is never judged again. The preview is the smallest fragment that shows the idea and how the options differ: a few lines for each option, only what differs, elided with `...`, never the whole change the option would make. The full change lives on the arc's preview and its sheet. The card record carries `about`, `preview` (`today` and `reason`, the reason the recommended option is shown as it is) and `settled`. A question reaches the developer only if it changes what a person sees or pays for, a boundary or a promise, or a real trade-off nothing settles.
 
 **The parts come in that order** (`RULE.DEVEX.WORKSPACE.242` · MUST · check:doc-check): the number and summary, Why, What,
-Views, Options, the recommendation, and the preview. Every page already runs Why, What, How, so a card
+Views, Options, the recommendation, and the preview. Every page already runs Why, What, Plan, How, so a card
 that opens with Why reads as the page around it does. The views come before the options, so the
 developer knows what each role saw before weighing the choices.
 
@@ -151,7 +151,7 @@ wherever it stands. The `workstream question` commands are the record's only wri
 | Command | What it does |
 | --- | --- |
 | `question raise <arc> --file card.json` | takes the next number from the record, writes the record, and puts the card in the approach page's `Open`. `card.json` is the card with its title, and a card with a part missing is refused, and so is a card whose What cites nothing it read: add the file and line, or a fact id, for what the card says about today, for example `scripts/commands/workstream/question.ts:68` or `f9` |
-| `question show <qN> --in notes/<arc>/preview.html` | shows the card in that preview's `Open`, with a line back to the approach page |
+| `question show <qN> --in notes/<arc>/arc.html` | shows the card in that preview's `Open`, with a line back to the approach page |
 | `question answer <qN> --key A --words "…"` | records the answer in the developer's words, and takes the card off every page |
 | `question withdraw <qN> --words "…"` | records the withdrawal, and takes the card off every page |
 
@@ -216,7 +216,7 @@ already gave point at a different question. A reopened card keeps its number and
 **A card raised in conversation keeps the number it was given there.** The person has been reading
 those numbers, so the page uses them rather than starting a second run.
 
-> Restates `01-devex/04-workspace/04-docs/05-artifacts.md` — *The approach document* → `Open`. Where the two
+> Restates `01-devex/04-workspace/04-docs/05-pages.md` — *The approach document* → `Open`. Where the two
 > disagree, the chapter wins.
 
 ## While a card is open

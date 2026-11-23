@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/",
-      "seen": "caf51475"
+      "seen": "bb05038a"
     }
   ]
 }

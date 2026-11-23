@@ -15,7 +15,7 @@ description: Prove SaaS Plane TS work is sound by running gates. Use when the as
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "c99bb438"
+      "seen": "de2ac7e0"
     }
   ]
 }
@@ -134,7 +134,7 @@ Destructive, and the local stack is frequently **shared**: `infra platform down 
    - **Fix what keeps a row unproved, before the report** (`RULE.DEVEX.FUNCTION.064` · MUST · skill:spn-apps/implement). A full run is not only a report. A row whose tier is not the tier of the case that proves it, a runner that ran and wrote no run file, a case its tier binds that carries no id, and a red case are each the run's own work. Fix each one, run that tier again under the same name, and stamp again. Name anything you cannot fix in the report, with the reason.
    - **Report the code coverage the run printed** — lines, statements, functions and branches, per project whose run collected it, read from its `coverage-summary.json`. It is reported, never enforced (`RULE.SUPPORT.APPS.133` · MUST · skill:spn-apps/implement): no configuration carries a threshold and nothing fails on a percentage. `spn-apps coverage check <project>` names an exclude that gives no reason.
    - **Then produce the pages whose behaviours moved**: the `spn-devex:check` skill, asking it to produce the matching `02-constructs` seat page. A construct page joins its behaviours from the register, so writing statuses makes every page for a changed construct stale, and `docs audit check` reds until they are produced again.
-   - **Last, the report** — the `TRACEABILITY_MATRIX` template through the `spn-devex:report` skill, into `docs/artifacts/reports/`. It is written by you from what you just read, never by a tool, and it names which tiers the run spoke for. The **spn-devex** plugin's `spn-devex behaviours coverage show --json` hands you the measurement to write it from.
+   - **Last, the report** — the `TRACEABILITY_MATRIX` template through the `spn-devex:report` skill, into `docs/artifacts/private/reports/`. It is written by you from what you just read, never by a tool, and it names which tiers the run spoke for. The **spn-devex** plugin's `spn-devex behaviours coverage show --json` hands you the measurement to write it from.
 8. **Finish** — stop what you started unless told to leave it running, and report the seeded credentials and the tally per suite.
 
 A seed or template migration edit only lands on a clean re-migrate. A warm database keeps the old row, so a seed change tested against a warm stack proves nothing about a fresh one.

@@ -71,6 +71,8 @@ place; in a construct seat it is the first lead paragraph.
   it in your report. The foundation hub's Title and Subtitle are fixed by DEC.DEVEX.WORKSPACE.143 and
   are never touched.
 
+**You may change a block to the one the table names.** Where a paragraph sits in a plain table or a list that the block table in `refs/devex/workspace/docs/blocks.md` and `refs/devex/workspace/docs/figures.md` (*Which block a content takes*) gives another block, write the block it names, keeping every claim and every term.
+
 ## The test, after every paragraph
 
 Answer each before you move on. A weaker answer to any one means revert your edit.

@@ -557,7 +557,6 @@ export function workNote(payload: Payload): string | null {
   }
   const subject = fresh.find((row) => row.work !== "preview") ?? fresh[0];
   const tail = [`Search first: spn-devex precedent find "<the nouns you use>" --work ${subject.work}${/^server-/.test(subject.work) ? " --code" : ""}`];
-  if (fresh.some((row) => row.work === "preview")) tail.push("Every block with a name or a value ends with a Reads line: the file and line it comes from.");
   // The note stays under its budget: the middle lines go first, from the end; the first line and the tail stay.
   while (Buffer.byteLength([...lines, ...tail].join("\n")) > NOTE_BYTES && lines.length > 1) lines.pop();
   lines.push(...tail);

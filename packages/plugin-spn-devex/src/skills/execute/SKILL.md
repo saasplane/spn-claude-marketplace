@@ -11,11 +11,14 @@ description: Carry out a go. Use the moment the developer gives the go on one ar
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "5ad84a2b"
+      "seen": "dbe1e12c"
     }
   ]
 }
 -->
+
+
+**Before step 1, run `spn-devex workstream sheet check <workstream>/<arc>` for each arc the go covers, and read the arc's status.** On an arc that is still PROPOSED, or on a sheet the check refuses, stop and say what is missing; never start a part. `workstream go write` refuses the same way (an arc "is PROPOSED, not DECIDED", and every fault of the sheet, named), so a go the developer gave on an arc that is not decided goes back to ideation: the patches, the sheet and the preview first, then the arc is decided (`workstream arc edit <workstream>/<arc> --status DECIDED`), then this skill runs.
 
 1. The scope: every arc the go covers is DECIDED and its sheet reads whole (`workstream sheet check`). The go refuses an entry that is incomplete, a change with no patch or a step with no command or no proof, in every hand-written file, the book, config, migrations, contract, server, web and tests included, and no warning stands in place of the refusal; a change marked judged still carries its patch (`RULE.DEVEX.WORKSPACE.502` · MUST · check:split-plan).
 2. Drift: `workstream state check --facts`, and `sheet edit` for each entry whose fact moved.
@@ -76,3 +79,4 @@ description: Carry out a go. Use the moment the developer gives the go on one ar
 - **Five things an order never does, and every brief says so** (`RULE.DEVEX.WORKSPACE.515` · MUST · skill:spn-devex/execute)
 - **The go on a workstream written from a layout is refused while any section is `PENDING`, or cites a decision newer than the section itself, and the refusal names each such section** (`RULE.DEVEX.WORKSPACE.542` · MUST · skill:spn-devex/execute)
 - **A handover quotes no decision without naming where it lives** (`RULE.DEVEX.WORKSPACE.545` · MUST · skill:spn-devex/execute)
+- **While an arc changes the agent's own tools, the agent and its helpers run those tools from the arc's branch source, and build, cut and test once at the end** (`RULE.DEVEX.WORKSPACE.559` · MUST · skill:spn-devex/execute)

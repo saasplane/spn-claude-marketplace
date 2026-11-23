@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 // RESTATES: the foundation book — 02-document.md rule 9 (RULE.DEVEX.WORKSPACE.162), rules 11-12 (RULE.DEVEX.WORKSPACE.096, the
 // one voice; RULE.DEVEX.WORKSPACE.106, its reach and its measure; RULE.DEVEX.WORKSPACE.107, the three moves that reach the
-// reader), 04-discipline.md § Voice discipline, 05-artifacts.md (the masthead, the approach document,
+// reader), 04-discipline.md § Voice discipline, 05-pages.md (the masthead, the approach document,
 // and the Plan section after How, RULE.DEVEX.WORKSPACE.487), 01-workstream.md § A step row says where, what work, and how
-// (RULE.DEVEX.WORKSPACE.183), 05-artifacts.md § One stylesheet, served in versions (RULE.DEVEX.WORKSPACE.214),
+// (RULE.DEVEX.WORKSPACE.183), 08-stylesheet.md § One stylesheet, served in versions (RULE.DEVEX.WORKSPACE.214),
 // § The header (a short name of at most three words, RULE.DEVEX.WORKSPACE.517) and § What an overview and a hub hold
 // (a rail entry of at most three words, RULE.DEVEX.WORKSPACE.518), § Prose and lists have limits (a figure comes from a
 // spec and never by hand, RULE.DEVEX.WORKSPACE.523)
-// and 06-registers.md § Writing a row. The chapters are the source of truth: a rule change is edited
+// and 09-registers.md § Writing a row. The chapters are the source of truth: a rule change is edited
 // there first, then here, in the same change. This script checks only what a script CAN check; the
 // register itself is judgement.
 //
@@ -57,16 +57,18 @@ import { isBuilderWorkspace } from "../lib/builder.ts";
 import { ARC_ID } from "../lib/workstream-schema.ts";
 /** An arc's address as a pattern part, read from `ARC_ID`: `N<nnn>`, `ideate` or `follow-ups`. */
 const ARC_PART = ARC_ID.source.slice(1, -1);
-import { blockFit, fitKind } from "../lib/block-fit.ts";
+import { blockFit, fitKind, templateFrameFindings } from "../lib/block-fit.ts";
+import { shownCommandFindings } from "./shown-commands.ts";
+import { tableHintsOf } from "../commands/docs/blocks.ts";
 import { findPartnerWords } from "./partner-words.ts";
 import { titleFindingsOnDisk } from "./page-title.ts";
 import { whereTreeFindings } from "./where-tree.ts";
 import { handDrawnFigures } from "../lib/figures.ts";
 import { bookClassFaults, inPluginSource, knownHolders, ownMarketplace, pluginNameFaults } from "./book-classes.ts";
-import { GUIDE_PAGE_SUFFIX, APPROACH_SUFFIX, ARTIFACT, CONSTRUCT_PAGES, CONSTRUCT_PAGE_SUFFIX, HUB, OVERVIEW_PAGE_SUFFIX, PLUGIN_TEMPLATES, POCKET,
+import { GUIDE_PAGE_SUFFIX, APPROACH_SUFFIX, ARTIFACT, CONSTRUCT_PAGES, CONSTRUCT_PAGE_SUFFIX, HUB, OVERVIEW_PAGE_SUFFIX, PLUGIN_TEMPLATES, POCKET, DOCS, TEMPLATES, VISIBILITY,
          artifactDocsPathOf, decisionsRegister, inArtifacts, workstreamPrefixSource, isApproachPage, isRegister as inRegisters, pagePlaceOf,
-         workstreamDirOf, workstreamsDir, isSeatFile } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { BUNDLED_SUFFIX, OWN_COPY, PAGE_SCRIPT, SERVED_FILES, cutVersions, linksSharedStyles, stylesDir } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
+         workstreamDirOf, workstreamsDir, isSeatFile, visibilityOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { ANY_SERVED_NAMES, BUNDLED_SUFFIX, OWN_COPY, PAGE_SCRIPT, anyNameOf, cutVersions, linksSharedStyles, stylesDir } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { CYCLES_COLUMNS, cyclesOf, headerOf, headerStatusRule, openHeadingFor, openHeadingOf, tableColumns,
          tableDifferences } from "../commands/docs/cycles.ts";
 
@@ -223,8 +225,8 @@ function pocketKind(parts: string[]): { place: string; suffix: string } | null {
 }
 const NODE_MANIFESTS = ["spkind.json", "spinfrapkg.json"];
 const SKIP = new Set(["node_modules", ".git", "dist", "build", "coverage", "tool-results", ".output", ".nx"]);
-/** An arc's one preview, `.spndevex/workstreams/<state>/<NNN>-<subject>/notes/<arc>/preview.html` (RULE.DEVEX.WORKSPACE.262). */
-const ARC_PREVIEW = new RegExp(`\\/${workstreamPrefixSource()}[^/]+\\/notes\\/N\\d+\\/preview\\.html$`);
+/** An arc's one page, `.spndevex/workstreams/<state>/<NNN>-<subject>/notes/<arc>/arc.html`, or `preview.html` where it was written before that name (RULE.DEVEX.WORKSPACE.262). */
+const ARC_PREVIEW = new RegExp(`\\/${workstreamPrefixSource()}[^/]+\\/notes\\/N\\d+\\/(?:arc|preview)\\.html$`);
 
 const MD_LINK = /!?\[([^\]]*)\]\([^)]*\)/g;
 const MD_BLOCK_START = /^(?:#{1,6}\s|[-*+]\s|\d+[.)]\s)/;
@@ -273,10 +275,10 @@ export function structural(path: string): Finding[] {
 
 // ---------------------------------------------------------------------------- the approach page
 
-// An approach page lives in the workstream that argues it (05-artifacts.md § The approach document),
+// An approach page lives in the workstream that argues it (05-pages.md § The approach document),
 // and its arcs sit beside it in `arcs/`. Only a page inside a workstream has arcs to compare against.
 // One early workstream is exempt by name: its page was written in the shape before this one, and it
-// closes under that shape (05-artifacts.md § The approach document).
+// closes under that shape (05-pages.md § The approach document).
 const EXEMPT_WORKSTREAM = /^008-/;
 
 /** The workstream folder a path sits in, and its name, or null outside one. */
@@ -320,7 +322,7 @@ function inClosedWorkstream(path: string): boolean {
 const WHAT_WITHOUT_FIGURE = 6000;
 
 /**
- * 05-artifacts.md § A section opens with its own overview, then a figure (RULE.DEVEX.WORKSPACE.497). On an open or backlog
+ * 05-pages.md § A section opens with its own overview, then a figure (RULE.DEVEX.WORKSPACE.497). On an open or backlog
  * approach page, a What past 6,000 characters of text holds a `<figure>` or an `<svg>`, or one `<!-- no figure: … -->` line
  * saying why prose is clearer there. A page in a closed workstream is not read.
  */
@@ -332,12 +334,12 @@ export function figureRule(path: string, text: string): Finding[] {
   if (length <= WHAT_WITHOUT_FIGURE) return [];
   if (/<figure\b|<svg\b|<!--\s*no figure:/i.test(what)) return [];
   return [["RULE", `${basename(path)} runs ${length} characters in What and holds no figure ` +
-    "(05-artifacts.md § A section opens with its own overview; RULE.DEVEX.WORKSPACE.497) · add a figure where seeing is faster, " +
+    "(05-pages.md § A section opens with its own overview; RULE.DEVEX.WORKSPACE.497) · add a figure where seeing is faster, " +
     "or one line, `<!-- no figure: the reason prose is clearer here -->`"]];
 }
 
 /**
- * 05-artifacts.md § Prose and lists have limits (RULE.DEVEX.WORKSPACE.523): a figure is drawn from a spec by `docs figure draw`, never
+ * 06-blocks.md § Prose and lists have limits (RULE.DEVEX.WORKSPACE.523): a figure is drawn from a spec by `docs figure draw`, never
  * by hand with coordinates. A page or a seat file that carries a flat drawing (`svg.sds-drawing`, `sds-skeleton`) or an arrowhead
  * (`marker-end`) carries a figure drawn by hand, and each one is a RULE that says to draw it from a `dg` spec. A seat file's fenced
  * code is an example and is not read; a sample the design language's page marks `data-dl-legend` is not read either
@@ -349,7 +351,7 @@ export function handDrawnRule(path: string, text: string): Finding[] {
 }
 
 /**
- * 05-artifacts.md § After `How` comes a section of its own, Plan (RULE.DEVEX.WORKSPACE.487). The Plan section is `<section id="arcs">`
+ * 05-pages.md § After `How` comes a section of its own, Plan (RULE.DEVEX.WORKSPACE.487). The Plan section is `<section id="arcs">`
  * under the `h2` Plan, and holds a table of two columns, Arc · Status. Inside a workstream the table has one row per arc in `arcs/`,
  * in the order a person chooses, and each row is the arc's own: its name, its line and the links to its preview and its samples, and the
  * reason a CARRIED or DROPPED arc carries (all in the Arc cell), and its status badge.
@@ -358,7 +360,7 @@ export function handDrawnRule(path: string, text: string): Finding[] {
  * named Cycles at the end of How. An open or backlog page with no Plan section is told to have one (`docs cycles write` moves it).
  */
 /**
- * 05-artifacts.md § After `How` comes a section of its own, Plan (RULE.DEVEX.WORKSPACE.487): a Plan row's facts line links the arc's
+ * 05-pages.md § After `How` comes a section of its own, Plan (RULE.DEVEX.WORKSPACE.487): a Plan row's facts line links the arc's
  * preview and, where the arc has `notes/<arc>/samples/index.html`, that index alone, never a sample page or folder beside it.
  */
 export function planRowSamples(table: string, folder: string): Finding[] {
@@ -370,7 +372,7 @@ export function planRowSamples(table: string, folder: string): Finding[] {
     const beside = hrefs.filter((href) => !/\/samples\/index\.html$/.test(href));
     if (beside.length)
       out.push([CYCLES, `Plan's row for ${arc} links ${listed(beside)} beside its samples index — an arc with \`samples/index.html\` is linked by that index alone ` +
-        "(05-artifacts.md § After How comes a section of its own, Plan; RULE.DEVEX.WORKSPACE.487) · `spn-devex docs cycles write <workstream>` writes the row"]);
+        "(05-pages.md § After How comes a section of its own, Plan; RULE.DEVEX.WORKSPACE.487) · `spn-devex docs cycles write <workstream>` writes the row"]);
   }
   return out;
 }
@@ -378,7 +380,7 @@ export function planRowSamples(table: string, folder: string): Finding[] {
 export function cyclesRule(path: string, text: string): Finding[] {
   if (section(text, "How") === null) return [];                   // approachShape reports a missing How
   const fix = "`spn-devex docs cycles show <workstream>` prints the table from the arcs";
-  const where = "(05-artifacts.md § After How comes a section of its own, Plan; RULE.DEVEX.WORKSPACE.487)";
+  const where = "(05-pages.md § After How comes a section of its own, Plan; RULE.DEVEX.WORKSPACE.487)";
   const plan = section(text, "Plan");
   if (plan === null) {
     if (!inClosedWorkstream(path)) {
@@ -401,7 +403,7 @@ export function cyclesRule(path: string, text: string): Finding[] {
       "run `spn-devex docs cycles write <workstream>` to write it from the arcs"]];
 
   // Rows are matched by arc, never by position: the page lists arcs in the order they run.
-  const { missing, unknown, stale } = tableDifferences(table, cyclesOf(home.folder));
+  const { missing, unknown, stale } = tableDifferences(table, cyclesOf(home.folder), { page: dirname(resolve(path)), folder: home.folder });
   const out: Finding[] = [...planRowSamples(table, home.folder)];
   if (missing.length)
     out.push([CYCLES, `Plan has no row for ${listed(missing)} — every arc in arcs/ is one row ` +
@@ -422,10 +424,10 @@ function closedCyclesRule(text: string, fix: string): Finding[] {
   const named = subsections.filter((m) => /^Cycles\b/i.test(flat(m[1]))).at(-1);
   if (!named)
     return [[CYCLES, "the page has neither a Plan section nor How's older Cycles subsection — one row " +
-      `per arc with ${CYCLES_HEADER} (05-artifacts.md § After How comes a section of its own, Plan) · ${fix}`]];
+      `per arc with ${CYCLES_HEADER} (05-pages.md § After How comes a section of its own, Plan) · ${fix}`]];
   if (named !== subsections.at(-1))
     return [[CYCLES, `How carries "${flat(subsections.at(-1)![1])}" after Cycles — Cycles is How's last ` +
-      "subsection in the older shape (05-artifacts.md § After How comes a section of its own, Plan)"]];
+      "subsection in the older shape (05-pages.md § After How comes a section of its own, Plan)"]];
   return [];
 }
 
@@ -433,7 +435,7 @@ function closedCyclesRule(text: string, fix: string): Finding[] {
 const WRITES_THE_PAGE = "`spn-devex docs cycles write <workstream>` writes it from the arcs";
 
 /**
- * 05-artifacts.md § After How comes a section of its own, Plan: on a workstream's page the header's status follows the arcs.
+ * 05-pages.md § After How comes a section of its own, Plan: on a workstream's page the header's status follows the arcs.
  * It reads `PLANNING` while no arc is past `DECIDED`, `IMPLEMENTING` once an arc runs or has
  * landed, and `DONE` when the workstream closes. The rule itself is `headerStatusRule`, beside the
  * command that writes the status; this states the finding. A header that labels none of the three
@@ -446,13 +448,13 @@ export function headerRule(path: string, text: string): Finding[] {
   if (!found) return [];
   if (inClosedWorkstream(path))
     return [[CYCLES, `the header's status reads ${found.shows}, and a closed workstream reads ${found.gives} ` +
-      "(05-artifacts.md § After How comes a section of its own, Plan) · stamp the header's status badge, which a closed page keeps by hand"]];
+      "(05-pages.md § After How comes a section of its own, Plan) · stamp the header's status badge, which a closed page keeps by hand"]];
   return [[CYCLES, `the header's status reads ${found.shows} and the arcs give ${found.gives} — the header's status ` +
-    `follows the arcs (05-artifacts.md § After How comes a section of its own, Plan; RULE.DEVEX.WORKSPACE.204) · ${WRITES_THE_PAGE}`]];
+    `follows the arcs (05-pages.md § After How comes a section of its own, Plan; RULE.DEVEX.WORKSPACE.204) · ${WRITES_THE_PAGE}`]];
 }
 
 /**
- * 05-artifacts.md § After How comes a section of its own, Plan: the heading of `Open` names the cards that are open, each by
+ * 05-pages.md § After How comes a section of its own, Plan: the heading of `Open` names the cards that are open, each by
  * its number, and with no card open it reads `Open — no card is open`. A page with no `Open` heading
  * and a page in a closed workstream are not judged.
  */
@@ -462,11 +464,11 @@ export function openHeadingRule(path: string, text: string): Finding[] {
   const gives = openHeadingFor(text);
   if (shows === null || shows === gives) return [];
   return [[CYCLES, `the heading of Open reads "${shows}" and the page's cards give "${gives}" ` +
-    `(05-artifacts.md § After How comes a section of its own, Plan; RULE.DEVEX.WORKSPACE.204) · ${WRITES_THE_PAGE}`]];
+    `(05-pages.md § After How comes a section of its own, Plan; RULE.DEVEX.WORKSPACE.204) · ${WRITES_THE_PAGE}`]];
 }
 
 /** A page's line that loads the shared script, which builds the rail and folds it. */
-const LOADS_PAGE_SCRIPT = new RegExp(`<script\\b[^>]*\\bsrc="[^"]*${PAGE_SCRIPT.replace(".", "\\.")}"`, "i");
+const LOADS_PAGE_SCRIPT = new RegExp(`<script\\b[^>]*\\bsrc="[^"]*${anyNameOf(PAGE_SCRIPT)}"`, "i");
 
 /**
  * The chrome every page with a rail owes its reader. The shared script builds the rail from the headings
@@ -477,7 +479,7 @@ export function pageFurniture(text: string): Finding[] {
   if (LOADS_PAGE_SCRIPT.test(text)) return [];
   return [[FURNITURE,
     `The outline is not built and does not fold: the page carries a rail and loads no \`${PAGE_SCRIPT}\`. ` +
-    "The shared script builds the rail from the headings and folds it (05-artifacts.md, The page itself) · " +
+    "The shared script builds the rail from the headings and folds it (05-pages.md, The page itself) · " +
     "add the script's line at the end of the page — take it from the approach template, " +
     `\`${PLUGIN_TEMPLATES}/workstream/approach-template.html\``]];
 }
@@ -490,14 +492,81 @@ function headings(text: string): string[] {
     .map((h) => h.split(/\s+/)[0].replace(/[:—-]+$/, "").toLowerCase());
 }
 
-const APPROACH_SECTIONS = ["why", "what", "how", "plan", "open", "deferred"];
+const APPROACH_SECTIONS = ["why", "what", "plan", "how", "open", "deferred"];
+/** The order a page written before Plan moved between What and How keeps: accepted until the rewrite pass moves it. */
+const OLDER_SECTIONS = ["why", "what", "how", "plan", "open", "deferred"];
+
+/** An arc as a heading's words or its id: `N017`, `ideate`, `follow-ups`, or an id ending `-what`. */
+const arcHeading = (id: string | null, words: string): boolean =>
+  /^(?:N\d{3}[a-z]?|ideate|follow-ups)\b/i.test(words) || (id !== null && (/^(?:N\d{3}[a-z]?|ideate|follow-ups)$/i.test(id) || /-what$/.test(id)));
 
 /**
- * An opening, then Why -> What -> How -> Plan -> Open -> Deferred, in that order and nothing else
- * (05-artifacts.md § The approach document). `exempt` is the early workstream's page, which keeps the
+ * 05-pages.md § The approach document: What is told by construct and How by repository, and an arc is neither (RULE.DEVEX.WORKSPACE.487).
+ * It names an arc as a heading of What or How, a status word or a developer's quoted line in How, and a code block, a file frame or a
+ * tab set in What (the page is the summary, the arc page is the preview). A page still in the older order, Plan after How, owes its
+ * rewrite pass and is told softly; a page in the new order is held to it.
+ */
+export function whatHowShape(text: string, older: boolean): Finding[] {
+  const grade = older ? "SOFT" : "RULE";
+  const where = "(05-pages.md § The approach document; RULE.DEVEX.WORKSPACE.487)";
+  const out: Finding[] = [];
+  const what = section(text, "What");
+  const how = section(text, "How");
+  for (const [name, body] of [["What", what], ["How", how]] as const) {
+    if (body === null) continue;
+    const arcs = [...body.matchAll(/<h([34])\b([^>]*)>([\s\S]*?)<\/h\1>/gi)]
+      .filter((found) => arcHeading(/\bid="([^"]*)"/.exec(found[2])?.[1] ?? null, flat(found[3])))
+      .map((found) => flat(found[3]));
+    if (arcs.length)
+      out.push([grade, `${name} has ${arcs.length === 1 ? "a heading that is an arc" : "headings that are arcs"}, ${listed(arcs)} — ${name === "What" ? "What is told by domain (an `h3`) and construct (an `h4`)" : "How is told by repository"}, ` +
+        `and each arc's goal is its row in Plan ${where} · \`spn-devex docs cycles show <workstream>\` prints the rows`]);
+  }
+  if (how !== null) {
+    const words = flat(how);
+    const status = /\b(?:RUNNING|PROPOSED|DECIDED|LANDED|CARRIED|DROPPED)\b|\bis running\b|\bready for the go\b/.exec(words);
+    if (status)
+      out.push([grade, `How says "${status[0]}" — a status word belongs to the Plan row and the arc's page, and How says what changes in each repository and what ships ${where}`]);
+    if (/<blockquote\b|<q\b/i.test(how) || /[“"][^“”"<>]{30,}[”"]/.test(words))
+      out.push([grade, `How quotes a line of the developer — the developer's words are the arc's, and How says what changes and what ships ${where}`]);
+    if (/\bThe batch\b/.test(words))
+      out.push([grade, `How tells how the go runs — that is the go plan's, and How says what changes in each repository ${where}`]);
+  }
+  // THE ARC LINKS ARE PLAN'S ALONE, AND THE FIGURES ARE WHAT's AND HOW's (RULE.DEVEX.WORKSPACE.487): What and How link no arc and carry no `Arcs:` line,
+  // no figure stands in Why, Plan, Open or Deferred, a What domain holds at most one, and How holds its release chain, exactly one.
+  const figures = (body: string): number => (body.match(/<figure\b[^>]*\bclass="dl-figure"/g) ?? []).length;
+  for (const [name, body] of [["What", what], ["How", how]] as const) {
+    if (body === null) continue;
+    const link = /<a\b[^>]*\bhref="(?:[^"]*#(?:N\d+[a-z]?|ideate|follow-ups)\b|(?:[^"]*\/)?notes\/(?:N\d+[a-z]?|ideate|follow-ups)\/)[^"]*"/i.exec(body);
+    if (link || /\bArcs:/.test(flat(body)))
+      out.push([grade, `${name} ${link ? "links an arc" : "has an \`Arcs:\` line"} — Plan is the only place arcs are linked, and each Plan row's goal names the constructs the arc changes ${where}`]);
+  }
+  for (const name of ["Why", "Plan", "Open", "Deferred"]) {
+    const body = section(text, name);
+    if (body !== null && figures(body)) out.push([grade, `${name} holds a figure — figures stand in What (one for each domain, after its list, where the change is a shape) and in How (the release chain) ${where}`]);
+  }
+  if (what !== null) {
+    const crowded = what.split(/<h3\b/i).slice(1).filter((domain) => figures(domain) > 1).length;
+    if (crowded) out.push([grade, `${crowded === 1 ? "A What domain holds" : `${crowded} What domains hold`} more than one figure — at most one for each domain, after its list ${where}`]);
+  }
+  const deferred = section(text, "Deferred");
+  if (deferred !== null && (/class="sds-tiles"/.test(deferred) || /<th\b/i.test(deferred) || /<tr\b[^>]*>(?:(?!<\/tr>)[\s\S])*<\/td>\s*<td\b/i.test(deferred)))
+    out.push([grade, `Deferred is a catalog or a table of columns — it is one bordered list framed like Plan's rows: one column and no header row, each row the item in bold, its why-not-now line and an italic note, Needed for: …, naming what brings it back ${where}`]);
+  if (how !== null && figures(how) !== 1)
+    out.push([grade, `How holds ${figures(how) === 0 ? "no release chain" : `${figures(how)} figures`} — How's one figure is the release \`chain\`, then the repositories with Ships and After ${where}`]);
+  if (what !== null) {
+    const kinds = [/<pre\b/i.test(what) ? "a code block" : "", /class="sds-file"/.test(what) ? "a file frame" : "", /class="sds-tabset"/.test(what) ? "a tab set" : ""].filter(Boolean);
+    if (kinds.length)
+      out.push([grade, `What holds ${kinds.join(" and ")} — the page is the summary and the arc page is the preview, so What holds the decision, at most a small figure, and the links to the arc page ${where}`]);
+  }
+  return out;
+}
+
+/**
+ * An opening, then Why -> What -> Plan -> How -> Open -> Deferred, in that order and nothing else
+ * (05-pages.md § The approach document). `exempt` is the early workstream's page, which keeps the
  * shape it was written in and is held only to the skeleton.
  */
-export function approachShape(text: string, exempt = false): Finding[] {
+export function approachShape(text: string, exempt = false, closed = false): Finding[] {
   const heads = headings(text);
   if (!heads.length) return [];
   // The SKELETON decides the kind. A settled approach legitimately lacks Open, and a closed one lacks
@@ -506,38 +575,41 @@ export function approachShape(text: string, exempt = false): Finding[] {
   if (missing.length)
     return [["RULE", "carries no " + missing.join(" + ") + " — this explains rather than argues, so " +
       `it is an overview: ${POCKET.artifacts}/${ARTIFACT.docs}/<domain>/<name>${OVERVIEW_PAGE_SUFFIX} (RULE.DEVEX.WORKSPACE.102 / 040). An approach ` +
-      "is an opening, then Why > What > How > Plan > Open > Deferred"]];
+      "is an opening, then Why > What > Plan > How > Open > Deferred"]];
   if (exempt) return [];
 
   const out: Finding[] = [];
-  const where = "(05-artifacts.md § The approach document)";
+  const where = "(05-pages.md § The approach document)";
   if (heads.includes("terms"))
     out.push(["RULE", `carries a Terms section, and an approach page has none ${where} · explain a word ` +
       "in brackets where it first appears; a word the product owns belongs in its construct's own Terms table"]);
   const others = [...new Set(heads.filter((h) => h !== "terms" && !APPROACH_SECTIONS.includes(h)))];
   if (others.length)
     out.push(["RULE", `carries ${others.join(" + ")} — an approach page is an opening, then Why > What > ` +
-      `How > Plan > Open > Deferred, and nothing else ${where}`]);
-  const order = heads.filter((h) => APPROACH_SECTIONS.includes(h)).map((h) => APPROACH_SECTIONS.indexOf(h));
-  if (order.some((at, i) => i > 0 && at < order[i - 1]))
-    out.push(["RULE", `sections run ${heads.filter((h) => APPROACH_SECTIONS.includes(h)).join(" > ")} — ` +
-      `the order is Why > What > How > Plan > Open > Deferred ${where}`]);
+      `Plan > How > Open > Deferred, and nothing else ${where}`]);
+  const named = heads.filter((h) => APPROACH_SECTIONS.includes(h));
+  const inOrder = (list: string[]): boolean => named.map((h) => list.indexOf(h)).every((at, i, all) => i === 0 || at >= all[i - 1]);
+  const older = !inOrder(APPROACH_SECTIONS) && inOrder(OLDER_SECTIONS);
+  if (!inOrder(APPROACH_SECTIONS) && !older)
+    out.push(["RULE", `sections run ${named.join(" > ")} — ` +
+      `the order is Why > What > Plan > How > Open > Deferred ${where}`]);
+  if (!closed) out.push(...whatHowShape(text, older));
   if (!/<p\b[^>]*class="(?:[^"]*\s)?sds-standfirst(?:\s[^"]*)?"/i.test(text))
     out.push(["RULE", "has no opening — one `p.sds-standfirst` in the header comes before Why " +
-      "(05-artifacts.md § The masthead, and the opening; RULE.DEVEX.WORKSPACE.182) · start from the approach template"]);
+      "(05-pages.md § The masthead, and the opening; RULE.DEVEX.WORKSPACE.182) · start from the approach template"]);
   return out;
 }
 
 // ---------------------------------------------------------------------------- the masthead
 
-// 05-artifacts.md § The masthead, and the opening (RULE.DEVEX.WORKSPACE.187, RULE.DEVEX.WORKSPACE.182).
+// 05-pages.md § The masthead, and the opening (RULE.DEVEX.WORKSPACE.187, RULE.DEVEX.WORKSPACE.182).
 // The header holds the Title (`h1`), an optional Subtitle (`p.sds-subtitle`) and the Description (one
 // `p.sds-standfirst`), in that order, and nothing after the Description. Every masthead finding is SOFT
 // while the trees outside the foundation wait for their retrofit (the retrofit still owed); when every tree
 // audits clean, change SECOND_PARAGRAPH to RULE, because the chapter states that rule as MUST.
 const SECOND_PARAGRAPH = "SOFT";
 const MASTHEAD = "SOFT";
-const MASTHEAD_WHERE = "(05-artifacts.md § The masthead, and the opening; RULE.DEVEX.WORKSPACE.187)";
+const MASTHEAD_WHERE = "(05-pages.md § The masthead, and the opening; RULE.DEVEX.WORKSPACE.187)";
 
 /**
  * The page kinds the masthead rule binds, read from a page's file name. The index of artifacts has
@@ -654,15 +726,42 @@ function workstreamTemplates(): string | null {
   return null;
 }
 
-/** Whether a page's `spn:doc` block says its variant is `surface-page-preview`. */
-export const isSurfacePreviewText = (text: string): boolean => /<!--\s*spn:doc[\s\S]*?"variant"\s*:\s*"surface-page-preview"/.test(text);
+/** Whether a page's `spn:doc` block says it is a surface page: variant `surface-page`, or `surface-page-preview` as the pages written before it were. */
+export const isSurfacePreviewText = (text: string): boolean => /<!--\s*spn:doc[\s\S]*?"variant"\s*:\s*"surface-page(?:-preview)?"/.test(text);
+
+const LEGACY_SURFACE_PAGE = /<!--\s*spn:doc[\s\S]*?"variant"\s*:\s*"surface-page-preview"/;
 
 /**
- * RULE.DEVEX.WORKSPACE.535: a surface page preview holds a bar and a frame and nothing else. It is held to the template: no `{{…}}` slot
- * left in, the bar with the page's title and the width, mode and Notes switches, a frame whose address is the copy beside the page
- * (a relative path, never another site), and no section, table, list or paragraph of the page's own words, which belong in the copy.
+ * RULE.DEVEX.WORKSPACE.535 and .536: a surface page holds a bar and the page's markup, and nothing else. It is held to the template: no
+ * `{{…}}` slot left in, the bar with the page's title and the width, mode and Notes switches, a frame, one `<template id="page">` that
+ * holds the markup, and the two metas that name the design system's version and the app's stylesheet. Words of the page's own stand in
+ * the template, never beside the bar. A page written with the variant `surface-page-preview` is held to the shape it had, a frame over a
+ * copy beside it.
  */
 export function surfacePageShape(text: string): Finding[] {
+  if (LEGACY_SURFACE_PAGE.test(text)) return legacySurfacePageShape(text);
+  const parts: string[] = [];
+  const bare = text.replace(/<!--[\s\S]*?-->/g, " ");
+  const slots = (bare.match(/\{\{[^{}\n]*\}\}/g) ?? []).length;
+  if (slots) parts.push(`still holds ${slots} template slot${slots === 1 ? "" : "s"}`);
+  const switches = ["width", "mode", "notes"].filter((one) => !new RegExp(`data-surface="${one}"`).test(bare));
+  if (!/class="sds-surface-bar"/.test(bare) || !/class="sds-surface-title"/.test(bare)) parts.push("has no bar with the page's title");
+  else if (switches.length) parts.push(`has no ${switches.join(" and no ")} switch in its bar`);
+  if (!/<iframe\b[^>]*class="[^"]*sds-surface-frame[^"]*"[^>]*>/.test(bare)) parts.push("has no frame for the page");
+  if (!/<template\s+id="page"[^>]*>/.test(bare)) parts.push("has no `<template id=\"page\">` holding the page's markup");
+  const ds = /<meta\s+name="surface-ds"\s+content="([^"]*)"/.exec(bare)?.[1];
+  if (ds === undefined) parts.push("has no `surface-ds` meta naming the design system's version");
+  else if (!slots && !/^\d+\.\d+\.\d+$/.test(ds.trim())) parts.push(`names \`${ds}\` in its \`surface-ds\` meta, which is no version`);
+  const app = /<meta\s+name="surface-app-css"\s+content="([^"]*)"/.exec(bare)?.[1];
+  if (app === undefined) parts.push("has no `surface-app-css` meta naming the app's stylesheet");
+  else if (!slots && app.trim() && /^([a-z][a-z0-9+.-]*:|\/)/i.test(app.trim())) parts.push("names an app stylesheet that is no relative path (it is empty for Surface's own look)");
+  const outside = bare.replace(/<template\b[\s\S]*?<\/template>/i, " ").replace(/<header\b[\s\S]*?<\/header>/i, "");
+  if (/<(?:h2|h3|section|table|ul|ol|p)\b/i.test(outside)) parts.push("holds words of its own beside the bar and the template");
+  if (!parts.length) return [];
+  return [["RULE", `a surface page ${parts.join(", and ")} (RULE.DEVEX.WORKSPACE.535, .536) · keep to the template: the bar, the frame and the page's markup in its template, with the two metas`]];
+}
+
+function legacySurfacePageShape(text: string): Finding[] {
   const parts: string[] = [];
   const bare = text.replace(/<!--[\s\S]*?-->/g, " ");
   const slots = (bare.match(/\{\{[^{}\n]*\}\}/g) ?? []).length;
@@ -678,15 +777,16 @@ export function surfacePageShape(text: string): Finding[] {
   }
   if (/<(?:h2|h3|section|table|ul|ol|p)\b/i.test(bare.replace(/<header\b[\s\S]*?<\/header>/i, ""))) parts.push("holds words of its own beside the bar and the frame");
   if (!parts.length) return [];
-  return [["RULE", `a surface page preview ${parts.join(", and ")} (RULE.DEVEX.WORKSPACE.535) · keep to the template: the bar and the frame only, and the page's own words in its copy`]];
+  return [["RULE", `a surface preview ${parts.join(", and ")} (RULE.DEVEX.WORKSPACE.535) · keep to the template: the bar and the frame only, and the page's own words in its copy`]];
 }
 
 /**
- * RULE.DEVEX.WORKSPACE.536: the copy a surface page preview frames names its own mode switch in a `preview-mode` meta and listens for the
- * bar's message `{ "surface-page-preview": { mode, notes } }`, whichever way it was made. Read only where the framed copy sits beside the
- * preview as a file; a copy that is not there is not judged here.
+ * The copy a legacy surface preview frames names its own mode switch in a `preview-mode` meta and listens for the bar's message. A surface
+ * page has no copy beside it, so only a page written with the variant `surface-page-preview` is read. Read only where the framed copy sits
+ * beside the preview as a file; a copy that is not there is not judged here.
  */
 export function surfacePageCopy(path: string, text: string): Finding[] {
+  if (!LEGACY_SURFACE_PAGE.test(text)) return [];
   const bare = text.replace(/<!--[\s\S]*?-->/g, " ");
   const src = /<iframe\b[^>]*class="[^"]*sds-surface-frame[^"]*"[^>]*\bsrc="([^"]*)"/.exec(bare)?.[1];
   if (!src || /^([a-z][a-z0-9+.-]*:|\/)/i.test(src)) return [];
@@ -696,14 +796,14 @@ export function surfacePageCopy(path: string, text: string): Finding[] {
   if (!/<meta\s+name="preview-mode"/i.test(copy)) missing.push("the `preview-mode` meta");
   if (!/surface-page-preview/.test(copy)) missing.push("a listener for the message `{ \"surface-page-preview\": { mode, notes } }`");
   if (!missing.length) return [];
-  return [["RULE", `the page a surface page preview frames (${src}) lacks ${missing.join(" and ")} (RULE.DEVEX.WORKSPACE.536) · a page made by any other means carries the same meta and listener, or the bar's switches do nothing`]];
+  return [["RULE", `the page a surface preview frames (${src}) lacks ${missing.join(" and ")} (RULE.DEVEX.WORKSPACE.536) · a page made by any other means carries the same meta and listener, or the bar's switches do nothing`]];
 }
 
 /** An arc's preview, by its fixed name in `notes/<arc>/` (`N<nnn>`, `ideate` or `follow-ups`). */
-const isArcPreview = (path: string): boolean => new RegExp(`[\\\\/]notes[\\\\/]${ARC_PART}[\\\\/]preview\\.html$`).test(path);
+const isArcPreview = (path: string): boolean => new RegExp(`[\\\\/]notes[\\\\/]${ARC_PART}[\\\\/](?:arc|preview)\\.html$`).test(path);
 
 // A comment every page keeps: the restated chapter, the page's `spn:doc` block, the approach page's `spn:closing` shape (replaced by the closing block at the close), the markers of a generated block, and the `no figure:` line that says why a long What has no figure.
-const KEPT_COMMENT = /^\s*(?:RESTATES:|spn:doc\b|spn:closing\b|\/?spn:generated\b|no figure:)/;
+export const KEPT_COMMENT = /^\s*(?:RESTATES:|spn:doc\b|spn:closing\b|\/?spn:generated\b|no figure:)/;
 const commentsOf = (text: string): string[] =>
   [...text.matchAll(/<!--([\s\S]*?)-->/g)].map((m) => m[1].replace(/\s+/g, " ").trim()).filter((one) => !KEPT_COMMENT.test(one));
 
@@ -721,7 +821,7 @@ export function templateShape(path: string, text: string, template: string | nul
   let model = template;
   if (model === null) {
     const dir = workstreamTemplates();
-    try { model = dir ? readFileSync(join(dir, preview ? "approach-preview-template.html" : "approach-template.html"), "utf8") : ""; }
+    try { model = dir ? readFileSync(join(dir, preview ? "arc-template.html" : "approach-template.html"), "utf8") : ""; }
     catch { model = ""; }
   }
   const parts: string[] = [];
@@ -741,6 +841,55 @@ export function templateShape(path: string, text: string, template: string | nul
   return [["RULE", `${basename(dirname(dirname(path))) === "notes" ? `notes/${basename(dirname(path))}/${basename(path)}` : basename(path)} ` +
     `${parts.join(", and ")} (RULE.DEVEX.WORKSPACE.187, .228, .233, .238) · fill every slot, drop the template's comments, ` +
     "keep to the template's sections, and say Overview in prose"]];
+}
+
+// ---------------------------------------------------------------------------- a page shown to the developer is filled
+
+const FILLED_MEDIA = /<(?:img|svg|table|figure|iframe|video|canvas|picture|ul|ol|dl|pre|hr|a|button|input|details|nav|blockquote|math|object|embed|audio)\b/i;
+const SLOT = /\{\{(?:(?!\{\{|\}\})[^\n])*\}\}/g;
+
+/** A template, or a file under a `templates/` folder, is a model and holds slots by design. */
+const TEMPLATE_FOLDER = new RegExp(`(?:^|\\/)${TEMPLATES}\\/`);
+export const isTemplatePath = (path: string): boolean => TEMPLATE_FOLDER.test(slashes(path));
+
+/** The `{{…}}` slots a page's text still holds, each once, outside comments, scripts, styles and code. */
+export function slotsLeft(text: string): string[] {
+  // The page's own `spn:doc` block is read; every other comment is a note.
+  const bare = text.replace(/<!--(?!\s*spn:doc\b)[\s\S]*?-->/g, " ").replace(/<(script|style|code|pre)\b[\s\S]*?<\/\1>/gi, " ");
+  return [...new Set(bare.match(SLOT) ?? [])];
+}
+
+/**
+ * RULE.DEVEX.WORKSPACE.560: a page shown to the developer holds no placeholder and no empty section. One RULE finding for each
+ * slot list, each section whose heading has nothing under it, and each section whose only content is a placeholder. A file under a
+ * `templates/` folder is exempt, and a heading that is followed by a deeper heading is a section with parts, not an empty one.
+ */
+export function unfilledPage(path: string, text: string): Finding[] {
+  if (isTemplatePath(path) || !/\.html?$/i.test(path)) return [];
+  const out: Finding[] = [];
+  const slots = slotsLeft(text);
+  if (slots.length) out.push(["RULE", `this page still has slots to fill: ${slots.join(", ")}; fill them, or say it is a template (RULE.DEVEX.WORKSPACE.560)`]);
+  const bare = text.replace(/<!--[\s\S]*?-->/g, " ").replace(/<(script|style)\b[\s\S]*?<\/\1>/gi, " ");
+  const heads = [...bare.matchAll(/<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/gi)];
+  for (const head of heads) {
+    const level = Number(head[1]);
+    if (level === 1) continue;   // the masthead's own heading; its subtitle and standfirst are `masthead`'s
+    const title = head[2].replace(/<[^>]*>/g, "").replace(/&[a-z]+;/g, " ").replace(/\s+/g, " ").trim();
+    // A heading that says there is nothing ("Open — no card is open") is the generated block's own.
+    if (/\bno card\b|\bnothing\b|\bnone\b/i.test(title)) continue;
+    const from = head.index! + head[0].length;
+    const rest = bare.slice(from);
+    const stop = rest.search(/<h[1-6]\b|<\/section>|<section\b|<\/main>|<footer\b|<\/body>/i);
+    const chunk = stop < 0 ? rest : rest.slice(0, stop);
+    const next = stop < 0 ? null : /^<h([1-6])/i.exec(rest.slice(stop));
+    if (next && Number(next[1]) > level) continue;
+    if (stop >= 0 && /^<section\b/i.test(rest.slice(stop))) continue;
+    if (FILLED_MEDIA.test(chunk)) continue;
+    const spoken = chunk.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").trim();
+    if (!spoken) { out.push(["RULE", `the section "${title}" has a heading and nothing under it: fill it, or remove the section where the kind allows it (RULE.DEVEX.WORKSPACE.560)`]); continue; }
+    if (!spoken.replace(SLOT, "").trim()) out.push(["RULE", `the section "${title}" holds only a placeholder: write what it says, or remove the section (RULE.DEVEX.WORKSPACE.560)`]);
+  }
+  return out;
 }
 
 /**
@@ -772,7 +921,7 @@ export function partnerWords(path: string, text: string): Finding[] {
     "why, and the ways to reach it, each with its trade-off (RULE.DEVEX.AGENT.160)"] as Finding);
 }
 
-/** An overview borrows its outline and carries no argument organs (05-artifacts). */
+/** An overview borrows its outline and carries no argument organs (05-pages). */
 export function overviewShape(text: string): Finding[] {
   const organs = headings(text).filter((h) => h === "open" || h === "deferred");
   if (organs.length)
@@ -1131,7 +1280,7 @@ export function isRegister(path: string): boolean {
   return inRegisters(p);
 }
 
-// 06-registers.md § A row states present truth, and carries no supersession — a row is never
+// 09-registers.md § A row states present truth, and carries no supersession — a row is never
 // annotated, struck through, or left standing with a note, and it never names what it replaced.
 // THE WORD IS NOT THE BREACH; the ruling is. A row legitimately says `superseding the working label
 // "AGT"` — ordinary English about an enum value, a file set or a config key. So a ruling is only a
@@ -1170,11 +1319,11 @@ export function supersession(rid: string, body: string, raw: string): Finding[] 
   for (const [name, how] of [...over.map((n) => [n, "rules over"] as const),
                              ...under.map((n) => [n, "is ruled by"] as const)])
     out.push([SUPERSESSION, `row ${rid} ${how} ${name} — a row states present truth and never names ` +
-      `what it replaced (06-registers.md § A row states present truth) · rewrite the row, and let git ` +
+      `what it replaced (09-registers.md § A row states present truth) · rewrite the row, and let git ` +
       `keep the old wording`]);
   if (ANNOTATED.test(raw))
     out.push([SUPERSESSION, `row ${rid} carries struck-through or annotated text — a row is never ` +
-      `annotated, struck through, or left standing with a note (06-registers.md § A row states ` +
+      `annotated, struck through, or left standing with a note (09-registers.md § A row states ` +
       `present truth) · rewrite the cell, and let git keep the old wording`]);
   return out;
 }
@@ -1323,14 +1472,14 @@ export function kindOf(path: string): string {
 
 // ---------------------------------------------------------------------------- the shared styles
 
-// 05-artifacts.md § What a stored page carries, and what a published one carries: the check on a page
+// 08-stylesheet.md § What a stored page carries, and what a published one carries: the check on a page
 // refuses a link to a version that nobody cut. The finding carries the words below, and the hook
 // reads them to tell the one finding it refuses a write for.
 const UNCUT = "links a version of the shared styles that nobody cut";
 
 /** A link or a script of a page that loads one of the served files: everything before the file's name. */
 const SERVED_LINK = new RegExp(
-  `\\b(?:href|src)="([^"]*)(?:${SERVED_FILES.map((file) => file.replace(/\./g, "\\.")).join("|")})"`, "gi");
+  `\\b(?:href|src)="([^"]*)(?:${ANY_SERVED_NAMES.map((file) => file.replace(/\./g, "\\.")).join("|")})"`, "gi");
 /** A version as the last folder of an address or a path: `…/1.0.0/`. */
 const VERSION_FOLDER = /(?:^|\/)(\d+\.\d+\.\d+)\/$/;
 
@@ -1354,8 +1503,8 @@ export function uncutVersions(text: string, styles: string | null = ownStylesDir
     .filter((version): version is string => version !== undefined);
   return [...new Set(linked)].filter((version) => !cut.includes(version)).map((version): Finding =>
     ["RULE", `the page ${UNCUT}: \`${version}\`. \`versions.json\` holds ${cut.map((one) => `\`${one}\``).join(" · ")}. ` +
-      `Link a version that exists, or cut this one first with \`spn-devex docs sds cut ${version}\` ` +
-      "(05-artifacts.md § One stylesheet, served in versions)"]);
+      `Link a version that exists, or cut this one first with \`spn-devex docs styles cut ${version}\` ` +
+      "(08-stylesheet.md § One stylesheet, served in versions)"]);
 }
 
 /**
@@ -1393,7 +1542,7 @@ export function check(path: string, text: string, fragment = false): Finding[] {
     if (!fragment || ownSentences.length >= 5) found.push(...voice(ownProse, ownSentences, kindOf(path), isOperative(path)));
     return found;
   }
-  // A surface page preview is a bar and a frame (RULE.DEVEX.WORKSPACE.535): the template's shape is all it is read for, never an arc's preview's.
+  // A surface preview is a bar and a frame (RULE.DEVEX.WORKSPACE.535): the template's shape is all it is read for, never an arc's preview's.
   if (isHtml && !fragment && isSurfacePreviewText(text)) return [...structural(path), ...uncutVersions(text), ...surfacePageShape(text), ...surfacePageCopy(path, text)];
   const isApproach = isApproachPage(path);
   const isOverview = path.endsWith("-overview.html");
@@ -1406,7 +1555,7 @@ export function check(path: string, text: string, fragment = false): Finding[] {
 
   if ((isApproach || isOverview) && !fragment) {
     if (!/who this is for|audience/i.test(text))
-      out.push(["BLOCK", "masthead names no audience — an artifact has no seat, so its content is decided by its audience (05-artifacts)"]);
+      out.push(["BLOCK", "masthead names no audience — an artifact has no seat, so its content is decided by its audience (05-pages)"]);
     const terms = /<section id="s0"[\s\S]*?<\/section>/.exec(text);
     if (terms) {
       const n = [...terms[0].matchAll(/<tr>/g)].length - 1;
@@ -1416,7 +1565,7 @@ export function check(path: string, text: string, fragment = false): Finding[] {
   if (isApproach) {
     if (!fragment) {
       const exempt = exemptWorkstream(path);
-      out.push(...approachShape(text, exempt));
+      out.push(...approachShape(text, exempt, inClosedWorkstream(path)));
       if (!exempt) out.push(...cyclesRule(path, text), ...headerRule(path, text));
       out.push(...figureRule(path, text));
     }
@@ -1432,15 +1581,24 @@ export function check(path: string, text: string, fragment = false): Finding[] {
     out.push(...workingDetail(path, text), ...partnerWords(path, text));
   }
   if (isHtml && itemCellPage(path) && !inClosedWorkstream(path)) out.push(...columnRule(text));
+  if (isHtml && !fragment && inPocket(path) && !inClosedWorkstream(path)) out.push(...sidebarRule(text));
   // A figure comes from a spec (RULE.DEVEX.WORKSPACE.523): one drawn by hand is named on every page and seat file this reads.
   out.push(...handDrawnRule(path, text));
   // A page of a repository's pocket, and a workstream's own pages (an approach page, a preview) while open.
-  if (isHtml && !fragment && (inPocket(path) || ((isApproach || /-?preview\.html$/.test(path)) && workstreamOf(path) !== null && !inClosedWorkstream(path))))
+  if (isHtml && !fragment && (inPocket(path) || ((isApproach || /(?:-?preview|arc)\.html$/.test(path)) && workstreamOf(path) !== null && !inClosedWorkstream(path))))
     out.push(...nameRule(text));
 
   // Where a paragraph, a list or a callout should have been a block: a page of a bounded kind, and a construct's seat file.
   const fit = isHtml ? fitKind(path) : (isSeatFile(path) ? "seat" : null);
-  if (fit && !fragment && !(isHtml && (inClosedWorkstream(path) || exemptWorkstream(path)))) out.push(...blockFit(text, isHtml, fit));
+  const judged = !(isHtml && (inClosedWorkstream(path) || exemptWorkstream(path)));
+  // The hook scores what it was handed, so a fragment gets the same block and figure hints as a whole page (RULE.DEVEX.WORKSPACE.548).
+  if (fit && judged) out.push(...blockFit(text, isHtml, fit));
+  if (!isHtml && fit && judged) out.push(...tableHintsOf(text).map((message): Finding => ["SOFT", message]));
+  // A command a page shows is one the command line accepts today (RULE.DEVEX.WORKSPACE.557).
+  if ((fit || (isHtml && inPocket(path))) && judged) out.push(...shownCommandFindings(text).map((message): Finding => ["SOFT", message]));
+  // Every HTML page of the pocket and of an arc's notes starts from a docs template (RULE.DEVEX.WORKSPACE.554).
+  if (isHtml && !fragment && startsFromTemplate(path)) out.push(...templateFrameFindings(text));
+  if (isHtml) out.push(...publicLinkFindings(path, text));
 
   const sents = sentences(prose);
   if (!fragment || sents.length >= 5) out.push(...voice(prose, sents, kindOf(path), isOperative(path)));
@@ -1452,11 +1610,56 @@ export function check(path: string, text: string, fragment = false): Finding[] {
   return out;
 }
 
+/**
+ * A public page links only inside `public/` or out of the repository, never into `private/` and never to a `.md` seat file (RULE.DEVEX.WORKSPACE.555).
+ * A link with a scheme, a fragment and a `mailto:` leave the repository, so they are not read. Each finding names the link and what to do instead.
+ */
+export function publicLinkFindings(path: string, text: string): Finding[] {
+  if (visibilityOf(path) !== "public" || !path.endsWith(".html")) return [];
+  const out: Finding[] = [];
+  const seen = new Set<string>();
+  for (const found of text.replace(/<!--[\s\S]*?-->/g, " ").replace(/<(script|style)\b[\s\S]*?<\/\1>/gi, " ").matchAll(/<a\b[^>]*?\bhref="([^"#]+)/gi)) {
+    const href = found[1].replace(/[?].*$/, "");
+    if (/^(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(href) || seen.has(href)) continue;
+    seen.add(href);
+    if (/\.md$/i.test(href)) out.push(["RULE", `a public page links the seat file \`${href}\` — link the built page, or the file's address on github.com, read from the repository's git remote (RULE.DEVEX.WORKSPACE.555)`]);
+    else if (visibilityOf(resolve(dirname(path), href)) === "private") out.push(["RULE", `a public page links into private/, \`${href}\` — public/ is self-contained: link inside public/ or out of the repository (RULE.DEVEX.WORKSPACE.555)`]);
+  }
+  return out;
+}
+
+/** A page directly in one half of the artifacts pocket. */
+const POCKET_HALF_PAGE = new RegExp(`\\/${POCKET.artifacts}\\/(?:${VISIBILITY.public}|${VISIBILITY.private})\\/[^/]+\\.html$`);
+
+/** A page that owes a docs template's frame: a page of the artifacts pocket, or one of an arc's own notes, never a sample, a view of the work or a template. */
+export function startsFromTemplate(path: string): boolean {
+  const norm = slashes(path);
+  if (/\/(?:samples|work|templates|surface)\//.test(norm) || norm.endsWith(BUNDLED_SUFFIX)) return false;
+  if (inPocket(path) || POCKET_HALF_PAGE.test(norm)) return true;
+  return /\/notes\/(?:N\d+|ideate|follow-ups)\/[^/]+\.html$/.test(norm) && !inClosedWorkstream(path);
+}
+
 /** A page of a repository's artifacts pocket, other than its index. */
 const inPocket = (path: string): boolean => {
   const parts = slashes(path).split("/");
   return parts.includes(POCKET.artifacts) && parts.includes("docs") && basename(path) !== "index.html";
 };
+
+/**
+ * 05-pages.md: a page whose sidebar lists other pages is the index of artifacts, built from the index template, and no other
+ * page has a sidebar of its own. A page of the artifacts pocket other than the index (it holds no `index-data` block) that holds a `<nav>`
+ * linking to two or more other pages draws a finding. The page's own rail, `sds-rail`, holds its outline and the way back, and is not read.
+ */
+export function sidebarRule(text: string): Finding[] {
+  if (/id="index-data"/.test(text)) return [];
+  const sidebars = [...text.matchAll(/<nav\b([^>]*)>([\s\S]*?)<\/nav>/gi)]
+    .filter(([, attrs]) => !/\bclass="[^"]*\bsds-rail\b/.test(attrs) && !/\bid="rail"/.test(attrs))
+    .filter(([, , inside]) => [...inside.matchAll(/<a\b[^>]*\bhref="([^"#][^"]*)"/gi)].filter(([, href]) => !/^[a-z][a-z0-9+.-]*:/i.test(href)).length >= 2);
+  return sidebars.length
+    ? [["RULE", `this page holds a sidebar of links to other pages. Only the index of artifacts has one, built from \`${TEMPLATES}/${DOCS}/pages/index-template.html\` ` +
+      "with each entry a page; a page that lists pages becomes an index of its own, or links its pages in a catalog (05-pages.md, the block table)"]]
+    : [];
+}
 
 /** The words a list shows: tags dropped, entities read, and the part before a heading's dash. */
 const shown = (html: string): string => html.replace(/<span class="sds-number">[\s\S]*?<\/span>/g, "").replace(/<[^>]+>/g, "").replace(/&mdash;/g, "—").replace(/&amp;/g, "&")
@@ -1466,7 +1669,7 @@ const counted = (name: string): number => name.split(/\s+/).filter((one) => /[\p
 const NAME_LIMIT = 3;
 
 /**
- * 05-artifacts.md § The header and § What an overview and a hub hold: a page's short name, the block's `title`, is
+ * 05-pages.md § The header and § What an overview and a hub hold: a page's short name, the block's `title`, is
  * at most three words and never a sentence (RULE.DEVEX.WORKSPACE.517), and each heading the page's rail shows, a
  * section's `h2` and every `h3` with an id, reads as a name of at most three words before its dash
  * (RULE.DEVEX.WORKSPACE.518). Both are read in a list, where a sentence cannot be told from its neighbours.
@@ -1475,15 +1678,21 @@ export function nameRule(text: string): Finding[] {
   const out: Finding[] = [];
   const block = /<!--\s*spn:doc\s*(\{[\s\S]*?\})\s*-->/.exec(text);
   let title = "";
-  if (block) { try { title = String((JSON.parse(block[1]) as { title?: unknown }).title ?? ""); } catch { title = ""; } }
-  // A workstream's number in front of its page's name is an address, not a word of the name: `040 - Hiring Demo Ready`.
-  title = title.replace(/^\d{3}\s*(?:·\s*\S+\s*)?-\s+/, "");
+  if (block) {
+    try {
+      const parsed = JSON.parse(block[1]) as { title?: unknown; name?: unknown };
+      title = String((typeof parsed.name === "string" && parsed.name.trim() ? parsed.name : parsed.title) ?? "");
+    } catch { title = ""; }
+  }
+  // The number in front of a numbered name is an address, not a word of the name: `041 Improvements`, `N018 Docs tooling`, `03 Surface Types`
+  // (and `040 - Hiring Demo Ready`, as the pages written before it).
+  title = title.replace(/^(?:\d{2,3}|N\d{3})\s*(?:·\s*\S+\s*)?-\s+/, "").replace(/^(?:\d{2,3}|N\d{3})\s+(?=\S)/, "");
   // A fourth word is kept for one fixed term that breaks if cut, so four words warn and five refuse.
   const grade = (n: number): "RULE" | "SOFT" => (n > NAME_LIMIT + 1 ? "RULE" : "SOFT");
   if (title && !/\{\{/.test(title) && (counted(title) > NAME_LIMIT || /[.?!:]$/.test(title)))
     out.push([/[.?!:]$/.test(title) ? "RULE" : grade(counted(title)), `the page's name "${title}" is ${counted(title)} words or reads as a sentence — RULE.DEVEX.WORKSPACE.517: a short ` +
       "name is at most three words, a fourth only for one fixed term that breaks if cut, and the `<h1>` carries the promise · name the page in the words it uses for its subject"]);
-  // The rail reads a section's first h2, wherever it sits inside it, and every h3 with an id (sds-docs.js).
+  // The rail reads a section's first h2, wherever it sits inside it, and every h3 with an id (docs-page.js).
   const heads = [...text.matchAll(/<section id="[^"]+"[^>]*>(?:(?!<section\b|<\/section>)[\s\S])*?<h2[^>]*>([\s\S]*?)<\/h2>/g), ...text.matchAll(/<h3 id="[^"]+"[^>]*>([\s\S]*?)<\/h3>/g)]
     .map((found) => shown(found[1])).filter((name) => name && !/\{\{/.test(name));
   const long = heads.filter((name) => counted(name) > NAME_LIMIT);
@@ -1501,7 +1710,7 @@ export function nameRule(text: string): Finding[] {
  * and 233 (`where-tree.ts`). A page in a closed workstream, and any other file, return none.
  */
 export function pageRulesOnDisk(path: string): string[] {
-  const isPreview = /(?:^|[\\/])(?:[^\\/]*-)?preview\.html$/.test(path);
+  const isPreview = /(?:^|[\\/])(?:(?:[^\\/]*-)?preview|arc)\.html$/.test(path);
   if (!path.endsWith(".html") || !(isPreview || isApproachPage(path))) return [];
   const home = workstreamOf(path);
   if (!home || inClosedWorkstream(path) || exemptWorkstream(path)) return [];
@@ -1558,7 +1767,7 @@ export function itemCellPage(path: string): boolean {
   if (isApproachPage(path) || base === HUB) return true;
   if (/-(overview|construct)\.html$/.test(base)) return true;
   // An arc's preview, by its fixed name in `notes/<arc>/` (`N<nnn>`, `ideate` or `follow-ups`), or a preview outside any workstream.
-  return new RegExp(`[\\\\/]notes[\\\\/]${ARC_PART}[\\\\/]preview\\.html$`).test(path) || /-preview\.html$/.test(base);
+  return new RegExp(`[\\\\/]notes[\\\\/]${ARC_PART}[\\\\/](?:arc|preview)\\.html$`).test(path) || /-preview\.html$/.test(base);
 }
 
 /**

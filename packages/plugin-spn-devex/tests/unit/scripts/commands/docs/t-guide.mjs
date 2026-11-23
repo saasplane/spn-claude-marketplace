@@ -26,7 +26,7 @@ const same = (label, got, want) => ok(label, JSON.stringify(got) === JSON.string
 const STYLES = join(BASE, "styles");
 mkdirSync(STYLES);
 writeFileSync(join(STYLES, "versions.json"), JSON.stringify({ "1.0.0": {}, "1.10.0": {}, "1.2.0": {} }));
-// Each cut version has the hash of each served file, as `docs sds cut` records them.
+// Each cut version has the hash of each served file, as `docs styles cut` records them.
 const HASHES = Object.fromEntries(["1.0.0", "1.10.0", "1.2.0"].map((version) => [version,
   { "sds-docs.css": `sha384-css${version}`, "sds-docs.js": `sha384-js${version}`, "sds-index.js": `sha384-index${version}` }]));
 writeFileSync(join(STYLES, "integrity.json"), JSON.stringify(HASHES));
@@ -45,7 +45,7 @@ const WRITE_USAGE = "usage: spn-devex docs guide write <guide.md…> [--name <na
 const USAGE = `${CHECK_USAGE}\n${WRITE_USAGE.replace("usage: ", "       ")}`;
 
 const GUIDES = `${DOCS}/${SEAT.guides}`;
-const PAGES = `${DOCS}/${POCKET.artifacts}/${ARTIFACT.guides}`;
+const PAGES = `${DOCS}/${POCKET.artifacts}/public/${ARTIFACT.guides}`;
 
 let made = 0;
 /** A repository under the scratch folder, from a map of path to text. Its manifest names it Sample. */
@@ -159,7 +159,7 @@ After the last step the service is down again.
   ok("a link to a construct's seat file points at that construct's page, from the page's own place",
     text.includes(`<a href="../${ARTIFACT.docs}/01-core/${CONSTRUCT_PAGES}/thing-construct.html">the model</a>`), each(text, /(<a [^>]*>)/g).join(" "));
   ok("a link to another file is written again against the page's own place, and keeps its anchor",
-    text.includes('<a href="../../README.md#the-map">the face</a>') && text.includes(`<a href="../../${SEAT.guides}/02-build.md">Build</a>`));
+    text.includes('<a href="../../../README.md#the-map">the face</a>') && text.includes(`<a href="../../../${SEAT.guides}/02-build.md">Build</a>`));
   ok("a repository with no hub gives the page no way back, and not a link to the index",
     !text.includes("sds-home") && !text.includes("../index.html"), each(text, /(<a [^>]*sds-home[^>]*>)/g).join(" "));
   const lines = linesFor(NEWEST, undefined, HASHES[NEWEST]);
@@ -169,7 +169,7 @@ After the last step the service is down again.
     text.includes(`href="${STYLES_ADDRESS}${NEWEST}/sds-docs.css" integrity="${HASHES[NEWEST]["sds-docs.css"]}" crossorigin="anonymous"`)
       && text.includes(`src="${STYLES_ADDRESS}${NEWEST}/sds-docs.js" integrity="${HASHES[NEWEST]["sds-docs.js"]}" crossorigin="anonymous"`));
   ok("the header says the workspace, the repository's declared name and the guide, then the type and the audience",
-    text.includes('<span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Sample &nbsp;|&nbsp; Getting Started</span>')
+    /<span class="sds-line1">SaaS Plane &middot; (?:<a href="[^"]*">)?Sample(?:<\/a>)? &middot; Getting Started<\/span>/.test(text)
       && text.includes('<span class="sds-badge sds-type">Guide</span>')
       && text.includes('<span class="sds-audience"><span class="sds-badge sds-lens">Backend developer</span><span class="sds-badge sds-lens">Quality engineer</span></span>'));
   ok("the title is on the tab, in the rail and in the masthead, and the summary is the description",
@@ -477,17 +477,17 @@ tool run
     first.code === 1 && first.out.includes("no page has been produced here yet. Run `docs guide write`") && unchanged(), first.out);
 
   const templates = join(BASE, "templates-before");
-  mkdirSync(join(templates, "pages"), { recursive: true });
-  writeFileSync(join(templates, "pages", "guide-template.html"), "<title>Guide</title>\n<style>.step{}</style>\n<div class=\"page guide\"></div>\n");
+  mkdirSync(join(templates, "docs", "pages"), { recursive: true });
+  writeFileSync(join(templates, "docs", "pages", "guide-template.html"), "<title>Guide</title>\n<style>.step{}</style>\n<div class=\"page guide\"></div>\n");
   const refused = guide(["write", join(root, GUIDES, "01-getting-started.md")], { SPN_TEMPLATES: templates });
   ok("a template that links no shared stylesheet is refused in the one wording, and no page is written",
     refused.code === 1 && refused.out.includes(OWN_COPY) && unchanged(), refused.out);
 
   // A template with a slot this command does not know is not filled by a guess.
-  const real = readFileSync(join(environment.SPN_TEMPLATES, "pages", "guide-template.html"), "utf8");
+  const real = readFileSync(join(environment.SPN_TEMPLATES, "docs", "pages", "guide-template.html"), "utf8");
   const changed = join(BASE, "templates-changed");
-  mkdirSync(join(changed, "pages"), { recursive: true });
-  writeFileSync(join(changed, "pages", "guide-template.html"), real.replace("<h1>{{NAME}}</h1>", "<h1>{{NAME}}</h1>\n  <p>{{A NEW SLOT}}</p>"));
+  mkdirSync(join(changed, "docs", "pages"), { recursive: true });
+  writeFileSync(join(changed, "docs", "pages", "guide-template.html"), real.replace("<h1>{{TITLE}}</h1>", "<h1>{{TITLE}}</h1>\n  <p>{{A NEW SLOT}}</p>"));
   const slot = guide(["write", join(root, GUIDES, "01-getting-started.md")], { SPN_TEMPLATES: changed });
   ok("a template with a slot the command does not fill is refused, and the slot is named",
     slot.code === 1 && slot.out.includes("{{A NEW SLOT}}") && unchanged(), slot.out);
@@ -497,11 +497,11 @@ console.log("\n=== a guide goes back to the hub of its repository, one step up t
 {
   const hub = `<!-- spn:doc\n{"id":"hub","variant":"overview","title":"The Hub &amp; More","lenses":["LEAD"],"summary":"s"}\n-->\n<h1>x</h1>\n`;
   const root = repo({ [`${GUIDES}/01-getting-started.md`]: TABLE_GUIDE, [`${GUIDES}/02-build.md`]: "# Build\n",
-    [`${DOCS}/README.md`]: "# Docs\n", [`${DOCS}/${POCKET.artifacts}/${ARTIFACT.docs}/concept-overview.html`]: hub });
+    [`${DOCS}/README.md`]: "# Docs\n", [`${DOCS}/${POCKET.artifacts}/public/${ARTIFACT.docs}/concept-overview.html`]: hub });
   const ran = guide(["write", join(root, GUIDES, "01-getting-started.md")]);
   const text = read(root, `${PAGES}/getting-started-guide.html`);
   ok("the way back opens the hub, a page, named by the repository", ran.code === 0
-    && text.includes(`<a class="sds-home" href="../docs/concept-overview.html">&larr; ${basename(root)}</a>`), ran.out + each(text, /(<a [^>]*sds-home[^>]*>)/g).join(" "));
+    && text.includes('&middot; <a href="../docs/concept-overview.html">Sample</a> &middot;') && !text.includes("sds-crumb"), ran.out + each(text, /(<a [^>]*sds-home[^>]*>)/g).join(" "));
   ok("and it is not the index, and it keeps the page inside its own tab", !text.includes("../index.html") && !text.includes('target="_top"'));
   ok("the page is current against what the command writes now", guide(["check", join(root, GUIDES, "01-getting-started.md")]).code === 0);
 }

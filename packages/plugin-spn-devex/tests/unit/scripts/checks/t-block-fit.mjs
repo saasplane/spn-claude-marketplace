@@ -7,7 +7,7 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const HERE = resolve(import.meta.dirname, "..", "..", "..", "..");
-const { blockFit, fitKind, BOUNDS } = await import(pathToFileURL(resolve(HERE, "src", "scripts", "lib", "block-fit.ts")).href);
+const { blockFit, fitKind, BOUNDS, templateFrameFindings, holdsTemplateFrame } = await import(pathToFileURL(resolve(HERE, "src", "scripts", "lib", "block-fit.ts")).href);
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -74,6 +74,28 @@ ok("[RULE.DEVEX.WORKSPACE.531] a preview, an approach page and an overview have 
   fitKind("/r/.spndevex/workstreams/open/041-x/notes/N001/preview.html") === "preview" && fitKind("/r/x/041-approach.html") === "approach"
   && fitKind("/r/docs/artifacts/docs/a-overview.html") === "overview" && fitKind("/r/docs/artifacts/docs/a-construct.html") === null && fitKind("/r/docs/04-capabilities/a.md") === null);
 
+console.log("=== hand-written card blocks (RULE.DEVEX.WORKSPACE.549)");
+const tiles = (attrs, tile, heads) => `<div class="sds-tiles"${attrs}>${heads.map((h) => `<div class="sds-tile"${tile}><h4>${h}</h4><p>one line</p><dl class="sds-tile-facts"><div><dt>Key</dt><dd>value</dd></div></dl></div>`).join("")}</div>`;
+const written = ' data-layout="GRID"', facts = ' data-facts="1"';
+ok("[RULE.DEVEX.WORKSPACE.549] red: an sds-tiles block whose item headings read as conditions is a soft finding naming the item",
+  sayHtml(tiles(written, facts, ["how ideas connect", "Reach"])).some((m) => m.includes('"how ideas connect"') && m.includes("a first column of conditions is a table (rule 549)")));
+ok("[RULE.DEVEX.WORKSPACE.549] red: a heading that opens on a digit reads as a condition",
+  sayHtml(tiles(written, facts, ["3 steps in a row"])).some((m) => m.includes("reads as a condition")));
+ok("[RULE.DEVEX.WORKSPACE.549] green: named things in the writer's markup are silent",
+  sayHtml(tiles(written, facts, ["Reach", "Voice", "The Voice Check"])).length === 0);
+ok("[RULE.DEVEX.WORKSPACE.549] red: tiles with facts in a block without the writer's attributes is a soft finding",
+  sayHtml(tiles("", "", ["Reach"])).includes("this card block is hand-written without the writer's attributes, so its rows will not line up: use a table, or the writer's markup"));
+ok("[RULE.DEVEX.WORKSPACE.549] red: a GRID block whose tile lacks data-facts is the same finding",
+  sayHtml(tiles(written, "", ["Reach"])).some((m) => m.includes("hand-written without the writer's attributes")));
+ok("[RULE.DEVEX.WORKSPACE.549] green: tiles with no facts and no attributes are silent",
+  sayHtml('<div class="sds-tiles"><div class="sds-tile"><h4>Reach</h4><p>one line</p></div></div>').length === 0);
+ok("[RULE.DEVEX.WORKSPACE.549] red: facts whose values are phrases read as description and are folded into the line",
+  sayHtml(`<div class="sds-tiles" data-layout="LIST"><div class="sds-tile"><div class="sds-tile-body"><h4>Rail</h4><p>a rail</p>\n<dl class="sds-tile-facts"><div><dt>Width</dt><dd>on the right, from three sections</dd></div></dl></div></div></div>`).some((m) => m.includes("these facts read as description") && m.includes("(rule 549)")));
+ok("[RULE.DEVEX.WORKSPACE.549] red: a fact holding a quoted message says make it a quote, and not also fold it",
+  (() => { const m = sayHtml(`<div class="sds-tiles" data-layout="LIST"><div class="sds-tile"><div class="sds-tile-body"><h4>Block</h4><p>a line</p>\n<dl class="sds-tile-facts"><div><dt>Says</dt><dd>&ldquo;a table of six rows reads as a catalog&rdquo;</dd></div></dl></div></div></div>`); return m.some((x) => x.includes("make it a quote")) && !m.some((x) => x.includes("read as description")); })());
+ok("[RULE.DEVEX.WORKSPACE.549] green: short values as facts are silent",
+  !sayHtml(tiles(' data-layout="LIST"', "", ["Reach"])).some((m) => m.includes("read as description")));
+
 console.log("=== the hook reads a construct's seat file");
 const WORK = realpathSync(mkdtempSync(join(tmpdir(), "block-fit-")));
 process.on("exit", () => rmSync(WORK, { recursive: true, force: true }));
@@ -88,6 +110,49 @@ const hooked = run("# Thing\n\nA platform runs on backing services that hold sta
 ok("[RULE.DEVEX.WORKSPACE.530] red: the doc-check hook names the paragraph that lists on a construct's seat file", hooked.includes("parallel items"), hooked.slice(0, 300));
 const clean = run("# Thing\n\n- a database\n- a cache\n- a queue\n- object storage\n");
 ok("[RULE.DEVEX.WORKSPACE.530] green: the known-good twin, as a list, is silent on that finding", !clean.includes("parallel items"), clean.slice(0, 300));
+
+console.log("=== a tree on a hand-written page (RULE.DEVEX.WORKSPACE.238)");
+const TREE = "notes/\n  N018/\n    preview.html   the arc's preview\n    samples/\n      index.html";
+const BARE = "this block is a tree: mark it `<pre data-lang=\"tree\">` so the script colours it (rule 238)";
+ok("[RULE.DEVEX.WORKSPACE.238] red: a bare pre that reads as a tree is a soft finding with the exact message", blockFit(html(`<pre>${TREE}</pre>`), true, "preview").some(([sev, m]) => sev === "SOFT" && m === BARE));
+ok("[RULE.DEVEX.WORKSPACE.238] green: the same tree marked data-lang=\"tree\" is silent", sayHtml(`<pre data-lang="tree">${TREE}</pre>`).length === 0);
+ok("[RULE.DEVEX.WORKSPACE.238] green: a pre of code is no tree", sayHtml(`<pre>const a = 1;\nconst b = 2;</pre>`).length === 0);
+
+
+console.log("=== a figure beside the passage that calls for it, and matching it (RULE.DEVEX.WORKSPACE.548)");
+const FIG = (labels) => "```dg\n" + JSON.stringify({ kind: "chain", title: "t", caption: "c", boxes: labels.map((label, at) => ({ id: `b${at}`, label })) }) + "\n```";
+const STEPS = "A seat file is read by the page writer → drawn as a page → read by the check → listed by the index. The reader then opens it.";
+ok("[MKT.HOOKS.530] red: a paragraph with three arrows and no dg figure says what kind of figure to add", say(STEPS).some((m) => m.includes("a learner would see this faster as a chain: add a dg figure beside it") && m.includes("548")), JSON.stringify(say(STEPS)));
+ok("[MKT.HOOKS.530] green: the same paragraph with a dg fence in its section is silent on that", !say(`${STEPS}\n\n${FIG(["Seat file", "Page writer", "Page", "Check", "Index"])}`).some((m) => m.includes("add a dg figure")));
+ok("[MKT.HOOKS.530] red: a numbered list of three steps and no figure is flagged", say("1. Write the contract.\n2. Regenerate the validators.\n3. Write the service.").some((m) => m.includes("add a dg figure")));
+ok("[MKT.HOOKS.530] green: a paragraph of two steps is silent", !say("The writer draws the page, then the check reads it.").some((m) => m.includes("add a dg figure")));
+ok("[MKT.HOOKS.530] red: a sequence passage names a sequence", say("The client asks the server for a token. The server answers with one. The client then asks again → the server answers → done → ok.").some((m) => m.includes("as a sequence")));
+ok("[MKT.HOOKS.530] red: a figure whose box the section's prose never names is flagged with that label", say(`The writer draws the page and the check reads it.\n\n${FIG(["Writer", "Page", "Unicorn"])}`).some((m) => m.includes("the figure names Unicorn, which the passage does not")));
+ok("[MKT.HOOKS.530] green: a figure whose boxes the prose names is silent", say(`The writer draws the page and the check reads it.\n\n${FIG(["Writer", "Page", "Check"])}`).length === 0, JSON.stringify(say(`The writer draws the page and the check reads it.\n\n${FIG(["Writer", "Page", "Check"])}`)));
+ok("[MKT.HOOKS.530] green: a skeleton figure is never matched against the prose", say("A screen.\n\n```dg\n{\"kind\":\"skeleton\",\"frame\":{\"label\":\"Zzz\"}}\n```").length === 0);
+ok("[MKT.HOOKS.530] every figure hint is SOFT", blockFit(md(STEPS), false, "seat").every(([sev]) => sev === "SOFT"));
+
+console.log("=== a page with no template's frame (RULE.DEVEX.WORKSPACE.554)");
+const FRAMED = '<div class="sds-page"><div class="sds-wrap"><header class="sds-masthead"><h1>x</h1></header></div></div>';
+ok("[MKT.HOOKS.529] red: a bare page is a finding that names the page template", templateFrameFindings("<p>hi</p>").some(([sev, m]) => sev === "RULE" && m.includes("page-template.html") && m.includes("554")));
+ok("[MKT.HOOKS.529] green: .sds-page with .sds-wrap and .sds-masthead is a frame", holdsTemplateFrame(FRAMED) && templateFrameFindings(FRAMED).length === 0);
+ok("[MKT.HOOKS.529] green: the index template's index-data is a frame", holdsTemplateFrame('<script type="application/json" id="index-data">{}</script>'));
+ok("[MKT.HOOKS.529] red: .sds-page without .sds-masthead is no frame", !holdsTemplateFrame('<div class="sds-page"><div class="sds-wrap"></div></div>'));
+ok("[MKT.HOOKS.529] green: a frame named only inside a comment is no frame", !holdsTemplateFrame(`<!-- ${FRAMED} --><p>x</p>`));
+
+console.log("=== a list of links to other pages is a `cards` block (rule 549)");
+{
+  const DOORS = "these items are doors to other pages: a `cards` block (rule 549)";
+  ok("red: a list of two links to other pages is a SOFT hint to use cards", sayHtml('<ul><li><a href="a.html">The first path</a></li><li><a href="b.html">The second path</a></li></ul>', "overview").includes(DOORS));
+  ok("red: an item that names the link after a label is still a door", sayHtml('<ul><li>New here <a href="a.html">the day-zero walk</a></li><li>Building <a href="b.html">the path</a></li></ul>', "hub").includes(DOORS));
+  ok("green: links to anchors of the same page are a list of contents, silent", !sayHtml('<ul><li><a href="#one">One</a></li><li><a href="#two">Two</a></li></ul>').includes(DOORS));
+  ok("green: a list with one door among plain items is silent", !sayHtml('<ul><li>a plain item with several words in it</li><li><a href="b.html">The second path</a></li></ul>').includes(DOORS));
+  ok("green: a link that is a small part of a long item is silent", !sayHtml('<ul><li>This item says a good deal more than it links, in many words, <a href="a.html">see</a></li><li>And so does this item, in as many words as the first, <a href="b.html">here</a></li></ul>').includes(DOORS));
+  ok("green: a single link is no list of doors", !sayHtml('<ul><li><a href="a.html">The first path</a></li></ul>').includes(DOORS));
+  ok("red: a markdown list of two links to other pages is the same hint", say("- [The first path](a.md)\n- [The second path](b.md)").includes(DOORS));
+  ok("green: a markdown list of anchors is silent", !say("- [One](#one)\n- [Two](#two)").includes(DOORS));
+  ok("the hint is SOFT", blockFit(html('<ul><li><a href="a.html">The first path</a></li><li><a href="b.html">The second path</a></li></ul>'), true, "overview").every(([severity]) => severity === "SOFT"));
+}
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-block-fit` : `\n  all ${total} passed — t-block-fit`);
 process.exit(failed ? 1 : 0);

@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The coverage report — written, built and proved
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § The coverage report — written, built and proved
 //           docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md § What a Where row declares
 //           docs/04-capabilities/02-support/02-apps/10-providers/ts/03-structure.md § What a Where Row May Name
 //           docs/registers/decisions.md RULE.DEVEX.WORKSPACE.191
@@ -24,14 +24,15 @@ import { withOffset } from "../../lib/clock.ts";
 import { FLAG, OPTIONAL, onePath, readWords, repositoryOf, scopeOf, under } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { DOCS, behaviorsDir, reportsDir, slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { read } from "../../../../../plugin-support-lib/src/lib/runs.ts";
-import { measure as measureTests, nodesOf, TESTS_REPORT } from "../behaviours/coverage.ts";
+import { measure as measureTests, nodesOf, testsReportOf } from "../behaviours/coverage.ts";
 import {
   NEVER_READ, builtAmong, constructKeyOf, domainName, domainOf, domainOfKey, domainsOf, entriesOf, isDir, kindOf,
   readChapters, whereRoot, whyNotBuilt, type Chapter, type Seat, type StatedNotBuilt,
 } from "./_join.ts";
 
 /** Where the coverage report lands in a repository's pocket, named by its kind (RULE.DEVEX.WORKSPACE.149). */
-export const COVERAGE_REPORT = join(reportsDir(DOCS), "coverage-report.html");
+/** The coverage report's path in the repository at `root`, read from that repository's own pocket layout and never the folder the command runs in. */
+export const coverageReportOf = (root: string): string => slashes(relative(root, join(reportsDir(join(root, DOCS)), "coverage-report.html")));
 
 const digestOf = (value: unknown): string =>
   `sha256:${createHash("sha256").update(JSON.stringify(value)).digest("hex").slice(0, 16)}`;
@@ -186,7 +187,7 @@ export function measure(root: string): Record<string, unknown> {
   };
   const isProved = (row: { status: string | null }): boolean => row.status === "SUCCESS";
 
-  // A MANUAL row counts in none of the numbers (05-artifacts.md § The coverage report): a person proves
+  // A MANUAL row counts in none of the numbers (05-pages.md § The coverage report): a person proves
   // it by the repository's browser guide and no run records it, so counted it would read as Not proved.
   // Each level lists its own as `manual` instead.
   const counted = tests.rows.filter((row) => row.status !== "MANUAL");
@@ -301,15 +302,16 @@ export function measure(root: string): Record<string, unknown> {
     domains,
     wholeRepository,
     findings,
-    testsReport: { path: TESTS_REPORT, measuredAt: tests.measuredAt, digest: tests.digest },
+    testsReport: { path: testsReportOf(root), measuredAt: tests.measuredAt, digest: tests.digest },
   };
   const digest = digestOf(measured);
-  const page = read(join(root, COVERAGE_REPORT));
+  const coverageReport = coverageReportOf(root);
+  const page = read(join(root, coverageReport));
   return {
     ...measured,
     measuredAt: withOffset(new Date()),
     digest,
-    report: { path: COVERAGE_REPORT, exists: page !== null, current: page !== null && page.includes(digest) },
+    report: { path: coverageReport, exists: page !== null, current: page !== null && page.includes(digest) },
   };
 }
 

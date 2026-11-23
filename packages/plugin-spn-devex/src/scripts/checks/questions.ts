@@ -90,7 +90,7 @@ export function cardsDiffer(ws: string, records: readonly Question[] = readQuest
     try { text = readFileSync(join(ws, rel), "utf8"); } catch { out.push(`${rel} is named by a card's \`shownIn\` and is not there`); continue; }
     const isApproach = approach !== null && resolve(join(ws, rel)) === resolve(approach);
     const cards = cardsOn(text).filter((card) => card.inBlock);
-    const name = basename(rel) === "preview.html" ? rel : basename(rel);
+    const name = basename(rel) === "preview.html" || basename(rel) === "arc.html" ? rel : basename(rel);
     for (const card of cards) {
       const record = byId.get(card.id);
       if (!record) { out.push(`${name}'s ${cardName(card.id)} has no record`); continue; }
@@ -194,7 +194,7 @@ function judged(path: string): string | null {
   const ws = workstreamAround(path);
   if (!ws || !isDataLayout(ws)) return null;
   const name = basename(path);
-  if (name === "approach.html" || new RegExp(`/notes/${ARC_ID.source.slice(1, -1)}/preview\\.html$`).test(resolve(path).split("\\").join("/"))) return ws;
+  if (name === "approach.html" || new RegExp(`/notes/${ARC_ID.source.slice(1, -1)}/(?:arc|preview)\\.html$`).test(resolve(path).split("\\").join("/"))) return ws;
   return null;
 }
 

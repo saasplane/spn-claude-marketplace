@@ -1,0 +1,148 @@
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § The index of artifacts — one page that opens every other · § One stylesheet, served in versions
+     This file holds the structure of the index of a repository's artifacts and states no rule: the side with
+     its head card, its tree, the folded column's group marks, the bar above the frame, the frame, the block of data that holds the tree, and the lines that load the shared stylesheet
+     and the index's script. `docs index` writes the tree from the pages on disk. The sections above state
+     every rule. -->
+<!-- Placeholders:
+     {{PAGE-LISTS}} What this page lists, in one sentence.
+     {{UP-HREF}} THE ADDRESS OF THE HUB: base, then the path of the hub
+     {{BASE-PATH}} BASE: the path from this page to the pages, ending in a slash. It is empty when this page sits in docs/artifacts.
+     {{PATH-BASE}} PATH: from base to the page. The hub sits in docs/.
+     {{DOMAIN-HAS}} DOMAIN: it has one overview, so it opens that overview
+     {{OVERVIEW-TITLE}} OVERVIEW: its title
+     {{PATH-BASE-2}} PATH: from base to the page. An overview sits in docs/, in the folder of its domain.
+     {{CONSTRUCT-TITLE}} CONSTRUCT: its title
+     {{PATH-BASE-3}} PATH: from base to the page. A construct sits in the constructs/ folder of its domain.
+     {{DOMAIN-HAS-2}} DOMAIN: it has more than one overview, so it is a folder
+     {{PATH-BASE-4}} PATH: from base to the page.
+     {{PATH-BASE-5}} PATH: from base to the page. A report sits in reports/. -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Index Template</title>
+<!-- spn:doc
+{"id": "{{slug}}", "variant": "index", "title": "{{NAME}}", "summary": "{{PAGE-LISTS}}"}
+-->
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-z6T3Ju/mWAnv24wb8AFXMHYMyXMd5U/g7N2hA3X1uCys4Ty2Yy7TcMXWe+SMPck0" crossorigin="anonymous">
+<div class="sds-index" id="index">
+  <aside class="sds-index-side" id="index-side">
+    <div class="sds-rail-head">
+      <a class="sds-rail-brand" href="index.html" title="Open the first page of {{NAME OF THE REPOSITORY}}" aria-label="Open the first page of {{NAME OF THE REPOSITORY}}">
+        <span class="sds-rail-mark"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg></span>
+        <span class="sds-rail-words"><span class="sds-rail-name">{{NAME OF THE REPOSITORY}}</span><span class="sds-rail-place">{{WORKSPACE}} · {{REPOSITORY}}</span></span>
+      </a>
+      <button type="button" class="sds-index-toggle" id="index-toggle" aria-expanded="true" aria-controls="index-tree" aria-label="Show or hide the tree of pages" title="Hide the tree"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg></button>
+    </div>
+    <nav class="sds-tree" id="index-tree" aria-label="Pages"></nav>
+    <div class="sds-rail-marks" id="index-marks" aria-label="Groups of pages"></div>
+    <noscript><p class="sds-index-note">This index needs its script to list the pages. Start at <a href="{{UP-HREF}}">the hub</a>.</p></noscript>
+  </aside>
+  <main class="sds-index-main">
+    <div class="sds-pagebar" id="index-bar" aria-label="The page on screen"></div>
+    <div class="sds-panes" id="index-panes"></div>
+  </main>
+</div>
+
+<!-- THE TREE. THE BUILD WRITES THIS BLOCK FROM THE PAGES ON DISK. NOBODY TYPES IT. The short tree below shows
+     its shape and no more. A folder has `label` and `children`. A page has `label`, `kind` and `path`, and
+     it is listed by its own name. `kind` is kept for a reader of the data, and the tree does not show it.
+     THE GROUPS are Docs, Guides and Reports, in that order. The build leaves out a group that holds nothing,
+     so a real page shows Guides or Reports only when the repository has one. All three are kept here, so
+     the shape is shown. A group may also carry a `note`, which is one line shown under its pages.
+     AN AREA is a folder. Where a repository has no areas, its domains sit under Docs.
+     A DOMAIN WITH ONE OVERVIEW carries that overview's `path`. Its `label` is the domain's name, and its
+     `title` is the overview's own, which names it in the bar. Its `children` are the constructs of the domain. The
+     script shows it as a group of the domain's name whose first page is the overview, named Overview, because a
+     row does one thing: a group row folds, a page row opens.
+     A DOMAIN WITH MORE THAN ONE OVERVIEW is a folder. Each overview is an entry under it, by its own name,
+     and its `children` are the constructs it links, which the build reads from the page.
+     A construct that no overview of its domain links comes last in its domain.
+     The build marks each domain `folded`, so it starts closed. No domain is marked here, so the whole short
+     tree is seen.
+     `base` is the one slot here that a person fills: it is the one place the path to the pages is kept. The
+     real index sits at docs/artifacts/index.html, and there `base` is empty. An entry whose address still
+     holds a slot shows a note that says the page is a slot, and nothing is loaded. -->
+<script type="application/json" id="index-data">
+{
+ "base": "{{BASE-PATH}}",
+ "groups": [
+  {
+   "label": "Docs",
+   "children": [
+    {
+     "label": "{{HUB: its title}}",
+     "kind": "overview",
+     "path": "{{PATH-BASE}}"
+    },
+    {
+     "label": "{{AREA}}",
+     "children": [
+      {
+       "label": "{{DOMAIN-HAS}}",
+       "title": "{{OVERVIEW-TITLE}}",
+       "kind": "overview",
+       "path": "{{PATH-BASE-2}}",
+       "children": [
+        {
+         "label": "{{CONSTRUCT-TITLE}}",
+         "kind": "construct",
+         "path": "{{PATH-BASE-3}}"
+        }
+       ]
+      },
+      {
+       "label": "{{DOMAIN-HAS-2}}",
+       "children": [
+        {
+         "label": "{{OVERVIEW-TITLE}}",
+         "kind": "overview",
+         "path": "{{PATH-BASE-2}}",
+         "children": [
+          {
+           "label": "{{CONSTRUCT-TITLE}}",
+           "kind": "construct",
+           "path": "{{PATH-BASE-3}}"
+          }
+         ]
+        },
+        {
+         "label": "{{OVERVIEW-TITLE}}",
+         "kind": "overview",
+         "path": "{{PATH-BASE-2}}",
+         "children": [
+          {
+           "label": "{{CONSTRUCT-TITLE}}",
+           "kind": "construct",
+           "path": "{{PATH-BASE-3}}"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "label": "Guides",
+   "children": [
+    {
+     "label": "{{GUIDE: its title}}",
+     "kind": "guide",
+     "path": "{{PATH-BASE-4}}"
+    }
+   ]
+  },
+  {
+   "label": "Reports",
+   "children": [
+    {
+     "label": "{{REPORT: its title}}",
+     "kind": "report",
+     "path": "{{PATH-BASE-5}}"
+    }
+   ]
+  }
+ ]
+}
+</script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-index.js" integrity="sha384-/Ihb9dw88rr3gp69NAKJjvEtZiRZcO4ymq+9NaynOC6axp6Sv2c/RjpU5IH3m0b9" crossorigin="anonymous"></script>

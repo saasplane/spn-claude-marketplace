@@ -4,7 +4,7 @@
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/06-architecture-components.md",
       "section": "The choice table",
-      "seen": "8a8293c3"
+      "seen": "15f17128"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/04-plugins.md",
@@ -58,7 +58,7 @@ With the Figma connector in the window, the skill draws the tree in Figma (`skil
 
 ## 2. Draw a mock without Figma
 
-Run the `design` skill to its tree, then its mock step, `skills/design/steps/mock.md`. The mock is the tree drawn as skeletons: the facts first, one skeleton for each page in the order a person meets them, drawn once with its errors in place and its other states in words, and a flow file that orders the pages. A mock names units and never their props. The skeleton's own rules are in route 1's `standards-patterns.md`, under *The specs a screen starts from*.
+Run the `design` skill to its tree, then its mock step, `skills/design/steps/mock.md`. The mock is the tree drawn without Figma, a unit the design system builds drawn by the render and a skeleton, marked planned, only for a unit, variant or page shape not built yet: the facts first, one skeleton for each page in the order a person meets them, drawn once with its errors in place and its other states in words, and a flow file that orders the pages. A mock names units and never their props. The skeleton's own rules are in route 1's `standards-patterns.md`, under *The specs a screen starts from*.
 
 ## 3. Build a screen
 

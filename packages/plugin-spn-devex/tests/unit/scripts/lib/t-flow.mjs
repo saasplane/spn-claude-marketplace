@@ -1,4 +1,4 @@
-// `lib/flow.ts` — a flow file read against the specs it names (05-artifacts.md § A flow file orders a flow's pages).
+// `lib/flow.ts` — a flow file read against the specs it names (07-figures.md § A flow file orders a flow's pages).
 // Each finding the chapter names is proven twice: a file that holds it is named, and the clean file is not.
 import { readFlow } from "../../../../src/scripts/lib/flow.ts";
 

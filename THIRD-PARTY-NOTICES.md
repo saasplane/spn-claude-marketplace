@@ -6,7 +6,7 @@ This repository includes the following third-party component. It keeps its own l
 
 - Version: 4.3.3
 - Licence: MIT
-- Where it ships: built into `public/assets/docs/<version>/sds-docs.css` and `packages/plugin-spn-devex/src/styles/sds-docs.css`, each of which keeps Tailwind's own banner.
+- Where it ships: built into `public/assets/docs/<version>/docs-language.css` and `packages/plugin-spn-devex/src/styles/docs-language.css`, each of which keeps Tailwind's own banner.
 - Source of the notice: `node_modules/tailwindcss/LICENSE`
 
 ```

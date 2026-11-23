@@ -29,7 +29,10 @@
 // touch is another window's work (`withoutDoNotTouch`).
 //
 // THE DEVELOPER'S WORDS FOR PRESENCE are read on every prompt (`hearDeveloper`): away, watching, back, and "stay" for the
-// window check; the stamp it leaves is the time of the last message (`lib/presence.ts`).
+// window check; the stamp it leaves is the time of the last message (`lib/presence.ts`). It hears only the developer: a prompt the
+// harness delivers (`deliveredPrompt`: a helper's report, another session's message, a compaction summary) sets nothing, stamps
+// nothing and is not read for "stay". A developer message that flips AWAY back to PRESENT brings one line (`backLine`): grants
+// given while away have lapsed.
 //
 // A handover names its workstream by the folder or by the number: `025-partner-web, N011` and
 // `025 · N011` name the same workstream, because a number is never given to a second workstream. A
@@ -48,7 +51,7 @@ import { begin, end, span, tagsOf } from "../../../../plugin-support-lib/src/lib
 import { WORKSTREAM_NAME, handoverLines } from "./stop.ts";
 import { ARC_AFTER, ARC_PART, opensWithWorkstream, workstreamFolder, workstreamOfNumber, workstreamsOfLine } from "../lib/handover-continue.ts";
 import { bindNamed, bindVisited, noteStay, readWindow, windowSet } from "../lib/window.ts";
-import { nextState, presenceWords, readNode, stampMessage, staysInWindow, writeState } from "../lib/presence.ts";
+import { clockLine, deliveredPrompt, nextState, presenceWords, readNode, stampMessage, staysInWindow, writeState } from "../lib/presence.ts";
 /** An arc as a handover text writes it: `N011`, `ideate` or `follow-ups`, not inside a longer word or a folder name. */
 const ARC_NAME = new RegExp(`(?<![\\w-])(?:${ARC_PART})(?![\\w-])`);
 import { goStandings } from "./orientation.ts";
@@ -251,19 +254,30 @@ export function readRecord(file: string): SessionName | null {
   } catch { return null; }
 }
 
+/** What the agent is told when the developer comes back from AWAY: the grants given while away are over. */
+export const BACK_LINE = "The developer is back. Any grant given while they were away (never ask, no new window, run unattended, fastest) has lapsed: " +
+  "say what happened while they were away first, then ask again where a question is open.";
+
 /**
  * The developer's words for presence and for staying, read on every prompt: AWAY or WATCHING set by their words, AWAY flipped
  * back to PRESENT by any message without them, "stay" kept in the window's note, and the message stamped for the silence read.
- * Never throws: a window that cannot hear this is read by silence alone.
+ * A prompt the harness delivers is not the developer's message and sets nothing. Returns the line for a return from AWAY (the
+ * welcome-back clock line first where the gap was a night), or "" otherwise. Never throws: a window that cannot hear this is read by silence alone.
  */
-export function hearDeveloper(root: string, session: string, prompt: string): void {
+export function hearDeveloper(root: string, session: string, prompt: string): string {
+  if (deliveredPrompt(prompt)) return "";
+  let back = "";
   try {
     const current = readNode(root)?.state ?? "PRESENT";
     const next = nextState(current, prompt);
+    // The welcome is read before this message stamps the clock: the gap it measures is the time away.
+    const welcome = current === "AWAY" && next === "PRESENT" ? clockLine(root, null) : null;
     if (next !== current) writeState(root, next, presenceWords(prompt) ? prompt.trim().slice(0, 80) : null);
+    if (current === "AWAY" && next === "PRESENT") back = `${welcome?.catchUp ? `${welcome.line} ` : ""}${BACK_LINE}`;
   } catch { /* no state file to write: the words set nothing */ }
   try { if (staysInWindow(prompt)) noteStay(root, session); } catch { /* the offer lines are muted by a note that is missing */ }
   stampMessage(root, session);
+  return back;
 }
 
 /**
@@ -283,14 +297,14 @@ export function answerFor(payload: Payload, start: string): string {
     for (const bound of bindingsOf(prompt, root, session)) bindNamed(root, session, bound.name, bound.by);
     for (const visited of [...citedOf(prompt, root), ...alsoOpenOf(prompt, root)]) bindVisited(root, session, visited);
   } catch { /* a binding that cannot be written is a window that hears less */ }
-  hearDeveloper(root, session, prompt);
+  const back = hearDeveloper(root, session, prompt);
   const areas = areasOf(prompt);
   const areaFile = areasFile(root, session);
   if (areaFile) {
     try { mkdirSync(dirname(areaFile), { recursive: true }); writeFileSync(areaFile, JSON.stringify(areas), "utf8"); } catch { /* a window that cannot keep them is checked without them */ }
   }
   // The mid-run reminder leads: while a go runs, what a message changes is read first.
-  const reminder = [midRunReminder(root, windowSet(root, session)), areaReminder(areas)].filter(Boolean).join("\n\n");
+  const reminder = [back, midRunReminder(root, windowSet(root, session)), areaReminder(areas)].filter(Boolean).join("\n\n");
   const file = recordFile(root, session);
   let give = file ? nameToGive(sessionName(prompt, root), readRecord(file)) : null;
   if (file && give) {
@@ -304,7 +318,7 @@ export function answerFor(payload: Payload, start: string): string {
 const AREAS: Array<AreaViews & { pattern: RegExp }> = [
   { area: "a site page", views: ["UX", "UI", "VOICE", "MARKETING"], skill: "spn-surface:design",
     pattern: /\b(?:site|website|web ?page|landing|home ?page|topic page|launchpad|www)\b/i },
-  { area: "docs", views: ["VOICE"], skill: "spn-devex:spn-prose-rewriter",
+  { area: "docs", views: ["VOICE"], skill: "spn-devex:spn-prose-rewriter or spn-devex:spn-block-rewriter",
     pattern: /\b(?:docs?|chapter|the book|guide|readme|wording|words)\b/i },
   { area: "apps code", views: ["ARCHITECT", "SERVER_DEV", "WEB_DEV"], skill: "spn-apps:implement",
     pattern: /\b(?:service|endpoint|contract|module|screen|component|header|queue|listener|migration|api)\b/i },

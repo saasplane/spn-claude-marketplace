@@ -63,7 +63,7 @@ export function notesTreeRefusal(path: string, makesFolder = false): string | nu
   if (kind === (folder ? "folder" : "file")) return null;
   const arc = basename(arcDir);
   const home = kind ? wrongKind(entry, kind) : strayHome(entry, folder);
-  return `Denied: this write makes \`${NOTES}/${arc}/${entry}${folder ? "/" : ""}\`, and an arc's notes folder holds \`preview.html\`, ` +
+  return `Denied: this write makes \`${NOTES}/${arc}/${entry}${folder ? "/" : ""}\`, and an arc's notes folder holds \`arc.html\`, ` +
     `\`samples/\`, \`plan.md\`, \`orders/\`, \`scripts/\` and \`work/\`, and nothing else (01-workstream.md § An arc carries its specification, ` +
     `or names the note that holds it; RULE.DEVEX.WORKSPACE.262). It belongs in ${home}.`;
 }

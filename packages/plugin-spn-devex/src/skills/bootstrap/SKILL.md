@@ -69,8 +69,8 @@ Ask the layout data's `questions`, one at a time: the path, the workspace's name
     N001/ … N006/                   the decide-only arcs, each opened from the layout data
     follow-ups/                     one workstream per module after the go, the design language rounds, the cloud walk
   notes/
-    ideate/preview.html             the Ground, the flow round by round, the read-back
-    N001/ … N006/preview.html       each arc's tree of where it lands
+    ideate/arc.html                 the Ground, the flow round by round, the read-back
+    N001/ … N006/arc.html       each arc's tree of where it lands
 ```
 
 Write these in order, before the founder is asked anything more (`RULE.DEVEX.FUNCTION.108` · MUST · skill:spn-devex/bootstrap):
@@ -85,7 +85,7 @@ Write these in order, before the founder is asked anything more (`RULE.DEVEX.FUN
 
    Every other section is written `PENDING` with its Needed and its Waits on. The command prints one `arc edit` line for each arc of the layout data.
 4. **The arcs**, by the lines it printed, each with `{NNN}` in place of `<workstream>`. Each `--note` says the layout opened it, which is the ideate arc's proposal (`RULE.DEVEX.WORKSPACE.539` · MUST · skill:spn-devex/bootstrap). None of them is empty, because every section names what it waits on.
-5. **The previews.** The ideate preview holds the Ground table and the flow round by round, each section with Known, Needed and Waits on; each arc's preview holds its tree of where it lands, each leaf `— not yet decided`. Copy `approach-preview-template.html` for each and take out every slot they do not fill.
+5. **The previews.** The ideate preview holds the Ground table and the flow round by round, each section with Known, Needed and Waits on; each arc's preview holds its tree of where it lands, each leaf `— not yet decided`. Copy `arc-template.html` for each and take out every slot they do not fill.
 6. **The Plan rows and the stamps**: `spn-devex docs cycles write {NNN}`, then `spn-devex workstream arc stamp write {NNN}/<arc>` for each arc. `spn-devex workstream state check {NNN}` then reads no finding.
 
 **The layout is read-only.** The rounds, sections, views and arcs come from the data, never from you; a change to them is a change to the book and the plugins (`RULE.DEVEX.WORKSPACE.540` · MUST · skill:spn-devex/bootstrap). A part that does not apply is struck, not deleted.

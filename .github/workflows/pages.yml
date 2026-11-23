@@ -4,7 +4,7 @@
 # Serves `public/` as this repository's GitHub Pages site, so a page can link one version of the shared
 # stylesheet by its address:
 #
-#     https://saasplane.github.io/spn-claude-marketplace/assets/docs/<version>/sds-docs.css
+#     https://saasplane.github.io/spn-claude-marketplace/assets/docs/<version>/docs-language.css
 #
 # IT RUNS ON A PUSH TO `develop`, the branch a plugin is installed from, so the files a page links come
 # from the same commit as the plugin a partner installs. A version's folder never changes once it is
@@ -14,7 +14,7 @@
 # which branch may deploy, and it allows these two. A branch added here deploys only once that
 # environment allows it too: Settings, Environments, github-pages, Deployment branches.
 #
-# IT BUILDS NOTHING. `public/` is committed as it is served: `spn-devex docs sds cut <version>` writes a
+# IT BUILDS NOTHING. `public/` is committed as it is served: `spn-devex docs styles cut <version>` writes a
 # version's folder, and this workflow uploads the folder.
 name: pages
 

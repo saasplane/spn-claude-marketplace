@@ -10,33 +10,33 @@ description: Write one of the five reports on a repository — coverage (how muc
       "seen": "f9709d35"
     },
     {
-      "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/05-report.md",
-      "seen": "81706a25"
+      "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/05-docs-pages.md",
+      "seen": "422c982c"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "section": "The masthead, and the opening",
       "seen": "b8b710da"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "section": "Reports and templates",
-      "seen": "767752d2"
+      "seen": "8fe55314"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "section": "The header — two lines, six fields, produced from the block",
-      "seen": "e2b67f2c"
+      "seen": "de0e2c56"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "section": "Nothing is published unless the developer asks",
-      "seen": "cd38f32f"
+      "seen": "ca82b47a"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "section": "A page is written in two passes",
-      "seen": "3cff544c"
+      "seen": "b428fcc6"
     }
   ]
 }
@@ -72,22 +72,24 @@ The block names the type with one `SPDocReportType` value: `COVERAGE` · `TESTS`
 
 ## Where it lands, and how it is handed over
 
-`<repository>/docs/artifacts/reports/<type>-report.html` — `coverage-report.html`, `tests-report.html`, `audit-report.html`, `code-report.html`, `docs-report.html`. **Each is replaced in place** by the next report of its type. A report kept because the moment mattered, such as an incident, is dated in its filename and never overwritten.
+`<repository>/docs/artifacts/private/reports/<type>-report.html` — `coverage-report.html`, `tests-report.html`, `audit-report.html`, `code-report.html`, `docs-report.html`. **Each is replaced in place** by the next report of its type. A report kept because the moment mattered, such as an incident, is dated in its filename and never overwritten. **Where the repository's pocket still holds `docs/artifacts/reports/` directly, write there and say so in one line:** the rewrite pass moves it to `private/reports/`, and nobody moves it by hand. A report may link into `public/`, and no public page links into a report (RULE.DEVEX.WORKSPACE.555, .556).
 
 **Never publish a report unless the developer asks** (`RULE.DEVEX.WORKSPACE.117` · MUST · check:publish). Hand it over as the **full path** to the file, which the developer opens in a browser. A publishing tool's own default to publish without being asked does not apply. When the developer does ask, the file stays the source, and you hand the URL back with the full path beside it.
 
-**You publish the bundled copy, never the stored page** (`RULE.DEVEX.WORKSPACE.215` · MUST · check:publish). The publishing host does not load the shared stylesheet, so a page that links it arrives with no styling. Run `spn-devex docs sds bundle <page>`, which writes `<page>.bundled.html` beside the page with the styles inside it, and publish that copy. The check before a publish refuses a page that links a stylesheet from outside. Send the bundled copy as well to a reader who has no network.
+**You publish the bundled copy, never the stored page** (`RULE.DEVEX.WORKSPACE.215` · MUST · check:publish). The publishing host does not load the shared stylesheet, so a page that links it arrives with no styling. Run `spn-devex docs styles bundle <page>`, which writes `<page>.bundled.html` beside the page with the styles inside it, and publish that copy. The check before a publish refuses a page that links a stylesheet from outside. Send the bundled copy as well to a reader who has no network.
 
 - **The artifacts folder is earned.** A repository that has never had a page written has no `docs/artifacts/`; writing the first report creates it. Nested folders are allowed there, and they carry no `README.md`.
 - **A report is not an approach document.** An approach page argues a design and lives in its workstream folder; the `ideate` skill writes it. If what you are writing weighs options and chooses one, it is not a report.
 
 ## Copy the template, then fill it
 
-**Start from `refs/devex/workspace/docs/templates/pages/report-template.html`.** It holds only the page's structure — its sections with their ids, the slots you fill, and the two lines that load the shared stylesheet and script — and no rule (`RULE.DEVEX.WORKSPACE.182` · MUST · check:doc-check). Every rule for filling it is in this skill.
+**Start from `refs/devex/workspace/docs/templates/docs/pages/report-template.html`.** It holds only the page's structure — its sections with their ids, the slots you fill, and the two lines that load the shared stylesheet and script — and no rule (`RULE.DEVEX.WORKSPACE.182` · MUST · check:doc-check). Every rule for filling it is in this skill.
 
-**Write a report in two passes, the text first and the blocks second** (`RULE.DEVEX.WORKSPACE.533` · MUST · skill:spn-devex/ideate). Write each section's text in plain sentences first, then give each part the block that shows it best from [`refs/devex/workspace/docs/blocks.md`](../../refs/devex/workspace/docs/blocks.md). A report's paragraphs hold the bound of an explaining page, 120 words beside another block and 200 alone (`RULE.DEVEX.WORKSPACE.531` · MUST · check:doc-check), and `spn-devex docs audit` names, as a SOFT `fit` finding, a paragraph that should have been a list, a table or a numbered list.
+**Write the page by the runbook:** a page the developer will open is written by [`refs/devex/workspace/docs/writing-a-page.md`](../../refs/devex/workspace/docs/writing-a-page.md): pick the template, start it with `docs page write` or `docs page new`, fill every slot and section, check, look, hand on (RULE.DEVEX.WORKSPACE.560).
 
-**The page you write links the shared files, and holds no copy of them** (`RULE.DEVEX.WORKSPACE.214` · MUST · check:doc-check). The copy keeps the template's two lines: one links one version of `sds-docs.css` by its address, and the other loads `sds-docs.js` from the same version. The stylesheet gives the report its forms in both themes. The script shows the Generated time and builds the outline. A report needs no style of its own: every form it uses is in the shared stylesheet. A `style` attribute stays only where the template has one, such as the width of a column.
+**Write a report in two passes, the text first and the blocks second** (`RULE.DEVEX.WORKSPACE.533` · MUST · skill:spn-devex/ideate). A report's blocks and figures follow the blocks ref, and the doc-check hook's hints on what was written (a table that reads as a catalog, a passage that calls for a figure, a figure that does not match, a command that is gone) are acted on before the report is finished. Write each section's text in plain sentences first, then give each part the block that shows it best from [`refs/devex/workspace/docs/blocks.md` and `refs/devex/workspace/docs/figures.md`](../../refs/devex/workspace/docs/blocks.md). A report's paragraphs hold the bound of an explaining page, 120 words beside another block and 200 alone (`RULE.DEVEX.WORKSPACE.531` · MUST · check:doc-check), and `spn-devex docs audit` names, as a SOFT `fit` finding, a paragraph that should have been a list, a table or a numbered list.
+
+**The page you write links the shared files, and holds no copy of them** (`RULE.DEVEX.WORKSPACE.214` · MUST · check:doc-check). The copy keeps the template's two lines: one links one version of `docs-language.css` by its address, and the other loads `docs-page.js` from the same version. The stylesheet gives the report its forms in both themes. The script shows the Generated time and builds the outline. A report needs no style of its own: every form it uses is in the shared stylesheet. A `style` attribute stays only where the template has one, such as the width of a column.
 
 **Keep the template's class names, and every one opens with `sds-`** (`RULE.DEVEX.WORKSPACE.216` · GUIDE). A class the shared stylesheet does not hold has no form, so never invent one. A result takes one of the status classes: `sds-success`, `sds-warning` or `sds-error` (`RULE.DEVEX.WORKSPACE.217` · GUIDE).
 
@@ -313,7 +315,7 @@ Developers and leaders who have not learned the book's words read a report, so i
 1. **Confirm the report type and the repository.** If the request names no repository and the workspace holds more than one, ask — never infer from the last file touched.
 2. **Run the measuring commands** for the type, from a clean working tree, and keep what each printed. Record the commit you read.
 3. **Read the sources, not summaries of them.** The point of a report is the difference between what the tree contains and what the docs claim.
-4. **Copy the template** to `docs/artifacts/reports/<type>-report.html` and fill the header, then the five sections in order, from what you measured.
+4. **Copy the template** to `docs/artifacts/private/reports/<type>-report.html` and fill the header, then the five sections in order, from what you measured.
 5. **Set Decided by on every record**, by § Who decides, and write the Needs you cards.
 6. **Check the page**: `spn-devex docs audit check <the page>` reads clean, and every number on it traces to a Method row.
 7. **Hand it over as the full path.** Say the verdict in one line. Then open an arc for the records you may close, and raise the Needs you cards as `Q<n>` cards on its page. Publish nothing unless the developer asks.
@@ -330,7 +332,7 @@ Developers and leaders who have not learned the book's words read a report, so i
 
 ## What this skill never does
 
-- **Never write outside `docs/artifacts/reports/`.** A finding that belongs in a standard is a decision entry someone else makes.
+- **Never write outside `docs/artifacts/private/reports/`.** A finding that belongs in a standard is a decision entry someone else makes.
 - **Never generate on a schedule or a hunch.** On request only.
 - **Never leave two live copies of one type.** The report is replaced in place.
 - **Never fix what it finds.** The arc and the cards do that, after the report.

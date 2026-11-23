@@ -46,10 +46,10 @@ console.log("=== open: a block with one of the six things missing is refused");
   ok("[MKT.SCRIPTS.309] the number is recorded, and the other nodes of the state file are kept",
     json(join(root, ".spndevex", "state.json")).workstreams.lastNumber === 41 && json(join(root, ".spndevex", "state.json")).debug.telemetry === false);
   const page = existsSync(join(folder, "approach.html")) ? readFileSync(join(folder, "approach.html"), "utf8") : "";
-  ok("[MKT.SCRIPTS.309] the approach page is written from the block", page.includes("041 - Probe Reach") && page.includes(BLOCK.whyNow) && page.includes(BLOCK.limits) && page.includes(BLOCK.reaches), page.slice(0, 200));
-  ok("[MKT.SCRIPTS.402] the new page reads Why, What, How, Plan, Open, with the arcs table and the progress block in the Plan section after How",
+  ok("[MKT.SCRIPTS.309] the approach page is written from the block", page.includes("041 Probe Reach") && page.includes(BLOCK.whyNow) && page.includes(BLOCK.limits) && page.includes(BLOCK.reaches), page.slice(0, 200));
+  ok("[MKT.SCRIPTS.402] the new page reads Why, What, Plan, How, Open, with the arcs table and the progress block in the Plan section between What and How",
     /<section id="arcs"[^>]*>\s*<div class="sds-section-head"><h2>Plan<\/h2><\/div>[\s\S]*<table>[\s\S]*spn:generated progress[\s\S]*<\/section>/.test(page) && !page.includes("<h3 id=\"h9\">Cycles")
-      && page.indexOf("<h2>How</h2>") < page.indexOf("<h2>Plan</h2>") && page.indexOf("<h2>Plan</h2>") < page.indexOf("<h2>Open"), page.slice(page.indexOf("<h2>How")));
+      && page.indexOf("<h2>What</h2>") < page.indexOf("<h2>Plan</h2>") && page.indexOf("<h2>Plan</h2>") < page.indexOf("<h2>How</h2>") && page.indexOf("<h2>How</h2>") < page.indexOf("<h2>Open"), page.slice(page.indexOf("<h2>Plan")));
   const arc = join(folder, "arcs", "ideate");
   ok("[MKT.SCRIPTS.483] the ideate arc is opened for what the developer wants to see first, with the title, subject and goal N001 had", existsSync(join(arc, "state.json")) && json(join(arc, "state.json")).title === BLOCK.seeFirst
     && json(join(arc, "state.json")).subject === BLOCK.subject && json(join(arc, "state.json")).goal === BLOCK.seeFirst);

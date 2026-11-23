@@ -18,8 +18,8 @@ import { STORED_STATUSES, raisedSuggestions } from "../../checks/arc-status.ts";
 import { stepRowFindings } from "../../checks/workstream-state.ts";
 import { mapOrderOf } from "../../lib/go-plan.ts";
 import {
-  NOTES, PREVIEW_FILE, approachOf, arcDataDir, arcIdsOf, arcStamp, arcStatus, doneOf, everDecided, logEvent, logLinesOf, newArc, nextBuildArc, notesDirOf, previewFromTemplate, previewHrefOf, previewOf,
-  previewPathFault, proposedLines, readArc, readJsonl, restamped, sheetFileOf, stampsOn, suggestionsFileOf, whatEntryOf, whatId, withEntryLink, withWhatEntry, workspaceOf, writeArc, writeJsonl, writeWhole,
+  NOTES, ARC_FILE, arcPageNameOf, approachOf, arcDataDir, arcIdsOf, arcStamp, arcStatus, doneOf, everDecided, logEvent, logLinesOf, newArc, nextBuildArc, notesDirOf, previewFromTemplate, previewHrefOf, previewOf,
+  previewPathFault, proposedLines, readArc, readJsonl, restamped, sheetFileOf, stampsOn, suggestionsFileOf, whatEntryOf, whatId, holdsArcEntries, withEntryLink, withWhatEntry, workspaceOf, writeArc, writeJsonl, writeWhole,
 } from "../../lib/workstream.ts";
 import { isFile } from "../../lib/payload.ts";
 import { candidatesAt, precedentFor, wordsOf } from "../../lib/precedent.ts";
@@ -95,7 +95,7 @@ function header(data: ArcData, words: Words): string[] {
   const preview = words.value("preview");
   if (preview !== null) {
     const fault = previewPathFault(preview);
-    if (fault) throw new UsageFault(`takes \`--preview\` as the path from the workstream folder to the arc's preview, such as \`../030-next/notes/N002/${PREVIEW_FILE}\`: \`${preview}\` ${fault}.`);
+    if (fault) throw new UsageFault(`takes \`--preview\` as the path from the workstream folder to the arc's preview, such as \`../030-next/notes/N002/${ARC_FILE}\`: \`${preview}\` ${fault}.`);
     if (data.preview !== preview) { data.preview = preview; changed.push("preview"); }
   }
   const status = words.value("status");
@@ -166,7 +166,7 @@ function raisedGuard(ws: string, arc: string, was: string, words: Words): void {
 }
 
 /** What one run of the page pieces did: each piece of an arc's opening, written or kept. */
-type Pieces = { preview: "written" | "kept" | "elsewhere"; entry: "written" | "anchored" | "kept"; where: string; cycles: "written" | "stamped" | "kept" };
+type Pieces = { preview: "written" | "kept" | "elsewhere"; entry: "written" | "anchored" | "kept" | "none"; where: string; cycles: "written" | "stamped" | "kept" };
 
 /** What a repair did, in the words the line carries: the pieces written first, then the ones kept; one word where nothing was missing. */
 function repairedWords(pieces: Pieces, arc: string): string[] {
@@ -175,22 +175,22 @@ function repairedWords(pieces: Pieces, arc: string): string[] {
   const kept: string[] = [];
   (pieces.preview === "written" ? done : kept).push(pieces.preview === "written" ? "preview written from the template"
     : pieces.preview === "elsewhere" ? "preview not found where its field names it" : "preview kept");
-  (pieces.entry === "kept" ? kept : done).push(pieces.entry === "kept" ? "What entry kept" : entry);
+  if (pieces.entry !== "none") (pieces.entry === "kept" ? kept : done).push(pieces.entry === "kept" ? "What entry kept" : entry);
   (pieces.cycles === "kept" ? kept : done).push(`Plan row ${pieces.cycles === "kept" ? "kept" : pieces.cycles === "written" ? "written and stamped" : "stamped"}`);
   return done.length ? [...done, ...kept] : ["whole: nothing written"];
 }
 
 /** The detail lines under an opening's one line: where each piece went, as the preview draws them. */
-function openingLines(data: ArcData, pieces: Pieces): string[] {
+function openingLines(ws: string, data: ArcData, pieces: Pieces): string[] {
   const arc = data.arc;
-  const href = previewHrefOf(arc, data);
+  const href = previewHrefOf(arc, data, ws);
   const rows: Array<[string, string]> = [
     [`arcs/${arc}/state.json`, `written, with its log line and its name file, ${data.subject}.md`],
-    [href, pieces.preview === "written" ? `written from the template: the masthead, the ${arcStatus(data)} badge, the back link to #${whatId(arc)}, four sections to fill`
+    [href, pieces.preview === "written" ? `written from the template: the masthead, the ${arcStatus(data)} badge, the back link to #${arc}, four sections to fill`
       : pieces.preview === "kept" ? "kept" : "not found where the arc's preview field names it"],
-    ["approach.html · What", pieces.entry === "kept" ? `#${whatId(arc)} kept`
+    ...(pieces.entry === "none" ? [] : [["approach.html · What", pieces.entry === "kept" ? `#${whatId(arc)} kept`
       : pieces.entry === "anchored" ? `#${whatId(arc)} ${pieces.where}`
-      : `#${whatId(arc)} written ${pieces.where}: the title, the goal, and the link to ${href}`],
+      : `#${whatId(arc)} written ${pieces.where}: the title, the goal, and the link to ${href}`] as [string, string]]),
     ["approach.html · Plan", `row ${arc} ${pieces.cycles === "kept" ? "kept" : "written and stamped"}, its preview linked`],
   ];
   return rows.map(([label, text]) => `  ${label.padEnd(27)}${text}`);
@@ -201,8 +201,14 @@ function foresee(ws: string, data: ArcData, under: string | null): void {
   const page = approachOf(ws);
   if (!page) throw new UsageFault(`finds no approach page beside ${data.arc}'s workstream to write its What entry and its Plan row in.`);
   const text = readFileSync(page, "utf8");
-  if (under !== null || whatEntryOf(text, data.arc) === null) typed(() => withWhatEntry(text, data, under));
+  if (under !== null || wantsEntry(text, data.arc)) typed(() => withWhatEntry(text, data, under));
 }
+
+/**
+ * Whether the arc's What entry is owed: only a page that still tells What by arc has one, and a page told by construct is addressed by
+ * its Plan row, `approach.html#<arc>`, which the arc's opening writes. An entry the page holds is never written twice.
+ */
+const wantsEntry = (text: string, arc: string): boolean => whatEntryOf(text, arc) === null && holdsArcEntries(text);
 
 /**
  * RULE.DEVEX.WORKSPACE.254: the three pieces an arc owes beside its data, each written only where it is missing, in the
@@ -216,12 +222,12 @@ function leavePageWhole(ws: string, data: ArcData, under: string | null): Pieces
   if (!page) throw new UsageFault(`finds no approach page beside ${data.arc}'s workstream to write its What entry and its Plan row in.`);
   const arc = data.arc;
   let text = readFileSync(page, "utf8");
-  const needsEntry = whatEntryOf(text, arc) === null;
+  const needsEntry = under !== null ? whatEntryOf(text, arc) === null : wantsEntry(text, arc);
   const entry = needsEntry ? typed(() => withWhatEntry(text, data, under)) : null;
-  const pieces: Pieces = { preview: "kept", entry: "kept", where: "", cycles: "kept" };
-  const previewPath = resolve(ws, previewHrefOf(arc, data));
+  const pieces: Pieces = { preview: "kept", entry: needsEntry || whatEntryOf(text, arc) !== null ? "kept" : "none", where: "", cycles: "kept" };
+  const previewPath = resolve(ws, previewHrefOf(arc, data, ws));
   if (!isFile(previewPath)) {
-    if (previewHrefOf(arc, data) === `${NOTES}/${arc}/${PREVIEW_FILE}`) {
+    if (previewHrefOf(arc, data, ws) === `${NOTES}/${arc}/${ARC_FILE}`) {
       typed(() => writeWhole(previewPath, previewFromTemplate(ws, { arc, subject: data.subject, title: data.title, status: arcStatus(data) })));
       pieces.preview = "written";
     } else pieces.preview = "elsewhere";
@@ -232,8 +238,8 @@ function leavePageWhole(ws: string, data: ArcData, under: string | null): Pieces
     pieces.where = entry.where;
   }
   const hadRow = stampsOn(text).get(arc);
-  if (pieces.entry !== "kept") writeFileSync(page, text, "utf8");
-  if (pieces.entry !== "kept" || pieces.preview === "written" || !hadRow) refreshViews(ws);
+  if (pieces.entry !== "kept" && pieces.entry !== "none") writeFileSync(page, text, "utf8");
+  if ((pieces.entry !== "kept" && pieces.entry !== "none") || pieces.preview === "written" || !hadRow) refreshViews(ws);
   const row = stampsOn(readFileSync(page, "utf8")).get(arc);
   if (row && !row.stamp) {
     const stamped = restamped(readFileSync(page, "utf8"), arc, arcStamp(data));
@@ -301,14 +307,14 @@ function edit(args: string[]): number {
     logEvent(ws, arc, "opened", null, note ? `opened as ${data.status} · ${note}` : `opened as ${data.status}`);
     said.push(`${arc} opened · ${data.status}${reviewFixes ? " · review fixes" : ""}`);
     opened = leavePageWhole(ws, data, under);
-    said.push("preview", "What entry", "Plan row");
+    said.push("preview", ...(opened.entry === "none" ? [] : ["What entry"]), "Plan row");
     if (data.carries?.length) said.push(...shapedWords(ws, data.carries));
     precedent.push(...rankedPrecedent(workspaceOf(), title, words.value("goal") ?? ""));
   } else {
     const was = data.status;
     raisedGuard(ws, arc, was, words);
     wordsGuard(arc, data, everDecided(data, logLinesOf(ws, arc)), words);
-    const oldHref = previewHrefOf(arc, data);
+    const oldHref = previewHrefOf(arc, data, ws);
     const changed = header(data, words);
     if (was === "PROPOSED" && data.status === "DECIDED") {
       const found = sheetFindings(ws, arc);
@@ -329,14 +335,14 @@ function edit(args: string[]): number {
     const page = approachOf(ws);
     if (previewMoved && page) {
       const text = readFileSync(page, "utf8");
-      const linked = withEntryLink(text, arc, oldHref, previewHrefOf(arc, data));
+      const linked = withEntryLink(text, arc, oldHref, previewHrefOf(arc, data, ws));
       if (linked !== text) writeFileSync(page, linked, "utf8");
     }
     if (repairs) repaired = leavePageWhole(ws, data, under);
     // A status line leads with the move, so the log says where the arc went, and the developer's words sit beside it.
     const move = changed.includes("status") ? `${was} → ${data.status}${data.reason ? ` · ${data.reason}` : ""}`
       : changed.includes("wait") ? `${data.status} · wait: ${data.wait}` : changed.includes("start") ? `${data.status} · started` : "";
-    const wrote = repaired ? [repaired.preview === "written" ? "preview" : "", repaired.entry !== "kept" ? "What entry" : "", repaired.cycles !== "kept" ? "Plan row" : ""].filter(Boolean) : [];
+    const wrote = repaired ? [repaired.preview === "written" ? "preview" : "", repaired.entry !== "kept" && repaired.entry !== "none" ? "What entry" : "", repaired.cycles !== "kept" ? "Plan row" : ""].filter(Boolean) : [];
     if (move || changed.length || note || wrote.length)
       logEvent(ws, arc, move ? "status" : changed.length || wrote.length ? "header" : "note", null,
         move ? (note ? `${move} · ${note}` : move) : note ?? (changed.length ? `changed ${changed.join(", ")}` : `wrote ${wrote.join(", ")}`));
@@ -353,7 +359,7 @@ function edit(args: string[]): number {
   const refreshed = refreshIfMoved(ws, before, previewMoved);
   const { done, total } = doneOf(data);
   console.log(`ok · ${bare ? arc : `${arc} ${done}/${total}`} · ${[...said, ...refreshed.said].join(" · ")}`);
-  if (opened) for (const line of openingLines(data, opened)) console.log(line);
+  if (opened) for (const line of openingLines(ws, data, opened)) console.log(line);
   for (const line of [...refreshed.lines, ...afterWrite(ws)]) console.log(line);
   for (const line of stepRowFindings(data, before.get(arc), mapOrderOf(workspaceOf()))) console.log(`note: ${line}`);
   if (goes) for (const line of previewProposals(ws, arc)) console.log(line);
@@ -374,7 +380,7 @@ function previewProposals(ws: string, arc: string): string[] {
   if (!found.length) return [];
   const shown = (words: string): string => (words.length > 110 ? `${words.slice(0, 107)}…` : words);
   return [`the preview still says proposed in ${found.length} line(s) — bring each current now the go is given, with its Open:`,
-    ...found.map((one) => `  ${NOTES}/${arc}/${PREVIEW_FILE}:${one.line}  ${shown(one.text)}`)];
+    ...found.map((one) => `  ${NOTES}/${arc}/${arcPageNameOf(ws, arc)}:${one.line}  ${shown(one.text)}`)];
 }
 
 function stamp(args: string[]): number {

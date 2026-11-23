@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The index of artifacts — one page that opens every other
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § The index of artifacts — one page that opens every other
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // The index of a repository's artifacts, produced from the pages on disk.
@@ -8,7 +8,7 @@
 //
 // AN ARC'S SAMPLES ARE INDEXED THE SAME WAY (RULE.DEVEX.WORKSPACE.520). A path that is an arc's `notes/<arc>/samples/` folder, or sits in it, is read as
 // the pocket: the pages under it become the tree, grouped by the folder each sits in (the folder is the purpose: `drawn-on-an-app`, `read-from-a-reference`),
-// and `write` writes `samples/index.html`, in the same frame as a repository's artifacts index.
+// and `write` writes `samples/index.html`, in the same frame as a repository's index page.
 //
 // A SUBJECT WITH TWO ACTIONS, AND A `tree` PATH. The path may be a repository, or any folder or file
 // inside one, and the command finds the repository from it. A repository has one index, so `write`
@@ -17,7 +17,7 @@
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { type Action, OPTIONAL, REQUIRED, VALUE, docsTreeOf, onePath, readWords, repositoryOf, scopeOf, under } from "../../../../../plugin-support-lib/src/lib/command.ts";
-import { ARTIFACT_INDEX, CONSTRUCT_PAGES, DOCS, OVERVIEW_PAGE_SUFFIX, POCKET, artifactDocsDir, artifactIndex, artifactsDir, docsOf,
+import { ARTIFACT, ARTIFACT_INDEX, CONSTRUCT_PAGES, DOCS, VISIBILITY, artifactsLayout, type Visibility, OVERVIEW_PAGE_SUFFIX, POCKET, artifactDocsDir, artifactIndex, artifactsDir, docsOf,
   domainConstructsDir, guidePagesDir, hubPage, isOverview, isProducedPage, reportsDir,
   slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { BUNDLED_SUFFIX, INDEX_SCRIPT } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
@@ -27,14 +27,12 @@ import { Refusal, attribute, escaped, newestCut,
 
 export const describe = "the index of a repository's artifacts, produced from the pages on disk";
 
-const TEMPLATE = "artifact-index-template.html";
+const TEMPLATE = "index-template.html";
 const OPTIONS = { out: VALUE };
 /** The artifacts pocket, as a message names it. */
 const POCKET_PATH = `${DOCS}/${POCKET.artifacts}`;
-/** The three groups of the tree, in their order. */
-const GROUPS = ["Docs", "Guides", "Reports"] as const;
-/** How many tabs the index keeps open. One more page takes the tab that was opened longest ago. */
-const TAB_LIMIT = 8;
+/** The groups of the tree, in their order. The public index holds the first three, and the private index the last. */
+const GROUPS = ["Docs", "Guides", "Surface", "Reports"] as const;
 /** The block of data that holds the tree, with the comment above it. */
 const DATA_BLOCK = /(?:<!--(?:(?!-->)[\s\S])*-->\s*)?<script type="application\/json" id="index-data">([\s\S]*?)<\/script>/;
 
@@ -47,7 +45,7 @@ export type TreeNode = {
   note?: string; beside?: boolean;
 };
 /** The data of an index: the path to the pages, the limit of tabs, and the groups. */
-export type Tree = { base: string; tabs: number; groups: TreeNode[] };
+export type Tree = { base: string; groups: TreeNode[] };
 
 /** What the index reads of one page: its text, its name, its kind, and the guide it was produced from. */
 type PageFacts = { text: string; title: string; kind: string; source: string | null };
@@ -67,7 +65,7 @@ function pagesUnder(folder: string): string[] {
   });
 }
 
-/** A page's name is the `title` of its block, and its `<title>` where it has no block. */
+/** A page's name is the `name` of its block, its `title` where it has none, and its `<title>` where it has no block. */
 function factsOf(file: string): PageFacts {
   const text = readFileSync(file, "utf8");
   let block: Record<string, unknown> = {};
@@ -75,7 +73,8 @@ function factsOf(file: string): PageFacts {
   if (found) { try { block = JSON.parse(found[1]) as Record<string, unknown>; } catch { block = {}; } }
   const stem = basename(file, ".html");
   const tab = /<title>([\s\S]*?)<\/title>/.exec(text)?.[1];
-  const title = typeof block.title === "string" && block.title ? block.title : (tab ? plainText(tab) : "") || stem;
+  // The entry is the page's short name: the block's `name`, or its `title` where it has none, or its `<title>`; a numbered name keeps its number, drawn plainly.
+  const title = typeof block.name === "string" && block.name.trim() ? block.name.trim() : typeof block.title === "string" && block.title ? block.title : (tab ? plainText(tab) : "") || stem;
   const kind = typeof block.variant === "string" && block.variant ? block.variant : stem.slice(stem.lastIndexOf("-") + 1);
   return { text, title, kind, source: typeof block.source === "string" ? block.source : null };
 }
@@ -89,9 +88,13 @@ export function entriesOf(node: TreeNode): TreeNode[] {
  * The groups of the tree, from the pages under one artifacts pocket, and what is worth saying about
  * them. Every page is placed once.
  */
-export function groupsOf(artifacts: string): { groups: TreeNode[]; pages: string[]; notes: Note[] } {
-  const docs = dirname(artifacts);
-  const files = pagesUnder(artifacts).filter((file) => file !== artifactIndex(docs));
+export function groupsOf(artifacts: string, half?: Visibility): { groups: TreeNode[]; pages: string[]; notes: Note[] } {
+  // `artifacts` is the folder the index lists: the pocket in the earlier layout, and `public/` or `private/` in the split one.
+  const docs = half ? dirname(dirname(artifacts)) : dirname(artifacts);
+  const surfaceRoot = join(artifacts, ARTIFACT.surface);
+  // A design language's samples home is the one page of `surface/` the index lists; the samples behind it open from it.
+  const files = pagesUnder(artifacts).filter((file) => file !== join(artifacts, ARTIFACT_INDEX) && file !== artifactIndex(docs)
+    && (!file.startsWith(surfaceRoot + sep) || (basename(file) === ARTIFACT_INDEX && dirname(dirname(file)) === surfaceRoot)));
   const facts = new Map(files.map((file): [string, PageFacts] => [file, factsOf(file)]));
   const notes: Note[] = [];
   const pathOf = (file: string): string => slashes(relative(artifacts, file));
@@ -99,8 +102,8 @@ export function groupsOf(artifacts: string): { groups: TreeNode[]; pages: string
   const under = (folder: string): string[] => files.filter((file) => file.startsWith(folder + sep));
   const direct = (folder: string): string[] => files.filter((file) => dirname(file) === folder);
 
-  const docsRoot = artifactDocsDir(docs);
-  const hub = files.find((file) => file === hubPage(docs)) ?? null;
+  const docsRoot = half ? join(artifacts, ARTIFACT.docs) : artifactDocsDir(docs);
+  const hub = files.find((file) => file === join(docsRoot, basename(hubPage(docs)))) ?? null;
   /** The overviews directly in one folder. The hub is not one of them. */
   const overviewsIn = (folder: string): string[] => direct(folder).filter((file) => file !== hub && isOverview(file));
   /** The construct pages of one folder: every page directly in its `constructs` folder. */
@@ -204,20 +207,21 @@ export function groupsOf(artifacts: string): { groups: TreeNode[]; pages: string
   const docsGroup: TreeNode[] = [...(hub ? [entry(hub)] : []), ...beside.map(entry),
     ...(existsSync(docsRoot) ? foldersIn(docsRoot) : []).filter(inTree).map(folderNode)];
   // GUIDES stand in the order of the guides they were produced from, and REPORTS in the order of their paths.
-  const guides = under(guidePagesDir(docs));
+  const guides = under(half ? join(artifacts, ARTIFACT.guides) : guidePagesDir(docs));
   const orderOf = (file: string): string => facts.get(file)!.source ?? pathOf(file);
   const guidesGroup = [...guides].sort((one, two) => byName(orderOf(one), orderOf(two))).map(entry);
-  const reports = under(reportsDir(docs));
+  const reports = under(half ? join(artifacts, ARTIFACT.reports) : reportsDir(docs));
   const reportsGroup = reports.map(entry);
+  const surfaceGroup = files.filter((file) => file.startsWith(surfaceRoot + sep)).map(entry);
 
   // EVERY PAGE ON DISK IS IN THE TREE ONCE. A page in a place the tree has no rule for comes last under Docs.
-  const placed = new Set([...docsGroup.flatMap(entriesOf), ...guidesGroup, ...reportsGroup].map((node) => node.path));
+  const placed = new Set([...docsGroup.flatMap(entriesOf), ...guidesGroup, ...surfaceGroup, ...reportsGroup].map((node) => node.path));
   for (const file of files.filter((one) => !placed.has(pathOf(one)))) {
     docsGroup.push(entry(file));
     notes.push({ grade: "SOFT", check: "index", file, message:
       "the tree has no place for a page that sits here, so it is listed last under Docs, by its own name" });
   }
-  const every = [docsGroup, guidesGroup, reportsGroup].map((children, at): TreeNode => ({ label: GROUPS[at], children }));
+  const every = [docsGroup, guidesGroup, surfaceGroup, reportsGroup].map((children, at): TreeNode => ({ label: GROUPS[at], children }));
   const groups = every.filter((group) => group.children!.length > 0);
   const counted = new Map<string, number>();
   for (const node of groups.flatMap(entriesOf)) counted.set(node.path!, (counted.get(node.path!) ?? 0) + 1);
@@ -227,7 +231,7 @@ export function groupsOf(artifacts: string): { groups: TreeNode[]; pages: string
   return { groups, pages: files, notes };
 }
 
-/** What an index says of itself in its head, where it is not a repository's artifacts index. */
+/** What an index says of itself in its head, where it is not a repository's index page. */
 type Headed = { tab: string; id: string; title: string; summary: string };
 
 /** The index page: the template's shell, with its head and its slots filled and its tree written. */
@@ -235,7 +239,7 @@ function indexPage(template: string, tree: Tree, where: { organisation: string; 
   const shell = withHead(template, {
     tab: headed?.tab ?? `${where.location} Artifacts`,
     block: { id: headed?.id ?? `${basename(where.repository)}-artifacts-index`, variant: "index", title: headed?.title ?? "Artifacts",
-      summary: headed?.summary ?? `Every page of this repository's ${POCKET_PATH}, in one tree, opened in tabs.` },
+      summary: headed?.summary ?? `Every page of this repository's ${POCKET_PATH}, in one tree, one page open at a time.` },
     produced: "Produced by `docs index` from the pages on disk. Never edit this page: produce it again.",
     version: newestCut(), script: INDEX_SCRIPT,
   });
@@ -244,8 +248,8 @@ function indexPage(template: string, tree: Tree, where: { organisation: string; 
   let around = `${shell.slice(0, data.index)}\u0000${shell.slice(data.index + data[0].length)}`;
   around = swap(around, /\{\{WORKSPACE\}\}/, escaped(where.organisation), "slot `{{WORKSPACE}}`");
   around = swap(around, /\{\{REPOSITORY\}\}/, escaped(where.location), "slot `{{REPOSITORY}}`");
-  // THE HEAD CARD names the repository and opens its hub, so the hub is the way back and the side needs no other.
-  around = swap(around, /\{\{THE ADDRESS OF THE HUB[^}]*\}\}/g, attribute(where.hub), "slot for the address of the hub");
+  // THE HEAD CARD names the repository and opens the index itself, at its first page. The hub is the way back, in the note a page with no script shows.
+  around = swap(around, /\{\{UP-HREF\}\}/g, attribute(where.hub), "slot `{{UP-HREF}}`");
   around = swap(around, /\{\{NAME OF THE REPOSITORY\}\}/g, escaped(basename(where.repository)), "slot `{{NAME OF THE REPOSITORY}}`");
   refuseSlots(around, TEMPLATE);
   // The data sits in a script element, so a `<` in it is written as its escape and can never close the element.
@@ -332,7 +336,7 @@ function runSamples(samples: string, write: boolean, out: string | null): number
     const { groups, pages } = sampleGroupsOf(samples);
     if (!pages.length) throw new Refusal(`${relative(workspace, samples)} holds no page, so there is nothing to list`);
     const base = dirname(index) === samples ? "" : `${slashes(relative(dirname(index), samples))}/`;
-    const produce = (): string => indexPage(pageTemplate(templatesDir(workspace), TEMPLATE), { base, tabs: TAB_LIMIT, groups }, {
+    const produce = (): string => indexPage(pageTemplate(templatesDir(workspace), TEMPLATE), { base, groups }, {
       organisation: "SaaS Plane", location: `${stream} ${arc}`, repository: samples, hub: base + (groups.flatMap(entriesOf)[0]?.path ?? ""),
     }, { tab: `${stream} ${arc} samples`, id: `${stream}-${arc}-samples-index`, title: "Samples", summary: `Every sample page of arc ${arc}, in one tree grouped by what each is for, opened in tabs.` });
     if (write) return say(place(index, produce(), true, workspace, "index"), workspace) ? 1 : 0;
@@ -365,41 +369,59 @@ function run(args: string[], write: boolean): number {
     if (!existsSync(artifacts) || !statSync(artifacts).isDirectory())
       throw new Refusal(`${repository} has no ${POCKET_PATH}, so there is nothing to list`);
     const typedOut = words.value("out");
-    const out = resolve(typedOut ?? artifactIndex(docs));
-    // THE PATH FEEDS THE INDEX where the index sits under it, or where it sits in the pocket the index
-    // is produced from. A path beside both names no page of the index, so the run has nothing to do.
-    if (typedOut === null && !under(out, [path]) && !under(path, [artifacts])) {
-      console.log(`nothing to ${write ? "write" : "check"} — ${relative(workspace, path)} holds no page of ${POCKET_PATH} and no index`);
-      return 0;
-    }
-    const { groups, pages, notes } = groupsOf(artifacts);
-    // The path to the pages is kept once, as `base`. It is empty where the index sits in the pocket itself.
-    const base = dirname(out) === artifacts ? "" : `${slashes(relative(dirname(out), artifacts))}/`;
+    // THE POCKET HAS TWO INDEX PAGES where it is split (RULE.DEVEX.WORKSPACE.221): one over `public/` and one over `private/`. A pocket that
+    // still holds the earlier layout has the one, and `docs index` keeps writing it there until the rewrite pass moves the pages.
+    const split = artifactsLayout(docs) === "split";
+    const halves: (Visibility | undefined)[] = split ? [VISIBILITY.public, VISIBILITY.private].filter((half) => existsSync(join(artifacts, half))) : [undefined];
+    if (!halves.length) throw new Refusal(`${POCKET_PATH} holds neither \`public/\` nor \`private/\`, so there is nothing to list`);
+    if (!split && existsSync(artifacts)) console.log(`${POCKET_PATH} holds the earlier layout, so the index is written beside ${ARTIFACT.docs}/, ${ARTIFACT.guides}/ and ${ARTIFACT.reports}/ until the rewrite pass moves them to ${VISIBILITY.public}/ and ${VISIBILITY.private}/`);
     const named = locationOf(docs, workspace);
-    // The hub is the first page of the tree. Where a repository has no hub, the first page stands for it.
-    const first = groups.flatMap(entriesOf)[0]?.path ?? "";
-    const produce = (): string => indexPage(pageTemplate(templatesDir(workspace), TEMPLATE), { base, tabs: TAB_LIMIT, groups }, {
-      organisation: "SaaS Plane",
-      location: named === "—" ? basename(repository) : named,
-      repository,
-      hub: base + first,
-    });
-    if (write) return say([...place(out, produce(), true, workspace, "index"), ...notes], workspace) ? 1 : 0;
+    let failed = 0;
+    for (const half of halves) failed = Math.max(failed, one(half, half === halves[0] ? typedOut : null));
+    return failed;
 
-    // WHAT IS READ IS THE WHOLE POCKET, AND WHAT IS REPORTED SITS UNDER THE PATH. A note is reported
-    // where its file, or the page it is about, is under the path, and the index itself where it is.
-    const found = compare(out, artifacts, pages);
-    const whole = under(out, [path]);
-    if (!found.length && whole) {
-      let current = true;
-      try { current = readFileSync(out, "utf8") === produce(); } catch { current = true; }
-      if (!current) found.push({ grade: "SOFT", check: "index", file: out, message:
-        "the tree holds every page once, but this page is not what `docs index write` writes now: a name or a place changed" });
-      else console.log(`current  ${relative(workspace, out)}`);
+    /** One index: the page over one folder of the pocket, written or compared with the pages on disk. */
+    function one(half: Visibility | undefined, wanted: string | null): number {
+      const root = half ? join(artifacts, half) : artifacts;
+      const out = resolve(wanted ?? join(root, ARTIFACT_INDEX));
+      // THE PATH FEEDS THE INDEX where the index sits under it, or where it sits in the folder the index is produced from. A path beside
+      // both names no page of the index, so the run has nothing to do.
+      if (wanted === null && !under(out, [path]) && !under(path, [root])) {
+        console.log(`nothing to ${write ? "write" : "check"} — ${relative(workspace, path)} holds no page of ${slashes(relative(repository, root))} and no index`);
+        return 0;
+      }
+      const { groups, pages, notes } = groupsOf(root, half);
+      if (half === VISIBILITY.private && !pages.length) { console.log(`nothing to ${write ? "write" : "check"} — ${slashes(relative(repository, root))} holds no page`); return 0; }
+      // The path to the pages is kept once, as `base`. It is empty where the index sits in the folder itself.
+      const base = dirname(out) === root ? "" : `${slashes(relative(dirname(out), root))}/`;
+      // The hub is the first page of the tree. Where a repository has no hub, the first page stands for it.
+      const first = groups.flatMap(entriesOf)[0]?.path ?? "";
+      const headed = half ? { tab: `${named === "—" ? basename(repository) : named} ${half === VISIBILITY.public ? "Public" : "Private"}`, id: `${basename(repository)}-artifacts-${half}-index`,
+        title: half === VISIBILITY.public ? "Public" : "Private",
+        summary: `Every page of this repository's ${slashes(relative(repository, root))}, in one tree, one page open at a time.` } : undefined;
+      const produce = (): string => indexPage(pageTemplate(templatesDir(workspace), TEMPLATE), { base, groups }, {
+        organisation: "SaaS Plane",
+        location: named === "—" ? basename(repository) : named,
+        repository,
+        hub: base + first,
+      }, headed);
+      if (write) return say([...place(out, produce(), true, workspace, "index"), ...notes], workspace) ? 1 : 0;
+
+      // WHAT IS READ IS THE WHOLE FOLDER, AND WHAT IS REPORTED SITS UNDER THE PATH. A note is reported where its file, or the page it is
+      // about, is under the path, and the index itself where it is.
+      const found = compare(out, root, pages);
+      const whole = under(out, [path]);
+      if (!found.length && whole) {
+        let current = true;
+        try { current = readFileSync(out, "utf8") === produce(); } catch { current = true; }
+        if (!current) found.push({ grade: "SOFT", check: "index", file: out, message:
+          "the tree holds every page once, but this page is not what `docs index write` writes now: a name or a place changed" });
+        else console.log(`current  ${relative(workspace, out)}`);
+      }
+      const reported = [...found, ...notes].filter((note: Compared) => under(note.file, [path]) || (note.about !== undefined && under(note.about, [path])));
+      if (!reported.length && !whole) console.log(`current  ${relative(workspace, path)} — the tree of ${ARTIFACT_INDEX} and the pages under this path agree`);
+      return say(reported, workspace) ? 1 : 0;
     }
-    const reported = [...found, ...notes].filter((note: Compared) => under(note.file, [path]) || (note.about !== undefined && under(note.about, [path])));
-    if (!reported.length && !whole) console.log(`current  ${relative(workspace, path)} — the tree of ${ARTIFACT_INDEX} and the pages under this path agree`);
-    return say(reported, workspace) ? 1 : 0;
   } catch (refused) {
     if (!(refused instanceof Refusal)) throw refused;
     console.error(`✗ ${refused.message}`);

@@ -60,7 +60,7 @@ function run(root, args) {
 }
 const readAt = (root, p) => readFileSync(join(root, p), "utf8");
 /** Where the construct pages of the domain `01-core` sit: the `constructs` folder of its folder in the pocket. */
-const CORE_PAGES = `docs/${POCKET.artifacts}/${ARTIFACT.docs}/01-core/${CONSTRUCT_PAGES}`;
+const CORE_PAGES = `docs/${POCKET.artifacts}/public/${ARTIFACT.docs}/01-core/${CONSTRUCT_PAGES}`;
 
 let n = 0, failed = 0;
 function one(name, got, want) {
@@ -145,7 +145,7 @@ console.log("\n=== `figure check` takes a folder, the way `audit check` does");
     [`${CORE_PAGES}/a-construct.html`]: clean,
     [`${CORE_PAGES}/b-construct.html`]: clean,
   });
-  const out = run(ws, ["figure", "check", `docs/${POCKET.artifacts}/${ARTIFACT.docs}`]);
+  const out = run(ws, ["figure", "check", `docs/${POCKET.artifacts}/public/${ARTIFACT.docs}`]);
   one("a folder is every page under it, not a read of the directory", out, lacks("EISDIR"));
   one("and it says how many it judged", out, has("clean — 2 pages"));
   one("a path that is not there is named, not read",
@@ -204,7 +204,7 @@ console.log("\n=== a spec that draws nothing is a finding, not a silence");
 
 console.log("\n=== a figure that says nothing about itself is refused");
 {
-  // `05-artifacts.md § The figures` has asked for a caption since it was written — *a figure with
+  // `05-pages.md § The figures` has asked for a caption since it was written — *a figure with
   // neither is decoration* — and nothing enforced it: 94 of the corpus's 150 specs carried neither
   // field, half of them in the book. It reported rather than refused for one sitting so the count
   // could be seen and could fall (N14 step 1); all 94 were authored in step 2, every repository
@@ -262,13 +262,13 @@ console.log("\n=== a code file's own RESTATES header is read, and a path that is
   // silently dropped the rest — an under-report by a check whose whole job is to stop one.
   const wrapped = [
     "// RESTATES: the foundation book — 02-document.md rule 9, and",
-    "// 04-discipline.md § Voice discipline and 06-registers.md § Writing a row.",
+    "// 04-discipline.md § Voice discipline and 09-registers.md § Writing a row.",
     "//",
     "// Ordinary prose about 99-not-a-source.md, which is not part of the claim.",
   ].join("\n");
   one("a header wrapped at one space is read whole, not just its first line",
       headerSources(wrapped)[0].cited,
-      (got) => got.join(" ") === "02-document.md 04-discipline.md 06-registers.md");
+      (got) => got.join(" ") === "02-document.md 04-discipline.md 09-registers.md");
   one("and the prose after the bare `//` is not part of the claim",
       headerSources(wrapped)[0].cited, (got) => !got.includes("99-not-a-source.md"));
   one("a `RESTATES:` mid-line is a mention, not a header — a test fixture carries one",

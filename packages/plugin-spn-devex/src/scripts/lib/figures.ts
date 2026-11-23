@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The figures · § A connector is a claim
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § The figures · § A connector is a claim
 //           § One stylesheet, served in versions · § Prose and lists have limits (RULE.DEVEX.WORKSPACE.523, a figure comes from a spec)
 // The chapter is the source of truth. A rule change is edited there first, then here, in the same change.
 //
@@ -15,7 +15,7 @@
 // centre of each item of a row, a control on one line, a slot that holds nothing, and how deep names nest.
 // The rules for boxes, labels and arrows are not applied to it, and no other kind changes.
 
-/** The measure, at the drawn scale: pixels per character, by text class. The docs design language's three levels are a name (sans
+/** The measure, at the drawn scale: pixels per character, by text class. The Docs look's three levels are a name (sans
  *  600 at 12), a detail or a wire's label (mono at 10) and a plate's label (mono 600 capitals at 9.5, spaced .08em); the `sds-`
  *  classes are the flat drawing's, which a hand-written page may still hold. */
 const PX: Record<string, number> = {
@@ -254,7 +254,7 @@ export function checkFigures(src: string): FigureFinding[] {
     const legends = groupRanges(svg, LEGEND_GROUP);
     const inLegend = (at: number) => legends.some(([a, b]) => at >= a && at < b);
     // A viewBox may carry an origin, so a figure can hug its own content and render edge to edge
-    // rather than paying an inner margin the section already provides (05-artifacts.md § A figure runs
+    // rather than paying an inner margin the section already provides (05-pages.md § A figure runs
     // edge to edge). The edge test measures against the box's real bounds, not against 0,0.
     const vb = whole.match(/viewBox="(-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?) (\d+(?:\.\d+)?) (\d+(?:\.\d+)?)/);
     if (!vb) { findings.push({ figure: n + 1, message: "no viewBox, so nothing can be measured" }); return; }
@@ -642,12 +642,12 @@ export function checkFigures(src: string): FigureFinding[] {
 // ---------------------------------------------------------------------------- a figure drawn by hand
 
 /**
- * 05-artifacts.md § A page is written with Write or Edit, its figures come from a spec (RULE.DEVEX.WORKSPACE.523): a figure is drawn
+ * 05-pages.md § A page is written with Write or Edit, its figures come from a spec (RULE.DEVEX.WORKSPACE.523): a figure is drawn
  * from a spec by `docs figure draw`, never by hand with coordinates. Two marks say a figure was drawn by hand, because the drawer
  * makes neither: the flat drawing's classes (`svg.sds-drawing`, and its skeleton `sds-skeleton`), and an arrowhead (`marker-end`),
  * which the language's wire does not have.
  *
- * A SAMPLE IS NOT A FIGURE OF THE PAGE. The docs design language's construct page shows the language's own units, and it marks each
+ * A SAMPLE IS NOT A FIGURE OF THE PAGE. The Docs look's construct page shows the language's own units, and it marks each
  * drawing that stands as a sample with `data-dl-legend`. A mark inside a `data-dl-legend` group, or on an `svg` that carries the
  * attribute itself, is that page's subject and is not read; nothing else is exempt. In a markdown file, fenced code is not read.
  */
@@ -674,7 +674,7 @@ export function handDrawnFigures(src: string, markdown = false): FigureFinding[]
 // ---------------------------------------------------------------------------- colour
 
 /**
- * A code block is coloured when the page opens, by the shared script (`styles/sds-docs.js`), which holds
+ * A code block is coloured when the page opens, by the shared script (`styles/docs-page.js`), which holds
  * the language rules and is their one place. A page's file holds plain code, so the command side keeps
  * no rule of its own: it only finds a block whose file carries the spans the script writes.
  */

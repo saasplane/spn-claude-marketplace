@@ -1,0 +1,102 @@
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § The guide page — stages, and steps that number themselves · § One stylesheet, served in versions
+     This file holds the structure of a guide page and states no rule: the sections in order with their ids, a
+     stage and its steps, the slots, and the two lines that load the shared stylesheet and script.
+     `docs guide` produces a page from this file and a guide's markdown. The sections above state every rule. -->
+<!-- Placeholders:
+     {{TITLE}} the page's heading, the promise the page makes: the `<h1>` only
+     {{NAME}} the page's short name, at most three words (RULE.DEVEX.WORKSPACE.517): the block's title, written in the `<title>`, the outline's title, the eyebrow's last segment, the breadcrumb of a page below it and the page's entry in an index
+     {{SUMMARY}} The Description's first sentence, word for word.
+     {{UP-HREF}} THE ADDRESS OF THE HUB: base, then the path of the hub, ending in .html: the eyebrow&rsquo;s second level links it
+     {{SUBTITLE}} THE SUBTITLE: the task, in one plain sentence.
+     {{LEAD}} THE DESCRIPTION, one paragraph: what this guide walks you through, in everyday words; who it is for; then one short sentence on how it runs.
+     {{HAVE-END}} WHAT YOU HAVE AT THE END, in the reader's own terms: what runs, what exists, what you can do next.
+     {{HOW-GUIDE}} HOW THE GUIDE RUNS: how many stages, and how long it takes. Say who should not follow it, if anybody.
+     {{MUST-TRUE}} WHAT MUST BE TRUE FIRST, in one sentence: the machine, the access, the state of the repository.
+     {{TOOL-KEY}} a tool, a key or a running thing
+     {{COMMAND-ANSWERS}} one command that answers yes or no
+     {{STAGE-NAMED}} STAGE, named as what is true when it ends
+     {{SENTENCE-STAGE}} One sentence: what this stage gets you. Each subsection below is one step. A step numbers itself, so no number is typed.
+     {{STEP-NAMED}} STEP, named as what you do
+     {{WHY-SENTENCE}} WHY, in one sentence.
+     {{COMMAND-TYPE}} the command, as you type it
+     {{SEE-WHEN}} WHAT YOU SEE when it worked: the line, the file or the page.
+     {{NEXT-STAGE}} THE NEXT STAGE. The count of steps runs on from the stage before.
+     {{SENTENCE-STAGE-2}} One sentence: what this stage gets you. -->
+<meta charset="utf-8">
+<title>{{NAME}}</title>
+<!-- spn:doc
+{"id": "{{slug}}", "variant": "guide", "title": "{{NAME}}", "lenses": ["{{LENS}}"], "summary": "{{SUMMARY}}"}
+-->
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-z6T3Ju/mWAnv24wb8AFXMHYMyXMd5U/g7N2hA3X1uCys4Ty2Yy7TcMXWe+SMPck0" crossorigin="anonymous">
+<div class="sds-page sds-guide">
+
+<nav class="sds-rail" id="rail">
+  <div class="sds-rail-title">{{NAME}}</div>
+</nav>
+<div class="sds-wrap">
+<header class="sds-masthead">
+  <div class="sds-eyebrow"><span class="sds-line1">{{WORKSPACE}} &middot; <a href="{{UP-HREF}}">{{LOCATION}}</a> &middot; {{NAME}}</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Guide</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">{{ROLE}}</span><span class="sds-badge sds-lens">{{ROLE}}</span></span></span></div>
+  <h1>{{TITLE}}</h1>
+  <p class="sds-subtitle">{{SUBTITLE}}</p>
+  <p class="sds-standfirst">{{LEAD}}</p>
+</header>
+
+<section id="s0">
+  <div class="sds-section-head"><h2>Overview</h2></div>
+  <p>{{HAVE-END}}</p>
+  <p>{{HOW-GUIDE}}</p>
+</section>
+
+<section id="s1">
+  <div class="sds-section-head"><h2>Before you start</h2></div>
+  <p>{{MUST-TRUE}}</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>You need</th><th>How to check it</th></tr></thead>
+    <tbody>
+      <tr><td>{{TOOL-KEY}}</td><td><code>{{COMMAND-ANSWERS}}</code></td></tr>
+      <tr><td>{{&hellip; one line for each}}</td><td><code>{{&hellip;}}</code></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="s2">
+  <div class="sds-section-head"><h2>{{STAGE-NAMED}}</h2></div>
+  <p>{{SENTENCE-STAGE}}</p>
+  <div class="sds-step">
+    <h3 id="step-a">{{STEP-NAMED}}</h3>
+    <p>{{WHY-SENTENCE}}</p>
+    <pre>{{COMMAND-TYPE}}</pre>
+    <div class="sds-step-see"><span class="sds-label">What you see</span><p>{{SEE-WHEN}}</p></div>
+  </div>
+  <div class="sds-step">
+    <h3 id="step-b">{{STEP}}</h3>
+    <p>{{WHY-SENTENCE}}</p>
+    <pre>{{the command}}</pre>
+    <div class="sds-step-see"><span class="sds-label">What you see</span><p>{{WHAT YOU SEE.}}</p></div>
+  </div>
+</section>
+
+<section id="s3">
+  <div class="sds-section-head"><h2>{{NEXT-STAGE}}</h2></div>
+  <p>{{SENTENCE-STAGE-2}}</p>
+  <div class="sds-step">
+    <h3 id="step-c">{{STEP}}</h3>
+    <p>{{WHY-SENTENCE}}</p>
+    <pre>{{the command}}</pre>
+    <div class="sds-step-see"><span class="sds-label">What you see</span><p>{{WHAT YOU SEE.}}</p></div>
+  </div>
+</section>
+
+<section id="s4">
+  <div class="sds-section-head"><h2>Next — Where to go next</h2></div>
+  <div class="sds-tiles">
+    <a class="sds-tile sds-door" href="#"><span class="sds-door-kicker">{{the next task a reader has}}</span><span class="sds-door-title">{{the guide or the page for it}}<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span></a>
+    <a class="sds-tile sds-door" href="#"><span class="sds-door-kicker">{{what to do when a step fails}}</span><span class="sds-door-title">{{&hellip;}}<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span></a>
+  </div>
+</section>
+
+</div>
+</div>
+
+
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-yDkvlVaxZfr5SBqgjOk8GZPsDngeCYQxHHaY1aPfty/M6hFe1DXJz++VjJ+i+082" crossorigin="anonymous"></script>

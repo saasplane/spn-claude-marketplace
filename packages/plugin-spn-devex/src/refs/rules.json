@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "bc896b9b"
+    "commit": "eee770ce"
   },
   "rules": [
     {
@@ -2442,6 +2442,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/workstream.md",
           "heading": "Work is sized by its kind, and fixes gather into a round"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "Work is sized by its kind, and fixes gather into a round"
         }
       ]
     },
@@ -4300,7 +4305,7 @@
       "params": {},
       "class": "guidance",
       "sentence": null,
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The approach document — a workstream's, never a repository's",
       "decision": null,
       "restated": []
@@ -4324,7 +4329,7 @@
       "params": {},
       "class": "guidance",
       "sentence": null,
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-registers.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/09-registers.md",
       "heading": "What the pocket holds",
       "decision": null,
       "restated": []
@@ -4666,7 +4671,7 @@
       },
       "class": "checked",
       "sentence": "The concept belongs to the repository, however many nodes it grows",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "Concept, overview, construct — one progression",
       "decision": null,
       "restated": [
@@ -4807,7 +4812,7 @@
       "params": {},
       "class": "guidance",
       "sentence": "The pocket holds three kinds, and they do not share a rule",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "What the pocket holds",
       "decision": null,
       "restated": [
@@ -5040,7 +5045,7 @@
       },
       "class": "checked",
       "sentence": null,
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The overview set is fixed, and a name says its source",
       "decision": null,
       "restated": [
@@ -5064,7 +5069,7 @@
       },
       "class": "checked",
       "sentence": null,
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/08-stylesheet.md",
       "heading": "The suffix names the kind",
       "decision": null,
       "restated": [
@@ -5088,7 +5093,7 @@
       },
       "class": "stated in a skill",
       "sentence": "The Agent stewards artifacts and never manufactures them",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/08-stylesheet.md",
       "heading": "The Agent stewards, and never manufactures",
       "decision": "DEC.DEVEX.WORKSPACE.104",
       "restated": [
@@ -5105,7 +5110,7 @@
       "params": {},
       "class": "guidance",
       "sentence": "A decided row names what proves it, or states why nothing does",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-registers.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/09-registers.md",
       "heading": "Writing a row",
       "decision": null,
       "restated": []
@@ -5266,7 +5271,7 @@
       },
       "class": "checked",
       "sentence": "An artifact carries a chapter's share of reach, fifteen percent, and no artifact leaves the sweep",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The split plan is the arcs' step rows, and Repo is the scope",
       "decision": "DEC.DEVEX.WORKSPACE.108",
       "restated": []
@@ -5333,7 +5338,7 @@
       "params": {},
       "class": "guidance",
       "sentence": null,
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The overview set is fixed, and a name says its source",
       "decision": null,
       "restated": []
@@ -5344,7 +5349,7 @@
       "params": {},
       "class": "guidance",
       "sentence": "The page uses the window, and only prose is held to a measure",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The page itself — its outline, its rail, its width and its furniture",
       "decision": null,
       "restated": []
@@ -5384,7 +5389,7 @@
       "params": {},
       "class": "guidance",
       "sentence": "A corpus link is relative, and no page carries `file://`, a machine path or a hosted URL",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "Every link is relative, and the corpus has no single reader",
       "decision": "DEC.DEVEX.WORKSPACE.116",
       "restated": []
@@ -5397,7 +5402,7 @@
       },
       "class": "checked",
       "sentence": "The agent publishes no page unless the developer asks for it",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "Nothing is published unless the developer asks",
       "decision": null,
       "restated": [
@@ -5458,7 +5463,7 @@
       },
       "class": "checked",
       "sentence": "Constructs are the second seat, and the glossary is generated from them and from each domain's `data-model.md`, never typed",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The Terms table, and what is not a Term",
       "decision": "DEC.DEVEX.WORKSPACE.120",
       "restated": []
@@ -5471,7 +5476,7 @@
       },
       "class": "checked",
       "sentence": null,
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "A construct's status is derived, never typed",
       "decision": null,
       "restated": []
@@ -5591,7 +5596,7 @@
       "params": {},
       "class": "guidance",
       "sentence": null,
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "What the pocket holds",
       "decision": null,
       "restated": []
@@ -5626,7 +5631,7 @@
       },
       "class": "checked",
       "sentence": "What proves a construct is the behaviour rows in the behaviours seat, at the construct's own path",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "A construct types no proof, and its rows sit at its own path",
       "decision": null,
       "restated": [
@@ -5687,7 +5692,7 @@
       "params": {},
       "class": "guidance",
       "sentence": null,
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SYSTEM — one picture for server, web and estate alike",
       "decision": null,
       "restated": [
@@ -5704,7 +5709,7 @@
       "params": {},
       "class": "guidance",
       "sentence": "The block vocabulary ships in a rendered form and a markdown form, and an agent reads the markdown one",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "heading": "The blocks are an HTML vocabulary; markdown keeps its own",
       "decision": "DEC.DEVEX.WORKSPACE.136",
       "restated": []
@@ -5796,7 +5801,7 @@
       },
       "class": "checked",
       "sentence": "The punchline is `Your team's time belongs to your product.`, and the statement beside it does not change",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The masthead, and the opening",
       "decision": "DEC.DEVEX.WORKSPACE.143",
       "restated": [
@@ -5876,7 +5881,7 @@
       },
       "class": "checked",
       "sentence": "A card is a `div.sds-open` wrapping an `h4` whose `id` is its number, and that is the one shape",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/08-stylesheet.md",
       "heading": "Depth is decided by where else the detail lives",
       "decision": null,
       "restated": [
@@ -5895,7 +5900,7 @@
       },
       "class": "checked",
       "sentence": null,
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/08-stylesheet.md",
       "heading": "The suffix names the kind",
       "decision": null,
       "restated": []
@@ -5908,7 +5913,7 @@
       },
       "class": "stated in a skill",
       "sentence": "A report says where a repository stands at one moment, for two readers",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "Reports and templates",
       "decision": null,
       "restated": [
@@ -5963,7 +5968,7 @@
       "params": {},
       "class": "guidance",
       "sentence": null,
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-registers.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/09-registers.md",
       "heading": "What the pocket holds",
       "decision": null,
       "restated": []
@@ -5974,7 +5979,7 @@
       "params": {},
       "class": "guidance",
       "sentence": "The set is the hub, one page per domain, and one more for every further reading path",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The overview set is fixed, and a name says its source",
       "decision": null,
       "restated": [
@@ -6127,7 +6132,7 @@
       },
       "class": "stated in a skill",
       "sentence": null,
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-registers.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/09-registers.md",
       "heading": "The identifier",
       "decision": null,
       "restated": []
@@ -6138,7 +6143,7 @@
       "params": {},
       "class": "guidance",
       "sentence": "The decision column is the ruling, and nothing else",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-registers.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/09-registers.md",
       "heading": "Writing a row",
       "decision": null,
       "restated": []
@@ -6188,7 +6193,7 @@
       },
       "class": "checked",
       "sentence": "An id names its kind, the place it lives and its number, and it is never reused",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-registers.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/09-registers.md",
       "heading": "The identifier",
       "decision": null,
       "restated": []
@@ -6210,7 +6215,7 @@
       "params": {},
       "class": "guidance",
       "sentence": null,
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-registers.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/09-registers.md",
       "heading": "What the pocket holds",
       "decision": null,
       "restated": []
@@ -6240,7 +6245,7 @@
       },
       "class": "stated in a skill",
       "sentence": "The place is read from the repository itself",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-registers.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/09-registers.md",
       "heading": "The identifier",
       "decision": "DEC.DEVEX.WORKSPACE.178",
       "restated": [
@@ -6320,7 +6325,7 @@
       },
       "class": "checked",
       "sentence": "A page template holds only its structure",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The masthead, and the opening",
       "decision": "DEC.DEVEX.WORKSPACE.182",
       "restated": [
@@ -6447,7 +6452,7 @@
       },
       "class": "checked",
       "sentence": "Every page kind has a masthead of three levels: the Title, the Subtitle and the Description, in that order.",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The masthead, and the opening",
       "decision": null,
       "restated": [
@@ -6593,7 +6598,7 @@
       },
       "class": "stated in a skill",
       "sentence": null,
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The coverage report — written, built and proved",
       "decision": null,
       "restated": [
@@ -6622,7 +6627,7 @@
       },
       "class": "stated in a skill",
       "sentence": "The header names the report and says when its numbers were true",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The header and the five sections",
       "decision": null,
       "restated": [
@@ -6873,7 +6878,7 @@
       },
       "class": "checked",
       "sentence": null,
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/08-stylesheet.md",
       "heading": "The suffix names the kind",
       "decision": null,
       "restated": []
@@ -6905,7 +6910,7 @@
       },
       "class": "checked",
       "sentence": "The parts of the page that the arcs and the records decide are produced, never typed",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "Plan lists the arcs, and the arcs are the state",
       "decision": null,
       "restated": [
@@ -6924,7 +6929,7 @@
       },
       "class": "checked",
       "sentence": "The agent writes the Title and the Subtitle of every page kind itself, and keeps them current as the page grows",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The masthead, and the opening",
       "decision": null,
       "restated": [
@@ -7011,7 +7016,7 @@
       },
       "class": "stated in a skill",
       "sentence": "One item per file inside a group",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "Records in a report",
       "decision": null,
       "restated": [
@@ -7112,7 +7117,7 @@
       },
       "class": "checked",
       "sentence": "A report is written or refreshed only when somebody asks for it",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "Reports and templates",
       "decision": null,
       "restated": [
@@ -7153,7 +7158,7 @@
       },
       "class": "checked",
       "sentence": "Every page links one shared stylesheet and one shared script as its base, and holds no copy of them",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/08-stylesheet.md",
       "heading": "One stylesheet, served in versions",
       "decision": null,
       "restated": [
@@ -7192,7 +7197,7 @@
       },
       "class": "checked",
       "sentence": "A published page carries its version's styles inside it",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/08-stylesheet.md",
       "heading": "What a stored page carries, and what a published one carries",
       "decision": null,
       "restated": [
@@ -7214,7 +7219,7 @@
       "params": {},
       "class": "guidance",
       "sentence": "Every class and every token of ours opens with `sds-`",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/08-stylesheet.md",
       "heading": "Every class and token opens with sds-",
       "decision": null,
       "restated": [
@@ -7246,7 +7251,7 @@
       "params": {},
       "class": "guidance",
       "sentence": "A status is a set of classes of its own, and never a tone of the palette",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/08-stylesheet.md",
       "heading": "The statuses, the palette, the widths and the build",
       "decision": null,
       "restated": [
@@ -7265,7 +7270,7 @@
       },
       "class": "checked",
       "sentence": "A guide page is a guide shown as a page of steps, and it is produced from the guide's markdown",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The guide page — stages, and steps that number themselves",
       "decision": null,
       "restated": [
@@ -7283,8 +7288,8 @@
         "check": "doc-check"
       },
       "class": "checked",
-      "sentence": "Every repository's artifacts open from one page, `docs/artifacts/index.html`",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "sentence": "Every repository's artifacts open from two index pages, `docs/artifacts/public/index.html` and `docs/artifacts/private/index.html`",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The index of artifacts — one page that opens every other",
       "decision": null,
       "restated": [
@@ -7302,8 +7307,8 @@
         "check": "corpus"
       },
       "class": "checked",
-      "sentence": "A hub has no link above its rail",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "sentence": "A hub has no link in the masthead's first line",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The templates — the pages, and the two seat files behind them",
       "decision": null,
       "restated": [
@@ -7322,10 +7327,15 @@
       },
       "class": "checked",
       "sentence": null,
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "What the pocket holds",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The artifacts pocket — concept, overview, construct page"
+        },
         {
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/doc-sets.md",
@@ -7358,7 +7368,7 @@
       "params": {},
       "class": "guidance",
       "sentence": "A fact has one home",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "Plan lists the arcs, and the arcs are the state",
       "decision": null,
       "restated": [
@@ -7421,7 +7431,7 @@
       },
       "class": "checked",
       "sentence": "The page is written for the developer who decides, and holds what they need to decide. The agent's own material stays in the arc and its notes.",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The approach document — a workstream's, never a repository's",
       "decision": "DEC.DEVEX.WORKSPACE.225",
       "restated": [
@@ -7485,8 +7495,8 @@
       "level": "GUIDE",
       "params": {},
       "class": "guidance",
-      "sentence": "`What` groups by domain, `How` by repository, and `Why` by the nature of the problem",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "sentence": "`What` groups by domain and construct, `How` by repository, and `Why` by the nature of the problem",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The approach document — a workstream's, never a repository's",
       "decision": null,
       "restated": []
@@ -7518,18 +7528,18 @@
       },
       "class": "stated in a skill",
       "sentence": "A skeleton is drawn for one level: the app, a layout with its body, navigation and content, the page level, a container, a widget or a card, or a component. It shows where that level's primary sub-components are placed, each with its own component's name, and sample values fill the rest",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": "DEC.DEVEX.WORKSPACE.230",
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -7557,7 +7567,7 @@
       },
       "class": "checked",
       "sentence": "Every entry shows only the heading's words before its dash",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The page itself — its outline, its rail, its width and its furniture",
       "decision": null,
       "restated": []
@@ -7570,7 +7580,7 @@
       },
       "class": "checked",
       "sentence": "In its back link and its previous and next doors, a markdown file opens a markdown file and a page opens a page",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "How a page hands a reader on",
       "decision": null,
       "restated": [
@@ -7594,7 +7604,7 @@
       },
       "class": "checked",
       "sentence": "A preview shows, and an approach page argues, so a preview's sections are `Overview`, `Today`, `Proposed` and `Where it lands`, and an `Open` only for the questions it raises",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The approach document — a workstream's, never a repository's",
       "decision": null,
       "restated": [
@@ -7618,7 +7628,7 @@
       },
       "class": "stated",
       "sentence": "Code shown on a page is written to its stack's own standards",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The approach document — a workstream's, never a repository's",
       "decision": "DEC.DEVEX.WORKSPACE.235",
       "restated": [
@@ -7694,7 +7704,7 @@
       "params": {},
       "class": "guidance",
       "sentence": "A code block is coloured by the shared script when the page opens, and a page's file holds plain code",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/08-stylesheet.md",
       "heading": "One stylesheet, served in versions",
       "decision": "DEC.DEVEX.WORKSPACE.237",
       "restated": [
@@ -7717,8 +7727,8 @@
         "check": "doc-check"
       },
       "class": "checked",
-      "sentence": "`Where it lands` is one folder tree for each repository, and the blocks that explain a change follow its tree",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "sentence": "A tree on a hand-written page is a `<pre data-lang=\"tree\">`, so the shared script colours its branches, its folders and its status words",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The approach document — a workstream's, never a repository's",
       "decision": null,
       "restated": [
@@ -7827,7 +7837,7 @@
       },
       "class": "checked",
       "sentence": "A card in the `Open` section of an approach page carries a part named *Views*, and a card written without it is reported",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "A card says which views spoke",
       "decision": null,
       "restated": [
@@ -7924,7 +7934,7 @@
       "params": {},
       "class": "guidance",
       "sentence": null,
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "Plan lists the arcs, and the arcs are the state",
       "decision": null,
       "restated": []
@@ -7937,7 +7947,7 @@
       },
       "class": "checked",
       "sentence": "The page reads as the design, not as its history",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The approach document — a workstream's, never a repository's",
       "decision": null,
       "restated": []
@@ -7948,7 +7958,7 @@
       "params": {},
       "class": "guidance",
       "sentence": "A preview shows each construct in the form that shows it best, and shows the public shapes as code",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The approach document — a workstream's, never a repository's",
       "decision": null,
       "restated": []
@@ -7993,7 +8003,7 @@
       },
       "class": "checked",
       "sentence": "Plan holds the progress block, generated and never written by hand, and there is no progress page",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "Plan lists the arcs, and the arcs are the state",
       "decision": "DEC.DEVEX.WORKSPACE.250",
       "restated": [
@@ -8093,7 +8103,7 @@
         "check": "workstream-owner"
       },
       "class": "checked",
-      "sentence": "Every arc has one preview, and its name is fixed: `notes/N<nnn>/preview.html`",
+      "sentence": "Every arc has one page, and its name is fixed: `notes/N<nnn>/arc.html`",
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An arc carries its specification, or names the note that holds it",
       "decision": null,
@@ -8140,7 +8150,7 @@
       "params": {},
       "class": "guidance",
       "sentence": null,
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The approach document — a workstream's, never a repository's",
       "decision": null,
       "restated": [
@@ -8198,7 +8208,7 @@
       },
       "class": "checked",
       "sentence": "A table cell that holds an item reads in three levels, on a hub, an overview, a construct, an approach page and a preview. A table keeps a column only where a reader compares down it.",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The shape of a section, on every page kind",
       "decision": "DEC.DEVEX.WORKSPACE.259",
       "restated": [
@@ -8217,13 +8227,13 @@
       },
       "class": "stated in a skill",
       "sentence": "A page's skeleton stands in its layout and draws every level: the window, the layout's body, navigation and content, the page level, the containers, the widgets and cards, and the components",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -8294,7 +8304,7 @@
       },
       "class": "checked",
       "sentence": "Every arc has an address on the approach page, `approach.html#<arc>`, and every link to an arc points there",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "Plan lists the arcs, and the arcs are the state",
       "decision": null,
       "restated": [
@@ -8356,7 +8366,7 @@
       },
       "class": "checked",
       "sentence": "A preview's masthead names its arc and shows one status, labelled *Status*, and it is the arc's",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The approach document — a workstream's, never a repository's",
       "decision": null,
       "restated": [
@@ -8385,7 +8395,7 @@
       },
       "class": "checked",
       "sentence": "A sample is the work's own file, never a page built with the page template",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The approach document — a workstream's, never a repository's",
       "decision": null,
       "restated": [
@@ -8419,23 +8429,23 @@
       },
       "class": "stated in a skill",
       "sentence": "Every level that has a box is outlined and carries its name, and holds its own header. The navigation's chosen entry is the page's own.",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": "DEC.DEVEX.WORKSPACE.268",
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -8453,23 +8463,23 @@
       },
       "class": "stated in a skill",
       "sentence": "The default frame of a container is one dotted extent with an unframed header, and one thin rounded box round its content and its footer",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": "DEC.DEVEX.WORKSPACE.269",
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -8487,13 +8497,13 @@
       },
       "class": "stated in a skill",
       "sentence": "A skeleton draws a rail shut to its icons on every device, desktop included, so the content gets the room",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -8511,13 +8521,13 @@
       },
       "class": "stated in a skill",
       "sentence": "Tabs that stand at the page level, in the content or in the page head's actions, are drawn as pills, and tabs inside a container, a card or a widget as the line",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -8533,7 +8543,7 @@
       "params": {},
       "class": "guidance",
       "sentence": "A container's content is one or more content parts, and a part may hold groups",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": null,
       "restated": [
@@ -8544,12 +8554,12 @@
         },
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -8822,13 +8832,13 @@
       },
       "class": "stated in a skill",
       "sentence": "A feature's head is drawn as a head item, in `DSFeature`'s own names, and it leads the items under it",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -8846,13 +8856,13 @@
       },
       "class": "stated in a skill",
       "sentence": "A section of a page is drawn with its fill and its room, in `DSSectionContainer`'s own names",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -8870,13 +8880,13 @@
       },
       "class": "stated in a skill",
       "sentence": "A feature's frames are drawn where the design system takes them, in `DSFeature`'s own names",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -8894,13 +8904,13 @@
       },
       "class": "stated in a skill",
       "sentence": "A field that a skeleton does not have is a finding",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -8918,13 +8928,13 @@
       },
       "class": "stated in a skill",
       "sentence": "A feature's item lines stand each in a frame of their own where it takes `items.surface`, as `DSItemCard` draws them",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -8942,13 +8952,13 @@
       },
       "class": "stated in a skill",
       "sentence": "The lines between a feature's items, and between the cells of a grid section, are drawn in `DSGridBorderType`'s own words",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -8966,13 +8976,13 @@
       },
       "class": "stated in a skill",
       "sentence": "A skeleton draws a feature's numbered items with their number before the title, as `items.numbered` writes it in the design system",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": "DEC.DEVEX.WORKSPACE.290",
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -8990,13 +9000,13 @@
       },
       "class": "stated in a skill",
       "sentence": "A feature's `textAlign` lines up the rows that stand with its head, as the design system aligns a feature's words, its actions and its items",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -9014,13 +9024,13 @@
       },
       "class": "stated in a skill",
       "sentence": "A feature's `verticalAlign` stands the two sides of a split against each other, and each side keeps its own height",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -9038,18 +9048,18 @@
       },
       "class": "stated in a skill",
       "sentence": null,
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         }
       ]
@@ -9062,23 +9072,23 @@
       },
       "class": "stated in a skill",
       "sentence": "An item line's media is read in `IDSItemMedia`'s own kinds, and a bare icon is drawn bare",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -9094,18 +9104,18 @@
       "params": {},
       "class": "guidance",
       "sentence": "A head's eyebrow may be a badge, as the design system's eyebrow takes a badge's form",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         }
       ]
@@ -9116,13 +9126,13 @@
       "params": {},
       "class": "guidance",
       "sentence": "An item line's facts may stand under its title and over its description, as `factsPlacement` `AFTER_TITLE` puts them",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         }
       ]
@@ -9135,13 +9145,13 @@
       },
       "class": "stated in a skill",
       "sentence": "The arrow at the end of an item line is drawn bare, in `DSIconType`'s own names",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -9159,13 +9169,13 @@
       },
       "class": "stated in a skill",
       "sentence": "The chosen item line of a feature's boxed items is marked inside its box, as `DSItemCard` marks a selected tile",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -9183,13 +9193,13 @@
       },
       "class": "stated in a skill",
       "sentence": "A grid section's columns are read in each view of their screen class, as `IDSGrid` names them",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -9207,18 +9217,18 @@
       },
       "class": "stated in a skill",
       "sentence": "A feature's statistics are drawn as the design system draws a stat, its value large over its label, as `items.type` `STATS` writes them",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -9236,13 +9246,13 @@
       },
       "class": "stated in a skill",
       "sentence": "A `DSAccordionGroup` is drawn with its entries and the open one's body, in `IDSAccordionGroupOption`'s own names",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -9260,18 +9270,18 @@
       },
       "class": "stated in a skill",
       "sentence": "A row of tabs that names its `type` is drawn in it wherever it stands, as `DSTabs` draws the type a page names",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -9289,18 +9299,18 @@
       },
       "class": "stated in a skill",
       "sentence": "Words that run past their column wrap at a word inside it, as `DSItem` and `DSItemFacts` wrap them",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -9318,13 +9328,13 @@
       },
       "class": "stated in a skill",
       "sentence": "Code and a row of tabs wider than their column keep their width and scroll inside it, as `DSCodeBlockView` and `DSTabs` let them",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -9342,13 +9352,13 @@
       },
       "class": "stated in a skill",
       "sentence": "A feature of `type` `BACKDROP` stands its media behind its words and its actions, as `DSFeature` lays a backdrop",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -9639,7 +9649,7 @@
       },
       "class": "checked",
       "sentence": "A stored page links one version, in two lines, and each line carries that version's hash",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/08-stylesheet.md",
       "heading": "What a stored page carries, and what a published one carries",
       "decision": null,
       "restated": [
@@ -9916,7 +9926,7 @@
       "params": {},
       "class": "guidance",
       "sentence": "A rule lives in its chapter with its id on it",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/08-stylesheet.md",
       "heading": "Depth is decided by where else the detail lives",
       "decision": "DEC.DEVEX.WORKSPACE.333",
       "restated": []
@@ -9929,7 +9939,7 @@
       },
       "class": "stated in a skill",
       "sentence": "An open card headed with the id its row will take is where that id resolves until the card compresses to the row",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-registers.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/09-registers.md",
       "heading": "The identifier",
       "decision": "DEC.DEVEX.WORKSPACE.334",
       "restated": [
@@ -11000,7 +11010,7 @@
       },
       "class": "checked",
       "sentence": "The Description is one paragraph, in the standfirst's place",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The masthead, and the opening",
       "decision": null,
       "restated": [
@@ -11019,7 +11029,7 @@
       },
       "class": "checked",
       "sentence": "A construct in a `FOUNDATION` repository carries no status at all",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "A construct's status is derived, never typed",
       "decision": null,
       "restated": []
@@ -11032,7 +11042,7 @@
       },
       "class": "checked",
       "sentence": "A construct may not carry a status its own rows do not derive",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "What the derivation gates, and the three set-checks beside it",
       "decision": null,
       "restated": []
@@ -11043,7 +11053,7 @@
       "params": {},
       "class": "guidance",
       "sentence": "Every construct the pocket holds is linked from the hub",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/08-stylesheet.md",
       "heading": "The overview is the hub, and the constructs are its spokes",
       "decision": null,
       "restated": []
@@ -11056,7 +11066,7 @@
       },
       "class": "stated in a skill",
       "sentence": "Every number is measured, never estimated",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "Reports and templates",
       "decision": null,
       "restated": [
@@ -11075,7 +11085,7 @@
       },
       "class": "stated in a skill",
       "sentence": "A report has five sections, always in this order",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The header and the five sections",
       "decision": null,
       "restated": [
@@ -11094,7 +11104,7 @@
       },
       "class": "stated in a skill",
       "sentence": "Findings holds the facts, one axis per table, and its tables run in one order",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "Findings in a report",
       "decision": null,
       "restated": [
@@ -11113,7 +11123,7 @@
       },
       "class": "stated in a skill",
       "sentence": "A name cell in Findings has two levels, never three",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "Findings in a report",
       "decision": null,
       "restated": [
@@ -11132,7 +11142,7 @@
       },
       "class": "stated in a skill",
       "sentence": "Tables with the same columns have the same widths",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "Findings in a report",
       "decision": null,
       "restated": [
@@ -11151,7 +11161,7 @@
       },
       "class": "stated in a skill",
       "sentence": "Records are list items, never a table",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "Records in a report",
       "decision": null,
       "restated": [
@@ -11170,7 +11180,7 @@
       },
       "class": "stated in a skill",
       "sentence": "Recommendations is three groups, by who decides",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "Recommendations in a report",
       "decision": null,
       "restated": [
@@ -11189,7 +11199,7 @@
       },
       "class": "stated in a skill",
       "sentence": "Every record and every recommendation says who decides it",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "Who decides",
       "decision": null,
       "restated": [
@@ -11208,7 +11218,7 @@
       },
       "class": "stated in a skill",
       "sentence": "A report is read by developers and leaders who have not learned this book's words, so it uses plain ones",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The words a report uses",
       "decision": null,
       "restated": [
@@ -11227,7 +11237,7 @@
       },
       "class": "stated in a skill",
       "sentence": "A `MANUAL` row counts in none of the numbers",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The coverage report — written, built and proved",
       "decision": null,
       "restated": [
@@ -11246,7 +11256,7 @@
       },
       "class": "stated in a skill",
       "sentence": "The audit report is about setup only",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The audit report — how the repository is set up",
       "decision": null,
       "restated": [
@@ -11263,7 +11273,7 @@
       "params": {},
       "class": "guidance",
       "sentence": "Two generated kinds live on a workstream's pages, `progress` and `open`, and a kind is added only with the developer's approval",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "Plan lists the arcs, and the arcs are the state",
       "decision": null,
       "restated": []
@@ -11276,7 +11286,7 @@
       },
       "class": "checked",
       "sentence": "A row names the node it lands in",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The split plan is the arcs' step rows, and Repo is the scope",
       "decision": null,
       "restated": []
@@ -11289,7 +11299,7 @@
       },
       "class": "checked",
       "sentence": "`carried` means the work leaves this workstream, and the target must be able to receive it",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The split plan is the arcs' step rows, and Repo is the scope",
       "decision": null,
       "restated": []
@@ -11302,7 +11312,7 @@
       },
       "class": "checked",
       "sentence": "The close refuses a stopped row, and that is the one place it differs from deferred",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The split plan is the arcs' step rows, and Repo is the scope",
       "decision": null,
       "restated": []
@@ -11313,7 +11323,7 @@
       "params": {},
       "class": "guidance",
       "sentence": "Fold the card before you do the work it unblocked",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "Nothing is published unless the developer asks",
       "decision": null,
       "restated": []
@@ -11324,7 +11334,7 @@
       "params": {},
       "class": "guidance",
       "sentence": "The parts come in one order",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "Nothing is published unless the developer asks",
       "decision": null,
       "restated": []
@@ -11337,7 +11347,7 @@
       },
       "class": "stated in a skill",
       "sentence": "A view on a card is short",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "A card says which views spoke",
       "decision": null,
       "restated": [
@@ -11356,7 +11366,7 @@
       },
       "class": "stated in a skill",
       "sentence": "The agent shortens a view's words for the card, and keeps its name and its meaning",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "A card says which views spoke",
       "decision": null,
       "restated": [
@@ -11401,7 +11411,7 @@
       },
       "class": "stated in a skill",
       "sentence": "A sample is drawn from the page's own data and rules",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The approach document — a workstream's, never a repository's",
       "decision": null,
       "restated": [
@@ -11558,7 +11568,7 @@
       },
       "class": "stated in a skill",
       "sentence": "A section that holds only a table or a code block is drawn flush, and the fix is made for the whole kind",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The shape of a section, on every page kind",
       "decision": null,
       "restated": [
@@ -11597,7 +11607,7 @@
       "params": {},
       "class": "guidance",
       "sentence": "The agent never opens or reads a published artifact itself",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "Nothing is published unless the developer asks",
       "decision": null,
       "restated": []
@@ -11753,7 +11763,7 @@
       },
       "class": "checked",
       "sentence": "A heading below a section's, and an arc's title, is a topic name of at most five words, with no comma",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The approach document — a workstream's, never a repository's",
       "decision": null,
       "restated": []
@@ -11779,7 +11789,7 @@
       },
       "class": "checked",
       "sentence": "The opening of a hub, overview, construct, approach or report page is its Description, one plain paragraph",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The masthead, and the opening",
       "decision": null,
       "restated": []
@@ -11792,7 +11802,7 @@
       },
       "class": "stated in a skill",
       "sentence": "A mock of a layout is a `SKELETON` figure drawn by its helper, with a flow file ordering the pages and each page drawn once",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "SKELETON — a mock of a layout",
       "decision": null,
       "restated": [
@@ -12477,8 +12487,8 @@
         "check": "doc-check"
       },
       "class": "checked",
-      "sentence": "After `How` comes a section of its own, *Plan*: one row per arc, in the arc order (`ideate` first, the build arcs by number and letter, `follow-ups` last), the same order the status bar follows",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "sentence": "After `What` comes a section of its own, *Plan*: one row per arc, in the arc order (`ideate` first, the build arcs by number and letter, `follow-ups` last), the same order the status bar follows",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "Plan lists the arcs, and the arcs are the state",
       "decision": null,
       "restated": [
@@ -12693,7 +12703,7 @@
       },
       "class": "checked",
       "sentence": "A section opens with its own overview, then a figure where seeing is faster, then its content as blocks",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The shape of a section, on every page kind",
       "decision": null,
       "restated": [
@@ -12851,7 +12861,7 @@
       },
       "class": "stated in a skill",
       "sentence": "A proposal shown in chat is laid out by a preview's layers, and its flow shows its steps",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The approach document — a workstream's, never a repository's",
       "decision": null,
       "restated": [
@@ -12880,7 +12890,7 @@
       },
       "class": "stated in a skill",
       "sentence": "A change agreed on an arc reaches that arc's preview before any handover",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The approach document — a workstream's, never a repository's",
       "decision": null,
       "restated": [
@@ -13188,7 +13198,7 @@
       },
       "class": "checked",
       "sentence": "A short name is at most three words, and never a sentence",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The header — two lines, six fields, produced from the block",
       "decision": null,
       "restated": [
@@ -13196,6 +13206,11 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/doc-sets.md",
           "heading": "Every page opens on a masthead of three levels"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The templates sit beside the chapters, in templates/"
         }
       ]
     },
@@ -13207,7 +13222,7 @@
       },
       "class": "checked",
       "sentence": "Every heading a rail shows reads as a name of at most three words before its dash",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The level rule — an overview covers one level",
       "decision": null,
       "restated": [
@@ -13294,7 +13309,7 @@
       },
       "class": "checked",
       "sentence": "On a preview and an approach page, a paragraph gives a reason in at most 60 words, a list holds at most 7 items, each under 25 words, and a callout is one sentence",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "heading": "Prose and lists have limits",
       "decision": null,
       "restated": []
@@ -13307,7 +13322,7 @@
       },
       "class": "checked",
       "sentence": "A page is written with Write or Edit, its figures come from a spec, and an agreed point is folded into its part",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "heading": "Prose and lists have limits",
       "decision": null,
       "restated": []
@@ -13320,7 +13335,7 @@
       },
       "class": "checked",
       "sentence": "The stylesheet reads the design system's token names",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/08-stylesheet.md",
       "heading": "One stylesheet, served in versions",
       "decision": null,
       "restated": [
@@ -13358,7 +13373,7 @@
       },
       "class": "checked",
       "sentence": "Every block has a rule of its own: when to reach for it, its parts, its limit, and the check that holds it",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "heading": "Every block has a rule",
       "decision": null,
       "restated": [
@@ -13377,7 +13392,7 @@
       },
       "class": "checked",
       "sentence": "Every other page kind holds a bound of its own, and an explaining page holds a wider one than a page that decides",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "heading": "Prose and lists have limits",
       "decision": null,
       "restated": [
@@ -13399,7 +13414,7 @@
       "params": {},
       "class": "guidance",
       "sentence": "`CATALOG`, `CARDS`, `NEXT` and `FILE` are written as a fenced block, and `docs page write` draws each as the blocks template shows it",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "heading": "Four blocks have a spelling in markdown",
       "decision": null,
       "restated": [
@@ -13418,7 +13433,7 @@
       },
       "class": "stated in a skill",
       "sentence": "A page of every kind is written in two passes, the text first and the blocks second",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "heading": "A page is written in two passes",
       "decision": null,
       "restated": [
@@ -13444,9 +13459,9 @@
       "level": "GUIDE",
       "params": {},
       "class": "guidance",
-      "sentence": "A surface page preview is the workstream's third page template, used for a surface page review of a site's or an app's pages, and only once the app's design language exists",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "heading": "The surface page preview",
+      "sentence": "A surface preview is one file, the surface page template in `templates/surface/`, used for a surface page review of a site's or an app's pages, and only once the app's design language exists",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
+      "heading": "The surface preview",
       "decision": null,
       "restated": [
         {
@@ -13463,9 +13478,9 @@
         "skill": "spn-devex/ideate"
       },
       "class": "stated in a skill",
-      "sentence": "The preview holds a bar and a frame, and nothing else",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "heading": "The surface page preview",
+      "sentence": "The page holds a bar and the page's markup, and nothing else",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
+      "heading": "The surface preview",
       "decision": null,
       "restated": [
         {
@@ -13477,6 +13492,11 @@
           "plugin": "spn-devex",
           "path": "skills/ideate/SKILL.md",
           "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/page-preview.md",
+          "heading": "Traps"
         }
       ]
     },
@@ -13487,9 +13507,9 @@
         "skill": "spn-devex/ideate"
       },
       "class": "stated in a skill",
-      "sentence": "The copy names its own mode switch and holds its notes, and it is just the page when opened alone",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "heading": "The surface page preview",
+      "sentence": "The page names the design system and the app's stylesheet in two metas, and the shared script builds the frame's document",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
+      "heading": "The surface preview",
       "decision": null,
       "restated": [
         {
@@ -13516,9 +13536,9 @@
         "skill": "spn-devex/ideate"
       },
       "class": "stated in a skill",
-      "sentence": "The bar's message, the meta and the note marker change only with a new stylesheet version",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "heading": "The surface page preview",
+      "sentence": "The frame's document, the metas and the note marker change only with a new stylesheet version",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
+      "heading": "The surface preview",
       "decision": null,
       "restated": [
         {
@@ -13539,7 +13559,7 @@
       "params": {},
       "class": "guidance",
       "sentence": "A unit of the design system is shown as a fenced tree, and `docs page write` renders it into a unit in its own frame on every write",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "heading": "A rendered unit is written as a tree",
       "decision": null,
       "restated": []
@@ -13673,8 +13693,8 @@
       },
       "class": "checked",
       "sentence": "A wire carries no arrowhead",
-      "chapter": "02-constructs/01-devex/04-workspace/06-docs-design-language.md",
-      "heading": "Drawing style",
+      "chapter": "02-constructs/01-devex/04-workspace/06-docs-look.md",
+      "heading": "Drawing",
       "decision": null,
       "restated": []
     },
@@ -13778,8 +13798,8 @@
       },
       "class": "stated in a skill",
       "sentence": "A surface page sample is checked against the current standard for its kind before it is edited",
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "heading": "The surface page preview",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
+      "heading": "The surface preview",
       "decision": null,
       "restated": [
         {
@@ -13789,13 +13809,337 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/steps/mock.md",
+          "path": "skills/design/steps/page-preview.md",
           "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
           "path": "skills/design/steps/page-preview.md",
           "heading": "Traps"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.548",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "Which figure, for what you need to show",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
+      "heading": "The figures — what sits inside a block, and the closed set of them",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "8. Draw it as skeletons — a mock, with no Figma"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/page-preview.md",
+          "heading": "Traps"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.549",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "Content that has a shape takes the block that shape names, from this table, read down to the first row that fits",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
+      "heading": "Which block a content takes, and how its fence is written",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.550",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": "A page whose sidebar lists other pages is the index page, built from `templates/docs/pages/index-template.html`, and it never has a sidebar of its own",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
+      "heading": "The index of artifacts — one page that opens every other",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The artifacts pocket — concept, overview, construct page"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "Anything the developer has not reviewed: preview, confirm, record, then code"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.551",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": "A design-language construct page holds its spec in a fold",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
+      "heading": "The surface preview",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The artifacts pocket — concept, overview, construct page"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.552",
+      "level": "MUST",
+      "params": {
+        "check": "workstream-state"
+      },
+      "class": "checked",
+      "sentence": "An arc whose notes hold a samples index links it from its preview",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
+      "heading": "The approach document — a workstream's, never a repository's",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.553",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": "A docs page has four regions, and each one behaves the same on every page",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
+      "heading": "The templates — the pages, and the two seat files behind them",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.554",
+      "level": "MUST",
+      "params": {
+        "check": "doc-check"
+      },
+      "class": "checked",
+      "sentence": "Every HTML page in a repository's `docs/artifacts/` or an arc's `notes/` starts from one of the docs templates",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
+      "heading": "The templates — the pages, and the two seat files behind them",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The artifacts pocket — concept, overview, construct page"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.555",
+      "level": "MUST",
+      "params": {
+        "check": "doc-check"
+      },
+      "class": "checked",
+      "sentence": "`public/` is self-contained",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
+      "heading": "What the pocket holds",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The artifacts pocket — concept, overview, construct page"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.556",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "`private/` may link into `public/`",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
+      "heading": "What the pocket holds",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "The artifacts pocket — concept, overview, construct page"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.557",
+      "level": "MUST",
+      "params": {
+        "check": "doc-check"
+      },
+      "class": "checked",
+      "sentence": "A command a page shows, in a `sh` block or after \"Try it:\", is a form the command line accepts today",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
+      "heading": "Which block a content takes, and how its fence is written",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/page-preview.md",
+          "heading": "Traps"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.558",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "A page that already exists gets its second pass file by file, and only its form changes",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
+      "heading": "A page is written in two passes",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "How a first proposal is shaped"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.559",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/execute"
+      },
+      "class": "stated in a skill",
+      "sentence": "While an arc changes the agent's own tools, the agent and its helpers run those tools from the arc's branch source, and build, cut and test once at the end",
+      "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "heading": "Drift and the passes",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/execute/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "While the shape is discussed, a find stays on the ideate arc"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.560",
+      "level": "MUST",
+      "params": {
+        "check": "doc-check"
+      },
+      "class": "checked",
+      "sentence": "A page shown to the developer holds no placeholder and no empty section",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
+      "heading": "A page is written in two passes",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.561",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "On a hub and an overview, the words after a heading's dash are a plain phrase a newcomer reads in one pass",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
+      "heading": "The level rule — an overview covers one level",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "What an overview and a hub hold, section by section"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.562",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "A heading's name inside a page is in sentence case, and the words after its dash run on in lowercase",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
+      "heading": "The level rule — an overview covers one level",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "What an overview and a hub hold, section by section"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.563",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "Facts below an item's line stand in the same column on every item of the list, one column for each fact name",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
+      "heading": "Which block a content takes, and how its fence is written",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/blocks.md",
+          "heading": "Which block a content takes, and how its fence is written"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.564",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "A fact whose value is one or more codes from a closed set is written as tags, and drawn as badges",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
+      "heading": "Which block a content takes, and how its fence is written",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/blocks.md",
+          "heading": "Which block a content takes, and how its fence is written"
         }
       ]
     },
@@ -20868,7 +21212,7 @@
       },
       "class": "stated in a skill",
       "sentence": null,
-      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-registers.md",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/09-registers.md",
       "heading": "Which nodes earn one",
       "decision": null,
       "restated": []
@@ -26526,7 +26870,7 @@
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -29045,7 +29389,7 @@
         },
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -30353,7 +30697,7 @@
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -30448,7 +30792,7 @@
       "restated": [
         {
           "plugin": "spn-devex",
-          "path": "refs/devex/workspace/docs/blocks.md",
+          "path": "refs/devex/workspace/docs/figures.md",
           "heading": "skeleton — a mock of a layout, and nothing about how it looks"
         },
         {
@@ -37779,7 +38123,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "`spnutils apps surface render` draws each page of a tree and prints it, in one of two forms",
+      "sentence": "`spnutils apps surface render` draws a tree in an app's design language, and its three choices are always given",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
       "heading": "The command",
       "decision": null,
@@ -37798,9 +38142,9 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "The app object is the design language's row for the app, and no field of it is written by hand in a tree file",
+      "sentence": "The app's row in the design language is the one source of the look, and no field of it is written in a tree file",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
-      "heading": "The app object",
+      "heading": "The app",
       "decision": null,
       "restated": [
         {
@@ -37817,7 +38161,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "A tree has `specVersion` at its top, and a version the render does not read is refused",
+      "sentence": "A tree has `treeVersion` at its top, and a version the render does not read is refused",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
       "heading": "The tree",
       "decision": null,
@@ -37855,7 +38199,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "The render prints `{ \"pages\": [ { \"html\", \"findings\" } ] }` to standard output, one whole page for each page of the tree",
+      "sentence": "The render prints the HTML of the tree, keyed by mode and then by device, and no document around it",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
       "heading": "The output",
       "decision": null,
@@ -37893,7 +38237,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "The design system at the app object's `ds` version is fetched once into the machine's store when no app has it installed",
+      "sentence": "The design system at the version the app pins is fetched once into the machine's store when no app has it installed",
       "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
       "heading": "Nothing is kept",
       "decision": null,
@@ -38103,6 +38447,68 @@
       "sentence": "Features that each answer their own question stand in sections of their own; one section holds several features only when they answer one question",
       "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md",
       "heading": "What holds across",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.595",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A page that shows a render links the design system's stylesheet, and an app's own stylesheet only where the app gives one",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "heading": "One source for the platform's look",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "One source for the platform's look — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.596",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A choice left out is refused, never defaulted",
+      "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
+      "heading": "The command",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.597",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "The render returns markup only, and a page that shows a copy builds the page around it",
+      "chapter": "04-capabilities/02-support/01-surface/11-delivery-library/01-common/02-render.md",
+      "heading": "A page that shows a copy",
       "decision": null,
       "restated": [
         {

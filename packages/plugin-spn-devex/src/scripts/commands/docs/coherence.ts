@@ -1,5 +1,5 @@
 // RESTATES: RULE.DEVEX.WORKSPACE.162, RULE.DEVEX.WORKSPACE.080, RULE.DEVEX.WORKSPACE.088, RULE.DEVEX.WORKSPACE.118, `04-discipline.md` and
-// `06-registers.md`. The chapters are the source of truth; a rule change is edited there first.
+// `09-registers.md`. The chapters are the source of truth; a rule change is edited there first.
 //
 // The corpus checked against itself, rather than against its own form.
 //
@@ -26,7 +26,7 @@
 //   PATH         does every plugin path a document names resolve to something on disk
 //
 // NONE OF THEM ASKS WHETHER A ROW'S RULING IS TRUE of the documents it governs, and that is the
-// question worth most. It needs a row to name the surfaces stating it, which `06-registers.md` now
+// question worth most. It needs a row to name the surfaces stating it, which `09-registers.md` now
 // requires and no row yet carries. Until a row carries that list, the comparison is an inference
 // problem rather than a check, and an inference that guesses wrong is worse than silence.
 //
@@ -63,7 +63,7 @@ const SKIP_WORDS = new Set(["what", "this", "that", "with", "from", "they", "the
 // Prose that is deliberately historical: an artifact describes the moment it was produced
 // (RULE.DEVEX.WORKSPACE.088), so its struck-through text is a record rather than a claim.
 //
-// This once said a superseded ruling keeps its old words on purpose. It does not. `06-registers.md`
+// This once said a superseded ruling keeps its old words on purpose. It does not. `09-registers.md`
 // rules that a row is never annotated, struck through, or left standing with a note, and `doc-check`
 // refuses one now, so a register carries none to skip. The skip stays for artifacts, where the shape
 // is still legitimate.

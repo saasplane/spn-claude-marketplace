@@ -23,7 +23,7 @@ import { withOffset } from "../../lib/clock.ts";
 import { readdirSync, statSync } from "node:fs";
 import { basename, join, relative, resolve } from "node:path";
 import { type Action, FLAG, OPTIONAL, onePath, readWords, repositoryOf, scopeOf, under } from "../../../../../plugin-support-lib/src/lib/command.ts";
-import { DOCS, reportsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { DOCS, reportsDir, slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { declaredIds, declaredRows, idsIn } from "../../../../../plugin-support-lib/src/lib/register.ts";
 import { owedBy, TIERS } from "../../../../../plugin-support-lib/src/lib/kinds.ts";
 import { cited, read } from "../../../../../plugin-support-lib/src/lib/runs.ts";
@@ -35,7 +35,8 @@ const isFile = (path: string): boolean => { try { return statSync(path).isFile()
 type Finding = { project: string; kind: null; severity: string; ftype: string; message: string };
 
 /** Where the tests report lands in a repository's pocket, named by its kind (RULE.DEVEX.WORKSPACE.149). */
-export const TESTS_REPORT = join(reportsDir(DOCS), "tests-report.html");
+/** The tests report's path in the repository at `root`, read from that repository's own pocket layout and never the folder the command runs in. */
+export const testsReportOf = (root: string): string => slashes(relative(root, join(reportsDir(join(root, DOCS)), "tests-report.html")));
 
 const finding = (file: string, message: string, ftype = "BEHAVIOUR_ROW"): Finding =>
   ({ project: file, kind: null, severity: "WARN", ftype: ftype, message: message });
@@ -183,7 +184,7 @@ export function citingCases(root: string, nodes: string[]): CitingCase[] {
 
 /**
  * The row statuses a Repository row counts, each always present so a zero reads as counted. A `MANUAL`
- * row counts in none of the numbers (05-artifacts.md § The tests report): a person proves it by the
+ * row counts in none of the numbers (05-pages.md § The tests report): a person proves it by the
  * repository's browser guide, so it is listed as `manual` beside the counts, and the four sum to Written.
  */
 const STATUS_WORDS = ["SUCCESS", "FAILED", "PENDING", "PLANNED"] as const;
@@ -335,8 +336,9 @@ export function measure(root: string, scope: string[] | null = null): Record<str
   };
   const digest = digestOf(measured);
   if (scope !== null) return { ...measured, digest: digest, report: null };
-  const page = read(join(root, TESTS_REPORT));
-  return { ...measured, digest: digest, report: { path: TESTS_REPORT, exists: page !== null, current: page !== null && page.includes(digest) } };
+  const testsReport = testsReportOf(root);
+  const page = read(join(root, testsReport));
+  return { ...measured, digest: digest, report: { path: testsReport, exists: page !== null, current: page !== null && page.includes(digest) } };
 }
 
 /** The measurement as a person reads it in a terminal. The rows themselves are in `--json`. */

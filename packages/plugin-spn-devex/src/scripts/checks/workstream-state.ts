@@ -1,5 +1,5 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is cut by what is reviewed and released together, and named for its domain · § The folder · § The commands · § The life of an arc, and every file it touches · § The approach page keeps up with its arcs · § Open and backlog workstreams follow the standard as it moves · § An arc carries its specification, or names the note that holds it
-//           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The approach document — a workstream's, never a repository's · § After `How` comes a section of its own, Plan (RULE.DEVEX.WORKSPACE.487)
+//           docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § The approach document — a workstream's, never a repository's · § After `How` comes a section of its own, Plan (RULE.DEVEX.WORKSPACE.487)
 // The chapters are the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // `workstream state check`, as a function: whether each open and backlog workstream is whole. The
@@ -10,15 +10,15 @@ import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { cardsDiffer, openWithoutCard } from "./questions.ts";
 import { TERMINAL } from "./arc-status.ts";
-import { pageRulesOnDisk } from "./doc-check.ts";
+import { pageRulesOnDisk, unfilledPage } from "./doc-check.ts";
 import { cyclesOf, headerStatusRule, tableStatuses } from "../commands/docs/cycles.ts";
 import { isDir, isFile, listdir } from "../lib/payload.ts";
 import { linksSharedStyles } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import {
-  DATA_FILES, FACTS_FILE, findingsFileOf, SHEET_FILE, LOG_FILE, NOTES, PREVIEW_FILE, approachOf, arcStatus, stepsMayStart, arcDataDir, arcIdsOf, factsFileOf, sheetFileOf, readSheet, firstOpenArc, leafRows, isDataLayout, logFileOf, markdownArcsOf,
+  DATA_FILES, FACTS_FILE, findingsFileOf, SHEET_FILE, LOG_FILE, NOTES, ARC_FILE, PREVIEW_FILE, arcPageNameOf, approachOf, arcStatus, stepsMayStart, arcDataDir, arcIdsOf, factsFileOf, sheetFileOf, readSheet, firstOpenArc, leafRows, isDataLayout, logFileOf, markdownArcsOf,
   NO_REPO, arcStamp, markdownIn, nameFileHolds, nameFileOf, notesDirOf, previewOf, questionsFileOf, readJsonl, readQuestions, stampsOn, stateFileOf,
   strayLevels, strayNotes, suggestionsFileOf, readJson, readArc, workstreamsOf, previewWithStatus, builtOf,
-  localLinks, previewHrefOf, previewOwners, slotsIn, whatEntryOf, whatId, whatRange, workstreamName,
+  holdsArcEntries, localLinks, planRowOf, previewHrefOf, previewOwners, slotsIn, whatEntryOf, whatId, whatRange, workstreamName,
 } from "../lib/workstream.ts";
 import { ARC_ID, WORK, DONE_STATES, arcFaults, factFaults, findingFaults, type Finding as ReviewFinding, sheetFaults, logFaults, questionFaults, cardName, subjectFault, suggestionFaults, type ArcData, type ArcRow, type Fact } from "../lib/workstream-schema.ts";
 
@@ -43,30 +43,31 @@ function filesUnder(dir: string, base = dir): string[] {
 }
 
 /**
- * A surface page preview: a page whose `spn:doc` variant is `surface-page-preview` (RULE.DEVEX.WORKSPACE.534). It is the work's page
+ * A surface page: a page whose `spn:doc` variant is `surface-page` (or `surface-page-preview`, as the pages written before it) (RULE.DEVEX.WORKSPACE.534). It is the work's page
  * for one surface page, a viewer for the copy beside it, and never an arc's preview.
  */
 export function isSurfacePagePreview(path: string): boolean {
-  try { return /<!--\s*spn:doc[\s\S]*?"variant"\s*:\s*"surface-page-preview"/.test(readFileSync(path, "utf8")); } catch { return false; }
+  try { return /<!--\s*spn:doc[\s\S]*?"variant"\s*:\s*"surface-page(?:-preview)?"/.test(readFileSync(path, "utf8")); } catch { return false; }
 }
 
 /**
- * Q99: at most one preview per arc, by its fixed name, and no `previews/` folder. That every arc has its one
+ * Q99: at most one preview per arc, by its fixed name, and no `previews/` folder. A file under `samples/` is a sample, never a preview: a
+ * template copy named `arc-template.html` there is read by the sample check, not this one. That every arc has its one
  * is `arcPreviewFindings`' (RULE.DEVEX.WORKSPACE.254).
  */
 export function previewFindings(ws: string, arc: string): string[] {
   const out: string[] = [];
   const notes = notesDirOf(ws, arc);
-  if (isDir(join(notes, "previews"))) out.push(`${arc} keeps a \`previews/\` folder — an arc's one preview is \`${NOTES}/${arc}/${PREVIEW_FILE}\``);
+  if (isDir(join(notes, "previews"))) out.push(`${arc} keeps a \`previews/\` folder — an arc's one page is \`${NOTES}/${arc}/${ARC_FILE}\``);
   for (const [base, under] of [[notes, `${NOTES}/${arc}`], [join(ws, "arcs", arc), `arcs/${arc}`]] as const)
     for (const file of filesUnder(base))
-      if (/preview[^/]*\.html$/i.test(file) && !(base === notes && file === PREVIEW_FILE) && !isSurfacePagePreview(join(base, file)))
-        out.push(`\`${under}/${file}\` is a second preview — an arc has at most one, \`${NOTES}/${arc}/${PREVIEW_FILE}\``);
+      if (/preview[^/]*\.html$/i.test(file) && !(base === notes && (file === ARC_FILE || file === PREVIEW_FILE)) && !(base === notes && file.startsWith("samples/")) && !isSurfacePagePreview(join(base, file)))
+        out.push(`\`${under}/${file}\` is a second preview — an arc has at most one page, \`${NOTES}/${arc}/${ARC_FILE}\``);
   return out;
 }
 
 /** The kinds of page the book has. A sample whose masthead names one is a page of the book the work produces. */
-export const BOOK_PAGE_KINDS: readonly string[] = ["approach", "preview", "construct", "overview", "report", "guide", "index", "hub"];
+export const BOOK_PAGE_KINDS: readonly string[] = ["approach", "preview", "arc", "construct", "overview", "report", "guide", "index", "hub", "page"];
 
 /** A review copy of one of the book's templates, named for it: `blocks-template.html`, `approach-template-v2.html`. */
 const TEMPLATE_COPY = /-template(?:-[^/.]+)?\.html?$/i;
@@ -96,6 +97,81 @@ export function sampleFindings(ws: string, arc: string): string[] {
       "the work produces carries a masthead, its `Type` naming the page kind or its name the template it copies");
   }
   return out;
+}
+
+/** Every `path` a samples index's `index-data` lists, with the group's `base` put in front where it names one. */
+function indexPaths(node: unknown, base: string, out: string[]): void {
+  if (Array.isArray(node)) { for (const one of node) indexPaths(one, base, out); return; }
+  if (!node || typeof node !== "object") return;
+  const record = node as Record<string, unknown>;
+  if (typeof record.path === "string") out.push(base + record.path);
+  for (const key of ["groups", "children", "items"]) indexPaths(record[key], base, out);
+}
+
+/**
+ * RULE.DEVEX.WORKSPACE.560: no page of the work reaches the developer unfilled. A page the work holds, the approach page, an arc's page,
+ * and every HTML page a samples index lists, has no `{{…}}` slot left and no section with a heading and nothing under it. A review copy of a
+ * template, named `…-template.html`, is a template and is not read.
+ */
+export function unfilledFindings(file: string, label: string, generated: readonly string[] = []): string[] {
+  let text = "";
+  try { text = readFileSync(file, "utf8"); } catch { return []; }
+  if (TEMPLATE_COPY.test(file)) return [];
+  // A section the commands fill from the arcs and the cards (How, Open, Deferred on the approach page) is empty until they have something to write.
+  return unfilledPage(file, text).filter(([, message]) => !generated.some((name) => message.startsWith(`the section "${name}" has a heading and nothing under it`)))
+    .map(([, message]) => `${label}: ${message}`);
+}
+
+/** The pages a samples index lists, as files that exist. */
+export function listedSamples(ws: string, arc: string): string[] {
+  const dir = join(notesDirOf(ws, arc), "samples");
+  let text = "";
+  try { text = readFileSync(join(dir, "index.html"), "utf8"); } catch { return []; }
+  const json = /<script\b[^>]*\bid="index-data"[^>]*>([\s\S]*?)<\/script>/i.exec(text)?.[1];
+  if (!json) return [];
+  let data: unknown;
+  try { data = JSON.parse(json); } catch { return []; }
+  const base = typeof (data as { base?: unknown })?.base === "string" ? (data as { base: string }).base : "";
+  const paths: string[] = [];
+  indexPaths(data, base, paths);
+  return [...new Set(paths)].filter((one) => /\.html?$/i.test(one) && !one.split("/").includes("..")).map((one) => join(dir, one.split("#")[0])).filter((one) => isFile(one));
+}
+
+/**
+ * RULE.DEVEX.WORKSPACE.267: an arc's samples index lists only what the work produces. An entry whose path leaves
+ * `samples/` (a `..` segment) is a view of the work, kept in `work/` and never linked from samples; an entry that is no
+ * HTML page is a file the agent manages, kept out of samples.
+ */
+export function sampleIndexFindings(ws: string, arc: string): string[] {
+  let text = "";
+  try { text = readFileSync(join(notesDirOf(ws, arc), "samples", "index.html"), "utf8"); } catch { return []; }
+  const json = /<script\b[^>]*\bid="index-data"[^>]*>([\s\S]*?)<\/script>/i.exec(text)?.[1];
+  if (!json) return [];
+  let data: unknown;
+  try { data = JSON.parse(json); } catch { return []; }
+  const base = typeof (data as { base?: unknown })?.base === "string" ? (data as { base: string }).base : "";
+  const paths: string[] = [];
+  indexPaths(data, base, paths);
+  const out: string[] = [];
+  for (const one of paths) {
+    if (one.split(/[\\/]/).includes(".."))
+      out.push(`${arc}'s samples index lists \`${one}\`: a samples index lists only what the work produces; ${one} is a view of the work, kept in work/ and never linked from samples (rule 267)`);
+    else if (!/\.html?$/i.test(one.split(/[?#]/)[0]))
+      out.push(`${arc}'s samples index lists \`${one}\`: a samples index shows only pages a reader reviews; ${one} is a file the agent manages, kept out of samples (rule 267)`);
+  }
+  return out;
+}
+
+/**
+ * RULE.DEVEX.WORKSPACE.552: an arc whose notes hold `samples/index.html` links it from its preview, so a reviewer
+ * opens the built thing without hunting for it. The preview holds a link whose `href` ends in `samples/index.html`.
+ */
+export function sampleLinkFindings(ws: string, arc: string): string[] {
+  if (!isFile(join(notesDirOf(ws, arc), "samples", "index.html"))) return [];
+  let text = "";
+  try { text = readFileSync(previewOf(ws, arc), "utf8"); } catch { return []; }
+  if (/<a\b[^>]*\bhref="[^"]*samples\/index\.html(?:[?#][^"]*)?"/i.test(text)) return [];
+  return [`${arc}'s preview does not link its samples: end its Overview with a line that opens samples/index.html (rule 552)`];
 }
 
 /**
@@ -142,7 +218,7 @@ export function nameFindings(ws: string, arc: string, data: ArcData): string[] {
 }
 
 /** The path a preview named by the arc sits at: the fixed place, or where a carried arc's `preview` field names it. */
-const previewPathOf = (ws: string, arc: string, data: ArcData): string => resolve(ws, previewHrefOf(arc, data));
+const previewPathOf = (ws: string, arc: string, data: ArcData): string => resolve(ws, previewHrefOf(arc, data, ws));
 
 /**
  * RULE.DEVEX.WORKSPACE.254: every arc has one preview, written when it opens; an arc's preview names another arc by its What,
@@ -151,7 +227,7 @@ const previewPathOf = (ws: string, arc: string, data: ArcData): string => resolv
 export function arcPreviewFindings(ws: string, arc: string, data: ArcData, owners: ReadonlyMap<string, string>): string[] {
   const out: string[] = [];
   const path = previewPathOf(ws, arc, data);
-  const href = previewHrefOf(arc, data);
+  const href = previewHrefOf(arc, data, ws);
   const number = workstreamName(ws).number;
   const inFolder = notesFolderOf(ws, path);
   if (inFolder && inFolder !== arc)
@@ -166,7 +242,7 @@ export function arcPreviewFindings(ws: string, arc: string, data: ArcData, owner
     const other = owners.get(link.path);
     if (!other || other === arc || seen.has(other)) continue;
     seen.add(other);
-    out.push(`${arc}'s preview links \`${link.href}\`, ${other}'s preview — a preview names another arc by its What, \`../../approach.html#${whatId(other)}\`, and never links its preview`);
+    out.push(`${arc}'s preview links \`${link.href}\`, ${other}'s preview — a preview names another arc by its Plan row, \`../../approach.html#${other}\`, and never links its preview`);
   }
   const status = arcStatus(data);
   const slots = slotsIn(text);
@@ -189,8 +265,9 @@ export function findingsFindings(ws: string, arc: string, data: ArcData): string
 }
 
 /**
- * S7: the arc's row in Plan under its address, its stamp against its goal, title and repositories, and its own What
- * entry, `<arc>-what`, which links its preview and no other arc's (RULE.DEVEX.WORKSPACE.254).
+ * S7: the arc's row in Plan under its address, its stamp against its goal, title and repositories, and the place that links
+ * its preview and no other arc's (RULE.DEVEX.WORKSPACE.254): its Plan row, and, on a page written before What was told by
+ * construct, its own What entry, `<arc>-what`.
  */
 export function pageFindings(ws: string, arc: string, data: ArcData, page: string | null, text: string, owners: ReadonlyMap<string, string> = previewOwners(ws)): string[] {
   if (!page) return [`${arc} has no approach page to stand on`];
@@ -201,11 +278,14 @@ export function pageFindings(ws: string, arc: string, data: ArcData, page: strin
     out.push(`${arc}'s row in Plan carries no \`id="${arc}"\`, so \`approach.html#${arc}\` opens nothing — \`spn-devex docs cycles write\` writes it`);
   else if (row.stamp !== arcStamp(data))
     out.push(`${arc}'s part on the approach page is behind its goal, title or repositories — bring Why, What and How current, then \`workstream arc stamp write ${arc}\``);
-  const entry = whatEntryOf(text, arc);
+  // A page told by construct has no entry per arc: the Plan row is the arc's address and links its page. A page that still tells What by arc is read as it was.
+  const entry = whatEntryOf(text, arc) ?? planRowOf(text, arc);
   if (!entry) {
-    out.push(`${arc} has no What entry, \`${whatId(arc)}\`, on the approach page — \`spn-devex workstream arc edit ${workstreamName(ws).number}/${arc} --under <heading id>\` anchors it on its subject heading, or writes it under a domain heading`);
+    if (holdsArcEntries(text))
+      out.push(`${arc} has no What entry, \`${whatId(arc)}\`, on the approach page — \`spn-devex workstream arc edit ${workstreamName(ws).number}/${arc} --under <heading id>\` anchors it on its subject heading, or writes it under a domain heading`);
     return out;
   }
+  const place = entry.kind === "row" ? "Plan row" : "What entry";
   const own = previewPathOf(ws, arc, data);
   const links = localLinks(text.slice(entry.from, entry.to), dirname(page));
   const crossed = new Set<string>();
@@ -213,21 +293,22 @@ export function pageFindings(ws: string, arc: string, data: ArcData, page: strin
     const other = owners.get(link.path);
     if (!other || other === arc || crossed.has(other)) continue;
     crossed.add(other);
-    out.push(`${arc}'s What entry links \`${link.href}\`, ${other}'s preview — an arc's entry links its own preview only, and names another arc by its What, \`approach.html#${whatId(other)}\``);
+    out.push(`${arc}'s ${place} links \`${link.href}\`, ${other}'s preview — an arc's entry links its own preview only, and names another arc by its ${entry.kind === "row" ? "Plan row" : "What"}, \`approach.html#${entry.kind === "row" ? other : whatId(other)}\``);
   }
   for (const link of links) {
     const folder = notesFolderOf(ws, link.path);
     if (!folder || folder === arc || owners.get(link.path)) continue;
-    out.push(`${arc}'s What entry links \`${link.href}\`, inside ${folder}'s folder — an arc's entry links into \`${NOTES}/${arc}/\` only, and names another arc by its What, \`approach.html#${whatId(folder)}\``);
+    out.push(`${arc}'s ${place} links \`${link.href}\`, inside ${folder}'s folder — an arc's entry links into \`${NOTES}/${arc}/\` only, and names another arc by its ${entry.kind === "row" ? "Plan row" : "What"}, \`approach.html#${entry.kind === "row" ? folder : whatId(folder)}\``);
   }
-  if (!links.some((link) => link.path === own)) out.push(`${arc}'s preview is not linked from its What entry, \`#${whatId(arc)}\``);
+  if (!links.some((link) => link.path === own)) out.push(`${arc}'s preview is not linked from its ${place}, \`#${entry.kind === "row" ? arc : whatId(arc)}\``);
   return out;
 }
 
 /** RULE.DEVEX.WORKSPACE.254: a preview is linked from its own arc's What entry, and from no other place in What. One finding for each arc whose preview is so linked. */
 export function whatLinkFindings(ws: string, page: string | null, text: string, owners: ReadonlyMap<string, string>): string[] {
   const range = whatRange(text);
-  if (!page || !range) return [];
+  // A page told by construct links arc pages from the constructs the arcs change, so the rule binds only a page that tells What by arc.
+  if (!page || !range || !holdsArcEntries(text)) return [];
   const inside = [...new Set(owners.values())].flatMap((arc) => { const entry = whatEntryOf(text, arc); return entry ? [entry] : []; });
   const out: string[] = [];
   const seen = new Set<string>();
@@ -427,6 +508,8 @@ export function checkWorkstream(ws: string): Finding[] {
     const data = faults.length ? null : readArc(ws, arc);
     out.push(...previewFindings(ws, arc).map(say(arc, "preview")));
     out.push(...sampleFindings(ws, arc).map(say(arc, "samples")));
+    out.push(...sampleLinkFindings(ws, arc).map(say(arc, "preview")));
+    out.push(...sampleIndexFindings(ws, arc).map(say(arc, "samples")));
     if (!data) continue;
     out.push(...arcPreviewFindings(ws, arc, data, owners).map(say(arc, "preview")));
     out.push(...pageFindings(ws, arc, data, page, text, owners).map(say(arc, "stamp")));
@@ -438,8 +521,14 @@ export function checkWorkstream(ws: string): Finding[] {
   }
   // THE PAGE RULES READ THE SAVED FILE, whichever way it was written: the Write and Edit hook reads only what is typed.
   for (const arc of arcIdsOf(ws))
-    for (const message of pageRulesOnDisk(previewOf(ws, arc))) out.push(say(arc, "pages")(`${NOTES}/${arc}/${PREVIEW_FILE}: ${message}`));
+    for (const message of pageRulesOnDisk(previewOf(ws, arc))) out.push(say(arc, "pages")(`${NOTES}/${arc}/${arcPageNameOf(ws, arc)}: ${message}`));
   if (page) for (const message of pageRulesOnDisk(page)) out.push(say(null, "pages")(`${basename(page)}: ${message}`));
+  // NO PAGE REACHES THE DEVELOPER UNFILLED (RULE.DEVEX.WORKSPACE.560): the approach page, each arc's page, and every page a samples index lists.
+  if (page) for (const message of unfilledFindings(page, basename(page), ["How", "Open", "Deferred"])) out.push(say(null, "unfilled")(message));
+  for (const arc of arcIdsOf(ws)) {
+    for (const message of unfilledFindings(previewOf(ws, arc), `${NOTES}/${arc}/${arcPageNameOf(ws, arc)}`)) out.push(say(arc, "unfilled")(message));
+    for (const sample of listedSamples(ws, arc)) for (const message of unfilledFindings(sample, `${NOTES}/${arc}/samples/${relative(join(notesDirOf(ws, arc), "samples"), sample)}`)) out.push(say(arc, "unfilled")(message));
+  }
   // A preview linked from What outside its arc's entry belongs to no arc's check.
   out.push(...whatLinkFindings(ws, page, text, owners).map(say(null, "stamp")));
   // The status card is read from every arc together, so it belongs to none of them.

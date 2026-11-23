@@ -11,7 +11,7 @@ import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
 import { ARTIFACT, CONSTRUCT_PAGES, POCKET, SEAT, WORKSTREAMS } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { INDEX_SCRIPT, OWN_COPY, linesFor } from "../../../../../../plugin-support-lib/src/lib/page-styles.ts";
-import { ENUM_HEAD, checkCodeFigures, checkTreeFigures } from "../../../../../src/scripts/commands/docs/_lib.ts";
+import { ENUM_HEAD, backLinkOf, checkCodeFigures, checkTreeFigures } from "../../../../../src/scripts/commands/docs/_lib.ts";
 import { FINDINGS } from "../../../../../src/scripts/commands/docs/audit.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
@@ -510,7 +510,7 @@ console.log("\n=== the gap scan measures and never fixes");
       catch { return false; }
     });
 
-  // AN ARGUMENT IS A WORKSTREAM'S, NEVER A REPOSITORY'S. 05-artifacts.md has always said "an
+  // AN ARGUMENT IS A WORKSTREAM'S, NEVER A REPOSITORY'S. 05-pages.md has always said "an
   // argument does not live here", but nothing checked it, so fifteen pages accumulated across three
   // repositories before anybody counted. A rule a person has to remember is a rule that holds until
   // the week somebody is busy. The page is refused wherever it sits in `docs/`, a pocket folder too.
@@ -534,7 +534,7 @@ console.log("\n=== the gap scan measures and never fixes");
     one("the same page in a workstream is not", got, (g) => !/belongs to the workstream/.test(g));
   }
 
-  // The pocket's folder set is docs, guides and reports (05-artifacts.md § What the pocket
+  // The pocket's folder set is docs, guides and reports (05-pages.md § What the pocket
   // holds). A folder the set does not name held "what a document was written from", and every such
   // file was a seat depending on a pocket — 229 files across five repositories, 187 of them cited by
   // nothing. The check reads the set, so any other name is refused the same way; two are probed.
@@ -569,7 +569,7 @@ console.log("\n=== the gap scan measures and never fixes");
 
     const leftOverview = at(`${LEFT_OVERVIEWS}/core-overview.html`, overviewPage);
     one("[MKT.SCRIPTS.110] an overview left under `overviews/` is a finding of the audit, and it names the folder the pocket does not hold",
-      leftOverview, (g) => g.includes("✗ RULE block") && g.includes("the pocket holds `docs/`, `guides/` and `reports/`, and no `overviews/`"));
+      leftOverview, (g) => g.includes("✗ RULE block") && g.includes("the pocket holds `docs/`, `guides/`, `reports/` and `surface/`, and no `overviews/`"));
     one("[MKT.SCRIPTS.110] and it names where the overview belongs: beside the hub, or in its domain's folder",
       leftOverview, has(`this page belongs at ${placed.beside} beside the hub, or ${POCKET_DOCS}/<domain>/core-overview.html`));
     const leftConstruct = at(`${LEFT_CONSTRUCTS}/01-core/01-thing-construct.html`, constructPage);
@@ -1178,13 +1178,13 @@ console.log("\n=== a page's furniture is the shared files': a version that exist
 
   one("a page `docs page` produced links the shared stylesheet, and the audit finds it clean", audit(produced),
     // The page takes its two lines from the template, so it links the version the template links.
-    (g) => /<link rel="stylesheet" href="[^"]*\/assets\/docs\/\d+\.\d+\.\d+\/sds-docs\.css" integrity="sha384-[^"]+" crossorigin="anonymous">/.test(produced)
-      && produced.includes(/<link rel="stylesheet"[^>]*>/.exec(readFileSync(resolve(templates, "pages", "construct-template.html"), "utf8"))[0])
+    (g) => /<link rel="stylesheet" href="[^"]*\/assets\/docs\/\d+\.\d+\.\d+\/docs-language\.css" integrity="sha384-[^"]+" crossorigin="anonymous">/.test(produced)
+      && produced.includes(/<link rel="stylesheet"[^>]*>/.exec(readFileSync(resolve(templates, "docs", "pages", "construct-template.html"), "utf8"))[0])
       && g.includes("clean — 1 page"));
   one("known-bad: the same page edited by hand is not what the seat produces",
     audit(produced.replace("<h2>Model</h2>", "<h2>Model</h2>\n<p>typed into the page</p>")), has("✗ RULE produced"));
-  const own = produced.replace(LINES.stylesheet, "<style>.badge{color:red}</style>")
-    .replace(LINES.script, "<script>/* a rail builder of this page's own */</script>")
+  const own = produced.replace(/<link rel="stylesheet"[^>]*>/, "<style>.badge{color:red}</style>")
+    .replace(/<script src="[^"]*"[^>]*><\/script>/, "<script>/* a rail builder of this page's own */</script>")
     .replaceAll("sds-section-head", "sec-head").replaceAll("sds-label", "lbl").replaceAll("sds-separator", "sep").replaceAll("sds-", "");
   const named = audit(own);
   one("[MKT.SCRIPTS.108] a produced page that holds its own copy draws the one RULE line, and no `produced` finding",
@@ -1383,7 +1383,7 @@ console.log("\n=== a guide page and the index of artifacts are pages the audit k
     audit({ [stray]: guide() }, stray), (g) => g.includes("`index.html` is the one page that sits directly in the pocket") && g.includes("`guides/`"));
   const elsewhere = `${POCKET_DOCS}/index.html`;
   one("known-bad: an index in a folder of the pocket is refused, because a repository has one and it sits in the pocket itself",
-    audit({ [elsewhere]: index() }, elsewhere), has("a repository has one index, and it is `docs/artifacts/index.html`"));
+    audit({ [elsewhere]: index() }, elsewhere), has("a repository has one index in the pocket and one in each half of it"));
   one("the pocket's face sits directly in the pocket too, and is not refused",
     audit({ [`docs/${POCKET.artifacts}/README.md`]: doc({ id: "p", title: "Artifacts", lenses: ["ARCHITECT"], status: "DONE" }, "x\n", "`For: Architect` · `Status: ✅ DONE`") },
       `docs/${POCKET.artifacts}/README.md`), lacks("directly in the pocket"));
@@ -1406,9 +1406,9 @@ console.log("\n=== a preview page: variant `preview`, its own title, a Status ch
 {
   // THE BOOK'S OWN TEMPLATE GIVES THE TWO LINES, so a clean case links what the book links.
   const templates = TEMPLATES_DIR;
-  const previewTemplate = readFileSync(resolve(templates, "workstream", "approach-preview-template.html"), "utf8");
-  const linkLine = previewTemplate.match(/<link\b[^>]*sds-docs\.css"[^>]*>/)[0];
-  const scriptLine = previewTemplate.match(/<script\b[^>]*sds-docs\.js"[^>]*><\/script>/)[0];
+  const previewTemplate = readFileSync(resolve(templates, "workstream", "arc-template.html"), "utf8");
+  const linkLine = previewTemplate.match(/<link\b[^>]*docs-language\.css"[^>]*>/)[0];
+  const scriptLine = previewTemplate.match(/<script\b[^>]*docs-page\.js"[^>]*><\/script>/)[0];
   const notes = `.spndevex/${WORKSTREAMS}/open/001-a/notes/N001`;
   const at = `${notes}/previews/layout-preview.html`;
   const good = { id: "ws-001-a-layout", variant: "preview", title: "Layout", lenses: ["ARCHITECT"], status: "PLANNING",
@@ -1416,7 +1416,7 @@ console.log("\n=== a preview page: variant `preview`, its own title, a Status ch
   const state = (word) => `<span class="sds-state"><span class="sds-label">Status:</span> <a class="sds-badge sds-status sds-${word.toLowerCase()}">${word}</a></span>`;
   const page = (o, { chip = state("PROPOSED"), named = o.title, heading = o.title, own = "" } = {}) =>
     block(o) + `${linkLine}\n${own}<nav class="sds-rail" id="rail"></nav>\n<header class="sds-masthead">\n` +
-    `<div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Workstream 001 &nbsp;|&nbsp; ${named}</span>` +
+    `<div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &middot; 001 A &middot; ${named}</span>` +
     `<span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-separator">|</span>` +
     `<span class="sds-label">Shown:</span> <span class="sds-badge">2026-10-01</span>${chip}</span></div>\n` +
     `<h1>${heading}</h1>\n<p class="sds-subtitle">Decides how the page is laid out.</p>\n` +
@@ -1461,11 +1461,11 @@ console.log("\n=== a preview page: variant `preview`, its own title, a Status ch
     audit({ [`${notes}/samples/broken-preview.html`]: broken }, `${notes}/samples/broken-preview.html`),
     (got) => has("a sample, a template and a bundled copy are not audited as pages")(got) && lacks("RULE")(got));
   one("a template file is not audited as a page, wherever it sits",
-    audit({ [`${notes}/previews/approach-preview-template.html`]: previewTemplate }, `${notes}/previews/approach-preview-template.html`),
+    audit({ [`${notes}/previews/arc-template.html`]: previewTemplate }, `${notes}/previews/arc-template.html`),
     (got) => has("a sample, a template and a bundled copy are not audited as pages")(got) && lacks("RULE")(got));
   one("a notes folder is audited for its previews alone — the sample and the template beside it are not counted",
     audit({ [at]: page(good), [`${notes}/samples/broken-preview.html`]: broken, [`${notes}/samples/close-message.md`]: "Closing.\n",
-            [`${notes}/samples/approach-preview-template.html`]: previewTemplate }, notes),
+            [`${notes}/samples/arc-template.html`]: previewTemplate }, notes),
     has("clean — 1 page"));
 }
 
@@ -1638,6 +1638,17 @@ console.log("\n=== the set `--finding` takes is the names the audit's own findin
   one("[MKT.SCRIPTS.130] `audit check` of a path that does not exist names it as a RULE finding, with no stack",
     said, (got) => got.includes("✗ RULE audit") && got.includes("no such file or folder") && !got.includes("ENOENT"));
   one("[MKT.SCRIPTS.130] and exits 1", status, 1);
+}
+
+console.log("\n=== the back link — the last link of the eyebrow's first line");
+{
+  const eyebrow = (line) => `<header class="sds-masthead">\n  <div class="sds-eyebrow"><span class="sds-line1">${line}</span></div>\n</header>`;
+  one("[MKT.SCRIPTS.130] a page whose first line links the hub and the page above goes back to the page above, the last link",
+    backLinkOf(eyebrow('<a href="../hub.html">SaaS Plane</a> &middot; <a href="../up.html">Loc</a> &middot; Name')), "../up.html");
+  one("[MKT.SCRIPTS.130] a page whose first line holds no link has no back link, and the hub and an approach page are such", backLinkOf(eyebrow("SaaS Plane &middot; 041 Improvements")), null);
+  one("[MKT.SCRIPTS.130] a page written before the breadcrumb still reads its crumb line, and the first link of its rail after that",
+    backLinkOf('<p class="sds-crumb"><a href="../old.html">&larr; Old</a></p>' + eyebrow("A | B | C")), "../old.html");
+  one("[MKT.SCRIPTS.130] and the rail's link where there is neither", backLinkOf('<a class="sds-home" href="../rail.html">&larr; Home</a>' + eyebrow("A | B | C")), "../rail.html");
 }
 
 console.log(failed ? `\n  ${failed} of ${n} FAILED` : `\n  all ${n} passed`);

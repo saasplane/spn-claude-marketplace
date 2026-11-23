@@ -1513,9 +1513,10 @@ console.log("\n=== window — a new window is offered from 200k at a clean point
   const busy = await hear({ status: "RUNNING", running: true, kilo: 210 });
   check("a child running at 210k: no offer", !asks(busy), busy);
   const found = await hear({ broken: true, kilo: 210 });
-  check("a state finding at 210k: no offer", !asks(found) && /\[state\]/.test(found), found);
+  check("[S73] a state finding at 210k is said, and does not hold the offer back: the clean point is this window's own", asks(found) && /\[state\]/.test(found), found);
   const always = await hear({ status: "RUNNING", running: true, kilo: 460 });
-  check("[MKT.HOOKS.322] a child running at 460k: no offer, the always-message too waits for it", !asks(always), always);
+  check("[MKT.HOOKS.322] [S73] a row running at 460k does not hold the line, and the message says the handover follows when the running work finishes",
+    asks(always) && /handover follows when the running work finishes/.test(always), always);
   // THE OFFER IS WHERE A PERSON LEARNS HOW WINDOWS WORK: a partner holds no book, so the note asks the
   // turn to say why a new window helps, that nothing is lost, and how to open one, in the person's words.
   const forThePerson = (out) => /one or two plain sentences/.test(out) && /never this note's/.test(out)
@@ -1540,7 +1541,8 @@ console.log("\n=== window — a new window is offered from 200k at a clean point
   const waiting = await hear({ parts: [lines["bash-row-write"], lines["agent-background-pending"]], kilo: 220 });
   check("waits while a background Agent has no notification", !asks(waiting), waiting);
   const waitingAlways = await hear({ parts: [lines["bash-row-write"], lines["agent-background-pending"]], kilo: 470 });
-  check("[MKT.HOOKS.322] and past 450k too: never while a helper runs", !asks(waitingAlways), waitingAlways);
+  check("[MKT.HOOKS.322] [S73] but past 400k the line is said at the next reply even while a helper is out, and says the handover follows its report",
+    asks(waitingAlways) && /past 400k/.test(waitingAlways) && /handover follows when it reports/.test(waitingAlways), waitingAlways);
   check("asks when every background Agent has its notification",
     asks(await hear({ parts: [lines["bash-row-write"], lines["agent-background-notified"], lines["notification"]], kilo: 220 })));
   check("silent for a subagent's stop (agent_id)", !asks(await hear({ kilo: 220, extra: { agent_id: "a1" } })));
@@ -1566,6 +1568,29 @@ console.log("\n=== window — a new window is offered from 200k at a clean point
   check("window by presence: a line said at 310k is not said again at 350k", says(350, "PRESENT", false, feedback(310, 300)).length === 0);
   check("window by presence: past 400k with the 300k line said, the 400k line is said", /past 400k/.test(says(410, "PRESENT", false, feedback(310, 300))[0]?.message));
 
+  // S73: THIS WINDOW'S OWN CLEAN POINT. Another arc's standing findings never hold the offer back; a helper holds it below 400k only.
+  {
+    const dirty = await dataWorkspace("window-own-clean");
+    const arcFile = join(dirty.ws, "arcs", "N001", "state.json");
+    const arcData = JSON.parse(readFileSync(arcFile, "utf8")); arcData.status = "DECIDED"; writeFileSync(arcFile, JSON.stringify(arcData, null, 2) + "\n");
+    const other = join(dirty.root, ".spndevex", "workstreams", "open", "099-other");
+    mkdirSync(join(other, "arcs", "N001"), { recursive: true });
+    writeFileSync(join(other, "arcs", "N001", "state.json"), "{ not json");
+    const own = (kilo, ...before) => checkWindow(dirty.root, text(kilo, ...before), mine, false, "PRESENT", false);
+    check("[S73] window: an offer at 210k and 310k is said although another workstream stands with a finding", own(210).length === 1 && own(310).length === 1, JSON.stringify(own(210)));
+    const m210 = own(210)[0].message, m410 = own(410)[0].message;
+    check("[S73] window: the 200k message no longer claims the state check whole, and says what is true", !/workstream state check/.test(m210) && /no order of this window is running and no helper of it is out/.test(m210), m210);
+    check("[S73] window: a helper out holds the offer at 210k and 310k", own(210, lines["agent-background-pending"]).length === 0 && own(310, lines["agent-background-pending"]).length === 0);
+    check("[S73] window: a row of this window running holds it at 210k and 310k", checkWindow(dirty.root, text(210), mine, true, "PRESENT", false).length === 0 && checkWindow(dirty.root, text(310), mine, true, "PRESENT", false).length === 0);
+    const ranLate = checkWindow(dirty.root, text(410), mine, true, "PRESENT", false);
+    check("[S73] window: at 410k a running row does not hold it, and the message says the handover follows when the running work finishes",
+      ranLate.length === 1 && /past 400k/.test(ranLate[0].message) && /handover follows when the running work finishes/.test(ranLate[0].message), JSON.stringify(ranLate));
+    const late = own(410, lines["agent-background-pending"]);
+    check("[S73] window: at 410k a helper out does not hold it, and the message says the handover follows when the helper reports",
+      late.length === 1 && /past 400k/.test(late[0].message) && /handover follows when it reports/.test(late[0].message) && !/no helper of it is out/.test(late[0].message), JSON.stringify(late));
+    check("[S73] window: at 410k with no helper the message has no such sentence", !/handover follows/.test(m410));
+  }
+
   // THE COMPACTION OFFER (RULE.DEVEX.AGENT.182): a window that opened on a compaction summary, offered once at its first clean point.
   const { checkCompactOffer } = await import("../../../../src/scripts/events/stop.ts");
   const summary = { type: "user", isCompactSummary: true, isVisibleInTranscriptOnly: true, message: { role: "user", content: "This session is being continued from a previous conversation that ran out of context." } };
@@ -1579,6 +1604,15 @@ console.log("\n=== window — a new window is offered from 200k at a clean point
   check("[MKT.HOOKS.526] compaction offer: not while a row runs", offered("PRESENT", false, false, true).length === 0);
   check("[MKT.HOOKS.526] compaction offer: not while a background helper has not handed back",
     offered("PRESENT", false, false, false, compacted(lines["agent-background-pending"])).length === 0);
+  {
+    const standing = await dataWorkspace("compact-own-clean");
+    const other = join(standing.root, ".spndevex", "workstreams", "open", "099-other");
+    mkdirSync(join(other, "arcs", "N001"), { recursive: true });
+    writeFileSync(join(other, "arcs", "N001", "state.json"), "{ not json");
+    const own = checkCompactOffer(standing.root, compacted(), mine, false, "PRESENT", false, false);
+    check("[S73] compaction offer: another workstream's standing finding does not hold it, and its message claims no state check",
+      own.length === 1 && !/workstream state check/.test(own[0].message) && /no helper of it is out/.test(own[0].message), JSON.stringify(own));
+  }
   check("[MKT.HOOKS.526] compaction offer: a window with no compaction summary hears nothing at 40k", offered("PRESENT", false, false, false, text(40)).length === 0);
   {
     const { root: sroot } = await dataWorkspace("compact-offer-hook");
@@ -2020,9 +2054,9 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
   const editRows = (ws, change) => { const data = JSON.parse(readFileSync(arcFile(ws), "utf8")); change(data); writeFileSync(arcFile(ws), `${JSON.stringify(data, null, 2)}\n`); };
   const PROMISE = "The page is written and its checks are green.\n\nNext I'll build it.";
 
-  check("[MKT.HOOKS.341] the thirteen checks about the reply are one set in lib/payload.ts",
-    payloadLib.REPLY_CHECKS instanceof Set && payloadLib.REPLY_CHECKS.size === 13
-      && ["needs-you", "reply-shape", "handover", "how-it-runs", "partner-words", "page-path", "close-message", "card-case", "in-flight", "proposal-record", "welcome", "window", "hold"].every((name) => payloadLib.REPLY_CHECKS.has(name)),
+  check("[MKT.HOOKS.341] the fourteen checks about the reply are one set in lib/payload.ts",
+    payloadLib.REPLY_CHECKS instanceof Set && payloadLib.REPLY_CHECKS.size === 14
+      && ["needs-you", "reply-shape", "handover", "how-it-runs", "partner-words", "page-path", "unfilled-page", "close-message", "card-case", "in-flight", "proposal-record", "welcome", "window", "hold"].every((name) => payloadLib.REPLY_CHECKS.has(name)),
     JSON.stringify([...(payloadLib.REPLY_CHECKS ?? [])]));
 
   // The suite runs with SPN_TELEMETRY=off (tests/run.mjs); these cases read the rows a hook writes, so they take it out

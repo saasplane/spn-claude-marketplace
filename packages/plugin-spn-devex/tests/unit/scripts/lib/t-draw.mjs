@@ -894,7 +894,8 @@ console.log("\n=== every example in the blocks reference actually draws");
     existsSync(here),
     true,
   );
-  const src = existsSync(here) ? readFileSync(here, "utf8") : "";
+  const figures = new URL("../../../../src/refs/devex/workspace/docs/figures.md", import.meta.url);
+  const src = (existsSync(here) ? readFileSync(here, "utf8") : "") + (existsSync(figures) ? readFileSync(figures, "utf8") : "");
   const fences = [...src.matchAll(/```dg\n([\s\S]*?)\n```/g)].map((m) => m[1]);
   one(
     "the reference carries a worked example of more than one kind",
@@ -1214,7 +1215,7 @@ console.log("\n=== the label a screen reader is given is spoken, not rendered");
     "a link is spoken as its text, never as its address",
     labelOf({
       kind: "map",
-      caption: "Read [the chapter](../05-artifacts.md) for the rule.",
+      caption: "Read [the chapter](../05-pages.md) for the rule.",
       boxes,
     }),
     "Read the chapter for the rule.",
@@ -9309,13 +9310,13 @@ console.log(
 
 // ---------------------------------------------------------------------------------------------------------------------------------
 // ORDER 08 · A SKELETON'S CORNERS ARE THE THEME'S: each unit role takes the design system's token for it, at the default theme and when
-// `--radius` is changed in the tokens. The tokens are read from the docs build's own `ds-tokens.css`, never typed here.
+// `--radius` is changed in the tokens. The tokens are read from the docs build's own `design-system-tokens.css`, never typed here.
 {
   console.log("\n=== SKELETON — corners come from the design system's tokens");
   const { readFileSync } = await import("node:fs");
   const { SKEL_CORNER } = await import("../../../../src/scripts/lib/draw.ts");
   const tokens = readFileSync(
-    new URL("../../../../src/styles/ds-tokens.css", import.meta.url),
+    new URL("../../../../src/styles/design-system-tokens.css", import.meta.url),
     "utf8",
   );
   // a tiny resolver for the declarations the corner tokens are made of: `var(--a)`, `calc(x +/- Npx)`, `calc(x / N)`, `N rem`
@@ -9366,7 +9367,7 @@ console.log(
     (v) => v.every((set) => set.every(([, got, want]) => got === want)),
   );
   one(
-    "the tokens the roles name are in the docs build's `ds-tokens.css`, which `docs sds cut --ds` copies from the design system",
+    "the tokens the roles name are in the docs build's `design-system-tokens.css`, which `docs styles cut --ds` copies from the design system",
     [
       "--radius-sm",
       "--radius-md",

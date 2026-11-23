@@ -4,12 +4,12 @@
 //
 // The one command that builds the shared stylesheet every page loads.
 //
-//     node scripts/build-styles.mjs            build `sds-docs.css` from `sds-docs.src.css`
+//     node scripts/build-styles.mjs            build `docs-language.css` from `docs-language.src.css`
 //     node scripts/build-styles.mjs --check    build to a scratch file, and exit 1 where it differs
 //
-// THE SOURCE IS `packages/plugin-spn-devex/src/styles/sds-docs.src.css`, in which our tokens are
+// THE SOURCE IS `packages/plugin-spn-devex/src/styles/docs-language.src.css`, in which our tokens are
 // Tailwind's theme and our named classes use its utilities by `@apply`. Tailwind's command-line tool
-// builds `sds-docs.css` beside it. The two scripts, `sds-docs.js` and `sds-index.js`, are written by
+// builds `docs-language.css` beside it. The two scripts, `docs-page.js` and `docs-index.js`, are written by
 // hand and are not built.
 //
 // TAILWIND IS A DEVELOPMENT DEPENDENCY OF THIS REPOSITORY'S ROOT, pinned to one version, beside
@@ -27,8 +27,8 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const STYLES = join(ROOT, "packages", "plugin-spn-devex", "src", "styles");
-const SOURCE = join(STYLES, "sds-docs.src.css");
-const BUILT = join(STYLES, "sds-docs.css");
+const SOURCE = join(STYLES, "docs-language.src.css");
+const BUILT = join(STYLES, "docs-language.css");
 const TOOL = join(ROOT, "node_modules", ".bin", "tailwindcss");
 
 if (!existsSync(TOOL)) {
@@ -43,13 +43,13 @@ function build(target) {
 
 if (process.argv.includes("--check")) {
   const scratch = mkdtempSync(join(tmpdir(), "sds-build-"));
-  const fresh = join(scratch, "sds-docs.css");
+  const fresh = join(scratch, "docs-language.css");
   try {
     build(fresh);
     const same = existsSync(BUILT) && readFileSync(BUILT).equals(readFileSync(fresh));
     console.log(same
-      ? "sds-docs.css is current: a fresh build writes the same bytes"
-      : "sds-docs.css is behind its source: run `node scripts/build-styles.mjs`");
+      ? "docs-language.css is current: a fresh build writes the same bytes"
+      : "docs-language.css is behind its source: run `node scripts/build-styles.mjs`");
     process.exitCode = same ? 0 : 1;
   } finally {
     rmSync(scratch, { recursive: true, force: true });

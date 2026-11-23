@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "01af8b58"
+      "seen": "a792c869"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -51,7 +51,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
       "section": "Scope control",
-      "seen": "923d3752"
+      "seen": "36cc08d5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
@@ -248,7 +248,7 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
             <subject>.md                  the arc's name: its goal, its status and its links, written by the commands
         notes/
           <arc>/                          the same three forms; one arc's work order: at most these six entries, each made when the arc needs it
-            preview.html                  the arc's one preview, where something must be seen or worded to decide
+            arc.html                      the arc's one page, where something must be seen or worded to decide
             samples/                      real files of the kind the work produces, each in its own format
             plan.md                       what a row needs beside it: the traps, a set, a move table
             orders/                       one brief per delegated execution, named by its row, and its report
@@ -483,9 +483,9 @@ Both read one thing: the **split plan**, which is the step rows of every arc rea
 | **close** | a subject moves into `workstreams/closed/` | a **refusal** while any row is one nobody decided, one somebody started and put down, one held on an open card, or one still marked in progress |
 | **answered card** | you write while an approach page still asks a question its arc records as answered | a **warning** naming the card. Fold it into the section that now states it |
 
-**An approach page reads Why, What, How, Plan, Open, Deferred, and Plan lists the arcs** (`RULE.DEVEX.WORKSPACE.487` · MUST · check:doc-check). After `How` comes a section of its own, `<section id="arcs">` under the `h2` *Plan*, so `approach.html#arcs` opens the table from anywhere. An open or backlog page that still ends `How` in an older *Cycles* subsection has it moved into *Plan* by the plugin's migration (011), and a closed page keeps the shape it closed with.
+**An approach page reads Why, What, Plan, How, Open, Deferred, and Plan lists the arcs** (`RULE.DEVEX.WORKSPACE.487` · MUST · check:doc-check). After `What` comes a section of its own, `<section id="arcs">` under the `h2` *Plan*, so `approach.html#arcs` opens the table from anywhere. An open or backlog page that still ends `How` in an older *Cycles* subsection has it moved into *Plan* by the plugin's migration (011), and a closed page keeps the shape it closed with.
 
-**The arcs carry the rows, and the approach page does not.** The page argues the change, and a *Plan* section after `How` holds a table with one row per arc, written from each arc's data, with the generated progress block under it. Each *Plan* row carries a stamp of its arc's goal, title and repositories, so a check refuses a turn that leaves the page behind an arc proposed or moved to a new goal or repository; adding a row never does, and the places of `How` are produced from the rows' `repo`. Where the page and an arc disagree, the arc is right.
+**The arcs carry the rows, and the approach page does not.** The page argues the change, and a *Plan* section after `What` holds a table with one row per arc, written from each arc's data, with the generated progress block under it. Each *Plan* row carries a stamp of its arc's goal, title and repositories, so a check refuses a turn that leaves the page behind an arc proposed or moved to a new goal or repository; adding a row never does, and the places of `How` are produced from the rows' `repo`. Where the page and an arc disagree, the arc is right.
 
 **The close gate reads every step row of every arc as one split plan**, so a documentation row is held exactly as a code row is. Park one in a note beside the page and no gate can see it.
 

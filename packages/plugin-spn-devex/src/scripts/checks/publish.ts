@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § Nothing is published unless the developer asks · § What a stored page carries, and what a published one carries
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/08-stylesheet.md § Nothing is published unless the developer asks · § What a stored page carries, and what a published one carries
 //           docs/registers/decisions.md RULE.DEVEX.WORKSPACE.117 · RULE.DEVEX.WORKSPACE.215
 // The chapter is the source of truth.
 //
@@ -71,7 +71,7 @@ export function loadedFromOutside(html: string, beside: Set<string> = new Set())
   return outside;
 }
 
-/** The name `docs sds bundle` gives the copy it writes beside a page: `<name>.bundled.html`. */
+/** The name `docs styles bundle` gives the copy it writes beside a page: `<name>.bundled.html`. */
 export function bundledName(path: string): string {
   return `${basename(path).replace(/\.html?$/i, "")}${BUNDLED_SUFFIX}`;
 }
@@ -102,8 +102,8 @@ export function checkPublish(payload: Payload): Verdict {
   return { note, deny:
     `Denied: \`${path}\` loads ${outside.map((address) => `\`${address}\``).join(" · ")} from outside the page. ` +
     "The publishing host does not load that address, so the published page arrives with no styling. Run " +
-    `\`spn-devex docs sds bundle ${path}\`, which writes a copy with the styles and the script of the page's own ` +
+    `\`spn-devex docs styles bundle ${path}\`, which writes a copy with the styles and the script of the page's own ` +
     `version inside it, and publish that copy: \`${join(dirname(path), bundledName(path))}\`. A published page ` +
     `may load a stylesheet from ${STYLESHEET_HOSTS.join(" or ")} alone, and a script from ${SCRIPT_HOSTS.join(" or ")} ` +
-    "(05-artifacts.md § What a stored page carries, and what a published one carries; RULE.DEVEX.WORKSPACE.215)." };
+    "(08-stylesheet.md § What a stored page carries, and what a published one carries; RULE.DEVEX.WORKSPACE.215)." };
 }
