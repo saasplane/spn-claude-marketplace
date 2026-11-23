@@ -24,7 +24,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "Which block a content takes, and how its fence is written",
-      "seen": "4d81b652"
+      "seen": "e6afb1b9"
     }
   ]
 }
@@ -220,6 +220,8 @@ Three worked examples, each as Content, Right, Wrong:
 - **The figure table itself.** Content: each row starts with a condition ("2–4 things compared fact by fact") and says what to use. Right: a plain table. Wrong: cards, because a reader looks a case up and does not browse names.
 - **Four checks, each a name, a sentence and a weight.** Content: `Reach`, `Voice`, `Length`, `Fit`, each with what it measures and how much it counts. Right: `catalog layout=GRID`. Wrong: a plain table, because the names are things a reader browses and the sentences are read.
 - **Five numbers sorted by kind.** Content: a kind in the first column and a count beside it. Right: a plain table. Wrong: a catalog, because a number is a value, not a sentence a reader reads.
+
+**GRID or LIST is decided by what each item holds.** Use `GRID` when every item fits a card: a name of up to four words, one line of up to about fifteen words, and at most three short facts. Cards are for things a reader scans and picks from. Use `LIST` for anything longer: a name over four words, a line over about fifteen words, more than three facts, or facts that are sentences. Rows are for things a reader reads down. More than six items in the construct's own groups take group panels, and each panel holds a `GRID` or a `LIST` by the same test.
 
 Then read the table down to the first row that fits.
 
