@@ -7785,6 +7785,19 @@
   border-radius: 0;
   padding-top: 0;
 }
+.sds-fold-block > .sds-scroll {
+  margin: 0;
+  border: 0;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+.sds-fold-block > .sds-scroll > table {
+  border: 0;
+  border-radius: 0;
+}
+.sds-fold-block > :not(summary):not(.sds-scroll) {
+  margin-left: var(--sds-frame-head-px);
+  margin-right: var(--sds-frame-head-px);
+}
 .sds-fold.sds-guidance {
   margin: .35rem 0 0;
   border: 0;

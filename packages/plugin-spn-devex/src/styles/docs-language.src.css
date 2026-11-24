@@ -2108,6 +2108,10 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 .sds-code > .sds-more > summary:hover { color: var(--sds-accent); }
 .sds-code > .sds-more > pre { margin: 0; border: 0; border-radius: 0; padding-top: 0; }
 
+.sds-fold-block > .sds-scroll { margin: 0; border: 0; border-radius: 0 0 var(--radius) var(--radius); }
+.sds-fold-block > .sds-scroll > table { border: 0; border-radius: 0; }
+.sds-fold-block > :not(summary):not(.sds-scroll) { margin-left: var(--sds-frame-head-px); margin-right: var(--sds-frame-head-px); }
+
 /* GUIDANCE: the fold under a catalog row. A small gap under the row's facts, none after it; the summary and the open lines
    share one inset; the lines are tight, label and value on one line; rules are a run of small ids. */
 .sds-fold.sds-guidance { margin: .35rem 0 0; border: 0; background: none; }

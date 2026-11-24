@@ -776,7 +776,7 @@ function catalogBlock(tag: string, body: string[], findings: Finding[]): string 
 function tildeFenceEnd(lines: string[], open: number): number {
   let depth = 1;
   for (let k = open + 1; k < lines.length; k++) {
-    if (/^~~~(?:tabs|group)\b/.test(lines[k])) depth++;
+    if (/^~~~(?:tabs|group|fold)\b/.test(lines[k])) depth++;
     else if (/^~~~\s*$/.test(lines[k]) && --depth === 0) return k;
   }
   return -1;
@@ -849,7 +849,7 @@ function tabsBlock(tag: string, body: string[], findings: Finding[], nested: boo
   const { options } = tagWords(tag);
   const look = options.look ?? "LINE";
   if (!TAB_LOOKS.includes(look)) return stop(`a \`tabs\` look is one of ${TAB_LOOKS.join(", ")}, not \`${look}\``);
-  if (nested || body.some((line) => /^~~~\S/.test(line))) return stop("tabs inside tabs are refused: a panel holds ordinary blocks, and a second set of alternatives is a fold or a part of its own");
+  if (nested || body.some((line) => /^~~~(?:tabs|group)\b/.test(line))) return stop("tabs inside tabs are refused: a panel holds ordinary blocks, and a second set of alternatives is a fold or a part of its own");
   const panels: { label: string; lines: string[] }[] = [];
   let fenced = false;
   for (const line of body) {
@@ -983,13 +983,26 @@ function renderBody(lines: string[], findings: Finding[], nested = false): strin
       out.push(groupPanels(heads, findings));
       continue;
     }
+    // A FENCE OF TILDES TAGGED `fold <summary>` is a fold over ordinary blocks, a long table above all (RULE.DEVEX.WORKSPACE.575): shut, with the summary as its line.
+    if (/^~~~fold\b/.test(l)) {
+      flush();
+      const summary = l.replace(/^~~~fold\s*/, "").trim();
+      const end = tildeFenceEnd(lines, i);
+      if (!summary) findings.push({ message: "a `fold` fence is tagged with its summary: `~~~fold <summary>`", stops: true });
+      if (end < 0) { findings.push({ message: `a \`fold\` fence is never closed with \`~~~\`: "${summary}"`, stops: true }); i = lines.length; continue; }
+      out.push(`  <details class="sds-fold sds-fold-block">\n    <summary>${inline(summary)}</summary>\n${renderBody(lines.slice(i + 1, end), findings, nested)}\n  </details>`);
+      i = end + 1;
+      continue;
+    }
     // A fence of tildes is the TABS block, closed by a line of three tildes alone.
     if (/^~~~tabs\b/.test(l)) {
       flush();
       const tag = l.replace(/^~~~/, "").trim();
       const body: string[] = [];
+      // The fence closes on the line of three tildes that matches its opening, counting the fences it holds (a fold, a refused set of tabs).
+      const close = tildeFenceEnd(lines, i);
       i++;
-      while (i < lines.length && !/^~~~\s*$/.test(lines[i])) body.push(lines[i++]);
+      while (i < lines.length && (close < 0 ? !/^~~~\s*$/.test(lines[i]) : i < close)) body.push(lines[i++]);
       if (i >= lines.length) findings.push({ message: "a `tabs` fence is never closed with `~~~`", stops: true });
       i++;
       out.push(tabsBlock(tag, body, findings, nested));
@@ -1172,7 +1185,7 @@ function renderPageBody(opts: Parameters<typeof renderPage>[0]): { html: string;
   const sectionAt = new Set<number>();
   for (let k = 0; k < lines.length; k++) {
     if (/^```/.test(lines[k])) { k++; while (k < lines.length && !/^```/.test(lines[k])) k++; continue; }
-    if (/^~~~(?:tabs|group)\b/.test(lines[k])) { const end = tildeFenceEnd(lines, k); k = end < 0 ? lines.length : end; continue; }
+    if (/^~~~(?:tabs|group|fold)\b/.test(lines[k])) { const end = tildeFenceEnd(lines, k); k = end < 0 ? lines.length : end; continue; }
     if (/^##\s/.test(lines[k])) sectionAt.add(k);
   }
   const firstSection = lines.findIndex((_, k) => sectionAt.has(k));

@@ -522,6 +522,18 @@ console.log("\n=== the page renderer — tabs");
   ok("[MKT.SCRIPTS.615] a --- line inside a code fence of a panel is code, not a label", made(tilde("tabs", "--- A\n```text\n--- not a tab\n```\n--- B\ny")).findings.length === 0);
 }
 
+{
+  const rows = Array.from({ length: 26 }, (_, k) => `| \`R${k}\` | what rule ${k} decides | MUST |`).join("\n");
+  const longTable = `| Rule | What it decides | Weight |\n| --- | --- | --- |\n${rows}`;
+  const folded = produced(`~~~fold The 26 rules\n${longTable}\n~~~\n\nAfter it.\n`);
+  ok("[MKT.SCRIPTS.650] a `~~~fold <summary>` fence draws its table inside a shut details whose summary is the fence's words",
+    folded.includes('<details class="sds-fold sds-fold-block">\n    <summary>The 26 rules</summary>') && folded.includes("<table") && !folded.includes("<details open") && folded.indexOf("<summary>") < folded.indexOf("<table"), folded.slice(-600));
+  ok("[MKT.SCRIPTS.650] the prose after the fence is a paragraph of the page, not of the fold", /<\/details>\s*<p>After it\.<\/p>/.test(folded), folded.slice(-300));
+  ok("[MKT.SCRIPTS.650] a fold with no summary, or never closed, stops the write",
+    made("~~~fold\nx\n~~~\n").findings.some((f) => f.stops && f.message.includes("summary")) && made("~~~fold Long\nx\n").findings.some((f) => f.stops && f.message.includes("never closed")));
+  ok("[MKT.SCRIPTS.650] a fold stands inside a tab, and the tab's fence still closes on its own line",
+    made(tilde("tabs", `--- A\n~~~fold More\ntext\n~~~\n--- B\ny`)).findings.length === 0 && made(tilde("tabs", `--- A\n~~~fold More\ntext\n~~~\n--- B\ny`)).html.includes("<summary>More</summary>"));
+}
 console.log("\n=== the page renderer — a file frame that folds");
 {
   const plain = made("```json file=docs/specs/x.json\n{}\n```");
