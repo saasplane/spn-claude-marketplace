@@ -19,6 +19,7 @@ import { cardsOf } from "../../checks/split-plan.ts";
 import { STATUSES } from "../../checks/arc-status.ts";
 import { masthead, type MastheadKind } from "../../checks/doc-check.ts";
 import { blockFit, type FitKind } from "../../lib/block-fit.ts";
+import { readCatalogue, readChain, renderCatalogue, renderLanguage, resolve as resolveLanguage } from "../../lib/surface-catalogue.ts";
 import { filesUnder as proseFilesUnder, paragraphs as proseParagraphs, score as proseScore } from "./prose.ts";
 
 import { withOffset } from "../../lib/clock.ts";
@@ -2246,7 +2247,55 @@ export function placeGlossary(src: string, body: string): string | null {
  * constructs seat, and `contents` the map on a face of the capabilities seat. `tags` is the tag line
  * of each document.
  */
-export const FACE_BLOCKS = ["glossary", "constructs", "contents", "tags"] as const;
+export const FACE_BLOCKS = ["glossary", "constructs", "contents", "tags", "surface-catalogue", "surface-design-language"] as const;
+
+/** A marker of the two surface blocks: `surface-catalogue`, or `surface-design-language spec=<path from docs/>`. */
+const SURFACE_MARKER = /<!-- spn:generated (surface-catalogue|surface-design-language)((?: [\w-]+=\S+)*) —/g;
+
+/**
+ * The surface blocks: each marker in a seat names what it draws, and a marker that cannot be resolved is a finding, never a skip.
+ * `surface-catalogue` is drawn from `specs/surface/catalogue.json`, `surface-design-language` from the spec its `spec=` names.
+ */
+function surfaceBlocks(tree: string, write: boolean, scope: FaceScope, touched: string[], findings: Finding[]): void {
+  const carriers: Array<{ file: string; src: string; markers: Array<{ block: string; what: string; spec: string | null }> }> = [];
+  for (const file of walkFiles(tree, (p) => p.endsWith(".md"))) {
+    const src = readFileSync(file, "utf8");
+    if (!src.includes("spn:generated surface-")) continue;
+    const markers = [...src.matchAll(SURFACE_MARKER)].map((m) => ({ block: m[1], what: m[1] + m[2], spec: /(?:^| )spec=(\S+)/.exec(m[2])?.[1] ?? null }));
+    if (markers.length) carriers.push({ file, src, markers });
+  }
+  const catalogueFile = join(tree, "specs", "surface", "catalogue.json");
+  const asked = (b: string): boolean => scope.blocks.includes(b);
+  const problem = (file: string, message: string) => findings.push({ check: "face", grade: "RULE", file, message });
+  const read = carriers.length ? readCatalogue(catalogueFile) : { catalogue: null, problems: [] };
+  for (const { file, src, markers } of carriers) {
+    let next = src;
+    for (const marker of markers) {
+      if (!asked(marker.block)) continue;
+      const source = marker.block === "surface-catalogue" ? dirname(catalogueFile) : dirname(join(tree, marker.spec ?? "."));
+      if (!(under(file, scope.paths) || scope.paths.some((path) => under(path, [source])))) continue;
+      if (!read.catalogue) { problem(file, `\`${marker.what}\` cannot be drawn: ${read.problems.join("; ")}`); continue; }
+      let body: string;
+      if (marker.block === "surface-catalogue") {
+        if (marker.what !== "surface-catalogue") { problem(file, `\`${marker.what}\`: a surface-catalogue marker takes no parameter`); continue; }
+        body = renderCatalogue(read.catalogue, "docs/specs/surface/catalogue.json");
+      } else {
+        if (!marker.spec || marker.what !== `surface-design-language spec=${marker.spec}`) { problem(file, `\`${marker.what}\`: a surface-design-language marker names its spec as \`spec=<path from docs/>\` and nothing else`); continue; }
+        const specFile = join(tree, marker.spec);
+        const { chain, problems } = readChain(specFile, read.catalogue.outline, [join(tree, "specs", "design-languages")]);
+        if (problems.length) { problem(file, `\`${marker.what}\` cannot be drawn:\n         ${problems.join("\n         ")}`); continue; }
+        const resolved = resolveLanguage(read.catalogue, chain);
+        for (const m of resolved.problems) problem(file, `\`${marker.what}\`: ${m}`);
+        const parentRef = chain.length > 1 ? chain[chain.length - 2].name : null;
+        const parentCarrier = parentRef ? carriers.find((c) => c.markers.some((m) => m.spec && m.spec.endsWith(`/${parentRef}.spdl.json`))) : undefined;
+        if (parentRef && !parentCarrier) findings.push({ check: "face", grade: "SOFT", file, message: `\`${marker.what}\`: no seat draws ${parentRef}, so \`extends\` is not linked` });
+        body = renderLanguage(read.catalogue, resolved, { specPath: marker.spec, parentPage: parentCarrier ? relative(dirname(file), parentCarrier.file) : undefined });
+      }
+      next = replaceRegion(next, marker.what, body);
+    }
+    if (next !== src) { if (write) writeFileSync(file, next); touched.push(relative(tree, file)); }
+  }
+}
 
 /** What one run of `face` is narrowed to: the paths it was handed, and the blocks it was asked for. */
 export type FaceScope = { paths: readonly string[]; blocks: readonly string[] };
@@ -2367,11 +2416,13 @@ export function face(tree: string, write: boolean, scope: FaceScope = { paths: [
     if (after !== before) { if (write) writeFileSync(faceFile, after); touched.push(relative(tree, faceFile)); }
   }
 
+  surfaceBlocks(tree, write, scope, touched, findings);
+
   const tags = asked("tags") ? writeTagLines(tree, write, scope.paths) : { touched: [], findings: [] };
   findings.push(...tags.findings);
 
   // Each line speaks for the blocks the run asked for, and for those alone.
-  if (asked("glossary") || asked("constructs") || asked("contents"))
+  if (asked("glossary") || asked("constructs") || asked("contents") || asked("surface-catalogue") || asked("surface-design-language"))
     console.log(touched.length
       ? `${write ? "wrote" : "would write"} ${touched.length} face${touched.length > 1 ? "s" : ""}:\n  ${touched.join("\n  ")}`
       : "every face is already current");

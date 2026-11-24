@@ -1,7 +1,7 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md · 05-pages.md · 02-document.md
 // The chapters are the source of truth; a rule change is edited there first, then here.
 //
-// What is generated, between markers: a domain's glossary, the maps, and the tag lines.
+// What is generated, between markers: a domain's glossary, the maps, and the tag lines, and the surface catalogue and a design language's spec.
 //
 //   spn-devex docs face check [<path>] [--block <name>]   report what a write would change
 //   spn-devex docs face write <path> [--block <name>]     write it
