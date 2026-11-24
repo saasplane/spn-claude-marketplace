@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
-      "seen": "21b3b3bf"
+      "seen": "3c1e6d65"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
@@ -347,7 +347,7 @@ The pocket holds what the node **authors** rather than derives, and its three au
 | Section | Goes in | Never |
 | --- | --- | --- |
 | **Overview** | why this construct exists: the problem in the reader's own terms, what changes because it exists, and what a first-time reader has to unlearn | describing the shape — that is the `Model`, and two descriptions of one thing disagree eventually |
-| **Terms** | the words this construct gives a meaning to: the word a person uses, the contract term, and what it means | a word every engineer already knows; a row that points somewhere else instead of explaining |
+| **Terms** | the words this construct gives a meaning to: the word a person uses, the contract term (a column the page leaves out when every contract term is empty or a dash, rule 574), and what it means | a word every engineer already knows; a row that points somewhere else instead of explaining |
 | **Model** | what it is: what you are looking at, in prose first — the general shape, then its parts, then its kinds — with a figure where seeing is faster | a field list standing in for an explanation; an argument, which is the `Overview`'s |
 | **Parts** | the detail of the what: one subsection per piece the `Model` named, in that order — what it is, why it exists, and the facts that shape it | a *Where:* line — which package builds it is answered by that package's own capability chapter; a heading the `Model` did not lead the reader to expect |
 | **Boundary** | in plain prose: what this page does not answer, where that is answered, and when you go there | an edge stated before the reader has seen the shape |

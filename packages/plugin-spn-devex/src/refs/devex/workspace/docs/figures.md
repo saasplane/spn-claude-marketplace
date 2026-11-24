@@ -25,6 +25,8 @@
 
 **You write a spec, never a drawing.** A figure is a fence the page writer draws, so it has the look of every other figure in both themes. Every box is a thing the passage names, in its words.
 
+**Code on a docs page is an excerpt read from its file, not a figure** (`RULE.DEVEX.WORKSPACE.573` · GUIDE): `file=<path> lines=a-b`, see `refs/devex/workspace/docs/blocks.md`, *Code on a page is read from a file*.
+
 **A render (`unit`) belongs only on a surface sample page** (`RULE.DEVEX.WORKSPACE.571` · GUIDE): a design language's samples or a surface page preview. The page writer stops a `unit` fence on a docs page. There a built unit's structure is a skeleton, drawn only for a unit made of parts a reader places, each part in its design-system name, with a line naming its showcase page; a single component has no figure.
 
 ## A rendered unit is a tree (surface sample pages only)

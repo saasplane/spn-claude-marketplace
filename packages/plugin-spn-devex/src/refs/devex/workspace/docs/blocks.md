@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "section": "The blocks — what a page reaches for instead of prose",
-      "seen": "da0019b4"
+      "seen": "375db6c6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
@@ -19,12 +19,17 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "section": "Which block a content takes, and how its fence is written",
-      "seen": "630320ab"
+      "seen": "33c8754c"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
+      "section": "Code on a page is read from a file",
+      "seen": "7542c137"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "section": "Group panels, and the rows and folds inside them",
-      "seen": "8277bd3f"
+      "seen": "9e49fddb"
     }
   ]
 }
@@ -292,6 +297,8 @@ A plain table of a name column and a description column past four rows reads as 
 | `TABS` | a fence of tildes tagged `tabs look=LINE`, `SWITCH` or `PILL` (`LINE` when left out), and a `--- <label>` line before each panel, whose body is one block; two to six tabs, never nested | a bar at the start and one panel at a time; every panel shows where the script does not run |
 | group panel | a fence of tildes tagged `group <name> \| <description>` holding one `tabs` or one `catalog` fence | one panel: name, description and count in its head, its body flush; a fenced group draws no row of jump links |
 | `## Group` lines | inside a `catalog` fence | one panel for each group, with a row of jump links above them |
+| code excerpt | `file=<path> lines=a-b` after the language, the body left empty, and `mark=a-b` for the lines that matter | a frame titled with the path and the lines, linking the whole file, each line numbered as the file numbers it, the marked lines shaded, syntax colours in light and dark, a copy button; past 20 lines it folds with the first 10 showing |
+| table fold | a fence of tildes tagged `fold <summary>` holding ordinary markdown, a long table above all | a shut fold whose line is the summary |
 | fold | `file=<path> fold` after the language, the body left empty to read the file from the repository root | the file's frame inside a `details` whose summary is the path |
 
 ````markdown
@@ -321,6 +328,10 @@ The web's way.
 ```
 ````
 
+## Code on a page is read from a file
+
+**Code on a page is read from its file, never pasted** (`RULE.DEVEX.WORKSPACE.573` · GUIDE): `file=<path> lines=a-b` with an empty body draws that excerpt, titled with the path and lines and linking the whole file; `mark=a-b` shades the lines that matter; code past 20 lines folds with its first 10 showing; two forms of one thing are `tabs`; every frame has syntax colours and a copy button. A missing file, a range past the file, a body beside `lines=` or a mark outside the excerpt stops the write. A pasted fence still draws as plain code.
+
 ## Group panels, and the rows and folds inside them
 
 **A named set that needs a head is a group panel** (`RULE.DEVEX.WORKSPACE.565` · GUIDE): `~~~group <name> | <description>` holding one `tabs` or one `catalog` fence, drawn as one panel with its title, description and count in its head and its body flush. Groups never nest, and a fenced group draws no row of jump links. Pick by the set: a list for a named set of items, tabs for a set split into two to six sub-sets each its own list, a run of panels for peer sets, a plain `catalog` for a list with nothing above it to name, tabs alone for alternatives with no group to name, and a `catalog` with `## Group` lines for more than six items in groups read as one list.
@@ -328,5 +339,9 @@ The web's way.
 - **A list in a group draws Plan-style rows** (`RULE.DEVEX.WORKSPACE.566` · GUIDE): the title, its description, one small line of facts, and one closed-set fact `[CODE]` as a badge at the row's end.
 - **An item's `For:`, `Choose when:`, `Not when:` (`condition → instead`) and `Rules:` lines are one closed Guidance fold under the row** (`RULE.DEVEX.WORKSPACE.567` · GUIDE).
 - **A fact drawn with its item has one look** (`RULE.DEVEX.WORKSPACE.568` · GUIDE): the text font, the key in the fact colour at medium weight, the value in the card title colour. Only a fact in a column of its own (`facts=END`, a table) keeps the column's look.
-- **A numbered table reads its number and title on one line** (`RULE.DEVEX.WORKSPACE.569` · GUIDE).
+- **A numbered table reads its number and title on one line** (`RULE.DEVEX.WORKSPACE.569` · GUIDE): a table whose first column is only a number draws the number and the title, the second column, on one line, the sentence under it.
+- **A Terms table with no contract term draws no Contract term column** (`RULE.DEVEX.WORKSPACE.574` · GUIDE): when every cell of that column is empty or a dash.
+- **A long table folds** (`RULE.DEVEX.WORKSPACE.575` · GUIDE): write it inside `~~~fold <summary>` ... `~~~`; the page draws it shut.
+- **The writer holds a list to what it can draw** (`RULE.DEVEX.WORKSPACE.576` · GUIDE): a `LIST` with four or more fact keys stops the write; `facts=END` with no fact is a finding; bare tags never get the `facts=END` advice; `docs look` reads a `TABLE` catalog's pinned key column in dark.
+- **A glossary, a Terms table and a Binds table stay tables** (`RULE.DEVEX.WORKSPACE.577` · GUIDE): the catalog check skips a table whose first column is `Term` or `Rule`.
 - **A group's name and description are the construct's own words** (`RULE.DEVEX.WORKSPACE.570` · GUIDE).
