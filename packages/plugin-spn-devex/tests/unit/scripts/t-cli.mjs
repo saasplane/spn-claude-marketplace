@@ -103,8 +103,8 @@ console.log("\n=== cli — an unknown group or command refuses with the list, ne
 
 console.log("\n=== cli — a subject needs its action as a word");
 {
-  const USAGE = "usage: spn-devex docs face check [<path>] [--block glossary|constructs|contents|tags]\n" +
-                "       spn-devex docs face write <path> [--block glossary|constructs|contents|tags]\n";
+  const USAGE = "usage: spn-devex docs face check [<path>] [--block glossary|constructs|contents|tags|surface-catalogue|surface-design-language]\n" +
+                "       spn-devex docs face write <path> [--block glossary|constructs|contents|tags|surface-catalogue|surface-design-language]\n";
   const none = await capture(["docs", "face"]);
   ok("[MKT.SCRIPTS.111] a subject with no action exits 2", none.code === 2, `code ${none.code}`);
   ok("[MKT.SCRIPTS.111] and prints every usage line of the subject, then says an action is owed",

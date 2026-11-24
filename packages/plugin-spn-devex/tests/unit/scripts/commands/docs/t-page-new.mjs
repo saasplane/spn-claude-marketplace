@@ -28,8 +28,8 @@ function run(args) {
 console.log("=== unpairedTags");
 {
   const ok = `<section><div><h2>A</h2></div><pre></section> in code</pre><!-- </div> --></section>`;
-  one("[MKT.SCRIPTS.657] boxes that open and close in pairs have no finding, and a tag in pre or a comment is not read", unpairedTags(ok).length, 0);
-  one("[MKT.SCRIPTS.657] known-bad: a section closed twice is a RULE naming its line",
+  one("[RULE.DEVEX.WORKSPACE.579] [MKT.SCRIPTS.657] boxes that open and close in pairs have no finding, and a tag in pre or a comment is not read", unpairedTags(ok).length, 0);
+  one("[RULE.DEVEX.WORKSPACE.579] [MKT.SCRIPTS.657] known-bad: a section closed twice is a RULE naming its line",
     unpairedTags(`<section>\n<section class="sds-group"></section>\n</section>\n</section>\n<h3>FOLD</h3>`), (f) => f.length === 1 && f[0][0] === "RULE" && f[0][1].startsWith("line 4 closes a </section>"));
   one("[MKT.SCRIPTS.657] a box never closed is a RULE naming where it opened", unpairedTags(`<div>\n<section></section>`), (f) => f[0][1].includes("<div> of line 1 is never closed"));
 }
