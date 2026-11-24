@@ -1055,13 +1055,15 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
       }
     }
   }
+  // A row that landed, was carried to a successor, was replaced or was discarded owes no docs any more.
+  const settled = (state: string | undefined): boolean => ["landed", "carried", "replaced", "discarded"].includes(String(state));
   // A BASELINE WAITS ON THE PARTS HOLDING ITS REPOSITORY'S DOCS ROWS in every decided arc; an arc outside the scope is a line naming it.
   for (const one of parts) {
     if (!isBaselinePart(one) || keptIds.has(one.id)) continue;
     for (const { arc, data } of scope) {
       if (data?.status !== "DECIDED") continue;
       for (const row of data.rows) {
-        if (row.work !== "DOCS" || row.repo !== one.repo || row.state === "landed") continue;
+        if (row.work !== "DOCS" || row.repo !== one.repo || settled(row.state)) continue;
         for (const id of row.entries ?? []) {
           const holder = parts.find((other) => other.work === "DOCS" && other.entries.includes(`${arc}/${id}`));
           // A table that runs its baseline before the book (APPS: baseline, book, pins, …) has the book wait on the baseline: waiting
@@ -1071,7 +1073,7 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
       }
     }
     for (const { arc, data } of others.values()) {
-      if (data?.status === "DECIDED" && data.rows.some((row) => row.work === "DOCS" && row.repo === one.repo && row.state !== "landed") && !one.waitingOn) {
+      if (data?.status === "DECIDED" && data.rows.some((row) => row.work === "DOCS" && row.repo === one.repo && !settled(row.state)) && !one.waitingOn) {
         one.state = "waiting"; one.waitingOn = `${arc}'s docs of ${one.repo}`;
       }
     }
