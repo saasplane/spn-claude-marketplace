@@ -1612,30 +1612,45 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   grid-template-columns: minmax(6.5rem, max-content) 1fr;
   column-gap: .6rem;
 }
-.sds-tile .sds-tile-facts dt {
-  color: var(--sds-text-fact-card);
+/* AN INLINE FACT HAS ONE LOOK (rule 568), whatever block draws it: a tile's facts, a group row's small line, an item cell's line and an
+   after-description cell. The text font; the key in the fact colour at medium weight, close to its value; the value in the card title colour.
+   A key over its value takes the key at the extra-small step and the value at the small step; a fact on one line takes both at the small
+   step. Only a fact in a column of its own (`facts=END`, a table's column) keeps the column's look, and none of these rules is repeated per block. */
+.sds-tile-facts dt,
+.sds-fact-key {
+  font-family: inherit;
+  font-style: normal;
+  font-size: var(--sds-xs);
   font-weight: var(--font-weight-medium);
+  letter-spacing: .02em;
+  /* A key sits right on its value: no gap, and a line no taller than its letters need. */
+  line-height: 1.25;
+  color: var(--sds-text-fact-card);
 }
-.sds-tile .sds-tile-facts dd {
+.sds-tile-facts dd,
+.sds-fact-value {
   margin: 0;
-  color: var(--sds-text-description-card);
+  font-family: inherit;
+  font-style: normal;
+  font-size: var(--sds-sm);
+  color: var(--sds-text-title-card);
   overflow-wrap: anywhere;
 }
-/* A fact line in a group's rows: the key in the fact tone and the value in the description tone, as a tile's facts show them, in the text font: the key in the fact colour, the value in the card title colour,, at the CONTENT_SM step. */
-.sds-group-body td > .sds-small {
+/* The facts of one item on one line: the small step for the key and the value alike, the key close to its value. */
+.sds-facts {
   display: block;
+  margin-top: .5rem;
+  font-family: inherit;
   font-size: var(--font-content-sm-size);
   line-height: var(--font-content-sm-line-height);
-  font-family: inherit;
 }
-.sds-group-body .sds-fact-key {
-  color: var(--sds-text-fact-card);
-  font-weight: var(--font-weight-medium);
-  margin-right: .3em;
+.sds-facts .sds-fact-key,
+.sds-facts .sds-fact-value {
+  font-size: inherit;
+  line-height: inherit;
+  letter-spacing: normal;
 }
-.sds-group-body .sds-fact-value {
-  color: var(--sds-text-title-card);
-}
+.sds-facts .sds-fact-key { margin-right: .3em; }
 .sds-tile .sds-tile-facts code {
   font-size: inherit;
 }
@@ -1697,17 +1712,6 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   border-top: 1px solid var(--sds-rule);
   padding-top: .65rem;
   margin-top: .15rem;
-}
-.sds-tiles[data-layout='GRID'] .sds-tile-facts dt {
-  font-size: var(--sds-xs);
-  letter-spacing: .02em;
-  /* A key sits right on its value: no gap, and a line no taller than its letters need (the developer, 2026-11-24:
-     "a fact's key (title) and its value (description) ... do we need this space?"). */
-  line-height: 1.25;
-}
-.sds-tiles[data-layout='GRID'] .sds-tile-facts dd {
-  font-size: var(--sds-sm);
-  color: var(--sds-text-title-card);
 }
 
 /* MEDIA: a catalog names one media for all its items, in DSItem's and DSFeature's own terms (DSItemMediaType, DSFeatureType),
@@ -1876,16 +1880,6 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   flex-direction: column;
   gap: 0;
 }
-.sds-tiles[data-layout='LIST'] .sds-tile-facts dt {
-  font-size: var(--sds-xs);
-  letter-spacing: .02em;
-  /* A key sits right on its value: no gap, and a line no taller than its letters need (the developer, 2026-11-24:
-     "a fact's key (title) and its value (description) ... do we need this space?"). */
-  line-height: 1.25;
-}
-.sds-tiles[data-layout='LIST'] .sds-tile-facts dd {
-  color: var(--sds-text-title-card);
-}
 /* A fact that is a sentence takes the whole row; the short ones share a row in columns. */
 .sds-tiles[data-layout='LIST'] .sds-tile-fact-wide {
   grid-column: 1 / -1;
@@ -1904,16 +1898,11 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   align-items: baseline;
   column-gap: .6rem;
 }
-.sds-tiles[data-layout='LIST'] .sds-tile-facts-one dt {
-  font-size: var(--sds-caption);
-  font-weight: var(--font-weight-regular, 400);
-  color: var(--sds-text-fact-card);
-}
+.sds-tiles[data-layout='LIST'] .sds-tile-facts-one dt,
 .sds-tiles[data-layout='LIST'] .sds-tile-facts-one dd {
-  font-style: italic;
-  font-size: var(--sds-caption);
-  color: var(--sds-text-description-card);
-  line-height: 1.5;
+  font-size: var(--font-content-sm-size);
+  line-height: var(--font-content-sm-line-height);
+  letter-spacing: normal;
 }
 /* The one line sits tight under the description, in the small size of its key (the developer, 2026-11-24: "can we redec space
    between facts and descriptio n and also use small fonts for facts?"). */

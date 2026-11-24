@@ -86,6 +86,17 @@ ok("a table that is not the Terms table carries no such class",
   ok("[MKT.SCRIPTS.647] one contract term in any row keeps the column",
     rowsOf(produced(table(["Term", "Contract term", "What it means"], ["Estate", "—", "x"], ["Ring", "`SPRing`", "y"])), "<thead>").includes("<th>Contract term</th>"));
 }
+{
+  const css = (await import("node:fs")).readFileSync(resolve(HERE, "src", "styles", "docs-language.src.css"), "utf8");
+  const piece = produced(table(["Piece", "The question it answers", "Its terms"], ["A provider", "What must it build?", "Provider"]));
+  ok("[MKT.SCRIPTS.648] an item cell's facts are a key and a value, each its own element, in the one inline-fact look: no `Key: value` text",
+    piece.includes('<span class="sds-small sds-facts"><span class="sds-fact-key">Terms</span><span class="sds-fact-value">Provider</span></span>') && !piece.includes("Terms: Provider"), piece.slice(-400));
+  ok("[MKT.SCRIPTS.648] the stylesheet draws every inline fact from one set of rules: the key in the fact colour at medium weight, the value in the card title colour, in the text font",
+    /\.sds-tile-facts dt,\s*\.sds-fact-key\s*\{[^}]*font-family:\s*inherit[^}]*font-weight:\s*var\(--font-weight-medium\)[^}]*color:\s*var\(--sds-text-fact-card\)/.test(css)
+      && /\.sds-tile-facts dd,\s*\.sds-fact-value\s*\{[^}]*color:\s*var\(--sds-text-title-card\)/.test(css));
+  ok("[MKT.SCRIPTS.648] and no block keeps a copy: a group row, a GRID card, a LIST row and a one-line fact set no colour or weight of their own for their key and value",
+    !/\.sds-group-body \.sds-fact-(?:key|value)/.test(css) && !/data-layout='(?:GRID|LIST)'\] \.sds-tile-facts(?:-one)? d[td] \{[^}]*(?:color|font-weight|font-style)/.test(css));
+}
 const { cutVersions, integrityTable, newestVersion, linesFor } = await import(pathToFileURL(resolve(HERE, "..", "plugin-support-lib", "src", "lib", "page-styles.ts")).href);
 const { readFileSync } = await import("node:fs");
 const STYLES_HOME = resolve(HERE, "src", "styles");
@@ -104,12 +115,12 @@ ok("Binds keeps the Weight a reader compares down, and folds what a rule decides
   binds.includes("<thead><tr><th>Rule</th><th>Weight</th></tr></thead>") && binds.includes("<tr><td><p><code>RD.X.1</code></p><p>what every provider delivers</p></td><td>MUST</td></tr>"), binds);
 const pieces = rowsOf(produced(table(["Piece", "The question it answers", "Its terms"], ["**A provider**", "What must it build?", "Provider"], ["**Figma**", "Why elsewhere?", "—"])), "<thead>");
 ok("a Model's pieces are one column: the piece, its question, and its terms as a fact",
-  pieces.includes("<tr><td><p><strong>A provider</strong></p><p>What must it build?</p><span class=\"sds-small\">Terms: Provider</span></td></tr>") &&
+  pieces.includes("<tr><td><p><strong>A provider</strong></p><p>What must it build?</p><span class=\"sds-small sds-facts\"><span class=\"sds-fact-key\">Terms</span><span class=\"sds-fact-value\">Provider</span></span></td></tr>") &&
   pieces.includes("<tr><td><p><strong>Figma</strong></p><p>Why elsewhere?</p></td></tr>"), pieces);
 const edges = rowsOf(produced(table(["Owns", "Refuses", "Who owns that instead"], ["the build", "what a kind is", "[Targets](targets.md)"])), "<thead>");
 ok("a Boundary keeps Owns beside Refuses, and who owns the refused part is a fact",
   edges.includes("<thead><tr><th>Owns</th><th>Refuses</th></tr></thead>") &&
-  edges.includes("<tr><td>the build</td><td>what a kind is<span class=\"sds-small\">Owned by: <a href=\"targets.md\">Targets</a></span></td></tr>"), edges);
+  edges.includes("<tr><td>the build</td><td>what a kind is<span class=\"sds-small sds-facts\"><span class=\"sds-fact-key\">Owned by</span><span class=\"sds-fact-value\"><a href=\"targets.md\">Targets</a></span></span></td></tr>"), edges);
 const other = rowsOf(produced(table(["Key", "Example", "Why"], ["`a`", "`b`", "c"])), "<thead>");
 ok("any other table of short values keeps its columns, as written",
   other.includes("<thead><tr><th>Key</th><th>Example</th><th>Why</th></tr></thead>") && other.includes("<tr><td><code>a</code></td><td><code>b</code></td><td>c</td></tr>"), other);
@@ -455,10 +466,10 @@ console.log("\n=== the page renderer — group fences are panels");
     g.html.includes('<section class="sds-group" id="g-structure" aria-labelledby="g-structure-title">') && g.html.includes(`<h5 id="g-structure-title">Structure</h5><p class="sds-group-line">how a category's pages are built</p>`)
       && g.html.includes('<span class="sds-group-count">2 tabs</span>') && /<div class="sds-group-body">\s*<div class="sds-tabset"/.test(g.html) && g.findings.length === 0 && !g.html.includes("~~~"), g.html + JSON.stringify(g.findings));
   ok("[MKT.SCRIPTS.638] a LIST in a tab is the Plan table's rows: the name in bold, the description under it, the other facts on one small line joined with a dot, and the bracketed code a badge at the row's end",
-    g.html.includes('<tr><td><p><strong>Topnav</strong></p><p>a bar</p><span class="sds-small"><span class="sds-fact-key">Unit</span><span class="sds-fact-value">DSTopnav</span></span></td>') && !g.html.includes("sds-tile"), g.html);
+    g.html.includes('<tr><td><p><strong>Topnav</strong></p><p>a bar</p><span class="sds-small sds-facts"><span class="sds-fact-key">Unit</span><span class="sds-fact-value">DSTopnav</span></span></td>') && !g.html.includes("sds-tile"), g.html);
   const b = made(tilde("group Structure", tilde("tabs", "--- Layouts\n" + fence("catalog layout=LIST facts=AFTER_DESCRIPTION", "Topnav | a bar\n  Code: [TOPNAV]\n  Unit: DSSiteLayout\n  Level: site") + "--- Pages\nNone yet.")));
   ok("[MKT.SCRIPTS.638] the one fact of bracketed codes is a badge in a second cell, and the facts left are one small line joined with a dot",
-    b.html.includes('<span class="sds-small"><span class="sds-fact-key">Unit</span><span class="sds-fact-value">DSSiteLayout</span> &middot; <span class="sds-fact-key">Level</span><span class="sds-fact-value">site</span></span></td><td><span class="sds-tags"><span class="sds-badge">TOPNAV</span></span></td>'), b.html);
+    b.html.includes('<span class="sds-small sds-facts"><span class="sds-fact-key">Unit</span><span class="sds-fact-value">DSSiteLayout</span> &middot; <span class="sds-fact-key">Level</span><span class="sds-fact-value">site</span></span></td><td><span class="sds-tags"><span class="sds-badge">TOPNAV</span></span></td>'), b.html);
   const c = made(tilde("group Data entry", fence("catalog", "DSInput | one line of text\nDSSelect | a choice")));
   ok("[MKT.SCRIPTS.639] a group holding a catalog is one panel with the item count, and one group has no jump row",
     c.html.includes('<h5 id="g-data-entry-title">Data entry</h5><span class="sds-group-count">2 items</span>') && c.html.includes('<div class="sds-tiles">') && !c.html.includes("sds-group-jumps") && !c.html.includes("sds-group-line") && c.findings.length === 0, c.html);

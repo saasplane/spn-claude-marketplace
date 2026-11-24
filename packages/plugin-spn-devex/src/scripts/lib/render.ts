@@ -341,11 +341,11 @@ const bold = (html: string): string => /^<strong>[\s\S]*<\/strong>$/.test(html) 
  * with nothing to say is left out. The stylesheet tones and spaces the levels, so the cell carries no style.
  */
 function itemCell(title: string, line: string, facts: [string, string][]): string {
-  const said = facts.filter(([, value]) => !isBlank(value)).map(([key, value]) => `${key}: ${inline(value)}`);
+  const said = facts.filter(([, value]) => !isBlank(value)).map(([key, value]) => `<span class="sds-fact-key">${esc(key)}</span><span class="sds-fact-value">${inline(value)}</span>`);
   return [
     isBlank(title) ? "" : `<p>${title}</p>`,
     isBlank(line) ? "" : `<p>${inline(line)}</p>`,
-    said.length ? `<span class="sds-small">${said.join(" &middot; ")}</span>` : "",
+    said.length ? `<span class="sds-small sds-facts">${said.join(" &middot; ")}</span>` : "",
   ].join("");
 }
 
@@ -628,7 +628,7 @@ function catalogHtml(items: CatalogItem[], layout: string | null, media: string 
       const tags = item.facts.find(([, value]) => /^\s*(\[[^\]\[]+\]\s*)+$/.test(value));
       const small = item.facts.filter((fact) => fact !== tags).map(([key, value]) => `${key ? `<span class="sds-fact-key">${inline(key)}</span>` : ""}<span class="sds-fact-value">${inline(value)}</span>`);
       const badge = tags ? factValue(tags[1]) : "";
-      return `      <tr><td><p><strong>${inline(item.name)}</strong></p>${item.line ? `<p>${inline(item.line)}</p>` : ""}${small.length ? `<span class="sds-small">${small.join(" &middot; ")}</span>` : ""}${guidanceHtml(item)}</td>${items.some((one) => one.facts.some(([, value]) => /^\s*(\[[^\]\[]+\]\s*)+$/.test(value))) ? `<td>${badge}</td>` : ""}</tr>`;
+      return `      <tr><td><p><strong>${inline(item.name)}</strong></p>${item.line ? `<p>${inline(item.line)}</p>` : ""}${small.length ? `<span class="sds-small sds-facts">${small.join(" &middot; ")}</span>` : ""}${guidanceHtml(item)}</td>${items.some((one) => one.facts.some(([, value]) => /^\s*(\[[^\]\[]+\]\s*)+$/.test(value))) ? `<td>${badge}</td>` : ""}</tr>`;
     });
     return `  <div class="sds-scroll"><table>\n    <tbody>\n${rows.join("\n")}\n    </tbody>\n  </table></div>`;
   }
