@@ -77,6 +77,15 @@ ok("the Terms table carries the class `sds-terms`, which gives the three columns
 ok("a table that is not the Terms table carries no such class",
   !produced(table(["Rule", "What it decides", "Weight"], ["`RD.X.1`", "what every provider delivers", "MUST"])).includes("sds-terms")
   && !produced(table(["Term", "Meaning"], ["Estate", "everything a product runs on"])).includes("sds-terms"));
+{
+  const empty = rowsOf(produced(table(["Term", "Contract term", "What it means"], ["Estate", "—", "everything a product runs on"], ["Ring", "", "a set of estates"])), "<thead>");
+  ok("[MKT.SCRIPTS.647] a Terms table whose Contract term cells are all empty or a dash draws no Contract term column, in its head or its rows",
+    empty.startsWith("<thead><tr><th>Term</th><th>Description</th></tr></thead>") && empty.includes("<tr><td><strong>Estate</strong></td><td>everything a product runs on</td></tr>") && !empty.includes("Contract term"), empty);
+  ok("[MKT.SCRIPTS.647] it takes the class `sds-terms sds-terms-two`, so the stylesheet gives its two columns their own shares",
+    produced(table(["Term", "Contract term", "What it means"], ["Estate", "—", "x"])).includes('<table class="sds-terms sds-terms-two">'));
+  ok("[MKT.SCRIPTS.647] one contract term in any row keeps the column",
+    rowsOf(produced(table(["Term", "Contract term", "What it means"], ["Estate", "—", "x"], ["Ring", "`SPRing`", "y"])), "<thead>").includes("<th>Contract term</th>"));
+}
 const { cutVersions, integrityTable, newestVersion, linesFor } = await import(pathToFileURL(resolve(HERE, "..", "plugin-support-lib", "src", "lib", "page-styles.ts")).href);
 const { readFileSync } = await import("node:fs");
 const STYLES_HOME = resolve(HERE, "src", "styles");

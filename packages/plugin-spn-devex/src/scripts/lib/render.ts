@@ -438,9 +438,18 @@ function table(lines: string[], findings: Finding[] = []): string {
   // SOFT: a table of names and what each is, past four rows, is a catalog a reader browses (the block table in 05-pages.md).
   const described = ITEM_SHAPES.includes(shape as (typeof ITEM_SHAPES)[number]) ? null : readsAsCatalog(head, rows);
   if (described) findings.push({ message: `a table of ${rows.length} rows reads as a catalog, a \`${bare(head[0])}\` column and a \`${described}\` column: a \`catalog\` fence (\`layout=GRID\`, or \`LIST\` where the names are long) lets a reader browse them, and a plain table is for a wide comparison of attributes` });
-  const th = (shape ? shape.columns : head.map(inline)).map((c) => `<th>${c}</th>`).join("");
-  const tb = rows.map((r) => `<tr>${(shape ? shape.row(r) : r.map(inline)).map((c) => `<td>${c}</td>`).join("")}</tr>`).join("\n      ");
-  return `  <div class="sds-scroll"><table${shape?.tableClass ? ` class="${shape.tableClass}"` : ""}>\n    <thead><tr>${th}</tr></thead>\n    <tbody>\n      ${tb}\n    </tbody>\n  </table></div>`;
+  let columns = shape ? shape.columns : head.map(inline);
+  let drawn = rows.map((r) => shape ? shape.row(r) : r.map(inline));
+  let tableClass = shape?.tableClass;
+  // A Terms table whose Contract term cells are all empty or a dash draws no Contract term column (RULE.DEVEX.WORKSPACE.574).
+  if (tableClass === "sds-terms" && drawn.length && drawn.every((cells) => cells[1] === "")) {
+    columns = columns.filter((_, at) => at !== 1);
+    drawn = drawn.map((cells) => cells.filter((_, at) => at !== 1));
+    tableClass = "sds-terms sds-terms-two";
+  }
+  const th = columns.map((c) => `<th>${c}</th>`).join("");
+  const tb = drawn.map((cells) => `<tr>${cells.map((c) => `<td>${c}</td>`).join("")}</tr>`).join("\n      ");
+  return `  <div class="sds-scroll"><table${tableClass ? ` class="${tableClass}"` : ""}>\n    <thead><tr>${th}</tr></thead>\n    <tbody>\n      ${tb}\n    </tbody>\n  </table></div>`;
 }
 
 function anchorOf(text: string): string {
