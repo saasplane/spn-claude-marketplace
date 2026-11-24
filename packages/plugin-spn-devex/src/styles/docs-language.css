@@ -7754,18 +7754,21 @@
 }
 .sds-fold.sds-guidance > p {
   margin: .15rem 0 0;
-  padding: 0;
+  padding: 0 0 0 1.05em;
+  font-family: inherit;
   font-size: var(--sds-xs, .75rem);
-  line-height: 1.4;
+  line-height: 1.45;
+  color: var(--sds-text-description-card);
 }
 .sds-fold.sds-guidance > p:last-child {
-  margin-bottom: .25rem;
+  margin-bottom: .3rem;
 }
 .sds-fold.sds-guidance > p > strong {
   margin-right: .4rem;
   font-size: inherit;
   line-height: inherit;
-  font-weight: 600;
+  font-weight: var(--font-weight-medium);
+  color: var(--sds-text-fact-card);
 }
 .sds-guidance-ids {
   display: inline;

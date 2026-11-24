@@ -2115,9 +2115,24 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   color: var(--sds-text-description);
 }
 .sds-fold.sds-guidance[open] > summary { border-bottom: 0; }
-.sds-fold.sds-guidance > p { margin: .15rem 0 0; padding: 0; font-size: var(--sds-xs, .75rem); line-height: 1.4; }
-.sds-fold.sds-guidance > p:last-child { margin-bottom: .25rem; }
-.sds-fold.sds-guidance > p > strong { margin-right: .4rem; font-size: inherit; line-height: inherit; font-weight: 600; }
+/* The open guidance stands under the word Guidance, past the marker, in the text font: labels in the fact key's quiet colour,
+   values in the description's colour, as the facts line pairs them. */
+.sds-fold.sds-guidance > p {
+  margin: .15rem 0 0;
+  padding: 0 0 0 1.05em;
+  font-family: inherit;
+  font-size: var(--sds-xs, .75rem);
+  line-height: 1.45;
+  color: var(--sds-text-description-card);
+}
+.sds-fold.sds-guidance > p:last-child { margin-bottom: .3rem; }
+.sds-fold.sds-guidance > p > strong {
+  margin-right: .4rem;
+  font-size: inherit;
+  line-height: inherit;
+  font-weight: var(--font-weight-medium);
+  color: var(--sds-text-fact-card);
+}
 .sds-guidance-ids { display: inline; font-family: var(--font-code); font-size: .7rem; color: var(--sds-text-description); }
 .sds-guidance-ids > span { display: inline-block; margin-right: .4rem; white-space: nowrap; }
 
