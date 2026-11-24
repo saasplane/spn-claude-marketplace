@@ -7472,8 +7472,10 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-template-rows: minmax(0, 1fr);
 }
-.sds-json-body > section:not(.sds-json-code), .sds-json-scroll {
+.sds-json-body > section:not(.sds-json-code) {
   --pane: var(--sds-paper);
+}
+.sds-json-body > section:not(.sds-json-code), .sds-json-scroll {
   --edge: var(--sds-ink);
   @supports (color: color-mix(in lab, red, red)) {
     --edge: color-mix(in srgb, var(--sds-ink) 11%, transparent);

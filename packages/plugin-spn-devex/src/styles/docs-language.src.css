@@ -1733,8 +1733,8 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 .sds-json-body { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); }
 /* Each panel scrolls on its own, down and across, with a thin scrollbar and a soft shadow at an edge where more lies beyond (the cover gradients
    scroll with the content, the shadow gradients stay: a shadow shows only where the cover has moved off). The dialog itself never scrolls. */
+.sds-json-body > section:not(.sds-json-code) { --pane: var(--sds-paper); }
 .sds-json-body > section:not(.sds-json-code), .sds-json-scroll {
-  --pane: var(--sds-paper);
   --edge: color-mix(in srgb, var(--sds-ink) 11%, transparent);
   min-width: 0; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--surface-border-strong) transparent;
   background:
