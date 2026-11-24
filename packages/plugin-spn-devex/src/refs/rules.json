@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "065687c2"
+    "commit": "47c5e120"
   },
   "rules": [
     {
@@ -25181,11 +25181,6 @@
       "restated": [
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/writer-brief.md",
           "heading": "The rules this step holds"
         }
@@ -25203,11 +25198,6 @@
       "heading": "A builder manages the library, and a partner uses it",
       "decision": null,
       "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
         {
           "plugin": "spn-surface",
           "path": "skills/design/steps/writer-brief.md",
@@ -25561,11 +25551,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/given-design.md",
           "heading": "The rules this step holds"
         },
@@ -25597,11 +25582,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/standards-patterns.md",
           "heading": "The app page kinds — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -25678,11 +25658,6 @@
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
           "heading": "5. Then the blocks"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -30536,11 +30511,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/given-design.md",
           "heading": "The rules this step holds"
         }
@@ -31314,7 +31284,7 @@
       "restated": [
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
+          "path": "skills/design/steps/mock.md",
           "heading": "The rules this step holds"
         }
       ]
@@ -33463,11 +33433,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/writer-brief.md",
           "heading": "The rules this step holds"
         }
@@ -35606,11 +35571,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/given-design.md",
           "heading": "The rules this step holds"
         }
@@ -35694,11 +35654,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/delivery-library.md",
           "heading": "How an agent changes a library file through the connector"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -35942,11 +35897,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/change-library.md",
           "heading": "What the library draws, and what it does not"
         },
@@ -36010,11 +35960,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/writer-brief.md",
           "heading": "The rules this step holds"
         }
@@ -36040,11 +35985,6 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/steps/given-design.md",
           "heading": "The rules this step holds"
         }
       ]
@@ -36222,11 +36162,6 @@
       "restated": [
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/writer-brief.md",
           "heading": "The rules this step holds"
         }
@@ -36343,7 +36278,7 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
+          "path": "skills/design/steps/mock.md",
           "heading": "The rules this step holds"
         }
       ]
@@ -36372,7 +36307,7 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
+          "path": "skills/design/steps/mock.md",
           "heading": "The rules this step holds"
         }
       ]
@@ -36396,7 +36331,7 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
+          "path": "skills/design/steps/mock.md",
           "heading": "The rules this step holds"
         }
       ]
@@ -36420,7 +36355,7 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
+          "path": "skills/design/steps/mock.md",
           "heading": "The rules this step holds"
         }
       ]
@@ -36444,7 +36379,7 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
+          "path": "skills/design/steps/mock.md",
           "heading": "The rules this step holds"
         }
       ]
@@ -36468,7 +36403,7 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
+          "path": "skills/design/steps/mock.md",
           "heading": "The rules this step holds"
         }
       ]
@@ -36492,7 +36427,7 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
+          "path": "skills/design/steps/mock.md",
           "heading": "The rules this step holds"
         }
       ]
@@ -36516,7 +36451,7 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
+          "path": "skills/design/steps/mock.md",
           "heading": "The rules this step holds"
         }
       ]
@@ -36540,7 +36475,7 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
+          "path": "skills/design/steps/mock.md",
           "heading": "The rules this step holds"
         }
       ]
@@ -36564,7 +36499,7 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
+          "path": "skills/design/steps/mock.md",
           "heading": "The rules this step holds"
         }
       ]
@@ -36588,7 +36523,7 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
+          "path": "skills/design/steps/mock.md",
           "heading": "The rules this step holds"
         }
       ]
@@ -36612,7 +36547,7 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
+          "path": "skills/design/steps/mock.md",
           "heading": "The rules this step holds"
         }
       ]
@@ -36661,13 +36596,13 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
+          "path": "skills/design/steps/draw.md",
+          "heading": "How a block is drawn"
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/steps/draw.md",
-          "heading": "How a block is drawn"
+          "path": "skills/design/steps/mock.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -36841,11 +36776,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
@@ -36934,11 +36864,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/change-library.md",
           "heading": "What the library draws, and what it does not"
         },
@@ -37007,11 +36932,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/change-library.md",
           "heading": "What the library draws, and what it does not"
         },
@@ -37043,11 +36963,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/delivery-library.md",
           "heading": "The path of a page through the connector"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -37104,11 +37019,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
@@ -37138,11 +37048,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
@@ -37169,11 +37074,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "Media size by placement — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -37208,11 +37108,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "Items with a medium — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -37414,11 +37309,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
@@ -37440,11 +37330,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "The drawing scale — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -37482,11 +37367,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
@@ -37516,11 +37396,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
@@ -37545,11 +37420,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
@@ -37571,11 +37441,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "The drawing scale — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -37608,11 +37473,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
@@ -37637,11 +37497,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
@@ -37663,11 +37518,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "The drawing scale — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -37700,11 +37550,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
@@ -37726,11 +37571,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "The drawing scale — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -37758,11 +37598,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
@@ -37784,11 +37619,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "The drawing scale — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -37845,11 +37675,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
@@ -37871,11 +37696,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "The drawing scale — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -37922,11 +37742,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
@@ -37948,11 +37763,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "The drawing scale — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -37980,11 +37790,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
@@ -38006,11 +37811,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "How a page is built from it — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -38043,11 +37843,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
@@ -38069,11 +37864,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "A section's two layers — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -38106,11 +37896,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
@@ -38137,11 +37922,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "A section's two layers — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -38174,11 +37954,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
@@ -38200,11 +37975,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "A section's two layers — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -38232,11 +38002,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
@@ -38258,11 +38023,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "A section's two layers — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -38290,11 +38050,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
@@ -38316,11 +38071,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "Media size by placement — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -38348,11 +38098,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
@@ -38374,11 +38119,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "Items with a medium — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -38406,11 +38146,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
@@ -38432,11 +38167,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "The drawing scale — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -38469,11 +38199,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
@@ -38500,11 +38225,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "One source for the platform's look — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -38571,11 +38291,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
@@ -38622,11 +38337,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         },
@@ -38653,11 +38363,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "One source for the platform's look — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -38823,11 +38528,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
@@ -38915,11 +38615,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         },
@@ -38949,11 +38644,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
@@ -38978,11 +38668,6 @@
         },
         {
           "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
@@ -39004,11 +38689,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "The parts — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
@@ -39052,11 +38732,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "One source for the platform's look — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "The rules this step holds"
         },
         {
           "plugin": "spn-surface",
