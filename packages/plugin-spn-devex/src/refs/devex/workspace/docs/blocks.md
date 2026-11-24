@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "section": "The blocks — what a page reaches for instead of prose",
-      "seen": "9f51c990"
+      "seen": "fc1bed6a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
@@ -19,7 +19,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "section": "Which block a content takes, and how its fence is written",
-      "seen": "be488607"
+      "seen": "a07b2b9f"
     }
   ]
 }
@@ -216,7 +216,7 @@ Three worked examples, each as Content, Right, Wrong:
 - **Four checks, each a name, a sentence and a weight.** Content: `Reach`, `Voice`, `Length`, `Fit`, each with what it measures and how much it counts. Right: `catalog layout=GRID`. Wrong: a plain table, because the names are things a reader browses and the sentences are read.
 - **Five numbers sorted by kind.** Content: a kind in the first column and a count beside it. Right: a plain table. Wrong: a catalog, because a number is a value, not a sentence a reader reads.
 
-**GRID or LIST is decided by what each item holds.** Use `GRID` when every item fits a card: a name of up to four words, one line of up to about fifteen words, and at most three short facts. Cards are for things a reader scans and picks from. Use `LIST` for anything longer: a name over four words, a line over about fifteen words, more than three facts, or facts that are sentences. Rows are for things a reader reads down. More than six items in the construct's own groups take group panels, and each panel holds a `GRID` or a `LIST` by the same test.
+**GRID or LIST is decided by what each item holds.** Use `GRID` for a fixed set of types a reader scans and picks from, when every item fits a card: a name of up to four words, one line of up to about fifteen words, and at most three short facts. A card is drawn in `DSCardWidget`'s parts: the name and line in the head, the facts in the content, each key above its value. Short facts stand side by side in one row; a longer fact stacks under them across the card, with room between the facts that stack. Use `LIST` for anything longer: a name over four words, a line over about fifteen words, more than three facts, or facts that are sentences. Rows are for things a reader reads down, and a list names where its facts stand (rule 563). More than six items in the construct's own groups take group panels, and each panel holds a `GRID` or a `LIST` by the same test.
 
 Then read the table down to the first row that fits.
 
@@ -238,18 +238,22 @@ The rows leave some content between two of them. These lines settle the usual ca
 - **Two to four things make a catalog table, and five or more make a wide one.** A `catalog layout=TABLE` holds two to four things and at most six facts. Five things or more, or seven facts or more, is a wide comparison and stays a plain table.
 - **A catalog needs a name for each item, once.** A table whose first column repeats a name, or has no name at all, stays a table.
 - **A description is a clause a reader reads, not a value.** A column of sentences or clauses beside a name reads as a catalog. A column of numbers, owners, states or one-word values is a table of attributes, and stays a table.
-- **A fact is a value compared down a list; a phrase that describes the item goes in its line.** In a `catalog layout=LIST`, where every item holds one or two short facts (a word, a number, a status, a version; up to about 20 characters), they sit at the row's right end, one narrow column each, the column's name once at the top of the list. A fact that is a phrase is folded into the item's line (rule 549).
-- **Facts below an item's line stand in the same column on every item of the list, one column for each fact name** (`RULE.DEVEX.WORKSPACE.563` · GUIDE). A reader reads one name down the list, so a long value wraps inside its column and never takes the row, and an item without that fact leaves its column empty. The page writer lays it out where the list names two or three facts; with more, each fact takes a line of its own below the item.
-- **A fact whose value is codes from a closed set is written as tags** (`RULE.DEVEX.WORKSPACE.564` · GUIDE): `Owes: [UNIT] [COMPONENT]`, one bracket for each code, drawn as one badge each. Up to three tags count as a short fact, so they stand at the row's right end, one narrow column for each fact name. Use it for a tier, a status or a kind, never for words.
+- **A fact is a value compared down a list; a phrase that describes the item goes in its line.** A short fact is a word, a number, a status, a version (up to about 20 characters) or up to three tags. A fact that is a phrase about the item is folded into the item's line (rule 549).
+- **A catalog list names where its facts stand, `facts=END` or `facts=AFTER_DESCRIPTION`; the page writer never guesses it** (`RULE.DEVEX.WORKSPACE.563` · GUIDE). The two are the design system's placements: `END` is `DSItem`'s end part, `AFTER_DESCRIPTION` is `DSItemFactsPlacementType`'s default.
+  - **`END`, when every fact is short:** up to three columns at the row's end under a header row naming the thing and each fact once, every heading and value set at the start; an item without a fact leaves its cell empty. A longer value, or a fourth column, stops the write and names `AFTER_DESCRIPTION`.
+  - **`AFTER_DESCRIPTION`, the default, when a fact is a sentence:** under the description. One fact name across the list is one `Key: value` line; two or more are cells, each key over its value, one column for each key in the same place on every item, an empty cell kept.
+  - A list with no `facts=` whose facts are all short is a soft finding that names `END`. `facts=` is for `LIST` only.
+- **A fact whose value is codes from a closed set is written as tags** (`RULE.DEVEX.WORKSPACE.564` · GUIDE): `Owes: [UNIT] [COMPONENT]`, one bracket for each code, drawn as one badge each. Up to three tags count as a short fact, so they may stand in an `END` column. Use it for a tier, a status or a kind, never for words. A line of tags with no key is drawn as bare badges, in any layout, only as an item's one fact; beside other facts or in an `END` list it is a finding.
 - **Which part of a list item does this go in?** Read down to the first row that fits (rule 549):
 
 | What you have | It goes in |
 | --- | --- |
-| a value compared down the list: a status, a weight, a grade, a version, a count | a side column, named once at the top of the list (one or two of them) |
+| a short value compared down the list: a status, a weight, a grade, a version, a count, up to three tags | a fact, with `facts=END`: a column at the row's end, named once in the header row (up to three) |
 | words that describe the item | the item's line |
 | what the item prints, such as a message | a quote, a `> ` line under the item in the fence |
 | one phrase that holds only under a condition | a note, a `~ Label: phrase` line under the item |
-| three or more values, or a fact that is a sentence | facts below the line |
+| a fact that is a sentence, or more than three facts | a fact, with `facts=AFTER_DESCRIPTION`: under the description, one `Key: value` line, or a cell for each key |
+| only a few codes from a closed set, with no name needed | a line of tags with no key: bare badges, the item's one fact |
 - **A table of links to parts of the same page stays a table.** `cards` are doors to other pages a reader may open next; a list of examples or references is not a set of doors.
 - **A converted table keeps its words.** The first column becomes the items' names and its heading is dropped. Each other heading becomes a fact key and is cut to a word or two (`The prefix of its published keys` becomes `Prefix`). An item may have no one line of its own.
 - **Order decides between a list and a figure.** Steps a reader carries out in turn are a numbered list, and stay numbered when the sentence before them counts them ("Three steps…"). A flow between things the page names is a `chain`. Layers inside a boundary are a `system`. Anything else that connects things is a `map`.
@@ -267,10 +271,12 @@ A plain table of a name column and a description column past four rows reads as 
 
 | Block | You write | It becomes |
 | --- | --- | --- |
-| `CATALOG`, `GRID` | a fence tagged `catalog`, one line a card: name, one line; the card's facts on the lines under it, indented, one `Key: value` a line | cards in a grid of two to four across, each fact's label above its value |
-| `CATALOG`, `LIST` | the same fence tagged `catalog layout=LIST`; a list with side columns adds `name=Rule` (the item noun) to head the main column, and each side column is headed by its fact's key | one card a row, its name on the left and its facts on the right |
-| `CATALOG`, `TABLE` | the same fence tagged `catalog layout=TABLE` | the cards as columns and each fact key as a row |
-| `CATALOG` media | `media=ICON`, `MARK`, `AVATAR`, `AVATAR_GROUP` or `MEDIA_TOP` after the tag, one for every item; an item names its media after its line | `ICON` for an item read as a line, `MARK` for an item that is a thing of its own, `AVATAR` for a person or a team, `MEDIA_TOP` for an item told best by its shape |
+| `CATALOG`, `GRID` | a fence tagged `catalog`, one line a card: name, one line; the card's facts on the lines under it, indented, one `Key: value` a line | cards in a grid of two to four across, in `DSCardWidget`'s parts, each fact's key above its value |
+| `CATALOG`, `LIST`, `END` | the same fence tagged `catalog layout=LIST facts=END`; `name=Rule` (the item noun) heads the main column, and each fact column is headed by its key | one item a row, its short facts as up to three columns at the end under a header row |
+| `CATALOG`, `LIST`, `AFTER_DESCRIPTION` | the same fence tagged `catalog layout=LIST`, or with `facts=AFTER_DESCRIPTION` | one item a row, its facts under the description: one `Key: value` line, or a cell for each key, lined up down the list |
+| `CATALOG`, `TABLE` | the same fence tagged `catalog layout=TABLE` | the cards as columns and each fact key as a row; the key column takes its row's fill and stays at the start with an edge shadow while the table scrolls, as `DSTable`'s pinned column does |
+| bare tags | an item's one fact written as a line of tags with no key, `[UNIT] [COMPONENT]` | the tags alone, as badges, in any layout |
+| `CATALOG` media | `media=ICON`, `MARK`, `AVATAR`, `AVATAR_GROUP` or `MEDIA_TOP` after the tag, one for every item; an item names its media after its line | none by default: an item takes media only when the picture tells a reader something its name does not, never as decoration on every card; `ICON` for an item read as a line, `MARK` for an item that is a thing of its own, `AVATAR` for a person or a team, `MEDIA_TOP` for an item told best by its shape |
 | `TABS` | a fence of tildes tagged `tabs look=LINE`, `SWITCH` or `PILL` (`LINE` when left out), and a `--- <label>` line before each panel, whose body is one block; two to six tabs, never nested | a bar at the start and one panel at a time; every panel shows where the script does not run |
 | group panels | `## Group` lines inside a `catalog` fence | one panel for each group |
 | fold | `file=<path> fold` after the language, the body left empty to read the file from the repository root | the file's frame inside a `details` whose summary is the path |

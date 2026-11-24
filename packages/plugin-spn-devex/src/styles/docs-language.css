@@ -7196,6 +7196,11 @@
   row-gap: .55rem;
   align-content: start;
 }
+.sds-tiles[data-layout='GRID'] > .sds-tile:not([data-facts]) {
+  display: flex;
+  flex-direction: column;
+  row-gap: .55rem;
+}
 .sds-tiles[data-layout='GRID'] > .sds-tile[data-facts='1'] {
   grid-row: span 3;
 }
@@ -7214,7 +7219,21 @@
 .sds-tiles[data-layout='GRID'] .sds-tile-facts > div {
   display: flex;
   flex-direction: column;
-  gap: .15rem;
+  gap: 0;
+}
+.sds-tiles[data-layout='GRID'] .sds-tile-facts > .sds-tile-fact-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr));
+  gap: .55rem 1rem;
+}
+.sds-tiles[data-layout='GRID'] .sds-tile-fact-row > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+}
+.sds-tiles[data-layout='GRID'] .sds-tile-facts > div + div {
+  margin-top: .35rem;
 }
 .sds-tiles[data-layout='GRID'] .sds-tile-facts > div:first-child {
   border-top: 1px solid var(--sds-rule);
@@ -7224,6 +7243,7 @@
 .sds-tiles[data-layout='GRID'] .sds-tile-facts dt {
   font-size: var(--sds-xs);
   letter-spacing: .02em;
+  line-height: 1.25;
 }
 .sds-tiles[data-layout='GRID'] .sds-tile-facts dd {
   font-size: var(--sds-sm);
@@ -7405,11 +7425,12 @@
 .sds-tiles[data-layout='LIST'] .sds-tile-facts > div {
   display: flex;
   flex-direction: column;
-  gap: .15rem;
+  gap: 0;
 }
 .sds-tiles[data-layout='LIST'] .sds-tile-facts dt {
   font-size: var(--sds-xs);
   letter-spacing: .02em;
+  line-height: 1.25;
 }
 .sds-tiles[data-layout='LIST'] .sds-tile-facts dd {
   color: var(--sds-text-title-card);
@@ -7422,6 +7443,7 @@
 }
 .sds-tiles[data-layout='LIST'] .sds-tile-facts-one > div {
   display: flex;
+  flex-direction: row;
   flex-wrap: wrap;
   align-items: baseline;
   column-gap: .6rem;
@@ -7433,8 +7455,12 @@
 }
 .sds-tiles[data-layout='LIST'] .sds-tile-facts-one dd {
   font-style: italic;
+  font-size: var(--sds-caption);
   color: var(--sds-text-description-card);
   line-height: 1.5;
+}
+.sds-tiles[data-layout='LIST'] .sds-tile-body > .sds-tile-facts-one {
+  margin-top: .2rem;
 }
 @media (max-width: 720px) {
   .sds-tiles[data-layout='LIST'] .sds-tile-facts {
@@ -7443,17 +7469,38 @@
 }
 .sds-tiles[data-layout='LIST'][data-facts='side'] {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) repeat(var(--sds-side-columns, 1), 8.5rem);
+  grid-template-columns: minmax(0, 1fr) repeat(var(--sds-side-columns, 1), minmax(8.5rem, max-content));
   column-gap: 0;
   row-gap: 0;
 }
 .sds-tiles[data-layout='LIST'][data-facts='side'][data-columns='2'] {
   --sds-side-columns: 2;
 }
+.sds-tiles[data-layout='LIST'][data-facts='side'][data-columns='3'] {
+  --sds-side-columns: 3;
+}
+.sds-tiles[data-layout='LIST'] .sds-tile-facts[data-columns='2'] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.sds-tiles[data-layout='LIST'] .sds-tile-facts[data-columns='3'] {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+@media (max-width: 720px) {
+  .sds-tiles[data-layout='LIST'] .sds-tile-facts[data-columns] {
+    grid-template-columns: 1fr;
+  }
+  .sds-tiles[data-layout='LIST'] .sds-tile-facts[data-columns] > .sds-tile-fact-none {
+    display: none;
+  }
+}
+.sds-tile .sds-tile-facts > .sds-tile-fact-bare {
+  display: block;
+}
 .sds-tiles[data-layout='LIST'][data-facts='side'] > .sds-tile, .sds-tiles[data-layout='LIST'][data-facts='side'] > .sds-tiles-head {
   grid-column: 1 / -1;
   display: grid;
   grid-template-columns: subgrid;
+  column-gap: 0;
   align-items: start;
 }
 .sds-tiles[data-layout='LIST'][data-facts='side'] .sds-tile-main {
@@ -7561,6 +7608,47 @@
   font-size: var(--sds-sm);
   font-weight: var(--font-weight-medium);
   color: var(--sds-text-fact);
+}
+.sds-scroll:has(> .sds-catalog-table) {
+  scroll-timeline: --sds-catalog-x inline;
+}
+.sds-catalog-table tr > :first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+.sds-catalog-table tbody th {
+  background-color: var(--surface);
+}
+.sds-catalog-table tbody tr:last-child > th {
+  border-bottom: none;
+}
+.sds-catalog-table:has(> thead > tr > th:nth-child(3)):not(:has(td > p + p)) > tbody > tr:nth-child(even) > th {
+  background-color: var(--surface-sunken);
+}
+.sds-catalog-table tr > :first-child::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -8px;
+  width: 8px;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(to right, var(--fg), transparent);
+  @supports (color: color-mix(in lab, red, red)) {
+    background: linear-gradient(to right, color-mix(in oklab, var(--fg) 12%, transparent), transparent);
+  }
+  animation: sds-pin-shadow linear both;
+  animation-timeline: --sds-catalog-x;
+}
+@keyframes sds-pin-shadow {
+  0% {
+    opacity: 0;
+  }
+  1%, 100% {
+    opacity: 1;
+  }
 }
 .sds-catalog-table tbody td {
   vertical-align: top;
