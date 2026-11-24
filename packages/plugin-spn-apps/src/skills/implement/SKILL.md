@@ -14,16 +14,16 @@ description: THE requirement router for SaaS Plane TS repos. Use whenever the us
       "seen": "1e3741bc"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "de2ac7e0"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/",
+      "seen": "864bd327"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
-      "seen": "452caa48"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-widgets/",
+      "seen": "dae38f66"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "ec4b3a10"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-containers/",
+      "seen": "8998eda9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/07-comments/01-intent.md",
@@ -88,14 +88,14 @@ Order never changes; skip only what the classification skips. **Documents lead c
 
 The `ui` step follows this section for every page a change adds or rearranges. **The Surface rules are the spn-surface plugin's, and its entry ref, `refs/support/surface/README.md`, is the one way in: follow its route 3, *Build a screen*.** It reads the page's design tree first; with no tree, the design steps through the tree, shown before any code, and where the partner brings a design of the page or a page to follow, the design skill's given-design mode; then what a page writes for each unit on its stack, and what a unit does not do yet; then the choice tables, for every closed prop the page writes.
 
-- **Start from the tree the `design` skill wrote.** It names the kind of person the app is for, the flow the page is a step of, the facts, the app pattern (or each section's site pattern) and every block by level, with the case each block follows. Where a page has no tree, run the `design` skill first, and show its result before any code. Never arrange a page while you write it, and never build it from a picture: a design the partner brings goes through the given-design mode into the tree first.
+- **Start from the tree the `design` skill wrote.** It names the kind of person the app is for, the flow the page is a step of, the facts, the app page kind (or each section's site container kind) and every block by level, with the case each block follows. Where a page has no tree, run the `design` skill first, and show its result before any code. Never arrange a page while you write it, and never build it from a picture: a design the partner brings goes through the given-design mode into the tree first.
 - **Build a kept line as kept.** Where the partner answered *keep yours*, the tree marks the line with the rule, their words and the date. Build it as they chose, and carry the reason into the code as one comment on that line. A review raises nothing on a kept line, and where the Surface check notes one, answer from the comment and leave the code as it is.
-- **Build each line of the tree with the unit it names.** An app pattern is an arrangement of units that exist, and it is never a block of its own (`RULE.SUPPORT.SURFACE.048` · MUST · skill:spn-surface/design). So you write no component for a pattern, and no component named after one. The page composes the panels, the widgets and the components the design system already has.
+- **Build each line of the tree with the unit it names.** An app page kind is built from units that exist, and it is never a block of its own (`RULE.SUPPORT.SURFACE.048` · MUST · skill:spn-surface/design). So you write no component for a page kind, and no component named after one. The page composes the panels, the widgets and the components the design system already has.
 - **Use one panel for each thing a person reads or saves as a whole** (`RULE.SUPPORT.SURFACE.116` · GUIDE), as the tree has it. Its sections are content parts, each under its own title, and never panels of their own. Two things that are read or saved apart are two panels. An editor with its preview is one panel, with each thing written beside what it becomes and the actions at the start of the footer (`RULE.SUPPORT.SURFACE.115` · GUIDE).
 - **Give the page that reads a record and the page that changes it the same parts in the same order** (`RULE.SUPPORT.SURFACE.117` · GUIDE). A reading becomes a field, a block of source becomes an editor, and the footer with the actions is added. Nothing else moves.
-- **Read the spec of the pattern for each screen class.** It shows where the parts sit at a desktop, at a tablet and on a phone. Its values are samples, and the page's own data takes their place.
+- **Read the spec of the page kind for each screen class.** It shows where the parts sit at a desktop, at a tablet and on a phone. Its values are samples, and the page's own data takes their place.
 - **Keep the choice the tree made for each part.** A part whose query takes a page, a text or a filter is `DSDataTable`, in the layout the tree names. Send its search and its filters to the server, in the read the table asks for (`RULE.SUPPORT.SURFACE.070` · MUST · skill:spn-surface/design). Never filter in the page over the records already loaded.
-- **Keep a site section's eyebrows as its site pattern states.** A hero's state is a `PRIMARY` badge eyebrow and its stack is `OUTLINE` `DEFAULT` badge facts, a grid cell's eyebrow is its group or kind as text and a badge only when it says a state, and a plan holds one eyebrow, with a second word as a `PRIMARY` badge fact (`RULE.SUPPORT.SURFACE.371` · GUIDE) (`RULE.SUPPORT.SURFACE.372` · GUIDE) (`RULE.SUPPORT.SURFACE.373` · GUIDE).
+- **Keep a site section's eyebrows as its site container kind states.** A hero's state is a `PRIMARY` badge eyebrow and its stack is `OUTLINE` `DEFAULT` badge facts, a grid cell's eyebrow is its group or kind as text and a badge only when it says a state, and a plan holds one eyebrow, with a second word as a `PRIMARY` badge fact (`RULE.SUPPORT.SURFACE.371` · GUIDE) (`RULE.SUPPORT.SURFACE.372` · GUIDE) (`RULE.SUPPORT.SURFACE.373` · GUIDE).
 - **Read the app's design language before any choice of a site page's own, give each section one emphasis, and never style a gap by hand.** A site's page follows its app's design language (`RULE.SUPPORT.SURFACE.440` · GUIDE). Each section takes one emphasis and never two, and the agent writes its case line, which gives each answer, the test that decided it and what the other answer would cost (`RULE.SUPPORT.SURFACE.438` · GUIDE) (`RULE.SUPPORT.SURFACE.439` · GUIDE). A look no prop covers is a gap for the design system, and never a class on a unit (`RULE.SUPPORT.SURFACE.442` · GUIDE).
 - **Read the app's construct, its capability chapter and the `language` block of its design-language construct before a page or a picture is drawn** (`RULE.SUPPORT.SURFACE.525` · MUST · skill:spn-surface/design). **Place each medium on the section, the feature or the item its size fits, in the design system's tokens only, and size it from the container that holds it** (`RULE.SUPPORT.SURFACE.526` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.527` · MUST · skill:spn-surface/design): a hero scene is the section's media edge to edge, and a drawing is made for its frame, never scaled from another placement. A claim has one carrier, its items or the medium's labels (`RULE.SUPPORT.SURFACE.528` · MUST · skill:spn-surface/design). A medium takes the language's drawing scale, one step by where it sits, S in a card, M in a section, L in a hero, and a size not in the scale is a gap in the language (`RULE.SUPPORT.SURFACE.536` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.538` · MUST · skill:spn-surface/design).
 - **A grid row stands at one height, and features stacked in one section stand apart by the section's stack token.** Each cell hands its height to its feature, so every feature of a row fills its cell (`RULE.SUPPORT.SURFACE.530` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.531` · MUST · skill:spn-surface/design). Two or more features in a section stand apart by `--section-<step>-stack`, and a section with one child takes none (`RULE.SUPPORT.SURFACE.549` · MUST · skill:spn-surface/design).
@@ -114,7 +114,7 @@ The `ui` step follows this section for every page a change adds or rearranges. *
 - **Run the conformance gates** — the `verify` skill code mode: codegen freshness, `spnutils apps validate`, build, lint, tests. This is what catches a file whose name no longer matches its contents. It also catches a barrel that was never regenerated, or a reach past another module's contract. A passing build reveals none of them.
 - **Run the tests** — the `run` skill tests mode. Typecheck the touched projects first: `npx nx run <project>:typecheck`, and `npx tsc --noEmit -p <project>/tsconfig.json` for a web app, whose `typecheck` target is disabled.
 - **Contract review gate** — if the contract surface changed, run the `review` skill contract mode before calling the work done. Code review (the `review` skill code mode) for everything else.
-- Report what changed per layer, what was regenerated, and test results. For a page, name its kind of person, its app or site pattern and each gap of a unit the page met. Never claim green without having run the commands.
+- Report what changed per layer, what was regenerated, and test results. For a page, name its kind of person, its app or site page kind and each gap of a unit the page met. Never claim green without having run the commands.
 
 ## Lenses
 

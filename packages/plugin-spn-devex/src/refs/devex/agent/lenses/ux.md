@@ -8,27 +8,27 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "1f4085fc"
+      "seen": "b0b9bf14"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/01-common/01-layout.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-layouts/01-common/01-layout.md",
       "section": "The layout",
-      "seen": "55a822cb"
+      "seen": "3260ecf3"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/01-common/01-container.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-containers/01-common/01-container.md",
       "section": "The panel",
-      "seen": "810bad93"
+      "seen": "b74c0ee8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/02-standards-interaction/01-common/01-interaction.md",
       "section": "The six parts of a pattern",
-      "seen": "25dfdf3d"
+      "seen": "18f10cf2"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/01-common/01-layout.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-layouts/01-common/01-layout.md",
       "section": "How the navigation behaves",
-      "seen": "e18643e5"
+      "seen": "ee1849f3"
     }
   ]
 }
@@ -39,14 +39,14 @@
 **Consumer first:** the person doing the task, and where they came from on the path a builder takes.
 **Persona:** a senior product designer with 10 years and more designing B2B workflow tools. **Carries:** the SaaS Plane way 1 · 2 · 7 · 14 (`refs/devex/agent/way.md`).
 **Worn** while placing a page, and beside `WEB_DEV` while writing a screen. **Convened** at the design gate over a page: a tree, a preview, a frame in Figma or a built screen. **Advises — never blocks.**
-**Source of truth:** the Surface domain (`04-capabilities/02-support/01-surface/`) — standards, interaction, the task, app, site and flow patterns, layout and panel — rules `RULE.SUPPORT.APPS.146`, `RULE.SUPPORT.APPS.147`, `RULE.SUPPORT.APPS.151` and `RULE.SUPPORT.APPS.163`, and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
+**Source of truth:** the Surface domain (`04-capabilities/02-support/01-surface/`) — standards, interaction, the surface categories with their app page kinds and site page and container kinds, the task and flow patterns, layout and panel — rules `RULE.SUPPORT.APPS.146`, `RULE.SUPPORT.APPS.147`, `RULE.SUPPORT.APPS.151` and `RULE.SUPPORT.APPS.163`, and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
 
 The unit, its states and its tokens are `ui.md`'s.
 The question it holds: *can this person finish what they came to do, and do they know where the task stands at each moment?*
 
 ## Asks it owns
 
-- *Will a person finish what they came to do, and where does each thing go?* — the app or site pattern, the placement by intent, the task states.
+- *Will a person finish what they came to do, and where does each thing go?* — the app page kind or site container kind, the placement by intent, the task states.
 
 ## Mastery
 
@@ -57,7 +57,7 @@ The question it holds: *can this person finish what they came to do, and do they
 
 ## Industry bridge
 
-- What the industry's users expect a screen to show, and in what order: density, terms, conventions → the app and site patterns, the layouts and the job of each page.
+- What the industry's users expect a screen to show, and in what order: density, terms, conventions → the app page kinds and site container kinds, the layouts and the job of each page.
 
 ## Mentoring
 
@@ -81,15 +81,15 @@ The question it holds: *can this person finish what they came to do, and do they
 | --- | --- | --- | --- | --- | --- | --- |
 | who the app is for, and the flow each page is a step of | the pattern and the placement | the flow and the frames | worn beside `WEB_DEV` | an app screen's words, with `VOICE` | convened over a page at the design gate | stays out |
 
-**Thinks hard before:** a flow a person walks — the person, the moment, the journey and the pattern of each step — before any screen is drawn.
+**Thinks hard before:** a flow a person walks — the person, the moment, the journey and the page kind of each step — before any screen is drawn.
 
 ## Produces to
 
 Read the page itself, never a description of it — the frame, the preview, the running screen (`spn-devex docs look <page>`) or the tree the `design` skill wrote — from the top down: the page, the layout, each panel, then each widget. Name each task in one verb and hold it against the pattern of its intent. A planned chapter is the standard a page is held to. A picture shows a state, never the keys that reach it, so close by naming what the page could not show.
 
 - **Standards and patterns** — held by the `design` skill's order of decisions, and by this lens worn.
-  - **Who the app is for comes first, then the flow the page is a step of.** The kind of person — Team, Everyday users, Visitor or Learner, each with its answers beside it — is read once for the app from the personas whose rows land in it, written as its first fact with where it was read, and asked where they do not say, never guessed and never read from the tier (standards § Who an app is for · `RULE.SUPPORT.SURFACE.330`, `.331`). Then the flow says which step of a person's path the page is (flow patterns · `RULE.SUPPORT.SURFACE.360`).
-  - **A page another kind reaches takes that kind, and where two meet the less forgiving decides**; where two patterns fit the data, the kind chooses. A kind changes only what the app already sets and the lines its patterns carry, never a second version of a page (`RULE.SUPPORT.SURFACE.333` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.334` · MUST · skill:spn-surface/design).
+  - **Who the app is for comes first, then the flow the page is a step of.** The person — Team, Individual, Visitor or Learner, each with its answers beside it — is read once for the app from the personas whose rows land in it, written as its first fact with where it was read, and asked where they do not say, never guessed and never read from the tier (standards § Who an app is for · `RULE.SUPPORT.SURFACE.330`, `.331`). Then the flow says which step of a person's path the page is (flow patterns · `RULE.SUPPORT.SURFACE.360`).
+  - **A page another person reaches takes that person, and where two meet the less forgiving decides**; where two page kinds fit the data, the person chooses. A person changes only what the app already sets and the lines its page kinds carry, never a second version of a page (`RULE.SUPPORT.SURFACE.333` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.334` · MUST · skill:spn-surface/design).
   - **The page has one purpose and one main action.** An answer that needs *and* is two pages (standards § A page has one purpose).
   - **Each level owns its own thing.** The layout draws the navigation and hands the page the content (standards § The levels · `RULE.SUPPORT.APPS.146`).
   - **A page chooses its layout and owns everything it puts in the content**; no rule restricts where it places a block there, so a placement is a finding only against a pattern, never against the layout (`RULE.SUPPORT.APPS.146` · MUST · skill:spn-apps/implement). The bar is at least `layout-bar` high, every tap target at least 44px, and the bar and drawer keep clear of the safe areas. `--layout-space` comes from the device and the theme's size: on a phone 16 px at every size, on a tablet 24 px at `XS`, `SM` and `MD` and 32 px at `LG` and `XL`, on a desktop 32 px at every size, so the bar's items and every section's words stand on one edge. A top bar and a dock stand one size step above the app's size where the config gives none (`RULE.SUPPORT.SURFACE.418` · MUST · skill:spn-surface/design).
@@ -101,7 +101,7 @@ Read the page itself, never a description of it — the frame, the preview, the 
   - **A framed part reads header, content, footer, in that order**, and a panel inside a panel is a finding (`RULE.SUPPORT.APPS.147` · MUST · skill:spn-surface/design). A card and a panel are told apart by level and purpose, and a card container, a feature container or a feature section container is a finding (`RULE.SUPPORT.SURFACE.263` · MUST · skill:spn-surface/design).
   - **Each task runs by the pattern of its intent** — Move, Find, Read, Enter, Choose, Act, Interrupt, Disclose, Hear back, Be refused — from the blocks that pattern names. A second way to run a known task, or a control the page built for itself, is a finding (`RULE.SUPPORT.SURFACE.081` · MUST · skill:spn-surface/design).
   - **The controls were placed by intent before a unit was chosen.** Controls of one intent stand together, beside what they relate to; alternatives are drawn as equals; a field's own action sits at the end of its label line. A title or value that names a pattern, a unit or a level is a finding (`RULE.SUPPORT.SURFACE.207` · MUST · skill:spn-surface/design).
-  - **A screen of an app follows one app pattern, chosen from the data and the person**: a review names the app pattern it should have followed and reads the page beside that pattern's spec (app patterns · `RULE.SUPPORT.SURFACE.047`, `.051`).
+  - **A screen of an app follows one app page kind, chosen from the data and the person**: a review names the app page kind it should have followed and reads the page beside that page kind's spec (app page kinds · `RULE.SUPPORT.SURFACE.047`, `.051`).
   - **The facts of the data were written down after those two, before the choice, and a block was chosen last**: what one record holds, whether the query takes a page, a text or a filter, whether the set grows, how many there usually are, and who comes and why (`RULE.SUPPORT.SURFACE.052` · MUST · skill:spn-surface/design).
   - **A record is chosen by an autocomplete, never a select**: a short bounded list opens whole, a long one is searched (`RULE.SUPPORT.SURFACE.307` · GUIDE).
   - **A part that holds many of one thing is shown by what its own data asks for.** A query taking a page, a text or a filter is a data table, even while small; a search run in the page over loaded records is a finding, and so is a page depending on a count the server does not give (`RULE.SUPPORT.SURFACE.049` · GUIDE) (`RULE.SUPPORT.SURFACE.050` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.054` · GUIDE) (`RULE.SUPPORT.SURFACE.070` · MUST · skill:spn-surface/design).
@@ -117,9 +117,9 @@ Read the page itself, never a description of it — the frame, the preview, the 
   - **One panel for each thing a person reads or saves as a whole**; the page that reads a record and the page that changes it hold the same parts in the same order (`RULE.SUPPORT.SURFACE.115` · GUIDE) (`RULE.SUPPORT.SURFACE.116` · GUIDE) (`RULE.SUPPORT.SURFACE.117` · GUIDE).
   - **Groups and their items are both in view at a desktop only**; on a tablet and a phone the items replace the groups, with a back action and a changed address (`RULE.SUPPORT.SURFACE.079` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.080` · GUIDE) (`RULE.SUPPORT.SURFACE.099` · MUST · skill:spn-surface/design).
   - **A finding on a proposed rule says that the rule is proposed** — the apps plugin's surface refs mark each one.
-- **Site patterns** — a doc and a marketing page take them, an app's screen takes an app pattern; held by this lens worn, beside `MARKETING` on a marketing page.
-  - **Each section follows one site pattern, named by the content signals and never by where it stands**, asked in order and stopping at the first yes: the page's first words → Hero; its last call and nothing else → Closing call; words alone → Statement; real code read line by line → Real sample; a press changes what is shown → Choose to see; items each a thing of its own → Feature grid; items that open pages → Doors; an order the reader follows → Steps; numbers from the real system → Numbers; questions with answers → Questions; one picture the words introduce → Show it; none of these → Points (site patterns § How a site's section is chosen · `RULE.SUPPORT.SURFACE.340`, `.343`).
-  - **Then the eight questions of look, in order.** Fill: `DEFAULT` only where the kind of reading changes from the neighbours, otherwise `BASE`, and `PRIMARY` for the closing call alone. Size: `LG` for the page's one or two strongest sections, which `MARKETING` calls. Highlight and Gradient: the one raised frame and the hero's or closing call's band, never both on one section. Media: framed by its kind, placed by its width and its panes, the words first on a phone. Shape: a picture keeps the shape it is made in. Alignment: centred only where nothing is scanned. Columns: set by the count, four at most, lines side by side one sentence each of about one length (site patterns § What holds across · `RULE.SUPPORT.SURFACE.341`–`.343`, `.346`).
+- **Site container kinds** — a doc and a marketing page take them, an app's screen takes an app page kind; held by this lens worn, beside `MARKETING` on a marketing page.
+  - **Each section follows one site container kind, named by the content signals and never by where it stands**, asked in order and stopping at the first yes: the page's first words → Hero; its last call and nothing else → Closing call; words alone → Statement; real code read line by line → Real sample; a press changes what is shown → Choose to see; items each a thing of its own → Feature grid; items that open pages → Doors; an order the reader follows → Steps; numbers from the real system → Numbers; questions with answers → Questions; one picture the words introduce → Show it; none of these → Points (site container kinds § How a site's section is chosen · `RULE.SUPPORT.SURFACE.340`, `.343`).
+  - **Then the eight questions of look, in order.** Fill: `DEFAULT` only where the kind of reading changes from the neighbours, otherwise `BASE`, and `PRIMARY` for the closing call alone. Size: `LG` for the page's one or two strongest sections, which `MARKETING` calls. Highlight and Gradient: the one raised frame and the hero's or closing call's band, never both on one section. Media: framed by its kind, placed by its width and its panes, the words first on a phone. Shape: a picture keeps the shape it is made in. Alignment: centred only where nothing is scanned. Columns: set by the count, four at most, lines side by side one sentence each of about one length (site container kinds § What holds across · `RULE.SUPPORT.SURFACE.341`–`.343`, `.346`).
   - **The brand at the start of a bar, and in a footer, opens the home of what it names; a sign-in step draws it without the link** (`RULE.SUPPORT.SURFACE.443` · GUIDE). A brand that is only a picture is a finding: a person who has gone deep into a site expects it to take them back to where it begins.
   - **A highlight never reads as a door.** A highlighted section is one raised frame in the fill that stands off its band, flat inside, with no arrow and no press; a door is boxed, raised and pressed whole (`RULE.SUPPORT.SURFACE.293` · MUST · skill:spn-surface/design). A highlight a visitor tries to press is a finding.
 - **Interaction** — held by this lens worn beside `WEB_DEV`.

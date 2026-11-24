@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/06-architecture-components.md",
-      "seen": "d5c1bde4"
+      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/07-architecture-components.md",
+      "seen": "ea42ee6d"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/06-architecture-components/",
-      "seen": "4aea8166"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-components/",
+      "seen": "4c81d744"
     }
   ]
 }
@@ -15,7 +15,7 @@
 
 # Components — The Blocks a Surface Is Built From
 
-Source of truth: the foundation's Components construct (`docs/02-constructs/02-support/01-surface/06-architecture-components.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/06-architecture-components/`). Components is the sixth of thirteen Surface constructs.
+Source of truth: the foundation's Components construct (`docs/02-constructs/02-support/01-surface/07-architecture-components.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/07-architecture-components/`). Components is the seventh of sixteen Surface constructs.
 
 Read this before you place a block on a page, before you propose a new one, or before you draw or build a component on a new stack. **The thing to unlearn: a missing control is never a reason to write one inside a page.** A control built inside a page gets none of the theme, the density, the accessibility or the translation that every listed block has. Propose it to the design system. A core unit is named and grouped here, and only then drawn and built.
 
@@ -34,7 +34,7 @@ Read this before you place a block on a page, before you propose a new one, or b
 | Page level | `DSPageLevelType` — the level of a page a block stands at: `PAGE` · `CONTAINER` · `WIDGET` · `GROUP` · `CONTENT` · `INLINE`. The item line and the tabs take it through `pageLevel` |
 | Mark | a picture or an icon that stands for a thing or a person. It is round unless a page chooses another shape |
 | Choice table | what says which value each closed prop of a unit takes: its cases, a mapping where the data decides, the limits across a view, and an index of every value the code accepts, each ruled or never |
-| Mock | a page or a flow drawn before it is built, as its skeletons: one for each page and each task state, and the flow file that orders them |
+| Mock | a page or a flow shown before it is built, as its page previews, one for each page and each task state, and the flow file that orders them |
 | Composite | a block built from components that carries one task end to end, and that no other component is built from |
 | Core unit | a block the book names, which every stack builds under that name. A stack may provide further units of its own |
 
@@ -86,7 +86,7 @@ The surface has two levels (`RULE.SUPPORT.SURFACE.081` · MUST · skill:spn-surf
 
 | Level | Holds | Who states it |
 | --- | --- | --- |
-| The core | the units the book names, with their props, their vocabularies and their rules; the task patterns; the app patterns and their skeletons | the book, once, for every stack |
+| The core | the units the book names, with their props, their vocabularies and their rules; the task patterns; the app page kinds and their page previews | the book, once, for every stack |
 | A stack's own | further units that help build apps on that stack, most of them put together from core units | the stack, in its own docs |
 
 - **A stack's design system MUST build every core unit, and it MAY provide further units of its own that help build apps.** Such a unit is usually put together from core units, for a need that many pages of that stack share.
@@ -94,7 +94,7 @@ The surface has two levels (`RULE.SUPPORT.SURFACE.081` · MUST · skill:spn-surf
 - **A stack's own unit MUST keep every rule a core unit keeps.** It reads the same tokens, takes the three shared names where it has them, and draws each shared state with its one picture.
 - **A unit that every stack should build joins the core units, in the book first.** A unit that stays with one stack needs no line there.
 
-So an agent that builds a page reads its pattern and its skeleton from the book. It then picks the units from the stack's design system, the core units and the stack's own, or from a partner's own code.
+So an agent that builds a page reads its pattern and its page preview from the book. It then picks the units from the stack's design system, the core units and the stack's own, or from a partner's own code.
 
 ### A new unit weighs every axis the surface offers
 
@@ -413,7 +413,7 @@ A button is chosen by its view, then by whether it is the view's main action, th
 | any view | another action | a header or a footer | `OUTLINE` (the place's) | `DEFAULT` | the place's | nothing | `RULE.SUPPORT.SURFACE.376` |
 | any view | another action | the content, or no box | `OUTLINE` (the unit's) | `DEFAULT` | the size above | nothing | `RULE.SUPPORT.SURFACE.376` |
 
-**The limits across a view.** A view holds at most one `SOLID` button, its main action, and a view with no main action holds none (`RULE.SUPPORT.SURFACE.370` · GUIDE). A dialog, a drawer or a sheet over a page is a view of its own and holds its own. On a site page the closing call repeats the hero's one act at the page's end, so its `SOLID` and the hero's are one main action said twice, not on screen together (the site patterns). A feature leads with at most one `SOLID` `PRIMARY` (`RULE.SUPPORT.SURFACE.234` · MUST · skill:spn-surface/design).
+**The limits across a view.** A view holds at most one `SOLID` button, its main action, and a view with no main action holds none (`RULE.SUPPORT.SURFACE.370` · GUIDE). A dialog, a drawer or a sheet over a page is a view of its own and holds its own. On a site page the closing call repeats the hero's one act at the page's end, so its `SOLID` and the hero's are one main action said twice, not on screen together (the site container kinds). A feature leads with at most one `SOLID` `PRIMARY` (`RULE.SUPPORT.SURFACE.234` · MUST · skill:spn-surface/design).
 
 **The limits across a header.** A header shows at most one main action, the one given `PRIMARY`, and one or two secondaries (`RULE.SUPPORT.SURFACE.390` · GUIDE). On a record that moves through states, the main action is the move its state expects next, and it changes when the state changes. Every other move open at that state is a secondary, `DEFAULT`, and a record whose state expects no next move has no main action. A move shows only when the state allows it, and is left out and not drawn disabled. The two secondaries that stand are the two a person takes most. A third and every one after it stand behind "⋯", a `DSDropdownMenu` whose trigger is a `DSButton` with the icon `MORE_HORIZONTAL` alone, so the place draws it `GHOST`, or `OUTLINE` in the head of a page. The main action stays out of "⋯". A menu item has no colour, so a move there that deletes or ends something takes `ERROR` on its confirmation. Every move of a record, every track's included, stands in the record's header. Write no `variant` on a header's buttons: give the main action `color={DSColorType.PRIMARY}` and the place draws the rest.
 
@@ -712,7 +712,7 @@ Tabs are chosen by where they stand: the level says their size and, where the pa
 A step is `IDSStepperItem`, which extends `IDSDataOption`, so a step is an option, as a tab is: `key`, `label`, `disabled`, `data` and `testData` are the option's; `startIcon` is its indicator where `type` is `ICON` (ignored by `NUMBER` and `DOT`); `endIcon` stands after its title, such as a lock on a step the person cannot open yet; `description` is the line under the title; and `taskState` takes `DSTaskStateType`, `IDLE` · `WORKING` · `DONE` · `FAILED`. `NUMBER` draws each step's number and is the one form that draws numbers; `ICON` draws each step's `startIcon`, and a step with none falls back to a dot; `DOT` draws a dot. A done step draws its check in `NUMBER` and `ICON`, and a filled dot in `DOT`.
 
 - **A stepper MUST take its steps as data, and a step MUST take a task state and invent no state of its own** (`RULE.SUPPORT.SURFACE.308` · GUIDE) (`RULE.SUPPORT.SURFACE.309` · MUST · skill:spn-surface/design). There is no `PENDING` and no `IN_PROGRESS`: pending is `IDLE`, and in progress is `WORKING`. `EMPTY` and `DENIED` are task states of a block's data, and a step takes neither.
-- **Each step of a flow usually draws every task state its task can reach, and the joins between its pages hold what the task and app patterns hold on one page** (`RULE.SUPPORT.SURFACE.409` · GUIDE) (`RULE.SUPPORT.SURFACE.361` · MUST · skill:spn-surface/design). A flow spreads one task over several pages, so a state left out of one step is a state a person meets with nothing drawn for it.
+- **Each step of a flow usually draws every task state its task can reach, and the joins between its pages hold what the task patterns and app page kinds hold on one page** (`RULE.SUPPORT.SURFACE.409` · GUIDE) (`RULE.SUPPORT.SURFACE.361` · MUST · skill:spn-surface/design). A flow spreads one task over several pages, so a state left out of one step is a state a person meets with nothing drawn for it.
 - **A step's task state MUST be the one its `taskState` gives, else the one its place gives against `activeKey`** (`RULE.SUPPORT.SURFACE.308` · GUIDE). Unset, the steps before the active one are `DONE`, the active one `WORKING` and the steps after it `IDLE`; no step is `FAILED` unless the page says so. A form in steps gives `activeKey` alone; a timeline gives each step its own `taskState`, because two may be in progress at once. A step's own `taskState` wins.
 
 | Task state | Unset, which steps take it | The indicator | The bar after it | Words for a screen reader |
@@ -1108,7 +1108,7 @@ Each of these but the box of a small media is a token of the level (`architectur
 - **The items of a `GRID` and of `STATS` MUST keep a width of at most one column width per column, and stand where `textAlign` puts them** (`RULE.SUPPORT.SURFACE.269` · MUST · skill:spn-surface/design). The column width is 20rem, one value of the design system. The width is an upper bound: a narrower place still steps the columns down by its own width.
 - **Whatever stands boxed in a grid stands as tall as the tallest of its row, and a feature takes no height of its own** (`RULE.SUPPORT.SURFACE.530` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.531` · MUST · skill:spn-surface/design). A card, a feature, an item card and a record's card in a data table's grid take no height of their own, so the frames of one row end on one line; in a grid cell a feature fills the cell and carries the height down to its frame, and a page writes no prop or class for it.
 - **The items of a `LIST` MUST take the width of the text part, at most `62ch`, the measure of the description** (`RULE.SUPPORT.SURFACE.291` · MUST · skill:spn-surface/design). A `LIST` is a grid of one column, but the column cap is a grid's rule, so a row reads as wide as the description above it and no wider.
-- **A feature's items MUST be parted in one of four ways on every form, and the defaults MUST stay as they were** (`RULE.SUPPORT.SURFACE.269` · MUST · skill:spn-surface/design). `NONE` stands the items one room apart, the frame padding of the level the items are drawn at. `GRID` draws a line between each two. `EDGE` draws the lines between them and one around the outside, rounded with the theme's corners. Boxed, which is `surface` set, puts each item in a frame of its own, that room apart, and `borderType` is then not read. A `LIST` draws `GRID` where `borderType` is unset, and a `GRID` and `STATS` draw `NONE`.
+- **A feature's items MUST be parted in one of these ways on every form, and the defaults MUST stay as they were** (`RULE.SUPPORT.SURFACE.269` · MUST · skill:spn-surface/design). `NONE` stands the items one room apart, the frame padding of the level the items are drawn at. `GRID` draws a line between each two. `EDGE` draws the lines between them and one around the outside, rounded with the theme's corners. Boxed, which is `surface` set, puts each item in a frame of its own, that room apart, and `borderType` is then not read. A `LIST` draws `GRID` where `borderType` is unset, and a `GRID` and `STATS` draw `NONE`.
 
 | Form | `NONE` | `GRID` | `EDGE` | Boxed |
 | --- | --- | --- | --- | --- |
@@ -2818,7 +2818,7 @@ Words are chosen by what they are to the person reading. Their step says how lar
 | a description that stands a step back under a title the page draws itself | under the title | the step of its level | left out | `QUIET` | left out | left out | the step and the tone | `RULE.SUPPORT.SURFACE.143` |
 | a note that stands back from what it notes: a line under a list, the time or the person beside an entry, a site's fine print | under or beside what it notes | `CONTENT_SM`, or `CONTENT_XS` for fine print | left out | `SUBTLE` | left out | left out | the step and the tone | this table |
 | a title the page draws itself, where no box gives one: a group of a form, a name in a step | over what it names | `TITLE_SM` to `TITLE_LG`, by its level | left out | left out | left out | left out | the step | `RULE.SUPPORT.SURFACE.103` |
-| a display heading: a site's band, a home's greeting | the head of a band | `HEADING_LG` and up, as the site patterns give it | left out | left out | left out | left out | the step | `RULE.SUPPORT.SURFACE.103` |
+| a display heading: a site's band, a home's greeting | the head of a band | `HEADING_LG` and up, as the site container kinds give it | left out | left out | left out | left out | the step | `RULE.SUPPORT.SURFACE.103` |
 | a sentence that reports a state: a count gone wrong, a check that passed | in the part it reports on | the place's step | `ERROR` or `SUCCESS`, the hue a badge gives the state | left out | left out | left out | the step and the colour | `RULE.SUPPORT.SURFACE.369` |
 | a short label over a title that the site's look sets in capitals | over the title | `CONTENT_XS` | left out | `MUTED` | `UPPERCASE` | left out | the step, the tone and the format | this table |
 | a word a tooltip explains: a term, an abbreviation | in a line of words | the line's step | left out | left out | left out | `DOTTED` | the underline | this table |

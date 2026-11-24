@@ -2,48 +2,52 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md",
-      "seen": "f42c2c8e"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/04-site-container-kinds.md",
+      "seen": "5bb40e74"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/02-web/03-site-patterns.md",
-      "seen": "2b4c46e0"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/02-web/02-site-container-kinds.md",
+      "seen": "e36e6c76"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/02-site-page-kinds.md",
+      "seen": "251d90b9"
     }
   ]
 }
 -->
 
-# Site Patterns — One Shape for Each Section of a Site
+# Site Container Kinds — One Shape for Each Section of a Site
 
-Source of truth: the foundation's site patterns chapter (`docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md`) and the web's part of it (`docs/04-capabilities/02-support/01-surface/03-standards-patterns/02-web/03-site-patterns.md`), chapters of the Patterns construct. The specs of the site patterns are the book's `site-patterns/` folder, which this plugin carries as a copy in `refs/support/surface/site-patterns/`.
+Source of truth: the foundation's container kinds chapter (`docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/04-site-container-kinds.md`), the web's part of it (`docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/02-web/02-site-container-kinds.md`), and the chapter of the site page kinds (`docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/02-site-page-kinds.md`), chapters of the Surface Catalogue. The specs of the container kinds are the book's `site-container-kinds/` folder, which this plugin carries as a copy in `refs/support/surface/site-patterns/`.
 
-Site patterns are the third of the four groups of surface patterns, after the task patterns and the app patterns that `standards-patterns.md` restates, and before the flow patterns of `flow-patterns.md`. An app's screens take app patterns; a site's pages, a marketing page or a page of docs, take site patterns.
+A section of a site's page is a site category's container kind, and the page kinds of a site each order their sections. Container kinds belong to the surface categories MARKETING and RESOURCES, the sites. An app's screens take app page kinds, which `standards-patterns.md` restates; the flow patterns are `flow-patterns.md`.
 
-Read this before you design or review a page of a site. A site's page is a run of sections, and each section answers one question a reader asks. When each section is arranged from nothing, two sections that hold the same kind of content come out different. So you choose a section's shape by reading what it holds, and you review a page by naming the pattern each section should have followed.
+Read this before you design or review a page of a site. A site's page is a run of sections, and each section answers one question a reader asks. When each section is arranged from nothing, two sections that hold the same kind of content come out different. So you choose a section's shape by reading what it holds, and you review a page by naming the container kind each section should have followed.
 
 ## Terms
 
 | Term | What it means |
 | --- | --- |
-| Site pattern | the shape of a section of a site's page, chosen by what the section holds |
+| Container kind | the shape of a section of a site's page, chosen by what the section holds |
 | Section | one part of a site's page: a `DSSectionContainer` with its fill and its room, holding one `DSFeature` or a `DSFeatureGridSectionContainer` |
 | Highlight | the one section of a page whose whole feature stands in one raised frame, in the form the design language sets |
-| Content signals | the twelve questions asked of a section, in order, whose first yes names its pattern |
-| Kind of page | a page's job at its level of the site, such as a site home or a part page, which sets the order of its sections |
+| Content signals | the twelve questions asked of a section, in order, whose first yes names its container kind |
+| Site page kind | a page's job at its level of the site, such as a Home or a Topic, which sets the order of its sections |
 | The head across | a form of `DSFeature` for long words beside a picture that draws the items: the head across the full width, the split under it |
 
-## A site pattern — 🔮
+## A container kind — 🔮
 
-**A site pattern says: for this kind of content, show the section this way** (`RULE.SUPPORT.SURFACE.340` · MUST · skill:spn-surface/design). It is an arrangement of units the design system already has, and the design system builds nothing for one.
+**A container kind says: for this kind of content, show the section this way** (`RULE.SUPPORT.SURFACE.340` · MUST · skill:spn-surface/design). It is an arrangement of units the design system already has, and the design system builds nothing for one.
 
-- **A section of a site's page follows one of the site patterns below, and is built from `DSSectionContainer`, `DSFeature` and `DSFeatureGridSectionContainer` and their props** (`RULE.SUPPORT.SURFACE.340` · MUST · skill:spn-surface/design). A pattern names no component of one site's own. A partner's agent has the design system and this plugin, and never another site's code, so a look stated in a site's own component is a look it cannot build.
-- **A page whose sections follow site patterns MUST be wrapped once in `DSSiteLayout`** (`RULE.SUPPORT.SURFACE.196` · MUST · skill:spn-surface/design). The wrapper marks the page as a site's, a marketing page or a page of docs in a web app, so its display steps draw in the theme's display family; a page that follows an app pattern or a task pattern is never wrapped, a public sign-in page included.
-- **A section's pattern and its look follow from what the section holds, and not from where it stands on the page** (`RULE.SUPPORT.SURFACE.343` · MUST · skill:spn-surface/design). Every partner builds around their own content, so a rule by position, such as *every second section is filled*, fits nobody's page.
-- **Every pattern names the kinds of person it serves in its For line** (`RULE.SUPPORT.SURFACE.332` · MUST · skill:spn-surface/design). A site's page is read by a Visitor, who is deciding, or a Learner, who came to learn or to get a thing working (`standards-core.md`, *Who an app is for*).
+- **A section of a site's page follows one of the site container kinds below, and is built from `DSSectionContainer`, `DSFeature` and `DSFeatureGridSectionContainer` and their props** (`RULE.SUPPORT.SURFACE.340` · MUST · skill:spn-surface/design). A container kind names no component of one site's own. A partner's agent has the design system and this plugin, and never another site's code, so a look stated in a site's own component is a look it cannot build.
+- **A page whose sections follow site container kinds MUST be wrapped once in `DSSiteLayout`** (`RULE.SUPPORT.SURFACE.196` · MUST · skill:spn-surface/design). The wrapper marks the page as a site's, a marketing page or a page of docs in a web app, so its display steps draw in the theme's display family; a page that follows an app page kind or a task pattern is never wrapped, a public sign-in page included.
+- **A section's container kind and its look follow from what the section holds, and not from where it stands on the page** (`RULE.SUPPORT.SURFACE.343` · MUST · skill:spn-surface/design). Every partner builds around their own content, so a rule by position, such as *every second section is filled*, fits nobody's page.
+- **Every container kind names the persons it serves in its For line** (`RULE.SUPPORT.SURFACE.332` · MUST · skill:spn-surface/design). A site's page is read by a Visitor, who is deciding, or a Learner, who came to learn or to get a thing working (`standards-core.md`, *Who an app is for*).
 
 ## How a site's section is chosen — 🔮
 
-Two answers come before any section is chosen. Who the app is for is read once, for the whole app. The flow says which step of a person's path the page is (`flow-patterns.md`). Then the page itself is read for what it is for: a doc, an app's screen or a marketing page (`standards-core.md`) (`RULE.SUPPORT.SURFACE.208` · MUST · skill:spn-surface/design). An app's screen takes an app pattern. A doc and a marketing page take site patterns.
+Two answers come before any section is chosen. Who the app is for is read once, for the whole app. The flow says which step of a person's path the page is (`flow-patterns.md`). Then the page itself is read for what it is for: a doc, an app's screen or a marketing page (`standards-core.md`) (`RULE.SUPPORT.SURFACE.208` · MUST · skill:spn-surface/design). An app's screen takes an app page kind. A doc and a marketing page take site container kinds.
 
 Then ask these questions of each section, in this order, and stop at the first yes (`RULE.SUPPORT.SURFACE.343` · MUST · skill:spn-surface/design). These are the content signals.
 
@@ -66,29 +70,42 @@ The order matters. A grid of things that each open a page is a Feature grid and 
 
 ## The kinds of page, by level — 🔮
 
-A site stands in levels, and each kind of page has one job at its level. The main line runs **site home → group home → subgroup home → part page**. Every other kind stands at one of those levels, beside the page that usually stands there. Each name says the page's job and where it stands, and never its subject, so a partner's site uses the same names for its own pages.
+A site stands in levels, and each kind of page has one job at its level. The main line runs from Home down to the topics: **Home → Group home → Topic**, three levels by default, and a group home serves any level between the home and the topics. Every other kind stands at one of those levels, beside the page that usually stands there. Each name says the page's job and where it stands, and never its subject, so a partner's site uses the same names for its own pages.
 
 - **A kind of page orders its sections as its reader asks their questions, and does not count them** (`RULE.SUPPORT.SURFACE.340` · MUST · skill:spn-surface/design). A page skips a question its reader does not ask. A count of sections would make a page add a section with nothing to say, or cut one a reader needs.
 
-| Level | Kind | Sample breadcrumb | Its sections, in the order of its reader's questions (the usual pattern in brackets) |
-| --- | --- | --- | --- |
-| 1 | **Site home** | Home | what is it (Hero) → what does today's way cost me (Statement or Points, filled) → what do I get (Points, Show it, Feature grid) → is it real (Show it, Real sample, Numbers, quotes) → where does each part live (Doors) → what does it cost (plans) → what will I ask (Questions) → how do I start (Doors, Closing call). An app's signed-out home skips what its reader does not ask: what it is, what you get, and how to start |
-| 2 | **Group home** | Home › Build & Launch | what is this group (Hero) → why it matters (Statement) → its parts (Doors) → the strongest part, shown (Show it) → what do I do now (Closing call). A group that sells nothing, such as resources: what is here (Hero) → the places (Doors) |
-| 2 | **Docs home**, beside a group home | Surface Web › Showcase | what this place is (Hero, a doc page's head) → how to read one page (Show it, a teaching picture kept flat) → the map (Doors for each group, a Feature grid for a set of groups) |
-| 2 | **Contact page**, beside a group home | Home › Contact | who to reach and why (Hero) → the addresses (Doors or Points) → what is not ready yet (Points). No closing call |
-| 3 | **Subgroup home**, only where a group's parts group again | Home › Build & Launch › Apps | the group home's order, one level down: what is this subgroup (Hero) → its parts (Doors) → the strongest part, shown (Show it) → where next (Doors or Closing call). It states no problem of its own |
-| last | **Part page** | Home › Build & Launch › Surface | what is this part (Hero) → what problem does it end (Statement or Points, filled) → how does it work (Steps, Show it, Choose to see) → show me the code (Real sample) → what do I get (Points) → how do I know it holds (Points) → where next (Doors) → what do I do now (Closing call) |
-| last | **Audience page**, beside a part page | Home › Solutions › For leaders | who it is for (Hero) → the question this reader asks (Statement) → find yourself (Choose to see or Doors) → what changes for you (Points, Show it, Real sample) → what proves it (Statement or Points) → where next (Doors) → what do I do now (Closing call) |
-| last | **Guide**, beside a part page | Home › Resources › Get started | what you will have at the end (Hero, with Steps) → each step in turn (Real sample or Show it, the code placed by its length) → how you know it worked (in each step's words) → where next (Doors, or a Closing call with the product). It sells nothing |
-| last | **Values page**, beside a part page | Home › DevEx › Principles | what we decide by (Hero) → each group of principles (Points, with no fill and no media) → what do I do now (Closing call) |
+| Level | Kind | Contract name | Sample breadcrumb | Its sections, in the order of its reader's questions (the usual container kind in brackets) |
+| --- | --- | --- | --- | --- |
+| 1 | **Home** | `HOME` | Home | What is it (Hero) → what does today's way cost me (Statement or Points, filled) → what do I get (Points, Show it, Feature grid) → is it real (Show it, Real sample, Numbers, quotes) → where does each part live (Doors) → what does it cost (plans) → what will I ask (Questions) → how do I start (Doors, Closing call). An app's signed-out home is a Home that skips the questions its reader does not ask: what it is, what you get, and how to start. |
+| 2 | **Group home** | `GROUP_HOME` | Home › Build & Launch | What is this group (Hero) → why it matters (Statement) → its parts (Doors) → the strongest part, shown (Show it) → what do I do now (Closing call). A group that sells nothing, such as a group of resources, skips why it matters and the strongest part, and needs no closing call: what is here (Hero) → the places (Doors). On a resources site a Group home is one help topic, a group's front page with its guides and articles in one place: what is this topic (Hero) → its guides and articles (Doors) → what will I ask (Questions). |
+| 2 | **Docs**, beside a group home, on a resources site | `DOCS` | Surface Web › Showcase | What this place is (Hero, a doc page's head) → how to read one page (Show it, a teaching picture kept flat) → the map (Doors for each group, a Feature grid for a set of groups). |
+| 2 | **Contact**, beside a group home | `CONTACT` | Home › Contact | Who to reach and why (Hero) → the addresses (Doors or Points) → what is not ready yet (Points). It needs no closing call. |
+| 2 | **Pricing**, beside a group home | `PRICING` | Home › Pricing | What it costs, in a line (Hero, with no picture) → the plans side by side (Feature grid, its plans use) → what each plan holds, row by row, where plans differ in more than three ways (a comparison of the plans, in Points beside each plan, never a data table) → what will I ask about paying (Questions) → how do I start (Closing call). A site that sells nothing yet, such as one in alpha, has no pricing page and says how to reach it on its contact page instead. |
+| 2 | **About**, beside a group home | `ABOUT` | Home › About | Who we are and why we exist (Hero) → what we believe (Statement) → how far we have come (Numbers) → the people (Feature grid, its directory use, each person a mark and a line) → where to reach us, or work with us (Doors) → what do I do now (Closing call). |
+| 2 | **Blog**, beside a group home | `BLOG` | Home › Blog | What is written here, and for whom (Hero, with no picture) → the newest piece, led (Show it, its picture and its first lines) → every piece, newest first (Feature grid, its directory use: each a title, a line, a date and who wrote it) → where to follow (Doors). It sells nothing, so it needs no closing call. |
+| 2 | **Listing**, beside a group home | `LISTING` | Home › Careers | A page that lists the records of one kind, such as products, jobs or articles. What is listed here, and for whom (Hero, with no picture) → every record, in the order a reader looks for one (Feature grid, its directory use: each a title, a line and one fact, each a door to its detail page) → what will I ask before I choose (Questions) → where do I go if none fits (Doors or Closing call). A listing that sells nothing needs no closing call. |
+| 2 | **Search**, beside a group home, on a resources site | `SEARCH` | Home › Search | The results of a search, in a help centre started from a search. What was asked (Hero) → what answers it, grouped by kind (Feature grid) → where else to look (Doors). |
+| 2 | **Changelog**, beside a group home, on a resources site | `CHANGELOG` | Home › Changelog | What changed in which version, newest first, each version dated. What this page records (Hero) → each version in turn, newest first (the reading, as an Article's) → where next (Doors). |
+| last | **Topic** | `TOPIC` | Home › Build & Launch › Surface | What is this part (Hero) → what problem does it end (Statement or Points, filled) → how does it work (Steps, Show it, Choose to see) → show me the code (Real sample) → what do I get (Points) → how do I know it holds (Points) → where next (Doors) → what do I do now (Closing call). |
+| last | **Audience**, beside a topic | `AUDIENCE` | Home › Solutions › For leaders | Who it is for (Hero) → the question this reader asks (Statement) → find yourself (Choose to see or Doors) → what changes for you (Points, Show it, Real sample) → what proves it (Statement or Points) → where next (Doors) → what do I do now (Closing call). |
+| last | **Guide**, beside a topic, on a resources site | `GUIDE` | Home › Resources › Get started | What you will have at the end (Hero, with Steps) → each step in turn (Real sample or Show it, the code placed by its length) → how you know it worked (in each step's words) → where next (Doors, or a Closing call with the product). It sells nothing. |
+| last | **Reference**, beside a guide, on a resources site | `REFERENCE` | Home › Docs › Reference › One endpoint | One endpoint, command, record or config option, stated in full, in a `RAIL` of API docs. What is this (Hero) → what is true of it, in full (the reading, as an Article's) → how is it used, in code (Real sample) → where next (Doors). It is for a Learner who looks one thing up. Where the Learner is doing a task end to end, the page is a Guide. |
+| last | **Values**, beside a topic | `VALUES` | Home › DevEx › Principles | What we decide by (Hero) → each group of principles (Points, with no fill and no media) → what do I do now (Closing call). |
+| last | **Article**, under a blog | `ARTICLE` | Home › Blog › An article | The title, who wrote it and when (Hero, a doc page's head) → the reading (the site frame around long text: headings, figures, code placed by its length, at a reading width) → where next (Doors, the related pieces). An article is read whole, so it carries no sections between its paragraphs. |
+| last | **Detail**, beside a topic, under a listing | `DETAIL` | Home › Careers › One job | A page of one record, the page a listing's door opens. What is this record (Hero, with its picture where it has one) → what do I get, and what is true of it (Points) → how does it work, or how do I get it (Steps or Show it) → is it real (Real sample or Numbers) → what will I ask (Questions) → where next, the other records (Doors) → what do I do now (Closing call, with the record's one action). **A blog is a listing and a detail of articles with a reading order of its own.** Blog is the listing of articles, led by the newest, and an Article is their detail, read whole. They stay as they are and the two general kinds, Listing and Detail, stand beside them. |
+| — | **Landing**, outside the levels | `LANDING` | none: reached from a campaign | What is this offer (Hero) → why should I care (Points) → is it real (Real sample, Numbers, quotes) → what is the catch (Questions) → do it now (Closing call, with its one action). It stands in `CANVAS`, with no site navigation and a short footer, so nothing leads the Visitor away from the one thing the page asks. **A Guide is a page of a RESOURCES site, for a Learner.** A technical platform has guides, and a marketing site links to them; a product with no technical side has none, and its marketing pages end on a sign-up instead. **Not found keeps the layout of its site**, so the site's navigation stays beside it, with a short message, a search on a site that has one, and the way back. Two pages take no container kind. A page of the kind **Text**, with no sections, such as a privacy notice or the terms, is a doc: Privacy and Terms are the titles of such pages in a site's navigation, and never kinds. A sign-up's choice of path is an app's screen, and takes an app page kind. |
 
-The breadcrumb only shows where a kind stands; a site need not draw one. A subgroup home is a level the site patterns allow, and a site that needs no such level skips it. Two pages take no site pattern: a **text page** with no sections, such as a privacy notice or the terms, is a doc; a sign-up's choice of path is an app's screen, and takes an app pattern.
+The contract name is the `code` a design language's spec gives the kind under PAGES. **A page kind's code is the name a reader sees in a site's navigation, in capitals, with no `PAGE` suffix**: Home is `HOME`, Contact is `CONTACT`, About is `ABOUT`, Blog is `BLOG`, Listing is `LISTING`, Detail is `DETAIL` and Landing is `LANDING`, and a name with two words keeps an underscore, as `GROUP_HOME` does. A page's own title in the navigation, such as Privacy or Terms, is a page of a kind and never a kind: it is a page of Text. The catalogue holds two more kinds that take no sections of their own: `TEXT`, and `NOT_FOUND`, the page for an address that leads nowhere. On a resources site, `HOME` is the start of the whole site, and the catalogue gives it the sections Hero, Feature grid and Doors.
+
+**A design language may define a page kind of its own in its spec, built from the sections below.** The kinds above are the catalogue it picks from, and a kind it adds is stated in that language's own spec and never added here.
+
+The breadcrumb only shows where a kind stands; a site need not draw one. A group home serves any level between the home and the topics, so a site whose groups divide again uses a group home at the second level too, and three levels stay the default. A Guide is a page of a RESOURCES site, for a Learner: a technical platform has guides and a marketing site links to them, and a product with no technical side has none. A blog is a listing and a detail of articles with a reading order of its own: Blog is the listing of articles, led by the newest, and an Article is their detail, read whole, beside the two general kinds, Listing and Detail. **Not found keeps the layout of its site**, so the site's navigation stays beside it, with a short message, a search on a site that has one, and the way back. Two pages take no container kind: a page of the kind **Text**, with no sections, such as a privacy notice or the terms, is a doc, and a sign-up's choice of path is an app's screen, and takes an app page kind.
 
 ## The sections, by name — 🔮
 
 Each section gives the question it answers, its **For** line, what calls for it, its look in the design system's units and props, how it stacks on a phone, when not to use it, and its spec in `refs/support/surface/site-patterns/`. Shown features, a directory, plans and quotes are uses of the Feature grid, because their look is the grid's.
 
-| Site pattern | It answers | Calls for it |
+| Container kind | It answers | Calls for it |
 | --- | --- | --- |
 | Hero | What is this, and is it for me? | the page's one claim, as its first words |
 | Statement | Why does this matter? | words alone, read whole |
@@ -102,6 +119,13 @@ Each section gives the question it answers, its **For** line, what calls for it,
 | Numbers | Does it work for teams like mine? | numbers read from the real system |
 | Questions | What do people ask before they start? | questions, each with a short answer |
 | Closing call | What do I do now? | the page's last words and its one call to act |
+| Highlight | What matters most here? | one thing the page wants remembered, shown whole in a lit frame |
+| Reading column | Let me read it through. | a long text read whole: an article, a reference page, a changelog, a text page |
+| Records | What is here, all of it? | the records of one kind, each a door to its own page |
+| Plans | Which plan is mine? | the plans side by side, each with what it costs and holds |
+| Compare | What does each hold, row by row? | the same facts of several plans or alternatives, read across |
+| People | Who is behind this? | the people of a team, each a mark, a name and a line |
+| Find | Where is the answer? | the question a reader came with, and a way to search |
 | Footer | Where is everything else? Who is behind this? | the brand, the site's links and its legal line, at the foot of every page |
 
 ### Hero
@@ -228,6 +252,48 @@ The data decides the unit. A set of things of their own is a grid section, and t
 
 One call is enough. A second button that opens a door the reader has just passed says the same thing twice.
 
+### Highlight
+
+- **Calls for it.** One thing the page wants remembered, shown whole in a lit frame.
+- **Look.** `DSSectionContainer` holding one `DSFeature` framed raised and full, at most once on a page and never first. The case it draws by default is the kind's own, and the other cases are in the Surface Catalogue.
+- **Spec.** `highlight.dg.json`.
+
+### Reading column
+
+- **Calls for it.** A long text read whole: an article, a reference page, a changelog, a text page.
+- **Look.** `DSSectionContainer` holding one `DSFeature` at the start, at a reading width. The case it draws by default is the kind's own, and the other cases are in the Surface Catalogue.
+- **Spec.** `reading-column.dg.json`.
+
+### Records
+
+- **Calls for it.** The records of one kind, each a door to its own page.
+- **Look.** `DSFeatureGridSectionContainer` of cells, each a title, a line and one fact. The case it draws by default is the kind's own, and the other cases are in the Surface Catalogue.
+- **Spec.** `records.dg.json`.
+
+### Plans
+
+- **Calls for it.** The plans side by side, each with what it costs and holds.
+- **Look.** `DSFeatureGridSectionContainer` of cells, each a plan with one action. The case it draws by default is the kind's own, and the other cases are in the Surface Catalogue.
+- **Spec.** `plans.dg.json`.
+
+### Compare
+
+- **Calls for it.** The same facts of several plans or alternatives, read across.
+- **Look.** `DSFeatureGridSectionContainer` of cells holding the same facts in the same order. The case it draws by default is the kind's own, and the other cases are in the Surface Catalogue.
+- **Spec.** `compare.dg.json`.
+
+### People
+
+- **Calls for it.** The people of a team, each a mark, a name and a line.
+- **Look.** `DSFeatureGridSectionContainer` of cells, each with a mark. The case it draws by default is the kind's own, and the other cases are in the Surface Catalogue.
+- **Spec.** `people.dg.json`.
+
+### Find
+
+- **Calls for it.** The question a reader came with, and a way to search.
+- **Look.** `DSSectionContainer` holding one `DSFeature` with one action that opens the search. The case it draws by default is the kind's own, and the other cases are in the Surface Catalogue.
+- **Spec.** `find.dg.json`.
+
 ### Footer
 
 - **For** Visitor · Learner.
@@ -240,21 +306,24 @@ A footer has one shape, so two sites do not build two.
 
 ## What holds across — 🔮
 
-Every site pattern answers the same questions about its look, in this order (`RULE.SUPPORT.SURFACE.343` · MUST · skill:spn-surface/design).
+Every container kind answers the same questions about its look, in this order (`RULE.SUPPORT.SURFACE.343` · MUST · skill:spn-surface/design).
 
 | Question | The answer |
 | --- | --- |
 | Fill | Does the kind of reading change from the neighbours? If it does, `DEFAULT`; if not, `BASE`. `PRIMARY` is for the closing call alone |
 | Size | Is this one of the page's one or two strongest sections? If it is, `LG`. The `MARKETING` lens makes that call |
-| Highlight | Is this the one claim the page leans on? Its whole feature stands in one raised frame, in the fill that stands off its band as a door's box does (`DEFAULT` on a `BASE` band, `BASE` on a `DEFAULT` band, flat or tinted as the design language sets, never a gradient). The band follows the fill rule, and what stands inside the frame is flat, its picture included, so there is one frame. One on a page besides the closing call, never on the hero, never two in a row. The design language sets its form: a stage, a frame made for a site, or open, with no frame, the section larger and a backdrop behind it; never an app's panel look |
-| Gradient | Is this the hero or the closing call? Its band takes the design language's emphasis, at most once besides the hero, and never on a frame. A highlighted section's band stays flat |
-| Media | The frame follows the media's kind, and the place follows its width and how many panes it has. On a phone, the words come first |
+| Highlight | Is this the page's proof, read in place, or its one branded call to act? Proof is the evidence for the page's claims standing in the section itself, with no doors and no link onward. A branded call is one invitation, one `SOLID` button and the product's own picture, such as the sample platform live. A set of doors or links is never a highlight, nor an explanation that ends in an onward button, nor the closing call, and the case line names which of the two it is (rule RULE.SUPPORT.SURFACE.438 · GUIDE). Its whole feature stands in one raised frame, in the fill that stands off its band as a door's box does (`DEFAULT` on a `BASE` band, `BASE` on a `DEFAULT` band, flat or tinted as the design language sets, never a gradient, except in the closing call's band, as the Gradient row says). The band follows the fill rule like any section, and what stands inside the frame is flat, its picture included, so there is one frame. A page holds one besides the closing call, never on the hero and never two in a row. It may stand inside the closing call's band instead, as its first feature, the call stacked under it: the page then ends on one band that holds its proof and its call. The design language sets its form: a stage, a frame made for a site, or open, with no frame, the section larger and a backdrop behind it. It is never an app's panel look |
+| Gradient | Is this the hero or the closing call? Its band takes the design language's emphasis, at most once besides the hero, and never on a frame, with one exception: the highlight standing in the closing call's band takes a light tint of the brand that softens across its frame, so the frame reads as part of the band's sweep. A highlight on a band of its own stays flat |
+| Media | The frame follows the media's kind, and the place follows its width and how many panes it has. A picture beside the words is `SPLIT_END`; a picture beside the items, the words across above both, is `ITEMS_SPLIT_END`, and a site never rearranges a split with its own CSS. On a phone, the words come first |
 | Shape | A picture keeps the shape it is made in and is never cropped to a column; `verticalAlign` stands the shorter column |
-| Alignment | Centre the words only when they stand alone with nothing to scan: a Statement, a Closing call, a hero with no picture |
+| Alignment | `textAlign` `CENTER` centres the head alone. The split's words stand at the start. `verticalAlign` stands the items' column and the media at the `TOP`, the `CENTER` or the `BOTTOM` of their row; `BOTTOM` brings the foot of a picture shorter than its items level with the last item |
 | Columns | The count of items sets them, four at most. Lines that stand side by side are one sentence each, of about one length |
 
+- **A site's page MUST be a sequence of sections, and each MUST own its room and its fill** (`RULE.SUPPORT.SURFACE.414` · MUST · skill:spn-surface/design). The layout's box gives the side room, so the words of every section and the bar's items share one edge at every width; what a section holds adds no room unless it is framed, and a frame insets its own words. A footer's list of links keeps its words on the column's edge, with rows that are not pressed whole, each holding a link that marks itself under the pointer. A menu's panel is as wide as what it holds: a few short entries stand as a compact list, and a wide panel is for entries that carry content of their own.
+- **The brand at the start of a bar and in a footer links to the home of what it names** (`RULE.SUPPORT.SURFACE.443` · GUIDE). A sign-in step draws it without the link, so the one place a person is meant to finish is not left by a click on the logo.
+- **A backdrop may move, and stands still for a visitor who asked for reduced motion and for the app's own motion setting** (`RULE.SUPPORT.SURFACE.444` · MUST). A section's scene is part of its look, so it is the section that holds still.
 - **A section takes one emphasis and never two** (`RULE.SUPPORT.SURFACE.438` · GUIDE): the page's ground, its own fill where the kind of reading changes, the emphasis band of the hero or the closing call, or the one highlight.
-- **The patterns decide where emphasis goes, and the site's design language decides how it looks** (`design-languages.md`). A site that sets none keeps the look this ref states.
+- **The container kinds decide where emphasis goes, and the site's design language decides how it looks** (`design-languages.md`). A site that sets none keeps the look this ref states.
 - **For each section the agent writes one line, its case** (`RULE.SUPPORT.SURFACE.439` · GUIDE): each answer, the test that decided it, and what the other answer would cost. A reviewer then corrects a test's answer, and the section follows from it.
 - **A section is `BASE`, and takes `DEFAULT` only where the kind of reading changes from its neighbours** (`RULE.SUPPORT.SURFACE.341` · GUIDE). A statement read whole, code read closely and offers compared are such readings. Sections do not alternate their fills by turn. `PRIMARY` is the closing call's alone, and a hero takes no fill.
 - **Words stand on their section, not in a frame**, but for a highlighted section, whose whole feature is framed (`RULE.SUPPORT.SURFACE.293` · MUST · skill:spn-surface/design). A statement, a hero's words and a closing call stand on their section, and only a picture or an item takes a frame.
@@ -292,7 +361,7 @@ No entry and no section's item names `pageLevel`: each takes the level of the pl
 
 ### The head across
 
-Some sections have long words, and a picture that draws their items rather than their claim. In a split, the words, the items and the actions share one column beside the picture, so the items fall below the picture's foot. The head across is a form of `DSFeature` for these, `type` `ITEMS_SPLIT_END` or `ITEMS_SPLIT_START` (`RULE.SUPPORT.SURFACE.248` · MUST · skill:spn-surface/design): a form of Show it, Steps and Points when their words run long, not a pattern of its own.
+Some sections have long words, and a picture that draws their items rather than their claim. In a split, the words, the items and the actions share one column beside the picture, so the items fall below the picture's foot. The head across is a form of `DSFeature` for these, `type` `ITEMS_SPLIT_END` or `ITEMS_SPLIT_START` (`RULE.SUPPORT.SURFACE.248` · MUST · skill:spn-surface/design): a form of Show it, Steps and Points when their words run long, not a container kind of its own.
 
 | | The head across |
 | --- | --- |
@@ -313,33 +382,36 @@ A door already reads as a door at rest, because it is boxed and raised and its p
 
 ## The specs a section starts from — 🔮
 
-**This plugin carries 18 specs of the site patterns, in `refs/support/surface/site-patterns/`**: one for each of the twelve patterns, a second for Hero, Show it, Real sample and Choose to see (`-under`) and for Closing call (`-beside`), and a third for Show it, highlighted (`show-it-highlight.dg.json`), the section the Highlight test names. The hero and the closing call specs say in their captions where the emphasis band stands. Each is a skeleton of one section in the design system's units, with a view for a desktop, a tablet and a phone. Its `README.md` lists them.
+**This plugin carries 25 specs of the site container kinds, in `refs/support/surface/site-patterns/`**: one for each of the nineteen container kinds that draw a section, a second for Hero, Show it, Real sample and Choose to see (`-under`) and for Closing call (`-beside`), and a third for Show it, highlighted (`show-it-highlight.dg.json`), the section the Highlight test names. The hero and the closing call specs say in their captions where the emphasis band stands. Each is a skeleton of one section in the design system's units, with a view for a desktop, a tablet and a phone. Its `README.md` lists them.
 
-- **A section starts from the spec of its pattern.** Copy it and put the page's own words in its places; the words in a spec are placeholders that say what a heading or a point is for. Never start a section from an empty file.
+- **A section starts from the spec of its container kind.** Copy it and put the page's own words in its places; the words in a spec are placeholders that say what a heading or a point is for. Never start a section from an empty file.
 - **A spec is strict JSON.** Draw one with `spn-devex docs figure draw <spec>`.
 - **Never edit a file in that folder.** It is a byte-identical copy of the book's folder (`RULE.SUPPORT.SURFACE.053` · MUST · skill:spn-surface/design).
 
 ## What is not checked yet
 
-- **No check reads a section for its pattern, or a page for the order of its sections.** A review names the pattern and reads the section beside it, and reads the page's sections against its kind's order of questions.
+- **No check reads a section for its container kind, or a page for the order of its sections.** A review names the container kind and reads the section beside it, and reads the page's sections against its kind's order of questions.
 
 ## Boundary
 
-This ref states which shape a section of a site's page takes, how it is chosen from what it holds, the kinds of page and the order of their sections, and the look each pattern takes in the design system's units. It stops at the section. The shape of a screen of an app, and the task patterns a section's tasks follow, are `standards-patterns.md`. A path across pages is `flow-patterns.md`. Who the app is for and the length of the words by level are `standards-core.md`. What `DSSectionContainer`, `DSFeature` and `DSFeatureGridSectionContainer` take, prop by prop, is `architecture-components.md` and `architecture-containers.md`.
+This ref states which shape a section of a site's page takes, how it is chosen from what it holds, the kinds of page and the order of their sections, and the look each container kind takes in the design system's units. It stops at the section. The shape of a screen of an app, and the task patterns a section's tasks follow, are `standards-patterns.md`. A path across pages is `flow-patterns.md`. Who the app is for and the length of the words by level are `standards-core.md`. What `DSSectionContainer`, `DSFeature` and `DSFeatureGridSectionContainer` take, prop by prop, is `architecture-components.md` and `architecture-containers.md`.
 
 ## Binds
 
 | Rule | What it decides |
 | --- | --- |
-| `RULE.SUPPORT.SURFACE.340` | a section of a site's page follows a site pattern, built from the units that exist, and a kind of page orders its sections by its reader's questions |
+| `RULE.SUPPORT.SURFACE.340` | a section of a site's page follows a container kind, built from the units that exist, and a kind of page orders its sections by its reader's questions |
 | `RULE.SUPPORT.SURFACE.341` | a site's section is `BASE`, and `DEFAULT` only where the kind of reading changes from its neighbours |
 | `RULE.SUPPORT.SURFACE.342` | lines standing side by side in a site's section are one sentence each, of about one length |
-| `RULE.SUPPORT.SURFACE.343` | a site's section takes its pattern and its look from what it holds, and never from where it stands |
+| `RULE.SUPPORT.SURFACE.343` | a site's section takes its container kind and its look from what it holds, and never from where it stands |
 | `RULE.SUPPORT.SURFACE.344` | an item takes a mark where it stands for a thing of its own, and a bare icon where it is a line a person reads |
 | `RULE.SUPPORT.SURFACE.345` | the entries of a site's menu stand at `CONTENT` |
 | `RULE.SUPPORT.SURFACE.346` | every section of a site's page that holds items stands at the start |
 | `RULE.SUPPORT.SURFACE.347` | a menu's tile panel stands three across at most |
 | `RULE.SUPPORT.SURFACE.293` | a section's depth follows what each part holds: a point flat, a door boxed and raised, media framed by its kind, and a section never framed |
+| `RULE.SUPPORT.SURFACE.414` | a site's page is a sequence of sections, each owning its room and its fill |
+| `RULE.SUPPORT.SURFACE.443` | the brand at the start of a bar and in a footer links to the home of what it names, and a sign-in step draws it without the link. It is advice |
+| `RULE.SUPPORT.SURFACE.444` | a backdrop may move, and stands still for a visitor who asked for reduced motion and for the app's own motion setting |
 | `RULE.SUPPORT.SURFACE.438` | a section takes one emphasis and never two |
 | `RULE.SUPPORT.SURFACE.439` | the agent writes one line for each section, its case |
 | `RULE.SUPPORT.SURFACE.371` | a hero's state is a `PRIMARY` badge eyebrow and its stack is `OUTLINE` `DEFAULT` badge facts |
@@ -349,4 +421,4 @@ This ref states which shape a section of a site's page takes, how it is chosen f
 
 ## Proof
 
-No check reads a section against these rules yet. A review applies them by reading each section beside its pattern, and by drawing its spec.
+No check reads a section against these rules yet. A review applies them by reading each section beside its container kind, and by drawing its spec.

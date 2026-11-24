@@ -2,20 +2,20 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/",
-      "seen": "9f77780b"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/14-delivery-library/",
+      "seen": "9604845a"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-architecture-names/",
-      "seen": "7d4a3504"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/05-standards-names/",
+      "seen": "b4634429"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "ec4b3a10"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-containers/",
+      "seen": "8998eda9"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/",
-      "seen": "c4769c41"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-layouts/",
+      "seen": "dffed1ae"
     }
   ]
 }
@@ -30,7 +30,7 @@ Its provenance is the foundation book's design library, names, and layout and co
 
 - **Say what you are about to change**: the file, and the items. Stay inside them, and show the result when you have written.
 - **A page is composed from the published library, in a file that is not a library file.** Never write a page into a library file. A case the showcase shows is placed as instances of its unit and never drawn as a new look.
-- **The library holds the core units, which are the ones the book names, and no other unit** (`RULE.SUPPORT.SURFACE.082` · MUST · skill:spn-surface/design). It draws no component for a unit that a stack provides on its own, and nothing of a pattern: no task pattern, no app pattern, no skeleton and no sample page (`RULE.SUPPORT.SURFACE.099` · MUST · skill:spn-surface/design). So an app pattern is drawn as its units, and never as one instance.
+- **The library holds the core units, which are the ones the book names, and no other unit** (`RULE.SUPPORT.SURFACE.082` · MUST · skill:spn-surface/design). It draws no component for a unit that a stack provides on its own, and nothing of a pattern: no task pattern, no app page kind, no skeleton and no sample page (`RULE.SUPPORT.SURFACE.099` · MUST · skill:spn-surface/design). So an app page kind is drawn as its units, and never as one instance.
 - **A suffix names where a unit is placed: `App`, `Layout`, `Container` or `Widget`** (`RULE.SUPPORT.SURFACE.229` · MUST · skill:spn-surface/design). A component takes no such word, a composite is a component, and no block carries a letter for its layer before its name. The core composites are `DSDataTable`, `DSFilterBar`, `DSComparison` and `DSFeature`, and the core widget is `DSCardWidget`. A page of groups and their items has no core unit that places its two parts, so draw the two containers themselves; `DSListDetail` is the web stack's own unit and has no drawing.
 - **Never ask the developer to draw, rebind, remove or confirm anything in Figma.** A developer's hands are two: saving a named version before the connector's first change in a library file, and publishing a file. Nothing else is asked. When the library lacks something, the connector changes the library, as `refs/support/surface/delivery-library.md` states under "A developer's hands are two, and you change the library through the connector". Before a connector write, read its heading "The connector's facts". Name the developer's next step.
 
@@ -101,7 +101,7 @@ The design library holds one file for each layer of the design system that is dr
 - **Draw a card at the level of a widget.** A `DSCard`, a `DSItemCard` or a card of `DSCardWidget` stands in a container's content or on the page. Its title is at `WIDGET`, a part of it at `GROUP`, and its item lines at `CONTENT`.
 - **Draw a section of a website as `DSSectionContainer`, not as a container.** A section is one part of a page with a fill of its own and the room above and below that its `size` gives, and it holds one child and frames nothing: no header, no footer, no frame (`RULE.SUPPORT.SURFACE.243` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.247` · MUST · skill:spn-surface/design). It reaches the edges of its place, as the layout marks it (`RULE.SUPPORT.SURFACE.254` · MUST · skill:spn-surface/design). Where `size` is unset, the room is the `sectionSize` of the `designLanguage` that `DSSiteLayout` carries, and its `parting` (`NONE` or `HAIRLINE`), `pattern` (`NONE`, `DOTS`, `LINES` or `GRID`) and `fadedEdges` are read from that design language the same way, so a page writes none of the three on a section unless it differs; its own prop wins. A grid of features under a heading is `DSFeatureGridSectionContainer`, drawn as a section whose child is a feature at `CONTAINER` over the grid (`RULE.SUPPORT.SURFACE.259` · MUST · skill:spn-surface/design). The book states them before the library draws them, so a section the library lacks is handled as *When the library does not hold a block* says. What stands in a section takes its depth from what it holds and does for the visitor, and the section never frames itself (`RULE.SUPPORT.SURFACE.293` · MUST · skill:spn-surface/design). A part with a title and actions stays a `DSPanelContainer`.
 - **Draw the parts of a card inside its one frame.** A part of a card pads itself, and `flush` on a part drops that padding. A card's size sets its own spacing and reaches no block it holds, which takes the size of the place above the card (`RULE.SUPPORT.SURFACE.114` · MUST · skill:spn-surface/design), and a `flush` part of a card says so to the blocks in it. A `flush` part of a container around a card does not reach into it. An item line draws no padding or highlight of its own: the part that holds a title gives it no padding at its two sides, and in a `flush` part the inset of its place, and a row of a list gives the line it holds its room and its highlight. The book states these before the library draws them. `divided` is the line between each two parts. A card names the parts its frame holds with `frames`, all three where it names none, and a part not listed stands flat outside the frame (`RULE.SUPPORT.SURFACE.262` · MUST · skill:spn-surface/design).
-- **A header above the outline is a look, and the theme holds it.** It is the value of `frames` that lists `CONTENT` and `FOOTER` and leaves `HEADER` out. The app patterns are drawn in that form. Set it as a mode on the top frame, and on one container only where the tree sets `frames` on that container.
+- **A header above the outline is a look, and the theme holds it.** It is the value of `frames` that lists `CONTENT` and `FOOTER` and leaves `HEADER` out. The app page kinds are drawn in that form. Set it as a mode on the top frame, and on one container only where the tree sets `frames` on that container.
 - **An entry over the page is one container inside its overlay.** Draw the `DSDialog` or the `DSSheet` instance over a `DSBackdrop`, and place the container of the tree inside it. A container in an overlay is not a container inside a container.
 - **Draw sizes smallest to largest.** A set shows its `SM` version at the top left, as the default a theme sets, and its layers run `XS` to `XL`. An icon beside a title or beside running text takes the scale size of that text's own step name and shares its centre line: an `XS` icon beside `XS` text. `scaleSize` is a property, as `size` is, and the mark, the avatar and the avatar group carry it with every step from `XXS` to `XXL5`.
 - **Never rename an instance, a property or a value.** The name carries the link between the design and its code.

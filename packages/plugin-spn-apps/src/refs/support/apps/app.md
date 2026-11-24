@@ -7,12 +7,12 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/05-app/",
-      "seen": "9df00ebc"
+      "seen": "a1422729"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/02-web/03-entry/01-pages.md",
       "section": "The address of a screen",
-      "seen": "7f7295cb"
+      "seen": "add8774a"
     }
   ]
 }

@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/08-architecture-containers.md",
-      "seen": "d9e9bed2"
+      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/09-architecture-containers.md",
+      "seen": "6e22da15"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "ec4b3a10"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-containers/",
+      "seen": "8998eda9"
     }
   ]
 }
@@ -15,7 +15,7 @@
 
 # Containers — How a Part of a Page Is Framed
 
-Source of truth: the foundation's Containers construct (`docs/02-constructs/02-support/01-surface/08-architecture-containers.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/08-architecture-containers/`). Containers is the eighth of thirteen Surface constructs.
+Source of truth: the foundation's Containers construct (`docs/02-constructs/02-support/01-surface/09-architecture-containers.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/09-architecture-containers/`). Containers is the ninth of sixteen Surface constructs.
 
 Read this before you frame a part of a page, or before you draw or build the panel on a new stack.
 
@@ -77,13 +77,13 @@ What a page puts in each part follows one form. A person then finds the name and
 
 - **A page puts the title and the actions of a panel in its header, and what closes its work in its footer** (`RULE.SUPPORT.SURFACE.074` · GUIDE). The header places its first block, the title, at the start, where it grows, and every other block as one group of actions at the end, in the order written (`RULE.SUPPORT.SURFACE.178` · MUST · skill:spn-surface/design), so the title and the actions need no placing by the page. Which action is the main one, and how many stand before "⋯", is the button's *limits across a header* in `architecture-components.md` (`RULE.SUPPORT.SURFACE.390` · GUIDE).
 - **The action of one part of the content stands at the end of that part's title, and not in the header.** The header holds the actions of the whole panel.
-- **A page uses one panel for each thing a person reads or saves as a whole** (`RULE.SUPPORT.SURFACE.116` · GUIDE). The sections of that thing are its content parts, and two things that are read or saved apart are two panels. `standards-patterns.md` states the rule once, for every pattern.
+- **A page uses one panel for each thing a person reads or saves as a whole** (`RULE.SUPPORT.SURFACE.116` · GUIDE). The sections of that thing are its content parts, and two things that are read or saved apart are two panels. The Surface Catalogue states the rule once, for every app page kind (`standards-patterns.md` holds the task and flow patterns).
 - **A panel MUST give the title in its header the level of its box, `CONTAINER` unless the panel is the whole page, and a panel that is the whole page MUST say so with `fullPage`** (`RULE.SUPPORT.SURFACE.107` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.179` · MUST · skill:spn-surface/design). The title of a header is an item line. A panel takes `fullPage`, a boolean that is `false` where the page gives none and that is not a size: it says that this panel is the page. The level of its box is `CONTAINER`, or `PAGE` with `fullPage`, and the panel gives it to its header, its content and its footer as their place. With `fullPage` the header is the page head: the title is the `h1` with no level of its own, the main action is solid one step above the size, and every other action is an outline. A data table panel container takes `fullPage` in its `panel` and gives it to its box, and it takes no level from its title: the `pageLevel` of a title styles the title alone, as on any item line. A title the page gives no level takes the level of its box: `WIDGET` in a card, `GROUP` in the head of a part of a card widget, and `CONTAINER` in a dialog, a sheet or a drawer, as `architecture-components.md` states for each box. So every page of an app opens with the same head, and only its body differs.
 - **The back action of a header MUST stand level with the line of the title** (`RULE.SUPPORT.SURFACE.108` · MUST · skill:spn-surface/design). `DSPanelContainer.Header` draws a back action before its title where the page gives it an address to go back to. That action does not stand level with the middle of the title and the lines under it together. A person then reads the way back and the name of the page on one line.
 - **A page that holds several panels puts its head above them, outside any frame, with its way back** (`RULE.SUPPORT.SURFACE.120` · GUIDE). A page with one panel puts its head in the header of that panel. A page with several has no one panel that its head belongs to, so the head stands alone above them all. It is an item line at the level `PAGE`, with the way back before its title, level with the line of the title.
 - **The design system MUST draw that head and its way back.** A page gives the title and the address to go back to, and writes no row, no back button and no padding of its own. So the head of a page looks the same whether the page has one panel or several.
 - **The actions that close the work of an entry stand in one place and in one order** (`RULE.SUPPORT.SURFACE.095` · GUIDE). Over the page, in a dialog, a sheet, a drawer or a popover, they stand at the end of the footer: the action that leaves the work first, and the main action last, at the very end. In an entry that is a page of its own they stand at the start of the footer, the main action first, because the fields of a page line up at its start. A value changed in place, as in a row of a data table, keeps its two actions beside the box, the one that saves first, because a person reaches them in the order of reading. The main action is a solid button and the action that leaves an outline button, in both places.
-- **A header above the outline is the value of `frames` that lists `CONTENT` and `FOOTER` and leaves `HEADER` out.** The app patterns are drawn in that form. The look is still the theme's to choose: a theme that lists the header too moves the outline, and no page changes.
+- **A header above the outline is the value of `frames` that lists `CONTENT` and `FOOTER` and leaves `HEADER` out.** The app page kinds are drawn in that form. The look is still the theme's to choose: a theme that lists the header too moves the outline, and no page changes.
 
 Here is how the parts serve the pages most apps have.
 
@@ -91,9 +91,9 @@ Here is how the parts serve the pages most apps have.
 | --- | --- | --- | --- |
 | A listing | the page title, a line under it where one is needed, and actions at the end | a filter bar where the listing has one, and a data table in a `flush` part | the paging of the records |
 | A form | the title of the form | its sections, one under another, each under its own title | the actions that save the form or leave it |
-| A dashboard | flat | raised, holding widgets that show numbers | none |
+| An overview | flat | raised, holding widgets that show numbers | none |
 
-**What the units do.** A listing's paging in the footer of the panel is the form the app patterns are drawn in. `DSDataTable` hands its paging to a place the page gives it. The page puts an element in `DSPanelContainer.Footer` and names it as `settings.pagination.footerElement`, and the table draws its record count and its pager there. The table is handed a place and knows no panel, because a composite is a component, a layer before the panel. Where a page gives no place, the table draws its paging in a footer of its own, at the foot of the records.
+**What the units do.** A listing's paging in the footer of the panel is the form the app page kinds are drawn in. `DSDataTable` hands its paging to a place the page gives it. The page puts an element in `DSPanelContainer.Footer` and names it as `settings.pagination.footerElement`, and the table draws its record count and its pager there. The table is handed a place and knows no panel, because a composite is a component, a layer before the panel. Where a page gives no place, the table draws its paging in a footer of its own, at the foot of the records.
 
 ## The look — 🔮
 
@@ -170,6 +170,8 @@ A container takes no background color, no padding value, no margin, no container
 ### The section of a page
 
 A section is one part of a page, set apart from the next by a fill of its own and its own room above and below: the hero of a website, a row of three pillars, the strip behind a closing call, a tinted greeting that opens an app's page. `DSSectionContainer` is the unit (`RULE.SUPPORT.SURFACE.243` · MUST · skill:spn-surface/design), and it draws a `<section>`. It has no header, no footer, no frame and no parts. It holds one child. What stands in it sets its own level: a pitch on a website is a `DSFeature` placed in the section, with its own `pageLevel`, and the section hands down no level. It takes a `color` (`BASE` when unset), a `strength` (`SUBTLE` when unset) and `painted`, as a surface does, a `className`, a `size` (the app's when unset), `flush`, a `mediaNode` and an `id`.
+
+Each container kind of MARKETING and RESOURCES, the site categories of the Surface Catalogue, is realized by a section container, named in the site container kinds of the catalogue, so no section is defined twice.
 
 | prop | type | default | what it does and when to use it | library |
 | --- | --- | --- | --- | --- |
@@ -291,9 +293,9 @@ The card, `DSCard`, stays a separate block beside the panel, taking `surface` an
 - **A card's size MUST set its own spacing and reach no block it holds** (`RULE.SUPPORT.SURFACE.114` · MUST · skill:spn-surface/design). The size pads the card's parts and sets the gaps between them; a block inside, a button, a badge, a row's words and its chevron, takes the size of the place above the card, so a large card is roomier and what it holds is drawn as it is anywhere else. A row of a list and a title in a `flush` part still take the inset of the card's size at their sides, because that inset is spacing, so each starts where the card's own parts start their content. A card that states no size pads by the size it stands in.
 - **A `flush` part of a card MUST say so to what it holds, as a `flush` part of a panel does.** The header, the content and the footer of a card all do this.
 - **The card MUST take `surface` and `frames` for its look, and the paint of its frame MUST come from the theme's `component.card`** (`RULE.SUPPORT.SURFACE.261` · MUST · skill:spn-surface/design). `surface` is an `IDSFrameSurface`, and its keys mean on a card what they mean on a panel.
-- **A card MAY take `frames`, `DSBoxPartType[]`, and its default MUST be `HEADER`, `CONTENT` and `FOOTER`** (`RULE.SUPPORT.SURFACE.262` · MUST · skill:spn-surface/design). Two listed parts next to each other share one frame, and a part not listed sits flat, half the card's gap from the frame beside it. A header takes the same room at a size whether it stands in the frame or flat, so two cards of one size side by side line their headers up. So a dashboard tile may stand its title flat above a framed body by listing `CONTENT` alone. `DSCardWidget` takes `frames` and hands them to its card.
+- **A card MAY take `frames`, `DSBoxPartType[]`, and its default MUST be `HEADER`, `CONTENT` and `FOOTER`** (`RULE.SUPPORT.SURFACE.262` · MUST · skill:spn-surface/design). Two listed parts next to each other share one frame, and a part not listed sits flat, half the card's gap from the frame beside it. A header takes the same room at a size whether it stands in the frame or flat, so two cards of one size side by side line their headers up. So an overview tile may stand its title flat above a framed body by listing `CONTENT` alone. `DSCardWidget` takes `frames` and hands them to its card.
 - **A card and a panel MUST be told apart by level and purpose, and no unit MUST merge them** (`RULE.SUPPORT.SURFACE.263` · MUST · skill:spn-surface/design). There is no `DSCardContainer`, no `DSFeatureContainer` and no `DSFeatureSectionContainer`.
-- **A card MAY sit inside the content of a panel.** A dashboard MAY also use cards and no panel at all.
+- **A card MAY sit inside the content of a panel.** An overview page MAY also use cards and no panel at all.
 
 ### The frames of a box
 
@@ -330,7 +332,7 @@ A block with `bordered` in a `flush` part keeps its border, because its own prop
 
 ## A panel in use — 🔮
 
-The three parts below are a panel in use. Each says how the same header, content and footer carry one of the app patterns of `standards-patterns.md`. None adds a prop or a part to the panel.
+The three parts below are a panel in use. Each says how the same header, content and footer carry one of the app page kinds, the Pages of DASHBOARD and PORTAL in the Surface Catalogue. None adds a prop or a part to the panel.
 
 ### An entry over the page
 
@@ -370,14 +372,14 @@ Some pages hold things in groups: the fields of each record type, or the actions
 - **Both parts are in view at a desktop only** (`RULE.SUPPORT.SURFACE.079` · MUST · skill:spn-surface/design). There a person goes from one group to the next without losing the list.
 - **On a tablet and on a phone the items take the place of the groups.** The two parts do not fit side by side there.
 - **The part that holds the groups MAY be narrow, and a named choice MUST say so** (`RULE.SUPPORT.SURFACE.119` · MUST · skill:spn-surface/design). Where a group is read by its name alone, the items need most of the width. A unit that places the two parts keeps its usual width for the groups where the page chooses none, and it offers a narrower one by name. A page **MUST NOT** write a width of its own. The choice holds at a desktop, where both parts are in view.
-- On the web the swap also changes the address, as `standards-patterns.md` states under *On the web: the address of a screen*.
+- On the web the swap also changes the address, as the web's app page kinds state under *On the web: the address of a screen*.
 - **Each part is shown by what its own data asks for: a list, a table, a data table, or a view of one thing** (`RULE.SUPPORT.SURFACE.049` · GUIDE). The groups and the items seldom hold data of the same shape.
 - **A set of groups that can be added to is a list, and not a row of tabs** (`RULE.SUPPORT.SURFACE.080` · GUIDE). A row of tabs is safe only where the set cannot grow past the width of the page. A list takes any number of groups.
 - **Many groups that a person searches are a data table in its `LIST` layout** (`RULE.SUPPORT.SURFACE.069` · GUIDE), stated in `architecture-components.md`. A group is read by its name, as a line, and the groups stand in a narrow part of the page.
 
 Where the groups are few and fixed, the page needs no swap. Each group is a panel of its own, one under another on one page, and nothing is hidden.
 
-**What the units do.** The app patterns draw the back action on the title line of the panel that holds the items. `DSPanelContainer.Header` has a small place for it before the title: a page gives the header the address to go back to, and the header draws a back action there, in one group with its first block, so the title stays at the start and the last block at the end. The back action stands level with the line of the title. While the items stand alone, that back action is the way back to the groups.
+**What the units do.** The app page kinds draw the back action on the title line of the panel that holds the items. `DSPanelContainer.Header` has a small place for it before the title: a page gives the header the address to go back to, and the header draws a back action there, in one group with its first block, so the title stays at the start and the last block at the end. The back action stands level with the line of the title. While the items stand alone, that back action is the way back to the groups.
 
 **The foundation names no core unit that places the two parts** (`RULE.SUPPORT.SURFACE.099` · MUST · skill:spn-surface/design). The rules above say what a person sees, and they hold whatever places the parts. The web stack has a unit of its own that places them, `DSListDetail`: both parts at a desktop, and one at a time on a tablet and a phone. Its `listWidth` is the named choice for the width of the groups. `providers.md` names it and its values.
 

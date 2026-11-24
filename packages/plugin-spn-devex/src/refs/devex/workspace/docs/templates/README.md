@@ -3,7 +3,7 @@
   "files": [
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/templates",
-      "seen": "0aaff8ae"
+      "seen": "fdec26d8"
     }
   ]
 }
@@ -32,7 +32,7 @@ review and fails a gate.
 
 | Group | Templates |
 | --- | --- |
-| `docs/` | [`pages/blocks-template.html`](docs/pages/blocks-template.html) · [`pages/construct-template.html`](docs/pages/construct-template.html) · [`pages/guide-template.html`](docs/pages/guide-template.html) · [`pages/hub-template.html`](docs/pages/hub-template.html) · [`pages/index-template.html`](docs/pages/index-template.html) · [`pages/overview-template.html`](docs/pages/overview-template.html) · [`pages/page-template.html`](docs/pages/page-template.html) · [`pages/report-template.html`](docs/pages/report-template.html) · [`seats/capability-template.md`](docs/seats/capability-template.md) · [`seats/construct-seat-template.md`](docs/seats/construct-seat-template.md) · [`seats/design-language-capability-template.md`](docs/seats/design-language-capability-template.md) · [`seats/design-language-construct-template.md`](docs/seats/design-language-construct-template.md) · [`seats/design-language-reference-template.md`](docs/seats/design-language-reference-template.md) · [`seats/schema-template.sql`](docs/seats/schema-template.sql) · [`seats/test-and-verify-template.md`](docs/seats/test-and-verify-template.md) |
+| `docs/` | [`pages/blocks-template.html`](docs/pages/blocks-template.html) · [`pages/construct-template.html`](docs/pages/construct-template.html) · [`pages/guide-template.html`](docs/pages/guide-template.html) · [`pages/hub-template.html`](docs/pages/hub-template.html) · [`pages/index-template.html`](docs/pages/index-template.html) · [`pages/overview-template.html`](docs/pages/overview-template.html) · [`pages/page-template.html`](docs/pages/page-template.html) · [`pages/report-template.html`](docs/pages/report-template.html) · [`seats/capability-template.md`](docs/seats/capability-template.md) · [`seats/construct-seat-template.md`](docs/seats/construct-seat-template.md) · [`seats/design-language-capability-template.md`](docs/seats/design-language-capability-template.md) · [`seats/design-language-construct-template.md`](docs/seats/design-language-construct-template.md) · [`seats/design-language-reference-template.md`](docs/seats/design-language-reference-template.md) · [`seats/design-language-spec-sample.json`](docs/seats/design-language-spec-sample.json) · [`seats/design-language-spec-template.json`](docs/seats/design-language-spec-template.json) · [`seats/schema-template.sql`](docs/seats/schema-template.sql) · [`seats/test-and-verify-template.md`](docs/seats/test-and-verify-template.md) |
 | `plugin/` | [`agent-template.md`](plugin/agent-template.md) · [`hook-template.ts`](plugin/hook-template.ts) · [`lens-template.md`](plugin/lens-template.md) · [`ref-template.md`](plugin/ref-template.md) · [`skill-template.md`](plugin/skill-template.md) |
 | `surface/` | [`surface-page-template.html`](surface/surface-page-template.html) |
 | `workstream/` | [`approach-template.html`](workstream/approach-template.html) · [`arc-record-template.md`](workstream/arc-record-template.md) · [`arc-template.html`](workstream/arc-template.html) · [`handover-template.md`](workstream/handover-template.md) · [`order-template.md`](workstream/order-template.md) · [`plan-template.md`](workstream/plan-template.md) |

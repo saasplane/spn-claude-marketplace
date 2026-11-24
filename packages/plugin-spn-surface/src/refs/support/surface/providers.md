@@ -2,28 +2,28 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/13-providers.md",
-      "seen": "3942a323"
+      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/16-delivery-providers.md",
+      "seen": "429632e3"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/13-providers/",
-      "seen": "f51df29d"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/16-delivery-providers/",
+      "seen": "69881e2f"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/13-providers/ts/01-design-system.md",
-      "seen": "462133dd"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/16-delivery-providers/02-ts/01-design-system.md",
+      "seen": "b70c198a"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "de2ac7e0"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-standards-patterns/",
+      "seen": "98c2f3b5"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
-      "seen": "452caa48"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-widgets/",
+      "seen": "dae38f66"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "ec4b3a10"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-containers/",
+      "seen": "8998eda9"
     }
   ]
 }
@@ -31,34 +31,34 @@
 
 # Providers — Who Realizes Surface in Code
 
-Source of truth: the foundation's Providers construct (`docs/02-constructs/02-support/01-surface/13-providers.md`), its capability chapters (`docs/04-capabilities/02-support/01-surface/13-providers/`), and the TypeScript provider's own chapter, `13-providers/ts/01-design-system.md`. Providers is the thirteenth and last of the Surface constructs.
+Source of truth: the foundation's Providers construct (`docs/02-constructs/02-support/01-surface/16-delivery-providers.md`), its capability chapters (`docs/04-capabilities/02-support/01-surface/16-delivery-providers/`), and the TypeScript provider's own chapter, `16-delivery-providers/02-ts/01-design-system.md`. Providers is the sixteenth and last of the Surface constructs.
 
-Read this before you ask which stack builds a block, whether Figma counts as one, or how `@saasplane/support-web-ds-ts` realizes the app's two contexts. **The thing to unlearn: the design library is not a provider.** It draws the look; a provider builds code. Figma lives beside this construct, in `delivery-library.md`'s capability, never in this one's.
+Read this before you ask which provider draws or builds a block, which one a repository uses, or how `@saasplane/support-web-ds-ts` realizes the app's two contexts. A provider is named for what it realizes on, as in the Apps and Infra domains, and Surface has three: **Figma**, a design tool, which draws the library; **ts**, the TypeScript stack, which builds the web today; and **native**, later. A provider realizes a platform, Web or Native, and never a surface category: MARKETING, RESOURCES, DASHBOARD and PORTAL are the same on any provider. **The thing to unlearn: Figma and code are one thing.** Figma draws the look and `ts` builds it, and they sit in separate folders of their own. Both follow the book.
 
 ## Terms
 
 | Term | What it means |
 | --- | --- |
-| Provider | a stack that realizes Surface in code, and states no rule. The repository's stack claim picks it |
+| Provider | what realizes Surface on one stack or tool under the book's names, and states no rule of its own: Figma, `ts` or `native`. The repository's stack claim picks the one that builds |
 
 ## What every provider delivers — 🔮
 
-A provider holds one design-system package and one showcase, `ts` today and `native` later.
+A provider holds one library or design-system package and one showcase. Figma draws the library, `ts` builds the web today, and `native` comes later.
 
 - A provider **MUST** realize every block and vocabulary the constructs name, under the book's own names. A renamed block or prop is a second name nobody else reads by. Every vocabulary a provider realizes is a closed set, stated in the construct that names it and declared once in that construct's capability (`RULE.SUPPORT.SURFACE.005` · MUST · skill:spn-surface/design).
-- A provider **MUST** build the showcase that `delivery-showcase.md` lists, in its own stack's tool.
+- A provider **MUST** build or draw the showcase that `delivery-showcase.md` lists, in its own tool.
 - A provider **MUST** say what it does not realize yet. A gap stated in words is a plan; a gap left unstated is a surprise for whoever reaches for it next.
 - A provider **MUST NOT** give a core unit a second name, and **MUST NOT** restate a rule. The name of a core unit and a rule belong to the book, once; a provider that invents either has made a second standard nobody else reads.
-- A unit's name and props are the standard's; what a stack builds the unit from is the stack's own and private. A stack **MAY** replace a primitive under a unit, and no page that uses the unit changes.
+- A unit's name and props are the standard's; what a provider builds the unit from is its own and private. A provider **MAY** replace a primitive under a unit, and no page that uses the unit changes.
 - A provider **MAY** hold units of its own that help build apps, beside the core units (`RULE.SUPPORT.SURFACE.081` · MUST · skill:spn-surface/design). It names them and states them in its own docs, and each one keeps the rules of the book, as `architecture-components.md` states. Its showcase shows them marked as its own. They are no part of what every provider owes.
 
-- **A change to what a surface draws MUST be one change across four layers, and MUST be planned as one** (`RULE.SUPPORT.SURFACE.420` · MUST · skill:spn-surface/design): the book's construct that states the unit, the capability page that says how the stack realizes it, the showcase that shows it, and the code. A change that touches one layer names the others it moves, or says in a sentence why it moves none of them. This holds for every builder's UI library, a partner's own design system and showcase included, so a library never drifts from its book or its showcase from its code. The library's projects are read from each repository's declarations, never named.
+- **A change to what a surface draws MUST be one change across four layers, and MUST be planned as one** (`RULE.SUPPORT.SURFACE.420` · MUST · skill:spn-surface/design): the book's construct that states the unit, the capability page that says how the provider realizes it, the showcase that shows it, and the code. A change that touches one layer names the others it moves, or says in a sentence why it moves none of them. This holds for every builder's UI library, a partner's own design system and showcase included, so a library never drifts from its book or its showcase from its code. The library's projects are read from each repository's declarations, never named.
 
 ## The claim that picks a provider — 🔮
 
-**One claim picks a provider: the stack claim of the repository the code stands in, `config.stack` in its `sprepo.json`** (`RULE.SUPPORT.SURFACE.383` · MUST · skill:spn-surface/design). It is the claim that picks a stack's provider for Apps, so one fact answers both. A repository that claims `TS` builds its surface with the `ts` provider. An agent, a check or a command reads a provider's folder, in the book or in a plugin, only where the claim names that provider's stack, and reads no other folder to decide.
+**One claim picks a provider: the stack claim of the repository the code stands in, `config.stack` in its `sprepo.json`** (`RULE.SUPPORT.SURFACE.383` · MUST · skill:spn-surface/design). It is the same claim the Apps domain reads to pick its provider, so one fact answers both. A repository that claims the `TS` stack builds its surface with the `ts` provider. An agent, a check or a command reads a provider's folder, in the book or in a plugin, only where the claim names its stack, and reads no other folder to decide.
 
-**The kind of surface, `WEB` or `NATIVE`, is what a provider builds, and never what picks it.** A native provider joins as the provider of a stack the claim names, with a folder of its own and no second key. No value of the claim names a native stack today, so nothing reads a native folder yet.
+**The platform, `WEB` or `NATIVE`, is what a provider realizes, and never what picks it.** A native provider joins as the one a claim names, with a folder of its own and no second key. No value of the claim names a native stack today, so nothing reads a native folder yet.
 
 ## The ts provider — ✅ for the two contexts and tokens, 🔮 for the rest
 
@@ -87,9 +87,9 @@ The tokens sit in tiers, and a component sees only the roles and the scale: Tier
 
 ### What a page writes for each unit
 
-**A pattern asks a few things of a page, and in the ts design system the page passes each one and the unit does the rest.** `architecture-components.md`, `architecture-widgets.md` and `architecture-containers.md` state the rule or the advice behind each row, and the choice table of each unit in those refs gives the values its cases write; this table says what a page on this stack writes for it, and a row that says *nothing* is a thing the unit already does. Where a pattern's row is advice, a partner's own choice stands, and the page writes that choice instead.
+**A page kind or a pattern asks a few things of a page, and in the ts design system the page passes each one and the unit does the rest.** `architecture-components.md`, `architecture-widgets.md` and `architecture-containers.md` state the rule or the advice behind each row, and the choice table of each unit in those refs gives the values its cases write; this table says what a page on this stack writes for it, and a row that says *nothing* is a thing the unit already does. Where a row is advice, a partner's own choice stands, and the page writes that choice instead.
 
-| The pattern asks | What the page writes |
+| The page kind or pattern asks | What the page writes |
 | --- | --- |
 | the `LIST` layout on a phone | the page reads the live device, `useDSContext().device`, and lists `LIST` on a phone. `DSDataTable` reads no device type, and follows the layouts its page lists each time it draws |
 | a line of the `LIST` layout | the page gives each record as an item line, `DSItem`, with its title, its description and its facts. The table's rows carry no padding of their own and answer the pointer, so the page writes no padding and no hover. In a list the row carries the link, the chosen fill and the arrow, and the item line inside it carries none; `DSItem` takes no `selected` |
@@ -130,13 +130,13 @@ A unit that does not do a thing yet is a gap of the unit, named under *Missing* 
 
 The shadcn CLI emits or copies every file under `_shadcn/`, the hooks and helpers included — the rule covers the whole folder, stated in full in `architecture-app.md`. Make the change a component needs in its `DS*` wrapper. Run the CLI again to refresh a file; re-point the tokens to change a look, because an edited primitive loses the edit at the next regeneration.
 
-## Figma is not a provider — 🔮
+## Figma beside the code — 🔮
 
-Figma is where the library is drawn, and it lives in `delivery-library.md`'s capability, in `02-figma/`. What a stack must prove against lives in `delivery-showcase.md`'s capability. A provider is code; the library is a drawing, and the two are never the same folder.
+The Figma provider draws the library, and it lives in `01-figma/` of this construct's capability. The `ts` provider builds code, in `02-ts/`, and the showcase it must prove against is stated in `delivery-showcase.md`'s capability. The library the Figma provider draws is the book's own standard, `delivery-library.md`, and the drawing is never code: the library and a code provider are never the same folder (`RULE.SUPPORT.SURFACE.006` · MUST · skill:spn-surface/design).
 
 ## Boundary
 
-This ref states who realizes Surface, and what every provider owes and refuses. It stops at the edge of that obligation. It does not state which blocks or vocabularies exist — that is every ref before this one. It does not state how the library draws a block — that is `delivery-library.md`. It does not state what a provider's showcase must show — that is `delivery-showcase.md`. The TypeScript stack's component shape, its naming and its file structure are the stack's own, and the stack's build steps state them.
+This ref states who realizes Surface, and what every provider owes and refuses; the Figma provider's own chapters are restated in `delivery-library.md`. It stops at the edge of that obligation. It does not state which blocks or vocabularies exist — that is every ref before this one. It does not state how the library draws a block — that is `delivery-library.md`. It does not state what a provider's showcase must show — that is `delivery-showcase.md`. The TypeScript stack's component shape, its naming and its file structure are the stack's own, and the stack's build steps state them.
 
 ## Proof
 

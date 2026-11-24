@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/04-flow-patterns.md",
-      "seen": "068af1f5"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-standards-patterns/01-common/02-flow-patterns.md",
+      "seen": "6cae4215"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/02-web/04-flow-patterns.md",
-      "seen": "b221e6b1"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-standards-patterns/02-web/02-flow-patterns.md",
+      "seen": "e6eed69c"
     }
   ]
 }
@@ -15,9 +15,9 @@
 
 # Flow Patterns — One Path to Each Outcome
 
-Source of truth: the foundation's flow patterns chapter (`docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/04-flow-patterns.md`) and the web's part of it (`docs/04-capabilities/02-support/01-surface/03-standards-patterns/02-web/04-flow-patterns.md`), chapters of the Patterns construct.
+Source of truth: the foundation's flow patterns chapter (`docs/04-capabilities/02-support/01-surface/04-standards-patterns/01-common/02-flow-patterns.md`) and the web's part of it (`docs/04-capabilities/02-support/01-surface/04-standards-patterns/02-web/02-flow-patterns.md`), chapters of the Patterns construct.
 
-Flow patterns are the last of the four groups of surface patterns. The task patterns say how one task runs and the app patterns how a screen of an app is arranged (`standards-patterns.md`); the site patterns say how a section of a site's page is shaped (`site-patterns.md`). A flow pattern orders them into a path. Flow patterns hold on every kind of app.
+Flow patterns are the second of the two groups of surface patterns. The task patterns say how one task runs (`standards-patterns.md`); the app page kinds say how a screen of an app is arranged (`standards-patterns.md`); the site page kinds order the sections of a site's page and the container kinds shape each section (`site-patterns.md`). A flow pattern orders them into a path. Flow patterns hold on every surface category, and a flow may cross categories, as a sign-up flow runs from a MARKETING page into a PORTAL.
 
 Read this before you design a page that is a step of a path, such as signing up, signing in or making a record, and before you review such a path. A person rarely comes for one page. Every page on a path can follow its pattern and the path can still break: a step that ends at the wrong site, a wait drawn four ways, a screen that says done where the next page would have said it. So you design a page as a step of a path a person already knows, and you review a path by naming the flow it should have followed.
 
@@ -25,36 +25,53 @@ Read this before you design a page that is a step of a path, such as signing up,
 
 | Term | What it means |
 | --- | --- |
-| Flow pattern | a path across pages to one outcome, built from the app and site patterns that exist |
-| Step | a page, or a step inside a page, that follows an app pattern, a site pattern or, where it is one task on a page, a task pattern |
+| Flow pattern | a path across pages to one outcome, built from the page kinds that exist |
+| Step | a page, or a step inside a page, that follows an app page kind, a site page kind or container kind or, where it is one task on a page, a task pattern |
 | Outcome | what a person has at the end of the flow, such as being signed in at the place they asked for |
 
 ## A flow pattern and the patterns it is built from — 🔮
 
-A flow pattern is a path across pages to one outcome (`RULE.SUPPORT.SURFACE.360` · MUST · skill:spn-surface/design). Each step of it follows an app pattern or a site pattern, and each task on that step follows its task pattern. A flow is built from the patterns that exist, as an app pattern is built from the units that exist.
+A flow pattern is a path across pages to one outcome (`RULE.SUPPORT.SURFACE.360` · MUST · skill:spn-surface/design). Each step of it follows an app page kind or a container kind, and each task on that step follows its task pattern. A flow is built from the patterns that exist, as an app page kind is built from the units that exist.
 
 - **A flow MUST be built from the patterns that exist, and MUST add no unit and no page shape of its own** (`RULE.SUPPORT.SURFACE.360` · MUST · skill:spn-surface/design). A step that no pattern holds is a page arranged from nothing, and the next flow then copies it.
-- **A flow MUST name its outcome, the kinds of person it is for, its steps by the pattern each follows, where it starts and ends, and what a person sees in each task state** (`RULE.SUPPORT.SURFACE.360` · MUST · skill:spn-surface/design). A path that names only its happy steps leaves its waits and its failures to each page.
-- **Each flow opens with its For line** (`RULE.SUPPORT.SURFACE.332` · MUST · skill:spn-surface/design): the kinds of person it is for, and how it runs differently for one. A flow can carry a person from one kind to another: a Visitor who signs up is a Team or Everyday users at the Home the flow ends at. The kinds are stated in `standards-core.md`, under *Who an app is for*.
+- **A flow MUST name its outcome, the persons it is for, its steps by the pattern each follows, where it starts and ends, and what a person sees in each task state** (`RULE.SUPPORT.SURFACE.360` · MUST · skill:spn-surface/design). A path that names only its happy steps leaves its waits and its failures to each page.
+- **Each flow opens with its For line** (`RULE.SUPPORT.SURFACE.332` · MUST · skill:spn-surface/design): the persons it is for, and how it runs differently for one. A flow can carry a person from one person to another: a Visitor who signs up is a Team or an Individual at the Home the flow ends at. The persons are stated in `standards-core.md`, under *Who an app is for*.
 
 An arrow, →, leads from one step to the next. The task states are Interaction's (`standards-interaction.md`), and a flow names no state of its own. **Where a flow is an entry in steps, one group of fields at a time in one panel, `DSStepper` shows where the person stands.** Its steps are data, and its task states are the steps' own: `IDLE`, `WORKING`, `DONE` and `FAILED` (`RULE.SUPPORT.SURFACE.309` · MUST · skill:spn-surface/design).
 
 ## The flow patterns, by name — 🔮
 
-Ten flow patterns are named (`RULE.SUPPORT.SURFACE.360` · MUST · skill:spn-surface/design), in the order a person meets them: from a site to the app, then in, then inside it.
+Eleven flow patterns are named (`RULE.SUPPORT.SURFACE.360` · MUST · skill:spn-surface/design), in the order a person meets them: down a site, from the site to the app, then in, then inside it.
 
 | Flow pattern | The outcome | For |
 | --- | --- | --- |
+| Find your way down a site | a visitor goes from a site's home to the topic that answers them, and back up or across without being lost | Visitor · Learner |
 | From a site to the app | a visitor reaches the sign-up or the sign-in of the app the site is about, and never a dead end | Visitor · Learner |
-| Sign up | a visitor becomes a member with a place of their own, signed in at its Home | Visitor, who becomes a Team or Everyday users |
-| Sign in | a person with an account is in, at the place they asked for, for the site they came from | Team · Everyday users |
-| Get back in | a person who cannot prove who they are sets a new password and signs in to the same site | Team · Everyday users |
+| Sign up | a visitor becomes a member with a place of their own, signed in at its Home | Visitor, who becomes a Team or an Individual |
+| Sign in | a person with an account is in, at the place they asked for, for the site they came from | Team · Individual |
+| Get back in | a person who cannot prove who they are sets a new password and signs in to the same site | Team · Individual |
 | Accept an invitation | a person a member invited is in the inviting organization, at its Home | Team |
-| First run | a new member's empty place shows them the first thing to do, and they do it | Team · Everyday users |
-| Open one and come back | a person reads a record found in a list, and returns to the list where they left it | Team · Everyday users |
-| Make or change one | a record is made or changed, and the person is back where they started, told that it worked | Team · Everyday users |
-| Set up a way in, and prove it | a way of signing in is set up and shown to work before anyone relies on it | Team · Everyday users |
-| Leave or switch | a person who is signed in leaves, or moves to another organization or app, and knows where they are | Team · Everyday users |
+| First run | a new member's empty place shows them the first thing to do, and they do it | Team · Individual |
+| Open one and come back | a person reads a record found in a list, and returns to the list where they left it | Team · Individual |
+| Make or change one | a record is made or changed, and the person is back where they started, told that it worked | Team · Individual |
+| Set up a way in, and prove it | a way of signing in is set up and shown to work before anyone relies on it | Team · Individual |
+| Leave or switch | a person who is signed in leaves, or moves to another organization or app, and knows where they are | Team · Individual |
+
+### Find your way down a site
+
+**For** Visitor · Learner. A Visitor arrives from a link or a search, usually on a group or a topic, not on the home, so every level can be the first and each tells where it stands; a Learner reads one topic and moves on to the next, so a topic ends on where to go next.
+
+| Part | The flow states |
+| --- | --- |
+| Outcome | A visitor goes from the site's home to the topic that answers them, and goes back up or across without being lost. A site holds three levels by default, a home, a group and a topic, and one group may hold many topics |
+| Steps | The Home, level 1: its Doors, case *Child section with parts*, one section for each group, name the group's claim, its parts as door rows, one onward action and a picture; a short group of three or so is a grid of door cards (*Door cards*) → a group's home, the Group home, level 2: its doors, case *Child section with points*, one section for each topic, tell the topic's claim with two or three of its own points read, one onward action and a picture → a Topic, the last level: it ends on *Next topic*, one action to the topic most often read next, and the closing call. Where a group's topics are many, its doors fall into named sets (*In named sets*) and the top bar's menu for the group lists the same sets |
+| Across and back up | The top bar stands on every page: each group is a menu that lists its topics, and the group the reader is under is marked selected, so a reader on a topic sees which group they are in and reaches any sibling or other group in one press (the Footer repeats the same groups in columns). A group's home is one press up from any of its topics, through the bar's menu header. A topic's *Next topic* goes across to a sibling. Where a topic's page is long, the topic's own sections carry an id and the menu or a link reaches them by anchor. A site that draws a breadcrumb for a deep tree puts it under the bar, one link for each level above the page; saasplane.ai draws none today, since three levels fit the bar |
+| A group that is one page | Where a group's parts are short and read in one go, the group is one page (case *One page* of the Group home): its parts are its own sections, each with an id, and the bar's menu links to them by anchor. It holds no doors to child pages. AI-native does this with its two parts. A group is one page when its parts are short and read together; it holds child pages when each part needs a page's room |
+| A group inside a group | Never by default. A group sits inside a group, level 3 with topics at level 4, only when its topics are too many for one page and one menu even in named sets, and they fall into parts each worth a page of its own. A subgroup is then a Group home of its own, and the flow gains one step of the same kind |
+| A landing page | A Landing page sits off the tree, at level OUTSIDE: it is entered from a campaign, an advert or an email, never from the bar, and it names no group. It ends on its own ask in one place, so it has no doors to the tree and no *Next topic*. A reader who wants the site goes to the home through the brand mark in the bar |
+| Starts | Any level, from a link or a search; the home from the address; a landing page from its campaign |
+| Ends | The topic that answers the reader, and the closing call or the demo that follows it. A reader who is lost ends at Not found, which says so and leads back to the home or to a person (*Way back*) |
+| Task states | A site's page draws none of its own. A door to another site leaves it in its own tab and ends on the leaving arrow, never the inside arrow. An arrow stands only on a door, a boxed card or a lined row, never on a bare line of words |
 
 ### From a site to the app
 
@@ -63,14 +80,14 @@ Ten flow patterns are named (`RULE.SUPPORT.SURFACE.360` · MUST · skill:spn-sur
 | Part | The flow states |
 | --- | --- |
 | Outcome | A visitor on a site reaches the sign-up or the sign-in of the app the site is about, or a person to talk to, and never a dead end |
-| Steps | A site's page, by the site patterns → its doors: *Sign in* in the bar (Move), and the call to sign up as the page's one `SOLID` primary, in the Hero and the Closing call → where the platform offers more than one way to join, a page to choose what to join as, by Doors, each door saying whether it is open → the app's own Sign up or Sign in |
+| Steps | A site's page, by the site page kinds and container kinds → its doors: *Sign in* in the bar (Move), and the call to sign up as the page's one `SOLID` primary, in the Hero and the Closing call → where the platform offers more than one way to join, a page to choose what to join as, by Doors, each door saying whether it is open → the app's own Sign up or Sign in |
 | Starts | Any page of a site, from a link or a search |
 | Ends | The sign-up or the sign-in of the app the site is about. A site over several apps ends at the sign-in's front door, which ends at the workspace the person chooses. A site with no app ends on its own call: a demo, the docs, or a contact page |
 | Task states | A site's page draws none of its own. A page that reads whether each door is open shows its shape while it reads, and a failure with Try again |
 
 ### Sign up
 
-**For** Visitor, who becomes a Team or Everyday users here. The page is read by a Visitor, so it takes the Visitor's lines and asks only what the app's own kind needs; the Home it ends at takes the kind the app is for. For Everyday users, the fewest fields: a name, an email and a password or a provider, no organization's fields, nothing asked before value, and the providers first. For a Team, the organization's name and its web address, checked as it is typed. For a Visitor, one ask, and no account before value.
+**For** Visitor, who becomes a Team or an Individual here. The page is read by a Visitor, so it takes the Visitor's lines and asks only what the app's own person needs; the Home it ends at takes the person the app is for. For an Individual, the fewest fields: a name, an email and a password or a provider, no organization's fields, nothing asked before value, and the providers first. For a Team, the organization's name and its web address, checked as it is typed. For a Visitor, one ask, and no account before value.
 
 | Part | The flow states |
 | --- | --- |
@@ -85,7 +102,7 @@ The sign-up page is an entry in steps. `DSStepper` shows where the person stands
 
 ### Sign in
 
-**For** Team · Everyday users; where one sign-in serves both, it takes the less forgiving, Everyday users. For Everyday users, the providers and a code by email lead; for a Team, company sign-on stands as an equal.
+**For** Team · Individual; where one sign-in serves both, it takes the less forgiving, the Individual. For an Individual, the providers and a code by email lead; for a Team, company sign-on stands as an equal.
 
 | Part | The flow states |
 | --- | --- |
@@ -98,7 +115,7 @@ The sign-up page is an entry in steps. `DSStepper` shows where the person stands
 
 ### Get back in
 
-**For** Team · Everyday users. For Everyday users, a code by email first, and an expired link explained in everyday words.
+**For** Team · Individual. For an Individual, a code by email first, and an expired link explained in everyday words.
 
 | Part | The flow states |
 | --- | --- |
@@ -124,7 +141,7 @@ Sending an invitation is no flow of its own: it is an entry over the list of inv
 
 ### First run
 
-**For** Team, the owner of a new organization or a person just invited · Everyday users, on their account's first visit. For Everyday users, a greeting and one card with the one next thing, never a row of zero counts; for a Team, the counts appear once there is something to count, and the invitation card while the person is alone.
+**For** Team, the owner of a new organization or a person just invited · Individual, on their account's first visit. For an Individual, a greeting and one card with the one next thing, never a row of zero counts; for a Team, the counts appear once there is something to count, and the invitation card while the person is alone.
 
 | Part | The flow states |
 | --- | --- |
@@ -137,7 +154,7 @@ Sending an invitation is no flow of its own: it is an entry over the list of inv
 
 ### Open one and come back
 
-**For** Team · Everyday users. For Everyday users, the record is read before it is changed, and its one or two actions are their own.
+**For** Team · Individual. For an Individual, the record is read before it is changed, and its one or two actions are their own.
 
 | Part | The flow states |
 | --- | --- |
@@ -149,19 +166,19 @@ Sending an invitation is no flow of its own: it is an entry over the list of inv
 
 ### Make or change one
 
-**For** Team · Everyday users. For a Team, a medium entry in a sheet, with the page beside it; for Everyday users, only a small entry over the page, and a medium one is an entry that is a page in steps, with `DSStepper`.
+**For** Team · Individual. For a Team, a medium entry in a sheet, with the page beside it; for an Individual, only a small entry over the page, and a medium one is an entry that is a page in steps, with `DSStepper`.
 
 | Part | The flow states |
 | --- | --- |
 | Outcome | A record is made or changed, and the person is back where they started, told that it worked |
-| Steps | A list or a record → the entry, opened by its size, as step 4 of the app patterns says: An entry over the page for a small or a medium form, An entry that is a page for a large one → on save, a new record with a page of its own opens that page, one made in a sheet over a list returns to the list, and a change returns to where it was opened from, which the entry is given when it opens |
+| Steps | A list or a record → the entry, opened by its size, as step 4 of the app page kinds says: An entry over the page for a small or a medium form, An entry that is a page for a large one → on save, a new record with a page of its own opens that page, one made in a sheet over a list returns to the list, and a change returns to where it was opened from, which the entry is given when it opens |
 | Starts | A list's main action, an empty state's action, *Edit* on a record, or an action on another page that names where to return |
 | Ends | As the steps say, with a message (Hear back) |
 | Task states | Enter's states: a refused field says why beside it, and a failed save is an alert in the entry that keeps everything typed, never a toast alone. An entry that changes a record shows its shape while the record is read |
 
 ### Set up a way in, and prove it
 
-**For** Team, for an organization's providers and directories · Team and Everyday users, for their own second step. For a Team, the provider's console to open and the return address to copy; for Everyday users, an authenticator app or a code by text, in everyday words.
+**For** Team, for an organization's providers and directories · Team and Individual, for their own second step. For a Team, the provider's console to open and the return address to copy; for an Individual, an authenticator app or a code by text, in everyday words.
 
 | Part | The flow states |
 | --- | --- |
@@ -173,7 +190,7 @@ Sending an invitation is no flow of its own: it is an entry over the list of inv
 
 ### Leave or switch
 
-**For** Team · Everyday users. The switcher stands only for a person in two or more organizations, which Everyday users rarely are.
+**For** Team · Individual. The switcher stands only for a person in two or more organizations, which an Individual rarely is.
 
 | Part | The flow states |
 | --- | --- |
@@ -185,7 +202,7 @@ Sending an invitation is no flow of its own: it is an entry over the list of inv
 
 ## What holds across every flow — 🔮
 
-Each rule below is one the task or app patterns already state for one page, stated here for the join between two pages. So none needs a unit.
+Each rule below is one the task patterns or app page kinds already state for one page, stated here for the join between two pages. So none needs a unit.
 
 - **A flow ends where the person can carry on, for the site they came from** (`RULE.SUPPORT.SURFACE.361` · MUST · skill:spn-surface/design). It never drops a site it was given, and never ends at a front door when a site was named.
 - **One task is drawn one way** (`RULE.SUPPORT.SURFACE.361` · MUST · skill:spn-surface/design). A step that reads shows its own shape, the main action shows its own working state, and a page that only passes the person on draws one line.
@@ -219,11 +236,11 @@ A step kept in the tab goes when the tab closes. So a closed tab costs a person 
 ## What is not checked yet
 
 - **No check reads a flow for its pattern.** A review names the flow and walks it from where it starts, in each task state, and on the web goes back, reloads, opens a link and closes the tab at each step.
-- **A flow has no figure.** Each of its steps is drawn by the spec of the app pattern it follows, in `refs/support/surface/app-patterns/`, or of the site pattern, in `refs/support/surface/site-patterns/`.
+- **A flow has no figure.** Each of its steps is drawn by the spec of the app page kind it follows, in `refs/support/surface/app-patterns/`, or of the container kind, in `refs/support/surface/site-patterns/`.
 
 ## Boundary
 
-This ref states the paths across pages to one outcome: each flow's steps by the pattern each follows, where it starts and ends, the task states a person sees, and what holds at the joins. It stops at the step. The shape of each step is its app pattern or its task pattern, in `standards-patterns.md`, or its site pattern, in `site-patterns.md`; the sign-in page and the pages beside it are stated there too. What a task state is belongs to `standards-interaction.md`, and `DSStepper`'s props to `architecture-components.md`.
+This ref states the paths across pages to one outcome: each flow's steps by the pattern each follows, where it starts and ends, the task states a person sees, and what holds at the joins. It stops at the step. The shape of each step is its app page kind or its task pattern, in `standards-patterns.md`, or its container kind, in `site-patterns.md`; the sign-in page and the pages beside it are stated there too. What a task state is belongs to `standards-interaction.md`, and `DSStepper`'s props to `architecture-components.md`.
 
 ## Binds
 
@@ -232,7 +249,7 @@ This ref states the paths across pages to one outcome: each flow's steps by the 
 | `RULE.SUPPORT.SURFACE.360` | the ten flow patterns, each a path across pages to one outcome, built from the patterns that exist |
 | `RULE.SUPPORT.SURFACE.361` | every step of a flow draws every task state its task can reach; that a flow holds the rest at its joins is advice |
 | `RULE.SUPPORT.SURFACE.362` | on the web a step holding a proof from the server is the page's state, and every other step an address |
-| `RULE.SUPPORT.SURFACE.332` | every flow names the kinds of person it is for, with one line where it runs differently for one |
+| `RULE.SUPPORT.SURFACE.332` | every flow names the persons it is for, with one line where it runs differently for one |
 
 ## Proof
 

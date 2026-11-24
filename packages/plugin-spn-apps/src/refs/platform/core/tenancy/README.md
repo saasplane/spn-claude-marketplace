@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/",
-      "seen": "30ec19d3"
+      "seen": "655a9461"
     }
   ]
 }

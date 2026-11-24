@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/01-standards-core.md",
-      "seen": "1d164405"
+      "seen": "c1cdac7d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/",
-      "seen": "f570c68d"
+      "seen": "97d89fe8"
     }
   ]
 }
@@ -15,25 +15,24 @@
 
 # Standards — What Every Page Is Held To
 
-Source of truth: the foundation's Standards construct (`docs/02-constructs/02-support/01-surface/01-standards-core.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/01-standards-core/`). Standards is the first of thirteen Surface constructs, in three groups: Standards, Architecture and Delivery.
+Source of truth: the foundation's Standards construct (`docs/02-constructs/02-support/01-surface/01-standards-core.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/01-standards-core/`). Standards is the first of sixteen Surface constructs, in four groups: Standards, Architecture, Language and Delivery.
 
-Read this before you design a page, before you review one, or before you add a second kind of surface. It states what a surface is built in, who the app is for, what one page is for and how its words follow that, before any block is named. `standards-interaction.md`, `standards-patterns.md` and the ten `architecture-*` and `delivery-*` refs in this folder carry the rest of the domain; this one is the first.
+Read this before you design a page, before you review one, or before you add a second platform. It states what a surface is built in, who the app is for, what one page is for and how its words follow that, before any block is named. `standards-interaction.md`, `standards-patterns.md` and the ten `architecture-*` and `delivery-*` refs in this folder carry the rest of the domain; this one is the first.
 
 ## Terms
 
 | Term | What it means |
 | --- | --- |
-| Kind of surface | where a surface runs and how a person reaches it: web today, native later |
+| Platform | where a surface runs and how a person reaches it: web today, native later |
 | Page | one route of an app, with one purpose |
 | Block | any unit a surface is built from: a layout, a container, a widget or a component |
 | Level | one step of the chain from the app to a component, with what that step owns |
 | Device type | the screen class and the orientation a page is drawn at |
 | Line of facts | the one line under a title that holds the short facts of a thing, such as its state, its kind and its code |
-| Kind of person | who an app is for, named by how they use it: Team, Everyday users, Visitor or Learner |
 
-## The kinds of surface — ✅
+## The platforms — ✅
 
-A kind of surface says where a surface runs and how a person reaches it: **web**, with a pointer and a keyboard, in a browser window, realized today; **native**, with touch, on a phone or a tablet, realized later. A rule is shared only when it holds on every kind of surface — hover is the first example, because it needs a pointer, so it is the web's own shown state and never a shared one. The capability chapters divide the same way: one folder holds what every kind of surface follows, and one folder holds what a single kind needs.
+A platform says where a surface runs and how a person reaches it: **web**, with a pointer and a keyboard, in a browser window, realized today; **native**, with touch, on a phone or a tablet, realized later. A rule is shared only when it holds on every platform — hover is the first example, because it needs a pointer, so it is the web's own shown state and never a shared one. The capability chapters divide the same way: one folder holds what every platform follows, and one folder holds what a single platform needs.
 
 ## The levels — 🔮
 
@@ -65,7 +64,7 @@ A page has one purpose: one main intent, and one main action. A page with two pu
 
 A page is made of small things that come back on every page: a label, a state, a count, a field, a line of a list. Each has one rule here. A person who has read one page can then read the next, because the same thing stands in the same place on both.
 
-None of these rules names a block, so each holds on every kind of surface. The blocks that carry them are named where they belong. The item line, the badge and the two blocks of a field are in `architecture-components.md`. The data table is in `architecture-components.md`, under Composites. A form and its footer are in `architecture-containers.md`.
+None of these rules names a block, so each holds on every platform. The blocks that carry them are named where they belong. The item line, the badge and the two blocks of a field are in `architecture-components.md`. The data table is in `architecture-components.md`, under Composites. A form and its footer are in `architecture-containers.md`.
 
 The first five rules say what a page shows, and where.
 
@@ -108,50 +107,65 @@ A surface is not drawn once. A block reads each of these from the context it is 
 
 Never write a second version of a page for a density, a theme, a device type or a language.
 
+## The surface categories — 🔮
+
+A surface is a **site**, which people read, or an **app**, which people work in. Each family holds two categories, and each category is tied to one person. The Surface Catalogue states them; the design skill names the category first.
+
+| Category | Family | Person |
+| --- | --- | --- |
+| **MARKETING** | SITE | Visitor |
+| **RESOURCES** | SITE | Learner |
+| **DASHBOARD** | APP | Team |
+| **PORTAL** | APP | Individual |
+
+- **A surface has one category, named before a layout, a page kind or a design language is chosen.** The category follows from the person the surface is for, as the next section reads it.
+- **An admin or console app is a DASHBOARD.** A team works in it, and the word admin names a job inside it.
+- **Web and Native are a separate axis.** A native app is a DASHBOARD or a PORTAL on Native; the category does not change with the platform.
+
 ## Who an app is for — 🔮
 
 Every page asks who comes to it, how often, and to do what, and that answer belongs to the page. One question comes before it, asked once for the whole app: who is the app for? The same list is built one way for a trained team that works in it all day, and another way for many people who open it now and then, on a phone, and were never shown how. So the answer is read before any pattern is chosen, and every pattern reads it.
 
-A **kind of person** is who an app is for, named by how they use it. It is never a business domain, a role such as *merchant*, or one of the platform's apps. Each kind is defined by its answers to the same questions: how often they come, whether they were trained, the device they use, and what they never forgive. The name alone does not carry those answers, so wherever a kind is read, its answers stand beside it.
+A **person** is who an app is for, named by how they use it. It is never a business domain, a role such as *merchant*, or one of the platform's apps. Each person is defined by its answers to the same questions: how often they come, whether they were trained, the device they use, and what they never forgive. The name alone does not carry those answers, so wherever a person is read, its answers stand beside it.
 
-| Kind of person | Who they are | How often they come | Trained | Their device | What they never forgive |
+| Person | Who they are | How often they come | Trained | Their device | What they never forgive |
 | --- | --- | --- | --- | --- | --- |
 | **Team** | people who use the app as their job: staff, an operator, a seller running a shop, a client firm's employees, the administrator who sets it up | every day or every week; setup pages rarely | yes, or they learn on the job | a desktop, a keyboard and a pointer; a phone for a quick check or an approval | lost work, a slow task they repeat all day, or a page that hides where a task stands |
-| **Everyday users** | many people who use the app for themselves: a shopper, a traveller, a patient, a policyholder, a daily news reader | rarely, or now and then; every day for what they read | never | often a phone, by touch, sometimes on a poor connection | a confusing step, an error they cannot fix, or a form that asks too much |
+| **Individual** | many people who use the app for themselves: a shopper, a traveller, a patient, a policyholder, a daily news reader | rarely, or now and then; every day for what they read | never | often a phone, by touch, sometimes on a poor connection | a confusing step, an error they cannot fix, or a form that asks too much |
 | **Visitor** | a person not signed in, deciding whether a product is for them | once, or a few times while they decide | never | any; often a phone, from a link | a first screen that hides what it is, or a made-up claim |
 | **Learner** | a person reading to learn or to get a thing working: a developer in the docs, a person in a help article | in bursts, when they need it | in their own trade, and new to this product | a desktop, beside their work | a missing or wrong step, or a sample that does not run |
 
-- **An app MUST name the kind of person it is for before any pattern is chosen** (`RULE.SUPPORT.SURFACE.330` · MUST · skill:spn-surface/design).
-- **The kinds of person MUST be one closed set: Team, Everyday users, Visitor and Learner, each with its answers beside it** (`RULE.SUPPORT.SURFACE.331` · MUST · skill:spn-surface/design). *Everyday users* is not the platform's user record, which is an identity, and it is not the platform's consumer tier.
+- **An app MUST name the person it is for before any page kind is chosen** (`RULE.SUPPORT.SURFACE.330` · MUST · skill:spn-surface/design).
+- **The persons MUST be one closed set: Team, Individual, Visitor and Learner, each with its answers beside it** (`RULE.SUPPORT.SURFACE.331` · MUST · skill:spn-surface/design). *Individual* is not the platform's user record, which is an identity, and it is not the platform's consumer tier.
 
-### How the kind is read
+### How the person is read
 
-The kind is read once for the app, from what the partner has already written: the personas whose rows land in the app, each behaviour row's *Who* and *Does*, and the industry brief where there is one. Then ask of each persona: do they use the app as their job? Do they use it for themselves? Are they still deciding? Did they come to learn? Write the kind as the app's first fact, with where you read it.
+The person is read once for the app, from what the partner has already written: the personas whose rows land in the app, each behaviour row's *Who* and *Does*, and the industry brief where there is one. Then ask of each persona: do they use the app as their job? Do they use it for themselves? Are they still deciding? Did they come to learn? Write the person as the app's first fact, with where you read it.
 
-- **Where the personas and the rows do not say, the kind MUST be asked, and never guessed** (`RULE.SUPPORT.SURFACE.330` · MUST · skill:spn-surface/design). A guessed kind looks the same as a read one, so nobody would know to correct it.
-- **The kind MUST NOT be read from the platform's tier** (`RULE.SUPPORT.SURFACE.330` · MUST · skill:spn-surface/design). An app on a consumer tier is for Everyday users, but a member business on an enterprise account is a Team, and a one-person account in a product sold to the public is an Everyday user.
-- **A page that another kind reaches takes that kind** (`RULE.SUPPORT.SURFACE.333` · MUST · skill:spn-surface/design). An app's landing and its register page are read by a Visitor, whoever the app is for. In an app that serves two kinds, each page takes the kind of the persona its rows name: in an identity hub, an organization's sign-in policy is a Team's page, and a person's own devices are an Everyday users page.
-- **Where two kinds meet on one page, the less forgiving decides** (`RULE.SUPPORT.SURFACE.333` · MUST · skill:spn-surface/design). Everyday users decide over the Team, and the Visitor over the Learner, because a trained person loses little on a plain page and an untrained one is lost on a dense one. A page that would need two patterns for its two kinds is two pages, as a page with two purposes is.
-- **Where two patterns fit a page's data, the kind of person MUST decide between them** (`RULE.SUPPORT.SURFACE.333` · MUST · skill:spn-surface/design). The table below says which one each kind takes.
+- **Where the personas and the rows do not say, the person MUST be asked, and never guessed** (`RULE.SUPPORT.SURFACE.330` · MUST · skill:spn-surface/design). A guessed person looks the same as a read one, so nobody would know to correct it.
+- **The person MUST NOT be read from the platform's tier** (`RULE.SUPPORT.SURFACE.330` · MUST · skill:spn-surface/design). An app on a consumer tier is for Individual, but a member business on an enterprise account is a Team, and a one-person account in a product sold to the public is an Individual.
+- **A page that another person reaches takes that person** (`RULE.SUPPORT.SURFACE.333` · MUST · skill:spn-surface/design). An app's landing and its register page are read by a Visitor, whoever the app is for. In an app that serves two persons, each page takes the person of the persona its rows name: in an identity hub, an organization's sign-in policy is a Team's page, and a person's own devices are an Individual's page.
+- **Where two persons meet on one page, the less forgiving decides** (`RULE.SUPPORT.SURFACE.333` · MUST · skill:spn-surface/design). The Individual decides over the Team, and the Visitor over the Learner, because a trained person loses little on a plain page and an untrained one is lost on a dense one. A page that would need two page kinds for its two persons is two pages, as a page with two purposes is.
+- **Where two page kinds fit a page's data, the person MUST decide between them** (`RULE.SUPPORT.SURFACE.333` · MUST · skill:spn-surface/design). The table below says which one each person takes.
 
-The register page is where a Visitor becomes a Team or Everyday users: the Visitor reads it, and it ends at the new place's home, which takes the kind the app is for. The kind belongs to the app, and how often a person comes stays a fact of each page: a Team comes daily to a list and rarely to its setup page.
+The register page is where a Visitor becomes a Team or Individual: the Visitor reads it, and it ends at the new place's home, which takes the person the app is for. The person belongs to the app, and how often a person comes stays a fact of each page: a Team comes daily to a list and rarely to its setup page.
 
-### What each kind changes
+### What each person changes
 
-The book's rules hold for every kind as they stand. A kind changes only a setting the app already owns, or a line a pattern already carries.
+The book's rules hold for every person as they stand. A person changes only a setting the app already owns, or a line a page kind already carries.
 
-| What changes | Team | Everyday users | Visitor | Learner |
+| What changes | Team | Individual | Visitor | Learner |
 | --- | --- | --- | --- | --- |
 | **The layout's job** | `RAIL` for the app; `DOCK` for a person's own settings; `CANVAS` to sign in | `TOPNAV` with the few entries that fit on one line, or `DOCK` for their own account; never a `RAIL` of many sections | `TOPNAV` for a site; `CANVAS` for one landing | `TOPNAV` for a few pages; the doc's sections at the side where it has many |
 | **Density** | the theme's app size; tables keep every column a person compares | one size step up; fewer facts on a line; item lines before a table where the set is small | the site's sizes by a section's role, as today | the reading measure; code at its own size |
-| **The pattern, where two fit** | the one that keeps the person in place and fast: Find in a list as a table, Change in place, An entry over the page | the one that asks one thing at a time: the data table's `LIST` layout, an entry in steps, a record read before it is changed | words before a picture: Points before a Feature grid, Show it before a Real sample, except for a builder | the one that teaches: Steps, Real sample, Show it with a diagram, Questions |
+| **The page kind, where two fit** | the one that keeps the person in place and fast: Find in a list as a table, Change in place, An entry over the page | the one that asks one thing at a time: the data table's `LIST` layout, an entry in steps, a record read before it is changed | words before a picture: Points before a Feature grid, Show it before a Real sample, except for a builder | the one that teaches: Steps, Real sample, Show it with a diagram, Questions |
 | **An entry** | many fields at once, up to about 12 in a sheet; keyboard first; actions on many records; defaults filled | about 5 fields a screen and one decision; every format a person might type accepted; nothing they entered lost; undo before confirm | one ask, the fewest fields, and no account before value | a command to copy, and the line that says it worked |
 | **A failure, and empty** | a failure names what went wrong and the reference support can use; empty says what to create, in the trade's words | a failure says what happened and what to do next in everyday words, never a code alone, with a way to ask for help; empty says what will appear and how to start | a form's failure keeps what was typed; media that does not load leaves its words | a step's failure names the likely error and its fix |
 | **The words** | an app screen's rules, below, in the product's words, which may be the trade's | the same, with everyday words only, and a description one step shorter | the marketing page's rules, below, and its budget by level | the doc's rules: why before how, a term explained where it is first met |
 | **A phone** | desktop first; on a phone a person checks, approves and reads, and those tasks finish there | phone first: every task finishes with one hand, the main action in reach at the foot, an entry a full screen or a sheet from the bottom | the first screen says what it is and for whom; words, then the picture | code scrolls sideways and never wraps; steps stand one under another |
 
-- **A kind of person MUST change only what an app already sets, such as its density, and the lines its patterns carry** (`RULE.SUPPORT.SURFACE.334` · MUST · skill:spn-surface/design). It **MUST NOT** bring a second version of a page, or a unit of its own.
-- **Every pattern MUST name the kinds it serves, and one line says how it runs differently for one** (`RULE.SUPPORT.SURFACE.332` · MUST · skill:spn-surface/design). Every pattern of every group carries it as a *For* line: `standards-patterns.md`, `site-patterns.md` and `flow-patterns.md`. A page no pattern fits is derived from the patterns whose person and data fit it, and it never waits for a pattern; `standards-patterns.md` says when a page shape earns a pattern of its own.
+- **A person MUST change only what an app already sets, such as its density, and the lines its page kinds carry** (`RULE.SUPPORT.SURFACE.334` · MUST · skill:spn-surface/design). It **MUST NOT** bring a second version of a page, or a unit of its own.
+- **Every pattern MUST name the persons it serves, and one line says how it runs differently for one** (`RULE.SUPPORT.SURFACE.332` · MUST · skill:spn-surface/design). Every pattern of every group carries it as a *For* line: `standards-patterns.md`, `site-patterns.md` and `flow-patterns.md`. A page no page kind fits is derived from the page kinds whose person and data fit it, and it never waits for a page kind; `standards-patterns.md` says when a page shape earns a page kind of its own.
 
 ## An application and a site — 🔮
 
@@ -159,7 +173,7 @@ An application and a site are built from the same units, and one theme gives bot
 
 ## The words of a page, by what it is for — 🔮
 
-A page is read in one of three ways, and its words follow the way it is read. In **a doc** — a guide, a reference, a help article — the reader came to learn or to follow steps. On **an app's screen** — an admin, a profile, a sign-in — the person is in the middle of a task. On **a marketing page** — a product site, a landing page, the design system's public landing — the reader is deciding whether to care. This is not a kind of surface: all three can run on the web.
+A page is read in one of three ways, and its words follow the way it is read. In **a doc** — a guide, a reference, a help article — the reader came to learn or to follow steps. On **an app's screen** — an admin, a profile, a sign-in — the person is in the middle of a task. On **a marketing page** — a product site, a landing page, the design system's public landing — the reader is deciding whether to care. This is not a platform: all three can run on the web.
 
 - The writer decides what a page is for, from its purpose, before writing a word of it — the question § A page has one purpose asks: what did the person come here to do?
 - A page is one of the three, and not two at once. A product site's sign-in is an app's screen; a help article opened from a screen is a doc. A sign-in that argues for the product, a landing page holding a form of settings, and a guide that sells are each a finding.
@@ -223,7 +237,7 @@ One set of tokens moves every surface. A place has its own clamped duration (`cl
 
 ## What every surface owes a person — ✅
 
-Four things, on every kind of surface, by every page, whatever the page is for.
+Four things, on every platform, by every page, whatever the page is for.
 
 | A surface owes | What it means |
 | --- | --- |
@@ -232,7 +246,7 @@ Four things, on every kind of surface, by every page, whatever the page is for.
 | Meaning for a screen reader | each block carries the platform's accessibility attributes, so assistive technology announces what a sighted person sees |
 | Contrast | every pair of color tokens meets the contrast baseline, WCAG 2.1 AA, in light and in dark |
 
-A page built from the design system's components inherits all four. A page that builds a control of its own owes all four on its own — the argument for not building one.
+A page built from the design system's components inherits every one of them. A page that builds a control of its own owes every one on its own — the argument for not building one.
 
 ## What a surface is judged by — 🔮
 
@@ -248,7 +262,7 @@ A review asks the same questions of any page, each answered from one part of thi
 | Does every action answer the person: working, done or failed? | `standards-interaction.md` |
 | Does a hue, a surface treatment or a word mean the same thing as on every other page? | `architecture-names.md` |
 | Does it work by keyboard, show its focus, and keep its contrast? | this ref |
-| Does it hold on each kind of surface, at each density, theme and language? | this ref |
+| Does it hold on each platform, at each density, theme and language? | this ref |
 
 A question that cannot be answered from a part is a matter of taste, and it is not a finding.
 
@@ -258,13 +272,13 @@ A device type is two closed sets, stated in full in the web's chapter (`docs/04-
 
 ## Boundary
 
-This ref states what a surface is built in, what one page is for, and what a page has to hold through, before any block is named. It stops where a block, a pattern or a name begins — those are `standards-interaction.md`, `standards-patterns.md`, `architecture-names.md` and the refs after it. Where a `ui/` folder sits, and what a support package may share, are the stack's, and its build steps state them.
+This ref states what a surface is built in, what one page is for, and what a page has to hold through, before any block is named. It does not say which category a surface is, or what a category holds, which is the Surface Catalogue's. It stops where a block, a pattern or a name begins — those are `standards-interaction.md`, `standards-patterns.md`, `architecture-names.md` and the refs after it. Where a `ui/` folder sits, and what a support package may share, are the stack's, and its build steps state them.
 
 ## Binds
 
 | Rule | What it decides |
 | --- | --- |
-| `RULE.SUPPORT.SURFACE.050` | no app pattern depends on a count |
+| `RULE.SUPPORT.SURFACE.050` | no app page kind depends on a count |
 | `RULE.SUPPORT.SURFACE.056` | when a value takes a label. The rule is proposed |
 | `RULE.SUPPORT.SURFACE.057` | when a part of a page takes a frame of its own. The rule is proposed |
 | `RULE.SUPPORT.SURFACE.058` | a state is a badge on the line of facts or at the end of the line, never after the title, and the normal state shows none |
@@ -277,10 +291,10 @@ This ref states what a surface is built in, what one page is for, and what a pag
 | `RULE.SUPPORT.SURFACE.062` | the choices of one set stand in columns |
 | `RULE.SUPPORT.SURFACE.063` | a line stands between each two lines of a list |
 | `RULE.SUPPORT.SURFACE.201` | the surface moves by one set of tokens: a clamped duration for each place, three shared eases, a role for each kind of unit, and one rule for reduced motion |
-| `RULE.SUPPORT.SURFACE.330` | an app names the kind of person it is for before any pattern is chosen, read from its personas and rows, asked where they do not say, and never read from the tier |
-| `RULE.SUPPORT.SURFACE.331` | the kinds of person are one closed set, Team, Everyday users, Visitor and Learner, each named by how a person uses a product |
-| `RULE.SUPPORT.SURFACE.333` | the kind decides between two patterns that fit, a page another kind reaches takes that kind, and the less forgiving decides where two meet |
-| `RULE.SUPPORT.SURFACE.334` | a kind changes only what an app already sets and the lines its patterns carry, and never brings a second version of a page or a unit |
+| `RULE.SUPPORT.SURFACE.330` | an app names the person it is for before any page kind is chosen, read from its personas and rows, asked where they do not say, and never read from the tier |
+| `RULE.SUPPORT.SURFACE.331` | the persons are one closed set, Team, Individual, Visitor and Learner, each named by how a person uses a product |
+| `RULE.SUPPORT.SURFACE.333` | the person decides between two page kinds that fit, a page another person reaches takes that person, and the less forgiving decides where two meet |
+| `RULE.SUPPORT.SURFACE.334` | a person changes only what an app already sets and the lines its page kinds carry, and never brings a second version of a page or a unit |
 | `RULE.SUPPORT.SURFACE.208` | the words of a page follow what it is for, a doc, an app's screen or a marketing page, decided before a word is written |
 | `RULE.SUPPORT.SURFACE.335` | an app's action label is a verb and its object, 1 to 3 words and 4 at most, never a sentence or a question, with an arrow drawn as its icon |
 | `RULE.SUPPORT.SURFACE.282` | a reveal plays once, words first, and leaves the words shown without a script |

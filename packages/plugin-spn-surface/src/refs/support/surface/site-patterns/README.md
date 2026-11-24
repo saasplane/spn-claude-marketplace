@@ -2,8 +2,8 @@
 {
   "files": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/site-patterns",
-      "seen": "52ceb43c"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/site-container-kinds",
+      "seen": "b3d80377"
     }
   ]
 }
@@ -11,7 +11,7 @@
 # The specs of the site patterns, as a partner has them
 
 **The book owns every file here and this folder is a copy.** They are byte-identical to
-`spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/site-patterns/`, and when the two disagree the book wins.
+`spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/site-container-kinds/`, and when the two disagree the book wins.
 `restates files write` writes them and `restates check` reports a copy that has fallen behind.
 
 **Each file is a skeleton spec of one site pattern, and a section of a site's page starts from it.** The `design` skill
@@ -24,15 +24,22 @@ above names the folder and not each file, so a spec the book adds is seen as wel
 | [`choose-to-see.dg.json`](choose-to-see.dg.json) |
 | [`closing-call-beside.dg.json`](closing-call-beside.dg.json) |
 | [`closing-call.dg.json`](closing-call.dg.json) |
+| [`compare.dg.json`](compare.dg.json) |
 | [`doors.dg.json`](doors.dg.json) |
 | [`feature-grid.dg.json`](feature-grid.dg.json) |
+| [`find.dg.json`](find.dg.json) |
 | [`hero-under.dg.json`](hero-under.dg.json) |
 | [`hero.dg.json`](hero.dg.json) |
+| [`highlight.dg.json`](highlight.dg.json) |
 | [`numbers.dg.json`](numbers.dg.json) |
+| [`people.dg.json`](people.dg.json) |
+| [`plans.dg.json`](plans.dg.json) |
 | [`points.dg.json`](points.dg.json) |
 | [`questions.dg.json`](questions.dg.json) |
+| [`reading-column.dg.json`](reading-column.dg.json) |
 | [`real-sample-under.dg.json`](real-sample-under.dg.json) |
 | [`real-sample.dg.json`](real-sample.dg.json) |
+| [`records.dg.json`](records.dg.json) |
 | [`show-it-highlight.dg.json`](show-it-highlight.dg.json) |
 | [`show-it-under.dg.json`](show-it-under.dg.json) |
 | [`show-it.dg.json`](show-it.dg.json) |

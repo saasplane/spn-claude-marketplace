@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/09-architecture-layouts.md",
-      "seen": "74e7e467"
+      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/10-architecture-layouts.md",
+      "seen": "8f5f7e00"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/",
-      "seen": "c4769c41"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-layouts/",
+      "seen": "dffed1ae"
     }
   ]
 }
@@ -15,7 +15,7 @@
 
 # Layouts — How a Page Is Framed
 
-Source of truth: the foundation's Layouts construct (`docs/02-constructs/02-support/01-surface/09-architecture-layouts.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/09-architecture-layouts/`). Layouts is the ninth of thirteen Surface constructs.
+Source of truth: the foundation's Layouts construct (`docs/02-constructs/02-support/01-surface/10-architecture-layouts.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/10-architecture-layouts/`). Layouts is the tenth of sixteen Surface constructs.
 
 Read this before you choose a layout for an app, or before you build or draw a layout type on a new stack. A layout owns the navigation and the content of a page, and nothing inside the content. A page chooses its layout, and no rule restricts where the page places a block in the content. The layout types are `RAIL`, `DOCK`, `TOPNAV` and `CANVAS`, the body alone. A layout builds its navigation from the navigation units, fills places named by where they stand, and alone reads the theme. Each layout also marks the place a section reaches, so a section's fill stops at the navigation in an app and runs to the window's edges on a site. A part of a page that runs from edge to edge is a section, and the layout has no flush for it. A layout names no routing library.
 
@@ -41,10 +41,12 @@ Read this before you choose a layout for an app, or before you build or draw a l
 
 | Layout type | The navigation | What it is for |
 | --- | --- | --- |
-| `RAIL` | a sidebar at the side, with a fixed head and foot, which a person opens and shuts to icons | an app a person works in, with many sections: an admin console, the platform |
-| `DOCK` | a bar across the top, and the entries in a column beside one page | one person's or one thing's settings: a profile, an account, set inside another frame |
-| `TOPNAV` | a bar across the top, with the content below it | a website, with the few entries that fit on one line |
-| `CANVAS` | none: the body alone | a sign-in, a marketing page or a page of an error |
+| `RAIL` | a sidebar at the side, with a fixed head and foot, which a person opens and shuts to icons | an app a person works in, with many sections: an admin console, the platform; a RESOURCES site whose pages run in groups of several levels |
+| `DOCK` | a bar across the top, and the entries in a column beside one page | one person's or one thing's settings: a profile, an account, set inside another frame; used by DASHBOARD and PORTAL |
+| `TOPNAV` | a bar across the top, with the content below it | a website, with the few entries that fit on one line: MARKETING, a shallow RESOURCES site, or PORTAL |
+| `CANVAS` | none: the body alone | a landing page, a sign-in, an app that cannot start, or a tool that fills the window |
+
+Which layouts each surface category may use is the Layouts part of its category in the Surface Catalogue, and a design language picks among them: `RAIL` and `DOCK` serve DASHBOARD or RESOURCES and DASHBOARD or PORTAL, `TOPNAV` serves MARKETING, RESOURCES and PORTAL, and `CANVAS` serves MARKETING, DASHBOARD and PORTAL.
 
 **The library draws `DSLayout`** from its props table and its samples block (`architecture-components.md`, *The page model*). Its showcase layout is Full screen, so each cell is a whole screen at the width of a device. As its usage it draws a workspace's dashboard in the type `RAIL`, on a desktop window. A layout has no page of its own for a sizing: it has Overview, Main, Playground, one page for each value of `config.mtype` (`RAIL`, `DOCK`, `TOPNAV`, `CANVAS`), each holding Main's sections with that type fixed and its tabs from the unit's `types` list, and Screens. The one state it lists is Open, `open`, on the rail, which is shut at rest. On the web a type page adds a row of controls so a developer can try a look on every tab; the library draws none. `DSSiteLayout` is the layout's second unit, a wrapper that draws nothing of its own, with the pages Overview, Main and Playground.
 
@@ -145,8 +147,12 @@ A place has a short form for where its room is short: `startNodeCollapsed`, `act
 - **The notice MUST stand before the header, and it is the layout's one pinned place** (`RULE.SUPPORT.SURFACE.410` · MUST · skill:spn-surface/design). It is always pinned. In `TOPNAV` and `DOCK` it pins with the bar when `navigation.sticky` is set, and alone at the window's top when it is not. In `RAIL` it pins at the content's top, in `CANVAS` at the window's top, and on a phone under the phone bar. Its look is `notice.surface`, a DSSurface's own props, with the padding in the app's `className`, and the theme holds none.
 - **The header and the footer MUST each take one shape, `{ node, sticky? }`** (`RULE.SUPPORT.SURFACE.417` · MUST · skill:spn-surface/design). `IDSLayoutConfig` holds `header?: IDSLayoutPlace` and `footer?: IDSLayoutPlace`, where `IDSLayoutPlace` is `{ node: ReactNode; sticky?: boolean }`, and `DSLayout` takes no `footerNode` prop. `node` is what the place holds; `sticky` keeps the place in the window while the page scrolls and while the page in it changes, on the body's fill, one layer under the notice, and is off where it is left out. A sticky header stands under the bar and the notice in `TOPNAV` and `DOCK`, under the notice at the content's top in `RAIL`, and under the notice at the window's top in `CANVAS`; a sticky footer stands at the window's bottom, the content's width beside a rail. There is no second way to give either place a node.
 - **A top bar and a dock MUST stand one size step above the app's size where the config gives none** (`RULE.SUPPORT.SURFACE.418` · MUST · skill:spn-surface/design). `XS` takes `SM`, `SM` takes `MD`, `MD` takes `LG`, and `LG` and `XL` take `XL`, so their entries read above the page's text; a rail keeps the app's size. The config's `size` wins.
-- **The notice MUST stand flush in its place** (`RULE.SUPPORT.SURFACE.419` · MUST · skill:spn-surface/design). No padding above it and no inset; it is square, attached to the window in `RAIL` and `CANVAS` and under the bar in `TOPNAV` and `DOCK`, and the bar's own shadow falls over it.
+- **The notice MUST stand flush in its place** (`RULE.SUPPORT.SURFACE.419` · MUST · skill:spn-surface/design). No padding above it and no inset; it is square, attached to the window in `RAIL` and `CANVAS` and under the bar in `TOPNAV` and `DOCK`, and the bar casts its own shadow onto it.
 - **The bar of a dock is drawn only when it holds `startNode`, `actionsNode` or `endNode`;** on a phone a bar is still drawn. A top nav always draws its bar.
+- **Not found and No access MUST keep the layout of the surface they belong to.** Only the page is missing or closed, so the navigation stays and the person goes on from it; `CANVAS` is for an app that cannot start, where no navigation can be drawn.
+- **A rail MUST stay open where its entries carry no icon.** Shut, such a rail would show nothing, so its config sets `collapsible` to false and the rail draws no trigger. The rail of a RESOURCES site, whose entries are the titles of its pages, is one.
+- **`CANVAS` gives the page the height the window leaves, so a tool can fill the window.** A drawing board or an editor is one block that takes that height and keeps the page from scrolling; only the board inside it pans and zooms, and the tool's panels are the page's own blocks over it.
+- **A RESOURCES site MUST take `RAIL` where its pages run in groups of several levels, and `TOPNAV` where it is shallow and starts from a search.** Guides and API docs are the first, and a help centre the second.
 
 ## The bar's width and the navigation's size — 🔮
 

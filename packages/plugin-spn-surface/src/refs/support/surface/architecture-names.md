@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/04-architecture-names.md",
-      "seen": "ab53f1fe"
+      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/05-standards-names.md",
+      "seen": "c0362df1"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-architecture-names/",
-      "seen": "7d4a3504"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/05-standards-names/",
+      "seen": "b4634429"
     }
   ]
 }
@@ -15,23 +15,24 @@
 
 # Names — One Name for a Block, a Prop and a Value
 
-Source of truth: the foundation's Names construct (`docs/02-constructs/02-support/01-surface/04-architecture-names.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/04-architecture-names/`). Names is the fourth of thirteen Surface constructs, and the first of the Architecture group — what a surface is built from, layer by layer.
+Source of truth: the foundation's Names construct (`docs/02-constructs/02-support/01-surface/05-standards-names.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/05-standards-names/`). Names is the fifth of sixteen Surface constructs, and the last of the Standards group — what every surface owes, and the catalogue of what can exist.
 
 > **Built.** `@saasplane/support-web-ds-ts` carries the names `DSFeatureGridSectionContainer`, `DSDataTablePanelContainer`, `IDSGrid`, `IDSFrameSurface`, `DSBoxPartType` and the props `surface`, `section`, `panel`, `heading` and `grid` from support 5.22.0, and the library is owed.
 
-Read this before you name a new block, a new prop or a new layer of the design system, or before you change a block of the design system. It runs from the rule that keeps a name from drifting, to the three shared prop names, to the two sizes, to the six layers and the suffix that says where a unit is placed, to the kinds of prop and the states a design and its code share.
+Read this before you name a new block, a new prop or a new layer of the design system, or before you change a block of the design system. It runs from the rule that keeps a name from drifting, to the three shared prop names, to the two sizes, to the six layers and the suffix that says where a unit is placed, to the names the surface domain sets for itself, to the kinds of prop and the states a design and its code share.
 
 ## Terms
 
 | Term | What it means |
 | --- | --- |
 | Name | the one word the book gives a block, a prop or a value. The design library and every stack build under that word |
-| Shared name | one of the three prop names (`variant` · `color` · `size`) that mean one thing on every block and every kind of surface |
+| Shared name | one of the three prop names (`variant` · `color` · `size`) that mean one thing on every block and every platform |
 | Vocabulary | a closed set of values a prop may take |
 | Layer | one of the six steps the design system is built in: core, components, widgets, containers, layouts, app. A layer uses only the layers named before it |
 | Declared prop | a property the caller sets, under the same name on every stack |
 | Shown state | a state the platform produces itself, such as hover or focus. It has a picture and no prop |
-| Shared state | `REST` · `HOVER` · `FOCUS` · `PRESSED` · `DISABLED` · `ERROR` · `SELECTED` — a state most blocks share, with one picture on every block and every kind of surface |
+| Shared state | `REST` · `HOVER` · `FOCUS` · `PRESSED` · `DISABLED` · `ERROR` · `SELECTED` — a state most blocks share, with one picture on every block and every platform |
+| Surface name | `SPSurface…Type` · `SPSurfaceCatalogue` · `SPDesignLanguageSpec` — one of the names the surface domain sets for its categories, persons, parts and catalogue |
 
 ## A name is the contract — ✅
 
@@ -255,13 +256,32 @@ A suffix names where a unit is placed: `App`, `Layout`, `Container` and `Widget`
 
 `DSAnchorContainer` is a component of Utility, and its name ends in `Container` today. The developer has not ruled on that name, so it stays as it is.
 
+## The names of Surface — ✅
+
+The surface domain sets ten names of its own, and each is built under the same rule as every other: the book states it once, and the design library and every stack build under it. Eight are vocabularies, one is the catalogue, and one is the spec of a design language.
+
+| Name | What it says | Values |
+| --- | --- | --- |
+| `SPSurfaceCategoryType` | which surface a thing is, by what it is for and who it is for | `MARKETING` · `RESOURCES` · `DASHBOARD` · `PORTAL` |
+| `SPSurfaceFamilyType` | whether a person reads the surface or works in it | `SITE` (`MARKETING`, `RESOURCES`) · `APP` (`DASHBOARD`, `PORTAL`) |
+| `SPSurfacePersonType` | who a category is for | `VISITOR` · `LEARNER` · `TEAM` · `INDIVIDUAL` |
+| `SPSurfaceGroupType` | the three groups the parts of a category stand in | `SHARED` · `STRUCTURE` · `STYLE` |
+| `SPSurfacePartType` | one of the twelve parts, read as its group and its code, because `MOTION` stands in two groups | Shared: `BRAND` · `DRAWING` · `MOTION` · `VOICE`. Structure: `LAYOUTS` · `PAGES` · `CONTAINERS` · `WIDGETS`. Style: `THEME` · `MEDIA` · `MOTION` · `WORDS` |
+| `SPSurfaceSourceType` | who fills a part in a design language | `OWN` · `INHERITED` · `NONE` |
+| `SPSurfaceItemStateType` | where a kind stands in a design language | `CORE` · `PICKED` · `INHERITED` · `CUSTOMISED` · `NEW` · `NOT_USED` |
+| `SPSurfacePlatformType` | where a surface runs | `WEB` · `NATIVE` |
+| `SPSurfaceCatalogue` | the kinds the foundation defines and a language can extend: a version, and for each category and each part its kinds | no vocabulary: a structure, drawn in the Surface Catalogue |
+| `SPDesignLanguageSpec` | a design language, holding only its own decisions | no vocabulary: a structure, stated in the Design Language |
+
+**A page kind's code is the name a reader sees in a site's navigation, in capitals, with no `PAGE` suffix.** Home is `HOME`, and a Topic is `TOPIC`. The suffixed names, such as `SITE_HOME` and `CONTACT_PAGE`, are not used. A name of two words keeps an underscore, as `GROUP_HOME` does. A title in a site's navigation, such as Privacy or Terms, names a page of a kind and never a kind. `site-patterns.md` lists each kind with its code.
+
 ## Marking each property — ✅
 
 Mark each property of the design library as a declared prop, a shown state, or a setting taken from the block above. A design read back to code never gains a prop that no platform has. Name a hook of the design system by its context: `useDS`, then the context, then the value. Each context has one hook that returns it whole. The size context has a hook of one value, `useDSSize`, and the block's own `size` wins over it. The rule binds a hook whose value comes from one context: a hook that reads several, or none, is named for what it does.
 
 ## Each shared state has one picture — ✅
 
-A block drawn from data is a host and an item: one item serves every host that takes one data shape, and a host whose data differs declares its own item (stated further in `architecture-components.md`). Each shared state has one picture, on every block and on every kind of surface, chosen on the first component that has it. Selected has one picture for each kind of entry: the chosen option of a select or of a menu draws a check at its end; a chosen row of a list, the row with `selected`, draws a fill of the soft step of the primary role across the row, and no check; an entry that is no row — a bar entry, the current page of a pager, a tab, a day of a calendar, an item of the layout's navigation — has no room for a check, and draws a fill of the primary role with its label in that role. A breadcrumb is the one trail that is not a bar of entries: its current page is the last crumb, and draws plain text in a stronger weight than the links before it, is not a link, and draws no fill. Every block that takes the key draws the focus picture, including a tab, an entry of a menubar or a breadcrumb, and the header of an accordion or a collapsible. No block takes the key and shows nothing. The picture shows when a person reaches the block with the keyboard, and not after a click with a pointer, and a picture that shows is whole: neither the box of the block nor a neighbour cuts it.
+A block drawn from data is a host and an item: one item serves every host that takes one data shape, and a host whose data differs declares its own item (stated further in `architecture-components.md`). Each shared state has one picture, on every block and on every platform, chosen on the first component that has it. Selected has one picture for each kind of entry: the chosen option of a select or of a menu draws a check at its end; a chosen row of a list, the row with `selected`, draws a fill of the soft step of the primary role across the row, and no check; an entry that is no row — a bar entry, the current page of a pager, a tab, a day of a calendar, an item of the layout's navigation — has no room for a check, and draws a fill of the primary role with its label in that role. A breadcrumb is the one trail that is not a bar of entries: its current page is the last crumb, and draws plain text in a stronger weight than the links before it, is not a link, and draws no fill. Every block that takes the key draws the focus picture, including a tab, an entry of a menubar or a breadcrumb, and the header of an accordion or a collapsible. No block takes the key and shows nothing. The picture shows when a person reaches the block with the keyboard, and not after a click with a pointer, and a picture that shows is whole: neither the box of the block nor a neighbour cuts it.
 
 ## Boundary
 
@@ -272,7 +292,7 @@ This ref states which three props mean one thing everywhere, which of the two si
 | Rule | What it decides |
 | --- | --- |
 | `RULE.SUPPORT.APPS.140` | the book names every block, prop and token of the design system, and every stack uses that name |
-| `RULE.SUPPORT.APPS.143` | `variant` names the surface treatment, `color` the hue and `size` the density step, on every block and every kind of surface |
+| `RULE.SUPPORT.APPS.143` | `variant` names the surface treatment, `color` the hue and `size` the density step, on every block and every platform |
 | `RULE.SUPPORT.SURFACE.229` | a suffix names where a unit is placed (`App`, `Layout`, `Container`, `Widget`); a component, a composite included, takes none, and no block carries a letter for its layer before its name |
 | `RULE.SUPPORT.SURFACE.100` | `size` says how dense a control is and `scaleSize` how large a thing that is shown is drawn; the icon, the mark, the avatar and the avatar group take `scaleSize` |
 | `RULE.SUPPORT.SURFACE.267` | the word before `Container` names the box a unit draws and is written in place of, so a `…PanelContainer` stands where a panel may and a `…SectionContainer` where a section may |

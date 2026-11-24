@@ -340,7 +340,7 @@ export const PLUGIN_TEMPLATES = ["refs", "devex", "workspace", DOCS, TEMPLATES].
  * The specs of the surface's app patterns, relative to the foundation's root. Each is a skeleton spec an
  * agent starts a screen of an app from, beside the chapter that states the app patterns.
  */
-export const BOOK_PATTERNS = [DOCS, SEAT.capabilities, "02-support", "01-surface", "03-standards-patterns", "01-common", "app-patterns"].join("/");
+export const BOOK_PATTERNS = [DOCS, SEAT.capabilities, "02-support", "01-surface", "03-standards-surface-catalogue", "01-common", "app-page-kinds"].join("/");
 /**
  * The spn-surface plugin's byte-identical copy of those specs, relative to that plugin's `src/`, beside the
  * ref that restates the patterns chapter (`refs/support/surface/standards-patterns.md`).
@@ -350,7 +350,7 @@ export const PLUGIN_PATTERNS = ["refs", "support", "surface", "app-patterns"].jo
  * The specs of the surface's site patterns, relative to the foundation's root. Each is a skeleton spec an
  * agent starts a section of a site's page from, beside the chapter that states the site patterns.
  */
-export const BOOK_SITE_PATTERNS = [DOCS, SEAT.capabilities, "02-support", "01-surface", "03-standards-patterns", "01-common", "site-patterns"].join("/");
+export const BOOK_SITE_PATTERNS = [DOCS, SEAT.capabilities, "02-support", "01-surface", "03-standards-surface-catalogue", "01-common", "site-container-kinds"].join("/");
 /**
  * The spn-surface plugin's byte-identical copy of those specs, relative to that plugin's `src/`, beside the
  * ref that restates the site patterns chapter (`refs/support/surface/site-patterns.md`).

@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/02-figma/02-managed.md",
-      "seen": "d2801b98"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/16-delivery-providers/01-figma/02-managed.md",
+      "seen": "7f896ca7"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
-      "seen": "2589d6c5"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/16-delivery-providers/01-figma/04-drawing.md",
+      "seen": "5f79016f"
     }
   ]
 }
@@ -23,7 +23,7 @@
 - **A vocabulary whose every value names one set of tokens is a mode, and the page level is one: the collection Level, whose modes are the six values of `DSPageLevelType`** (`RULE.SUPPORT.SURFACE.296` · MUST · skill:spn-surface/design)
 - **The agent never hands the developer a Figma step to draw, rebind, delete or tick** (`RULE.SUPPORT.SURFACE.400` · MUST · skill:spn-surface/design)
 - **A unit's look is read from the running showcase into records, which name the cells to draw and are what a drawn cell is checked against** (`RULE.SUPPORT.SURFACE.411` · MUST · skill:spn-surface/design)
-- **Surface and Strength take their variables from [the modes of the collections](../../05-architecture-core/01-common/01-tokens.md#the-modes-of-the-collections), as Treatment and Color do: a cell of a surface table sets both modes. `PRIMARY`'s `SOLID` fill holds the result of the brand formula at the default seed. The four theme collections of the panel look hold the default theme's mode first, and a designer sets another on a frame** (`RULE.SUPPORT.SURFACE.413` · MUST · skill:spn-surface/design)
+- **Surface and Strength take their variables from [the modes of the collections](../../06-architecture-core/01-common/01-tokens.md#the-modes-of-the-collections), as Treatment and Color do: a cell of a surface table sets both modes. `PRIMARY`'s `SOLID` fill holds the result of the brand formula at the default seed. The four theme collections of the panel look hold the default theme's mode first, and a designer sets another on a frame** (`RULE.SUPPORT.SURFACE.413` · MUST · skill:spn-surface/design)
 - **A case prop whose look an instance cannot reach, a layout change such as an alignment, a placement of parts or a column count, is a look drawn once: one version for each value other than the default, on the default version only, crossed with nothing, named `prop=value`, and the case is an instance of that version** (`RULE.SUPPORT.SURFACE.421` · MUST · skill:spn-surface/design)
 - **The states a pointer makes, hover, pressed and the Open group, which no page of the showcase holds, are driven on the case rest of the unit, and every other state is read from the page that holds it** (`RULE.SUPPORT.SURFACE.445` · MUST · skill:spn-surface/design)
 - **A part of a unit that is another unit is an instance of that unit's set** (`RULE.SUPPORT.SURFACE.447` · MUST · skill:spn-surface/design)

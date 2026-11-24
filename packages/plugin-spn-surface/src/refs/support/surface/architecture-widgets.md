@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/07-architecture-widgets.md",
-      "seen": "5d2f6d20"
+      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/08-architecture-widgets.md",
+      "seen": "88c7bee2"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
-      "seen": "452caa48"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-widgets/",
+      "seen": "dae38f66"
     }
   ]
 }
@@ -15,7 +15,7 @@
 
 # Widgets — Units Placed Beside Others
 
-Source of truth: the foundation's Widgets construct (`docs/02-constructs/02-support/01-surface/07-architecture-widgets.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/07-architecture-widgets/`). Widgets is the seventh of thirteen Surface constructs.
+Source of truth: the foundation's Widgets construct (`docs/02-constructs/02-support/01-surface/08-architecture-widgets.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/08-architecture-widgets/`). Widgets is the eighth of sixteen Surface constructs.
 
 Read this before you place a card drawn from data, or before you decide whether a new block is a widget, a component or a composition of the page. **The thing to unlearn: a widget is not just a bigger component.** A component is the smallest block; a widget is built *from* components, and it stands beside others or in a sidebar, inside a container or not. A block built from components for one task and placed nowhere in particular, such as a data table, is a composite, and it is a component (`architecture-components.md`).
 
@@ -96,7 +96,7 @@ A card widget is chosen the way a card is, by what it holds: a head, and a body 
 
 ## Boundary
 
-This ref states what makes a unit a widget, and what `DSCardWidget` is built from. It stops at the edge of the widget. It does not state what a component is, or what any one of the components a widget is built from does — those are in `architecture-components.md`. It does not state how a page shows a list beside the detail of its chosen row. That is an app pattern, groups and their items, and `architecture-containers.md` states what a person sees on such a page. No core unit is built for it; the web stack has one of its own, `DSListDetail`, which `providers.md` names. It does not state what fills a part of a container, or what a widget does in a `flush` part — that is `architecture-containers.md`. It does not state where a widget's size comes from when none is set — that is `architecture-app.md`. It does not state what a data table, a filter bar, a comparison or a feature is; each is a composite of `architecture-components.md`. It does not state how `DSCardWidget` is drawn in the library or built by a stack — those are `delivery-library.md` and `providers.md`.
+This ref states what makes a unit a widget, and what `DSCardWidget` is built from. It stops at the edge of the widget. It does not state what a component is, or what any one of the components a widget is built from does — those are in `architecture-components.md`. It does not state how a page shows a list beside the detail of its chosen row. That is the app page kind Groups and their items, one of the Pages of DASHBOARD in the Surface Catalogue, and `architecture-containers.md` states what a person sees on such a page. No core unit is built for it; the web stack has one of its own, `DSListDetail`, which `providers.md` names. It does not state what fills a part of a container, or what a widget does in a `flush` part — that is `architecture-containers.md`. It does not state where a widget's size comes from when none is set — that is `architecture-app.md`. It does not state what a data table, a filter bar, a comparison or a feature is; each is a composite of `architecture-components.md`. It does not state how `DSCardWidget` is drawn in the library or built by a stack — those are `delivery-library.md` and `providers.md`.
 
 ## Binds
 

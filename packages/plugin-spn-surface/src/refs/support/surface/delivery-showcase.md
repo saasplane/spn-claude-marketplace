@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/12-delivery-showcase.md",
-      "seen": "449415a4"
+      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/15-delivery-showcase.md",
+      "seen": "077076b5"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/12-delivery-showcase/",
-      "seen": "63e4c864"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/15-delivery-showcase/",
+      "seen": "5e73e041"
     }
   ]
 }
@@ -15,7 +15,7 @@
 
 # Delivery Showcase — The Proof Every Realization Delivers
 
-Source of truth: the foundation's Delivery Showcase construct (`docs/02-constructs/02-support/01-surface/12-delivery-showcase.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/12-delivery-showcase/`). Delivery Showcase is the twelfth of thirteen Surface constructs.
+Source of truth: the foundation's Delivery Showcase construct (`docs/02-constructs/02-support/01-surface/15-delivery-showcase.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/15-delivery-showcase/`). Delivery Showcase is the fifteenth of sixteen Surface constructs.
 
 Read this before you add a unit to a showcase, or before you judge whether one is complete. A stack that realizes Surface proves it with a showcase: a running catalogue that shows how every unit is used, like the web's Storybook. Every stack follows the same outline with its own tool — Storybook on the web, a showcase app on native. A showcase is for a developer or a partner who is about to use a unit. A partner is an organization that builds its own SaaS platform on SaaS Plane. It shows how a unit is used, and it is not a test of the system. **The thing to unlearn: nobody lays out a page of a showcase.** A unit declares a few facts about itself, and its page is derived from them. A stack builds the frame that derives the pages, never an outline of its own.
 
@@ -60,7 +60,7 @@ The sidebar opens on Home, then lists six sections, each a root of the sidebar, 
 | --- | --- |
 | Home | one documentation page, the first of the sidebar. It says how the showcase is laid out, then gives each section from Core to Widget a part of its own with that section's main units as links, and gives Components one part whose links are its groups, each opening the group's Overview. Each part names its file of the library |
 
-The showcase's site stands beside the sidebar and is no section of it: three pages written as a small website, Overview, Get started and the folder Sample apps, each opening by its own address and standing full page with no sidebar. The Overview opens on its hero, whose picture is *How a screen is built*: one live picture of the groups, one inside the next on the ground of the standards, each labelled, linked to its section and named with its file of the library; it then says why the design system exists, why it is driven by data and by interaction, what the standard lets an app change and what it gives a coding agent, and ends on the ways to Get started and the sample apps. Sample apps holds the sample apps, one page each, built only from the units of the design system. A page is one row and the app: its name, a switcher for the device it is shown on, and *Open full screen*, then the app live in that device. On a desktop or a tablet the switcher offers Desktop and Tablet; on a phone there is no switcher and no frame, and the app stands in its own phone layout at the page's full width.
+The showcase's site stands beside the sidebar and is no section of it: three pages written as a small website, Overview, Get started and the folder Sample apps, each opening by its own address and standing full page with no sidebar. The Overview opens on its hero, whose picture is *How a screen is built*: one live picture of the groups, one inside the next on the ground of the standards, each labelled, linked to its section and named with its file of the library; it then says why the design system exists, why it is driven by data and by interaction, what the standard lets an app change and what it gives a coding agent, and ends on the ways to Get started and the sample apps. Sample apps holds the sample apps, one page each, built only from the units of the design system. A page is one row and the app: its name, a switcher for the device it is shown on, and *Open full screen*, then the app live in that device. On a desktop or a tablet the switcher offers Desktop and Tablet; on a phone there is no switcher and no frame, and the app stands in its own phone layout at the page's full width. The showcase's Sites can also hold site samples generated from a design language for a brief: whole pages the agent makes from the language, which prove that the language can generate a site. They are different from a language's own samples, which show each of its choices one by one and stand beside the language at `docs/artifacts/design-languages/<lang>/`, as the Design Language states.
 | Core | an Overview, then Colour, Type, Scale, Icons, States, Motion, Primitives, Page levels, Patterns and Inline alignment. Page levels tells every level a unit stands at, Page to Inline, with its look, its size and a live example |
 | App | its Overview, then `DSApp`, `DSContext` and `DSAppContext` |
 | Layout | its Overview, then `DSLayout` and its layouts |
@@ -319,7 +319,7 @@ A unit whose props take objects explains each object under its props table, in a
 
 The pages of `DSPanelContainer` show every variant that `architecture-containers.md` states, each as a real page of an app, as an embedded screen in the content of a section, never as an empty box. No container stands inside another container. Its main page says what a container is for under the opening. It then shows the parts, the parts a frame holds, each look that the `surface` makes, and a part with its inset and with `flush`, as tabs of sections of the container's own. Those sections stand after the sections that its tags give and before Props. A listing, a form and a dashboard are one scenario page each.
 
-App is three units, and none has a page beyond its Overview, its main page and its Playground; a case such as the theme's defaults or the device is a section or a tab of the main page. The main page of `DSApp` embeds one sample app for each job of a layout under its Usage, one tab each: an admin app in Rail, a profile in Dock, a website in Top nav and a sign-in on Canvas, with the app's theme settings in a sheet, and the sample app takes the theme those settings apply (`RULE.SUPPORT.SURFACE.207` · MUST · skill:spn-surface/design). The pages of `DSLayout` draw the same samples, and the admin app holds one working page for each of the fourteen app patterns. The Playground of `DSApp` and of `DSContext` chooses the theme the page's `DSApp` is given.
+App is three units, and none has a page beyond its Overview, its main page and its Playground; a case such as the theme's defaults or the device is a section or a tab of the main page. The main page of `DSApp` embeds one sample app for each job of a layout under its Usage, one tab each: an admin app in Rail, a profile in Dock, a website in Top nav and a sign-in on Canvas, with the app's theme settings in a sheet, and the sample app takes the theme those settings apply (`RULE.SUPPORT.SURFACE.207` · MUST · skill:spn-surface/design). The pages of `DSLayout` draw the same samples, and the admin app holds one working page for each of the fourteen app page kinds. The Playground of `DSApp` and of `DSContext` chooses the theme the page's `DSApp` is given.
 
 - **A sample is designed from its purpose before its units are chosen** (`RULE.SUPPORT.SURFACE.207` · MUST · skill:spn-surface/design). Name what the person came to do and the one main action, group the controls by intent, place each beside what it relates to and draw alternatives as equals, then pick the units that carry that. A sample built from a list of parts is a page of parts.
 - **A sample speaks as the product it stands for.** Its titles, descriptions and values are the product's own, such as *Northwind Traders* and *Every order your customers placed*, and never the name of a pattern, a unit or a level. The pattern a page follows is named in the code and in the tables of the Overview, never on the page.

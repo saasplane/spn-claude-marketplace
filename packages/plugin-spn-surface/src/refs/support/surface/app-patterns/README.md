@@ -2,8 +2,8 @@
 {
   "files": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/app-patterns",
-      "seen": "b4e0917c"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/app-page-kinds",
+      "seen": "9621dfa7"
     }
   ]
 }
@@ -11,7 +11,7 @@
 # The specs of the app patterns, as a partner has them
 
 **The book owns every file here and this folder is a copy.** They are byte-identical to
-`spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/app-patterns/`, and when the two disagree the book wins.
+`spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/app-page-kinds/`, and when the two disagree the book wins.
 `restates files write` writes them and `restates check` reports a copy that has fallen behind.
 
 **Each file is a skeleton spec of one app pattern, and a screen of an app starts from it.** The `design` skill
