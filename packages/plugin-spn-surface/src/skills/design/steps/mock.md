@@ -45,6 +45,7 @@ Its provenance is the foundation book's docs chapter, on the skeleton and the fl
 ## What a mock is, and what it is not
 
 - **A mock names units, and never their props.** It shows where each block stands and which unit it is: `DSPanelContainer`, `DSDataTable`, `DSCard`, an item line, a button. The choice table gives each unit its props when the page is built, so a mock writes no variant, colour or size.
+- **A unit the render will not draw with the props given is a finding of the render, and the mock says so.** The book states that a tree holds units, placements, slots and text, that media is a slot and never a path to an image, and that a unit which will not render with its props is a finding and never a silent gap. Draw the page as far as the render allows, and name what stays in words.
 - **A skeleton shows no look.** No colour that means something, no size in pixels, no theme, no unit drawn by hand from the library. The library holds the look: the render draws a built unit with it, and the Figma step draws it in Figma.
 - **A mock is drawn in a skeleton's own words and nothing else.** Out of it are clicking from page to page, sending the mock to Figma, and a native screen.
 
