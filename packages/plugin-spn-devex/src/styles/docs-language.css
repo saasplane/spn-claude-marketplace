@@ -7479,7 +7479,7 @@
   flex: 1 1 auto;
   min-width: 0;
 }
-.sds-json-dialog h2 {
+.sds-json-dialog .sds-json-title {
   margin: 0;
   padding: 0;
   border: 0;

@@ -511,12 +511,16 @@ const WIRES: Record<string, string> = {
   canvas: '<rect class="box" x="50" y="22" width="60" height="52" rx="3"/><rect class="line" x="60" y="32" width="40" height="4" rx="2"/><rect class="line" x="60" y="44" width="40" height="6" rx="2"/><rect class="nav" x="60" y="58" width="40" height="8" rx="2"/>',
 };
 
-type CatalogItem = { name: string; line: string; third: string; anchor?: string; facts: [string, string][]; quote?: string; note?: [string, string]; guidance?: [string, string][] };
+type CatalogItem = { name: string; line: string; third: string; anchor?: string; facts: [string, string][]; quote?: string; note?: [string, string]; guidance?: [string, string][]; detail?: [string, string][]; cases?: [string, string][] };
 /** The detail lines of an item that open under its row as one fold, "Guidance" (S77, the developer, 2026-11-24: "a row opens to its guidance"). */
 const GUIDANCE_KEYS = ["For", "Choose when", "Not when", "Rules"];
+/** The lines that say how a kind is laid out, opening in a fold of their own, "Detail" (a page kind's level and order, the default case), and one `Case: Name | when` line for each case, a fold "Cases". */
+const DETAIL_KEYS = ["Default case", "At level", "Order"];
 function guidanceHtml(item: CatalogItem): string {
-  if (!item.guidance?.length) return "";
-  return `<details class="sds-fold sds-guidance"><summary>Guidance</summary>${item.guidance.map(([key, value]) => key === "Rules" ? `<p class="sds-small"><strong>${esc(key)}</strong> <span class="sds-guidance-ids">${value.split(/\s+/).filter(Boolean).map((id) => `<span>${esc(id)}</span>`).join("")}</span></p>` : `<p class="sds-small"><strong>${esc(key)}</strong> ${inline(value)}</p>`).join("")}</details>`;
+  const detail = item.detail?.length ? `<details class="sds-fold sds-guidance"><summary>Detail</summary>${item.detail.map(([key, value]) => `<p class="sds-small"><strong>${esc(key)}</strong> ${inline(value)}</p>`).join("")}</details>` : "";
+  const cases = item.cases?.length ? `<details class="sds-fold sds-guidance"><summary>Cases</summary><ul class="sds-small">${item.cases.map(([name, when]) => `<li><strong>${inline(name)}</strong>${when ? ` ${inline(when)}` : ""}</li>`).join("")}</ul></details>` : "";
+  if (!item.guidance?.length) return detail + cases;
+  return detail + cases + `<details class="sds-fold sds-guidance"><summary>Guidance</summary>${item.guidance.map(([key, value]) => key === "Rules" ? `<p class="sds-small"><strong>${esc(key)}</strong> <span class="sds-guidance-ids">${value.split(/\s+/).filter(Boolean).map((id) => `<span>${esc(id)}</span>`).join("")}</span></p>` : `<p class="sds-small"><strong>${esc(key)}</strong> ${inline(value)}</p>`).join("")}</details>`;
 }
 type CatalogGroup = { name: string | null; items: CatalogItem[] };
 
@@ -552,6 +556,8 @@ function catalogLines(body: string[], findings: Finding[]): CatalogGroup[] {
       if (fact && fact[1].trim() === "Anchor" && /^[a-z0-9][a-z0-9-]*$/.test(fact[2].trim())) { item.anchor = fact[2].trim(); continue; }
       const detail = GUIDANCE_KEYS.find((key) => key !== "For" && fact?.[1].trim() === key);
       if (fact && detail) { (item.guidance ??= []).push([detail, fact[2].trim()]); continue; }
+      if (fact && DETAIL_KEYS.includes(fact[1].trim())) { (item.detail ??= []).push([fact[1].trim(), fact[2].trim()]); continue; }
+      if (fact && fact[1].trim() === "Case") { const [name, ...when] = fact[2].split(/\s+\|\s+/); (item.cases ??= []).push([name.trim(), when.join(" | ").trim()]); continue; }
       // A line of tags alone is a fact with no key, drawn as bare badges; it is allowed only as the item's one fact (S75).
       if (/^\s+(\[[^\]\[]+\]\s*)+$/.test(raw)) { item.facts.push(["", raw.trim()]); continue; }
       if (!fact || fact[1].trim().split(/\s+/).length > 3) { findings.push({ message: `a \`catalog\` fact is \`Key: value\`, with a key of a word or two, never a sentence: "${raw.trim()}"` }); continue; }
@@ -681,7 +687,7 @@ function jsonFact(json: unknown, name: string): string {
   const tree = `<svg class="sds-json-mark" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12h-8"/><path d="M21 6H8"/><path d="M21 18h-8"/><path d="M3 6v4c0 1.1.9 2 2 2h3"/><path d="M3 10v6c0 1.1.9 2 2 2h3"/></svg>`;
   return `<button type="button" class="sds-json-chip" data-json-open="${id}" aria-haspopup="dialog" aria-expanded="false" aria-label="${esc(label)}, JSON value, opens a dialog">${tree}<span class="sds-json-label">${esc(label)}</span></button>`
     + `<dialog id="${id}" class="sds-json-dialog" data-extent="${extent}" aria-labelledby="${id}-t">`
-    + `<div class="sds-json-head"><div class="sds-json-titles"><h2 id="${id}-t">${esc(title)}</h2></div>`
+    + `<div class="sds-json-head"><div class="sds-json-titles"><div class="sds-json-title" id="${id}-t" role="heading" aria-level="2">${esc(title)}</div></div>`
     + `<button type="button" class="sds-json-close" aria-label="Close" autofocus>${close}</button></div>`
     + `<div class="sds-json-body"><section class="sds-json-words" role="region" tabindex="0" aria-label="In words"><div class="sds-json-cap">In words</div>${body}</section>`
     + `<section class="sds-json-code"><div class="sds-json-caprow"><div class="sds-json-cap">JSON</div>`
@@ -719,7 +725,7 @@ function factCell(key: string, value: string): string {
 const anchorAttr = (item: CatalogItem): string => (item.anchor ? ` id="${item.anchor}"` : "");
 
 function catalogHtml(items: CatalogItem[], layout: string | null, media: string | null, findings: Finding[], compact = false, factsAt: string | null = null): string {
-  const hasFacts = items.some((item) => item.facts.length || item.quote || item.note || item.guidance?.length);
+  const hasFacts = items.some((item) => item.facts.length || item.quote || item.note || item.guidance?.length || item.detail?.length || item.cases?.length);
   const words = (text: string): number => text.trim().split(/\s+/).filter(Boolean).length;
   const longForCards = items.some((item) => words(item.name) > 4 || words(item.line ?? "") > 15 || item.facts.length > 3 || item.facts.some(([, value]) => words(value) > 5));
   if (!layout && longForCards) findings.push({ message: "these items are long for cards: layout=LIST (rule 549)" });

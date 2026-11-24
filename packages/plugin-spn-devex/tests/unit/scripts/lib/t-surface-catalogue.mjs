@@ -41,6 +41,16 @@ ok("it opens with the Shared panel and one tab a part", text.startsWith("~~~grou
   const anchors = [...text.matchAll(/^  Anchor: (\S+)$/gm)].map((m) => m[1]);
   ok("every kind's entry carries an anchor, <category>-<kind> in lower case with hyphens, once", anchors.length > 0 && anchors.every((a) => /^[a-z]+-[a-z0-9-]+$/.test(a)) && new Set(anchors).size === anchors.length && anchors.some((a) => a.startsWith("marketing-")), anchors.slice(0, 5).join());
 }
+{
+  // A kind's whole entry stands once, in its own place: units, placement and style as JSON facts, default case, level, order and cases in words, a planned kind marked.
+  const rich = checkCatalogue({ ...raw, categories: { MARKETING: { ...raw.categories.MARKETING, CONTAINERS: [kind("HERO", { status: "PLANNED", missing: "DSHeroScene", units: { container: { unit: "DSSectionContainer" } }, placement: { level: "2 OR DEEPER" }, style: { ground: "BASE" },
+    defaultCase: "ON_SCENE", order: ["HERO", { kind: "DOORS", case: "DOOR_CARDS" }], cases: [{ code: "ON_SCENE", when: "the scene sets the ground", status: "PLANNED", missing: "DSScene" }] })] } } }).catalogue;
+  const entry = renderCatalogue(rich, "docs/specs/surface/catalogue.json");
+  ok("a kind's units, placement and style are JSON facts, its default case, level and order are in words, and each case is a line with what it needs",
+    entry.includes("  Units: `{") && entry.includes("  Placement: `{") && entry.includes("  Style: `{") && entry.includes("  Default case: on scene") && entry.includes("  At level: 2 or deeper")
+      && entry.includes("  Order: Hero → Doors (door cards)") && entry.includes("  Case: On scene | the scene sets the ground Planned: needs DSScene."), entry.slice(entry.indexOf("Hero |"), entry.indexOf("Hero |") + 900));
+  ok("a planned kind is marked as planned and says what it needs", entry.includes("[HERO] [PLANNED]") && entry.includes("Planned: needs DSHeroScene."));
+}
 ok("a category is a heading and a Structure and a Style panel", text.includes("### MARKETING — a site for a Visitor\n\n~~~group Structure | how pages are built") && text.includes("~~~group Style | how pages look"));
 ok("a kind's code and its floor are tags in one fact, and no state is drawn", text.includes("  Code: [TOPNAV] [FLOOR]") && !text.includes("State"));
 ok("an empty part is its note as one row", text.includes("None defined yet | a site takes the one default theme"));
