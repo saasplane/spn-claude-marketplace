@@ -97,6 +97,15 @@ ok("a table that is not the Terms table carries no such class",
   ok("[MKT.SCRIPTS.648] and no block keeps a copy: a group row, a GRID card, a LIST row and a one-line fact set no colour or weight of their own for their key and value",
     !/\.sds-group-body \.sds-fact-(?:key|value)/.test(css) && !/data-layout='(?:GRID|LIST)'\] \.sds-tile-facts(?:-one)? d[td] \{[^}]*(?:color|font-weight|font-style)/.test(css));
 }
+{
+  const numbered = produced(table(["No", "Step", "What happens"], ["1", "Pick", "Choose the template by the page's kind, and start it from the seat"], ["2", "Fill", "Write each section in the block its content takes, in order"], ["3", "Check", "Run the page check until it reports no finding"]));
+  ok("[MKT.SCRIPTS.649] a table whose first column is only a number draws the number and the item's title on one line, its sentence under the title",
+    numbered.includes('<tr><td><p><span class="sds-num">1</span> <strong>Pick</strong></p><p>Choose the template by the page\'s kind, and start it from the seat</p></td></tr>'), numbered);
+  ok("[MKT.SCRIPTS.649] the number column is gone, and the head is the title column's name",
+    numbered.includes("<thead><tr><th>Step</th></tr></thead>") && !numbered.includes("<th>No</th>"), numbered);
+  ok("[MKT.SCRIPTS.649] a table whose first column holds words is not read this way, and a number beside other columns keeps those columns",
+    !produced(table(["Name", "Count"], ["a", "1"])).includes("sds-num") && produced(table(["No", "Step", "Owner"], ["1", "Pick", "lead"], ["2", "Fill", "agent"])).includes("<th>Owner</th>"));
+}
 const { cutVersions, integrityTable, newestVersion, linesFor } = await import(pathToFileURL(resolve(HERE, "..", "plugin-support-lib", "src", "lib", "page-styles.ts")).href);
 const { readFileSync } = await import("node:fs");
 const STYLES_HOME = resolve(HERE, "src", "styles");

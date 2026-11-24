@@ -3523,6 +3523,13 @@
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
   }
+  .sds-num {
+    font-family: var(--sds-ui);
+    color: var(--sds-accent);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--font-weight-bold);
+    margin-right: .35em;
+  }
   .sds-yes {
     color: var(--on-success-subtle);
     font-weight: var(--font-weight-semibold);

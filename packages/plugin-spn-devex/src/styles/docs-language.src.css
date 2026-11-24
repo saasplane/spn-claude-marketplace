@@ -338,6 +338,7 @@
     table.sds-terms th[scope="rowgroup"]{display:block; border:0; padding:.1rem .75rem}
   }
   .sds-number-cell{@apply font-ui text-right whitespace-nowrap; font-variant-numeric:tabular-nums}
+  .sds-num{@apply font-ui text-accent; font-variant-numeric:tabular-nums; font-weight:var(--font-weight-bold); margin-right:.35em}
   .sds-yes{@apply text-ok-ink; font-weight:var(--font-weight-semibold)}
   .sds-no{@apply text-gap-ink; font-weight:var(--font-weight-semibold)}
   .sds-small,.sds-code{@apply font-mono text-fact; font-family:var(--font-code)}

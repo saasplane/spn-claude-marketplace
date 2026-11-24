@@ -417,6 +417,27 @@ function sentenceShape(head: string[], rows: string[][]): (typeof ITEM_SHAPES)[n
   };
 }
 
+/**
+ * A table whose first column is only a number (RULE.DEVEX.WORKSPACE.569): the number and the item's title, the second column, stand on one
+ * line, and a column of sentences after them is the line under the title. Every other column stays, as written.
+ */
+function numberedShape(head: string[], rows: string[][]): (typeof ITEM_SHAPES)[number] | undefined {
+  if (head.length < 2 || !rows.length || !rows.every((r) => /^\d+[.)]?$/.test((r[0] ?? "").trim()))) return undefined;
+  const folded = head.map((_, at) => at).filter((at) => at > 1 && sentenceColumn(rows.map((r) => inline(r[at] ?? ""))).sentences);
+  const kept = head.map((_, at) => at).filter((at) => at > 1 && !folded.includes(at));
+  const sentences = sentenceColumn(rows.map((r) => inline(r[1] ?? ""))).sentences;
+  return {
+    head: [],
+    columns: [inline(head[1]), ...kept.map((at) => inline(head[at]))],
+    row: (cells) => {
+      const title = inline(cells[1] ?? "");
+      const lines = folded.map((at) => cells[at] ?? "").filter((cell) => !isBlank(cell)).map((cell) => `<p>${inline(cell)}</p>`);
+      const number = `<span class="sds-num">${esc(cells[0].trim().replace(/[.)]$/, ""))}</span>`;
+      return [`<p>${number} ${sentences ? title : bold(title)}</p>${lines.join("")}`, ...kept.map((at) => inline(cells[at] ?? ""))];
+    },
+  };
+}
+
 /** A plain table that reads as a catalog: a name column, a description column, and more than four rows. */
 const NAME_HEAD = /^(?:name|term|item|block|unit|command|page|check|field|option|figure|kind|type|tool|file|rule|view|layout|part)s?$/i;
 const DESCRIPTION_HEAD = /^(?:description|meaning|purpose|summary|what (?:it|this)\b.*|use|uses|does|about)$/i;
@@ -434,7 +455,7 @@ function table(lines: string[], findings: Finding[] = []): string {
   const head = cells(lines[0]);
   const rows = lines.slice(2).map(cells);
   const shape = ITEM_SHAPES.find((one) => one.head.length === head.length && one.head.every((name, at) => name.test(head[at])))
-    ?? sentenceShape(head, rows);
+    ?? numberedShape(head, rows) ?? sentenceShape(head, rows);
   // SOFT: a table of names and what each is, past four rows, is a catalog a reader browses (the block table in 05-pages.md).
   const described = ITEM_SHAPES.includes(shape as (typeof ITEM_SHAPES)[number]) ? null : readsAsCatalog(head, rows);
   if (described) findings.push({ message: `a table of ${rows.length} rows reads as a catalog, a \`${bare(head[0])}\` column and a \`${described}\` column: a \`catalog\` fence (\`layout=GRID\`, or \`LIST\` where the names are long) lets a reader browse them, and a plain table is for a wide comparison of attributes` });
