@@ -4,7 +4,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "section": "The surface preview",
-      "seen": "3a2ee701"
+      "seen": "83cb8f02"
     }
   ]
 }

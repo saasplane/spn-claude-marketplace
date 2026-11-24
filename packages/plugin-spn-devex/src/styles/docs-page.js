@@ -521,7 +521,7 @@ try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(
    markup and nothing else, linking `design-system.css` from the folder this script was served from (the cut of the design system that
    `<meta name="surface-ds">` names) and the app's stylesheet at the path `<meta name="surface-app-css">` names. Notes live outside the page, in
    `<script type="application/json" id="sample-notes">`, a list of { n, kind, case, status, text, href }, `n` the place of a top-level section
-   counted from 1; the Notes switch draws a numbered label over each section's box in a layer above the frame, and nothing when off. A `#<id>` in
+   counted from 0; the Notes switch draws a numbered label over each section's box in a layer above the frame, and nothing when off. A `#<id>` in
    the page's address scrolls the frame to that element. The choice is kept in this browser (05-pages.md, The surface preview). */
 (function () {
   var root = document.querySelector('.sds-surface'); if (!root) return;
@@ -557,9 +557,23 @@ try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(
       (template ? template.innerHTML : '') + '</body></html>';
   }
   function inner() { try { return frame.contentDocument && frame.contentDocument.documentElement ? frame.contentDocument : null; } catch (e) { return null; } }
-  // A top-level section: a section container that stands in no other section.
+  // The top-level sections of the page, in order: the section containers that stand in no other section, within the page's own roots
+  // (`[data-layout-page]`, else `[data-ds-page]`); where a root holds none, its children are the sections.
   function sections(doc) {
-    return Array.prototype.filter.call(doc.querySelectorAll('section[data-slot="section-container"]'), function (s) { return !s.parentElement || !s.parentElement.closest('section'); });
+    var all = '[data-layout-page],[class*="&>[data-item-head]"]';
+    var roots = Array.prototype.filter.call(doc.querySelectorAll(all), function (e) { return !e.parentElement.closest(all); });
+    if (!roots.length) roots = Array.prototype.slice.call(doc.querySelectorAll('[data-ds-page]'));
+    var out = [];
+    roots.forEach(function (r) {
+      var q = Array.prototype.filter.call(r.querySelectorAll('[data-slot=section-container]'), function (e) {
+        var up = e.parentElement.closest('[data-slot=section-container]'); return up === null || !r.contains(up);
+      });
+      if (q.length) { out = out.concat(q); return; }
+      var k = Array.prototype.slice.call(r.children);
+      if (k.length === 1 && k[0].hasAttribute('data-place')) k = Array.prototype.slice.call(k[0].children);
+      out = out.concat(k);
+    });
+    return out;
   }
   var WIDTHS = { desktop: 1440, tablet: 768, phone: 390 };
   var scale = 1, left = 0;
@@ -579,19 +593,22 @@ try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(
     var doc = inner(); if (!state.notes || !doc || !notes.length) return;
     var list = sections(doc), win = frame.contentWindow, html = '';
     notes.forEach(function (note) {
-      var section = list[(note.n | 0) - 1]; if (!section) return;
+      var section = list[note.n | 0]; if (!section) return;
       var box = section.getBoundingClientRect(), top = box.top * scale, x = left + box.left * scale;
       if (top + 24 < 0 || top > stage.clientHeight) return;
       var what = [note.kind, note.case, note.status].filter(Boolean).join(' · ');
-      html += '<div class="sds-surface-note" tabindex="0" style="top:' + Math.max(8, top + 8) + 'px;left:' + Math.max(8, x + 8) + 'px"><b>' + text(note.n) + '</b><span>' +
+      html += '<div class="sds-surface-note" tabindex="0" style="top:' + Math.max(8, top + 8) + 'px;left:' + Math.max(8, x + 8) + 'px"><b>' + text((note.n | 0) + 1) + '</b><span>' +
         (what ? '<small>' + text(what) + '</small>' : '') + text(note.text) +
         (note.href ? ' <a href="' + attr(note.href) + '">Open</a>' : '') + '</span></div>';
     });
     layer.innerHTML = html;
   }
+  // A `#<id>` scrolls the frame to the element of that id; failing that, to the first section whose note's kind is that word.
   function anchor() {
     var doc = inner(), id = decodeURIComponent((location.hash || '').slice(1)); if (!doc || !id) return;
-    var el = doc.getElementById(id); if (el && el.scrollIntoView) el.scrollIntoView();
+    var el = doc.getElementById(id);
+    if (!el) { var list = sections(doc); for (var i = 0; i < notes.length && !el; i++) if (notes[i].kind === id) el = list[notes[i].n | 0]; }
+    if (el && el.scrollIntoView) el.scrollIntoView();
   }
   function set() {
     var doc = inner(); if (!doc) return;

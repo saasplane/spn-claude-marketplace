@@ -80,8 +80,8 @@ console.log("\n=== the templates are laid out by where the made file lives, and 
       && /<meta name="surface-ds" content="\d+\.\d+\.\d+">/.test(frameOnly) && /<meta name="surface-app-css" content="">/.test(frameOnly) && !/<style/.test(frameOnly), String(surface.length));
   ok("[MKT.SCRIPTS.407] the frame holds the render's output and nothing else: two sections, no section wrapper, no aside, no note attribute inside the template",
     (frameOnly.match(/<section data-slot="section-container"/g) ?? []).length === 2 && !/data-section=|class="sds-note"|data-note=|<aside/.test(frameOnly));
-  ok("[MKT.SCRIPTS.407] the notes stand outside the page, as a JSON list of { n, kind, case, status, text, href }, one for each top-level section, n counted from 1",
-    Array.isArray(sampleNotes) && sampleNotes.length === 2 && sampleNotes.every((note, i) => note.n === i + 1 && ["kind", "case", "status", "text", "href"].every((key) => key in note)) && frameOnly.indexOf('id="sample-notes"') < frameOnly.indexOf("<template"));
+  ok("[MKT.SCRIPTS.407] the notes stand outside the page, as a JSON list of { n, kind, case, status, text, href }, one for each top-level section, n counted from 0",
+    Array.isArray(sampleNotes) && sampleNotes.length === 2 && sampleNotes.every((note, i) => note.n === i && ["kind", "case", "status", "text", "href"].every((key) => key in note)) && frameOnly.indexOf('id="sample-notes"') < frameOnly.indexOf("<template"));
   ok("[MKT.SCRIPTS.407] the markup stands in one template for each device and mode rendered, named page-<MODE>-<DEVICE>, and the old one-template page is gone",
     /<template id="page-LIGHT-DESKTOP">/.test(frameOnly) && !/<template id="page">/.test(frameOnly) && (frameOnly.match(/<template id="page-(LIGHT|DARK)-(DESKTOP|TABLET|PHONE)">/g) ?? []).length >= 1);
   ok("[MKT.SCRIPTS.407] the template's own links are the published stylesheet and script, each with its integrity; a local copy drops it",

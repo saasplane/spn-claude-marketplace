@@ -15,7 +15,7 @@
      {{APP-CSS}} the app's stylesheet, a relative path, or empty for Surface's own look with no brand
      {{NAME}} the page's short name, at most three words (RULE.DEVEX.WORKSPACE.517): the block's title, written in the `<title>`, the outline's title, the eyebrow's last segment, the breadcrumb of a page below it and the page's entry in an index
      {{MARKUP}} the page's markup: replace the sample page between a template's tags with what `spnutils apps surface render` prints for that device and mode, untouched. Write one `<template id="page-<MODE>-<DEVICE>">` for each device (DESKTOP, TABLET, PHONE) and mode (LIGHT, DARK) that was rendered, and no more
-     {{NOTES}} the JSON list in `<script type="application/json" id="sample-notes">`: one `{ "n", "kind", "case", "status", "text", "href" }` for each top-level section, `n` its place among the page's top-level sections counted from 1, `text` one plain sentence (the section pattern and the question it answers) -->
+     {{NOTES}} the JSON list in `<script type="application/json" id="sample-notes">`: one `{ "n", "kind", "case", "status", "text", "href" }` for each top-level section, `n` its place among the page's top-level sections counted from 0, `text` one plain sentence (the section pattern and the question it answers) -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="surface-ds" content="11.21.0">
@@ -48,8 +48,8 @@
 </div>
 <script type="application/json" id="sample-notes">
 [
-  {"n": 1, "kind": "HERO", "case": "", "status": "BUILT", "text": "The hero: the page's first section, and the question it answers is what the product is, in one line.", "href": ""},
-  {"n": 2, "kind": "FEATURE", "case": "", "status": "BUILT", "text": "A feature section: a heading and a line under it, and the question it answers is why the reader should go on.", "href": ""}
+  {"n": 0, "kind": "HERO", "case": "", "status": "BUILT", "text": "The hero: the page's first section, and the question it answers is what the product is, in one line.", "href": ""},
+  {"n": 1, "kind": "FEATURE", "case": "", "status": "BUILT", "text": "A feature section: a heading and a line under it, and the question it answers is why the reader should go on.", "href": ""}
 ]
 </script>
 <template id="page-LIGHT-DESKTOP">
