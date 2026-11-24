@@ -7452,7 +7452,7 @@
   --pane: var(--sds-paper);
   --edge: var(--sds-ink);
   @supports (color: color-mix(in lab, red, red)) {
-    --edge: color-mix(in srgb, var(--sds-ink) 16%, transparent);
+    --edge: color-mix(in srgb, var(--sds-ink) 11%, transparent);
   }
   min-width: 0;
   padding: 1.25rem;
