@@ -1936,8 +1936,8 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   .sds-tiles[data-layout='LIST'] .sds-tile-facts[data-columns] { grid-template-columns: 1fr; }
   .sds-tiles[data-layout='LIST'] .sds-tile-facts[data-columns] > .sds-tile-fact-none { display: none; }
 }
-/* A LINE OF TAGS WITH NO KEY (S75): an item's one fact, drawn as its badges alone; the sentence before the catalog names them. */
-.sds-tile .sds-tile-facts > .sds-tile-fact-bare { display: block; }
+/* A LINE OF TAGS WITH NO KEY (S75): an item's one fact, drawn as its badges alone; the sentence before the catalog names them. Its `dt` is hidden, for a reader of the markup. */
+.sds-tile-fact-bare > dt { display: none; }
 .sds-tiles[data-layout='LIST'][data-facts='side'] > .sds-tile,
 .sds-tiles[data-layout='LIST'][data-facts='side'] > .sds-tiles-head {
   grid-column: 1 / -1;

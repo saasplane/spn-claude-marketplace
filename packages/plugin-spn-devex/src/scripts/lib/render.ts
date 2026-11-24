@@ -605,7 +605,7 @@ export function shortFact(value: string): boolean {
  * (RULE.DEVEX.WORKSPACE.563), so one item with no fact never sends the whole list's facts under the line.
  */
 export function sideFactKeys(items: CatalogItem[]): string[] | null {
-  if (!items.some((item) => item.facts.length) || items.some((item) => item.facts.length > 2 || item.facts.some(([, value]) => !shortFact(value)))) return null;
+  if (!items.some((item) => item.facts.length) || items.some((item) => item.facts.length > 2 || item.facts.some(([key, value]) => !key || !shortFact(value)))) return null;
   const keys: string[] = [];
   for (const item of items) for (const [key] of item.facts) if (!keys.includes(key)) keys.push(key);
   return keys.length <= 2 ? keys : null;
@@ -626,7 +626,7 @@ function factKeys(items: CatalogItem[]): string[] {
 
 /** One fact as a definition: its key over its value, or, with no key, the value's tags alone. */
 function factCell(key: string, value: string): string {
-  return key ? `<div><dt>${inline(key)}</dt><dd>${factValue(value)}</dd></div>` : `<div class="sds-tile-fact-bare"><dd>${factValue(value)}</dd></div>`;
+  return key ? `<div><dt>${inline(key)}</dt><dd>${factValue(value)}</dd></div>` : `<div class="sds-tile-fact-bare"><dt hidden>Tags</dt><dd>${factValue(value)}</dd></div>`;
 }
 
 /** The cards of one set of items, as the fence's layout and media draw them. Without either, and with no facts, the one-line tile of old. */
@@ -642,6 +642,12 @@ function catalogHtml(items: CatalogItem[], layout: string | null, media: string 
     return `  <div class="sds-tiles">\n${tiles.join("\n")}\n  </div>`;
   }
   const kind = layout ?? "GRID";
+  // A LIST HOLDS UP TO THREE FACT KEYS (RULE.DEVEX.WORKSPACE.576): four or more are a table's columns, not a row's facts.
+  if (kind === "LIST") {
+    const named = factKeys(items);
+    if (named.length >= 4) findings.push({ message: `a \`catalog layout=LIST\` holds up to three fact keys, this list names ${named.length} (${named.join(", ")}): fold a phrase into the item's line, or write a table`, stops: true });
+    if (factsAt === "END" && !items.some((item) => item.facts.length)) findings.push({ message: "`facts=END` draws a column for each fact, and no item of this list holds one: write the facts under their items, or leave `facts=END` out (rule 563)" });
+  }
   // IN A GROUP PANEL A LIST IS THE PLAN TABLE'S ROWS (the approach page's Plan): a line between rows, the name in bold, the description under it,
   // the facts on one small line under that joined with ` · `, and a fact that is only bracketed codes as a badge at the row's end.
   if (inGroup && kind === "LIST" && !media) {

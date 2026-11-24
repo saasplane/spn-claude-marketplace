@@ -7543,8 +7543,8 @@
     display: none;
   }
 }
-.sds-tile .sds-tile-facts > .sds-tile-fact-bare {
-  display: block;
+.sds-tile-fact-bare > dt {
+  display: none;
 }
 .sds-tiles[data-layout='LIST'][data-facts='side'] > .sds-tile, .sds-tiles[data-layout='LIST'][data-facts='side'] > .sds-tiles-head {
   grid-column: 1 / -1;

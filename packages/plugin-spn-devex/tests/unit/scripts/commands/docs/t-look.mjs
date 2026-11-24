@@ -6,6 +6,7 @@ import { chmodSync, mkdtempSync, mkdirSync, rmSync, writeFileSync, existsSync } 
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
+import { pathToFileURL } from "node:url";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
 const BASE = mkdtempSync(join(tmpdir(), "t-docs-look-"));
@@ -47,5 +48,14 @@ const bare = run(["docs", "look", page, "--out", out], { ...process.env, PATH: `
 one("with no browser it prints `not checked` and the line that installs one", /^not checked/.test(bare.out) && bare.out.includes("npx playwright install chromium"), bare.out);
 one("and exits 0", bare.code === 0);
 one("and writes no picture", !existsSync(out));
+console.log("\n=== the pinned key column is read in dark");
+{
+  const { PINNED_PROBE, LAYOUT_PROBE } = await import(pathToFileURL(resolve(PLUGIN, "src", "scripts", "commands", "docs", "look.ts")).href);
+  let compiled = true;
+  try { new Function(`return ${PINNED_PROBE}`); } catch { compiled = false; }
+  one("[MKT.SCRIPTS.651] the pinned-column probe is a script the browser can run, and it reads a catalog table's key cell against its row's value cell", compiled && PINNED_PROBE.includes(".sds-catalog-table") && PINNED_PROBE.includes("tbody > tr") && PINNED_PROBE !== LAYOUT_PROBE);
+  const source = (await import("node:fs")).readFileSync(resolve(PLUGIN, "src", "scripts", "commands", "docs", "look.ts"), "utf8");
+  one("[MKT.SCRIPTS.651] the command asks for the dark scheme before it runs the pinned-column probe", /emulateMedia\(\{ colorScheme: "dark" \}\);\s*const pinned[^\n]*PINNED_PROBE/.test(source));
+}
 console.log(failed ? `\n  ${failed} of ${n} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

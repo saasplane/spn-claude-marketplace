@@ -441,7 +441,7 @@ console.log("\n=== the page renderer — a catalog in three layouts, with media 
     cells.html.includes('<dl class="sds-tile-facts" data-columns="2"><div><dt>Example</dt>') && cells.html.includes('<div class="sds-tile-fact-none"></div></dl>') && !cells.html.includes("sds-tile-fact-wide"), cells.html);
   const bareTags = made(fence("catalog layout=GRID", "MARKETING | a site\n  [UNIT] [PAGE]"));
   ok("[RULE.DEVEX.WORKSPACE.564] a line of tags with no key is the item's one fact, drawn as its badges alone",
-    bareTags.html.includes('<div class="sds-tile-fact-bare"><dd><span class="sds-tags"><span class="sds-badge">UNIT</span> <span class="sds-badge">PAGE</span></span></dd></div>') && !bareTags.html.includes("<dt>") && bareTags.findings.length === 0, bareTags.html);
+    bareTags.html.includes('<div class="sds-tile-fact-bare"><dt hidden>Tags</dt><dd><span class="sds-tags"><span class="sds-badge">UNIT</span> <span class="sds-badge">PAGE</span></span></dd></div>') && !bareTags.html.includes("<dt>") && bareTags.findings.length === 0, bareTags.html);
   ok("[RULE.DEVEX.WORKSPACE.564] tags with no key beside another fact are a finding, and facts= on a GRID is a finding",
     made(fence("catalog layout=GRID", "MARKETING | a site\n  [UNIT]\n  Person: Visitor")).findings.some((f) => f.message.includes("tags stand bare only"))
       && made(fence("catalog layout=GRID facts=END", "A | a\n  K: v")).findings.some((f) => f.message.includes("in LIST only"))
@@ -534,6 +534,21 @@ console.log("\n=== the page renderer — tabs");
   ok("[MKT.SCRIPTS.650] a fold stands inside a tab, and the tab's fence still closes on its own line",
     made(tilde("tabs", `--- A\n~~~fold More\ntext\n~~~\n--- B\ny`)).findings.length === 0 && made(tilde("tabs", `--- A\n~~~fold More\ntext\n~~~\n--- B\ny`)).html.includes("<summary>More</summary>"));
 }
+console.log("\n=== the page renderer — a LIST's fact keys, facts=END with no fact, and bare tags");
+{
+  const four = made(fence("catalog layout=LIST", "Item | line\n  A: 1\n  B: 2\n  C: 3\n  D: 4"));
+  ok("[MKT.SCRIPTS.652] a LIST with four or more fact keys stops the write and names the keys", four.findings.some((f) => f.stops && f.message.includes("up to three fact keys") && f.message.includes("A, B, C, D")), JSON.stringify(four.findings));
+  ok("[MKT.SCRIPTS.652] three keys draw as before", !made(fence("catalog layout=LIST", "Item | line\n  A: 1\n  B: 2\n  C: 3")).findings.some((f) => f.stops));
+  const tags = made(fence("catalog layout=LIST", "Kinds | which rules are shared?\n  [UNIT] [COMPONENT]\nLevels | what does each level own?\n  [WIDGET]\nPages | what a page holds\n  [PAGE]"));
+  ok("[MKT.SCRIPTS.653] bare tags never get the advice to write facts=END, which does not draw a keyless fact", !tags.findings.some((f) => f.message.includes("facts=END")), JSON.stringify(tags.findings));
+  ok("[MKT.SCRIPTS.653] a list of short keyed facts still gets it", made(fence("catalog layout=LIST", "Kinds | q\n  Owes: one\nLevels | q\n  Owes: two")).findings.some((f) => f.message.includes("facts=END")));
+  const none = made(fence("catalog layout=LIST facts=END", "Kinds | which rules are shared?\nLevels | what does each level own?"));
+  ok("[MKT.SCRIPTS.654] facts=END with no fact on any item raises a finding", none.findings.some((f) => f.message.includes("no item of this list holds one")), JSON.stringify(none.findings));
+  ok("[MKT.SCRIPTS.655] a line of bare tags is a fact whose definition term is hidden, so the definition list is whole", tags.html.includes('<div class="sds-tile-fact-bare"><dt hidden>Tags</dt><dd>'), tags.html.slice(-500));
+  ok("[MKT.SCRIPTS.655] and the stylesheet carries no display rule for the bare tags' row",
+    !/\.sds-tile-facts > \.sds-tile-fact-bare\s*\{\s*display/.test(readFileSync(resolve(HERE, "src", "styles", "docs-language.src.css"), "utf8")));
+}
+
 console.log("\n=== the page renderer — a file frame that folds");
 {
   const plain = made("```json file=docs/specs/x.json\n{}\n```");
