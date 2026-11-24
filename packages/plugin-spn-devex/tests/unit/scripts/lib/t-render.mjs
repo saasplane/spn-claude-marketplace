@@ -668,5 +668,24 @@ console.log("\n=== the page renderer — the page's name and its title are two t
     hubbed.html.includes('<span class="sds-line1"><a href="../../hub.html">SaaS Plane</a> &middot; <a href="../up.html">spn-probe</a> &middot; Probe</span>'), hubbed.html.slice(0, 900));
 }
 
+{
+  // A fact whose value is JSON opens in a popover (rule 580).
+  const catalog = (value) => produced("```catalog layout=LIST\nRoom | the room\n  Value: " + value + "\n```\n");
+  const obj = catalog('`{"roomAndLayouts": {"kind": "SPLIT", "sizes": [1, 2]}, "tone": "WARM", "tags": ["A", "B"]}`');
+  ok("[MKT.SCRIPTS.649] a JSON object fact draws a chip naming its keys, bound to a native popover",
+    /<button type="button" class="sds-json-chip" popovertarget="(sds-json-\d+)"[^>]*>Room and layouts, Tone \+1<\/button><div id="\1" popover class="sds-json-pop">/.test(obj), obj.slice(-900));
+  ok("[MKT.SCRIPTS.649] the popover lists each key in words, an enum code in code, a list joined with a dot, a nested object indented",
+    obj.includes("<dt>Room and layouts</dt><dd><dl class=\"sds-json-nest\">") && obj.includes("<dt>Kind</dt><dd><code>SPLIT</code></dd>") && obj.includes("<code>A</code> &middot; <code>B</code>"), obj.slice(-1400));
+  ok("[MKT.SCRIPTS.649] the popover holds a copy button with the JSON, quotes escaped", obj.includes('class="sds-json-copy" data-json="{\n  &quot;roomAndLayouts&quot;'));
+  ok("[MKT.SCRIPTS.649] and the fact no longer draws the JSON as one line of code", !obj.includes("<code>{"));
+  const arr = catalog('`["ONE", "TWO", "THREE"]`');
+  ok("[MKT.SCRIPTS.649] a JSON list draws a chip counting its items", arr.includes('>3 items</button>') && arr.includes("<code>ONE</code> &middot; <code>TWO</code>"), arr.slice(-700));
+  ok("[MKT.SCRIPTS.649] a value that is not JSON draws as before, and no popover stands for it",
+    !catalog("`PLAIN`").includes("popover") && catalog("`PLAIN`").includes("<code>PLAIN</code>") && !catalog("`{not json}`").includes("popover") && catalog("a sentence").includes("a sentence"));
+  const css = (await import("node:fs")).readFileSync(resolve(HERE, "src", "styles", "docs-language.src.css"), "utf8");
+  ok("[MKT.SCRIPTS.649] the stylesheet styles the chip and the popover, 36rem wide at most and scrolling inside past 60vh",
+    /\.sds-json-chip\s*\{/.test(css) && /\.sds-json-pop\s*\{[^}]*max-width:\s*min\(36rem[^}]*max-height:\s*60vh[^}]*overflow:\s*auto/.test(css));
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-render` : `\n  all ${total} passed — t-render`);
 process.exit(failed ? 1 : 0);

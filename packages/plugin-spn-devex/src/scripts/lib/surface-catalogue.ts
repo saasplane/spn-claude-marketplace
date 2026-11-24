@@ -5,6 +5,7 @@
 // one reader, one resolver, one frame. Nothing is read or written here; `face` places the markers.
 
 import { existsSync, readFileSync } from "node:fs";
+import { keyInWords } from "./render.ts";
 import { basename, dirname, join } from "node:path";
 
 /** What a kind is in a language: the contract's `SPSurfaceItemStateType`. */
@@ -346,7 +347,7 @@ const compact = (v: Json): string => (typeof v === "string" ? v : JSON.stringify
 function valueList(values: ResolvedValue[]): string {
   const rows = [CATALOG];
   for (const v of values) {
-    rows.push(v.key);
+    rows.push(keyInWords(v.key));
     rows.push(`  Source: [${v.source}]`);
     if (v.source === "INHERITED") rows.push(`  From: ${v.definedIn}`);
     rows.push(`  Value: \`${clean(compact(v.value))}\``);

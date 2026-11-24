@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "section": "The blocks — what a page reaches for instead of prose",
-      "seen": "a6e82e51"
+      "seen": "6c62c9f8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
@@ -29,7 +29,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "section": "Group panels, and the rows and folds inside them",
-      "seen": "1bb97e34"
+      "seen": "48a3b5e2"
     }
   ]
 }
@@ -339,6 +339,7 @@ The web's way.
 - **A list in a group draws Plan-style rows** (`RULE.DEVEX.WORKSPACE.566` · GUIDE): the title, its description, one small line of facts, and one closed-set fact `[CODE]` as a badge at the row's end.
 - **An item's `For:`, `Choose when:`, `Not when:` (`condition → instead`) and `Rules:` lines are one closed Guidance fold under the row** (`RULE.DEVEX.WORKSPACE.567` · GUIDE).
 - **A fact drawn with its item has one look** (`RULE.DEVEX.WORKSPACE.568` · GUIDE): the text font, the key in the fact colour at medium weight, the value in the card title colour. Only a fact in a column of its own (`facts=END`, a table) keeps the column's look.
+- **A fact whose value is a JSON object or list draws as a chip and opens in a popover** (`RULE.DEVEX.WORKSPACE.580` · GUIDE): write `Value: `{...}``; the chip names its first keys in words (a list, its item count), and a native popover lists each key in words with its value, an enum code in code font, a nested value indented, and a copy of the JSON. A value that is not a JSON object or list draws as written.
 - **A numbered table reads its number and title on one line** (`RULE.DEVEX.WORKSPACE.569` · GUIDE): a table whose first column is only a number draws the number and the title, the second column, on one line, the sentence under it.
 - **A Terms table with no contract term draws no Contract term column** (`RULE.DEVEX.WORKSPACE.574` · GUIDE): when every cell of that column is empty or a dash.
 - **A long table folds** (`RULE.DEVEX.WORKSPACE.575` · GUIDE): write it inside `~~~fold <summary>` ... `~~~`; the page draws it shut.

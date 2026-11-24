@@ -506,6 +506,28 @@ Home | the first page
   </div></div>
 </section>
 
+  <h4 id="b-json-fact">A JSON fact</h4>
+  <p class="sds-small"><strong>Use when</strong> a fact holds an object or a list that one line of JSON would make unreadable: a language&rsquo;s own values, a config, a list of records.</p>
+  <p>The fact is written as JSON in backticks. The page shows a chip naming its first keys, or a list&rsquo;s item count; pressing it opens a popover with each key in words and its value, a nested value indented under its key, a code in code font, and a button that copies the JSON. A value that is not JSON stays as written.</p>
+  <pre data-lang="text">```catalog layout=LIST facts=AFTER_DESCRIPTION
+Room | where a page sits
+  Value: `{"roomAndLayouts": {"width": "WIDE", "gutters": ["SM", "LG"]}, "tone": "WARM"}`
+  Code: [OWN]
+```</pre>
+  <div class="sds-tiles" data-layout="LIST">
+    <div class="sds-tile"><div class="sds-tile-body"><h4>Room</h4><p>where a page sits</p>
+      <dl class="sds-tile-facts" data-columns="2"><div><dt>Value</dt><dd><button type="button" class="sds-json-chip" popovertarget="sds-json-1" aria-label="Show Room and layouts, Tone as a list">Room and layouts, Tone</button><div id="sds-json-1" popover class="sds-json-pop"><dl class="sds-json-list"><div><dt>Room and layouts</dt><dd><dl class="sds-json-nest"><div><dt>Width</dt><dd><code>WIDE</code></dd></div><div><dt>Gutters</dt><dd><code>SM</code> &middot; <code>LG</code></dd></div></dl></dd></div><div><dt>Tone</dt><dd><code>WARM</code></dd></div></dl><button type="button" class="sds-json-copy" data-json="{
+  &quot;roomAndLayouts&quot;: {
+    &quot;width&quot;: &quot;WIDE&quot;,
+    &quot;gutters&quot;: [
+      &quot;SM&quot;,
+      &quot;LG&quot;
+    ]
+  },
+  &quot;tone&quot;: &quot;WARM&quot;
+}">Copy JSON</button></div></dd></div><div><dt>Code</dt><dd><span class="sds-tags"><span class="sds-badge">OWN</span></span></dd></div></dl></div></div>
+  </div>
+
   <h3 id="b-fold">FOLD &mdash; extra detail</h3>
   <p class="sds-small"><strong>Use when</strong> some readers want detail the rest can skip, or a file the page explains has no need to be shown whole.</p>
   <p>A fold is a <code>details</code> with its summary. It keeps the page short and still shows on a search. What every reader must read never goes in one. A file the page explains is a fold with an empty body, <code>file=&lt;path&gt; fold</code>, and the writer reads the file&rsquo;s own words.</p>

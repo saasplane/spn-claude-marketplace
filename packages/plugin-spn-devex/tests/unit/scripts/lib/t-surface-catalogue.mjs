@@ -79,6 +79,7 @@ const page = renderLanguage(catalogue, r, { specPath: "specs/design-languages/de
 ok("it opens with the language's panel and links the parent's page", page.startsWith("~~~group Language | demo 1.0.0") && page.includes("Extends: [surface@1](13-language-surface.md)"));
 ok("a kind's state stands as a tag beside its code", page.includes("  Code: [HERO] [CUSTOMISED]") && page.includes("  Code: [NUMBERS] [NOT_USED]") && page.includes("  Code: [PLANS] [NEW]"));
 ok("the part's source and its values stand in the tab", page.includes("Filled by: [OWN]") && page.includes("  Source: [OWN]"));
+ok("a value's key stands in words as its row's title, and its JSON is emitted for the writer to draw", !page.includes("\ntheBrand\n") && /\nThe brand\n  Source: \[(OWN|INHERITED)\]/.test(page) && /  Value: `\{"primary"/.test(page), page.slice(0, 900));
 ok("a wholly inherited category is one line", renderLanguage(catalogue, resolveLanguage(catalogue, [root, spec("quiet", "surface@1")]), { specPath: "s.json" }).includes("Inherited whole from surface@1: this language says nothing here."));
 // A LIST holds up to three facts beside its badge (RULE.DEVEX.WORKSPACE.576), so the writer never stops on a block it generates.
 const factsBesideBadge = (md) => [...md.matchAll(/```catalog[^\n]*\n([\s\S]*?)```/g)].map(([, body]) => {

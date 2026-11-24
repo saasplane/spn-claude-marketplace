@@ -341,7 +341,7 @@ const bold = (html: string): string => /^<strong>[\s\S]*<\/strong>$/.test(html) 
  * with nothing to say is left out. The stylesheet tones and spaces the levels, so the cell carries no style.
  */
 function itemCell(title: string, line: string, facts: [string, string][]): string {
-  const said = facts.filter(([, value]) => !isBlank(value)).map(([key, value]) => `<span class="sds-fact-key">${esc(key)}</span><span class="sds-fact-value">${inline(value)}</span>`);
+  const said = facts.filter(([, value]) => !isBlank(value)).map(([key, value]) => `<span class="sds-fact-key">${esc(key)}</span><span class="sds-fact-value">${factHtml(value)}</span>`);
   return [
     isBlank(title) ? "" : `<p>${title}</p>`,
     isBlank(line) ? "" : `<p>${inline(line)}</p>`,
@@ -613,10 +613,68 @@ export function sideFactKeys(items: CatalogItem[]): string[] | null {
   return keys.length <= 2 ? keys : null;
 }
 
+/** The value of a fact as JSON when it is an object or a list (a whole value in backticks or bare), else null. A string, a number or an empty one is not. */
+function jsonOf(value: string): unknown | null {
+  const text = value.trim().replace(/^`([^`]+)`$/, "$1").trim();
+  if (!/^[\[{]/.test(text)) return null;
+  try {
+    const parsed = JSON.parse(text);
+    return parsed !== null && typeof parsed === "object" && Object.keys(parsed).length ? parsed : null;
+  } catch { return null; }
+}
+
+/** A key in words: `roomAndLayouts` is "Room and layouts", `MARKETING_SITE` is "Marketing site". */
+export function keyInWords(key: string): string {
+  const spaced = key.replace(/[_-]+/g, " ").replace(/([a-z0-9])([A-Z])/g, "$1 $2").replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2").trim().toLowerCase();
+  return spaced ? spaced[0].toUpperCase() + spaced.slice(1) : key;
+}
+
+let jsonPopovers = 0;
+
+/** One JSON scalar: an enum code in code font, other text as text. */
+function jsonScalar(v: unknown): string {
+  if (typeof v === "string") return /^[A-Z][A-Z0-9_]*$/.test(v) ? `<code>${esc(v)}</code>` : esc(v);
+  return `<code>${esc(String(v))}</code>`;
+}
+
+/** One JSON value for the popover: a scalar, a list of scalars joined with ` · `, or an indented list of keys (a list of objects is one entry each). */
+function jsonValue(v: unknown): string {
+  if (Array.isArray(v)) {
+    if (v.every((one) => one === null || typeof one !== "object")) return v.map(jsonScalar).join(" &middot; ");
+    return `<dl class="sds-json-nest">${v.map((one, i) => `<div><dt>${i + 1}</dt><dd>${jsonValue(one)}</dd></div>`).join("")}</dl>`;
+  }
+  if (v !== null && typeof v === "object") return jsonList(v as Record<string, unknown>, true);
+  return jsonScalar(v);
+}
+
+function jsonList(obj: Record<string, unknown>, nested: boolean): string {
+  return `<dl class="${nested ? "sds-json-nest" : "sds-json-list"}">${Object.entries(obj).map(([key, v]) => `<div><dt>${esc(keyInWords(key))}</dt><dd>${jsonValue(v)}</dd></div>`).join("")}</dl>`;
+}
+
+/**
+ * A fact whose value is a JSON object or list (RULE.DEVEX.WORKSPACE.580): a chip naming its keys, bound to a native popover that lists each key in
+ * words with its value, a nested value indented under its key, and a button that copies the JSON. No script is needed to open it.
+ */
+function jsonFact(json: unknown): string {
+  const id = `sds-json-${++jsonPopovers}`;
+  const keys = Array.isArray(json) ? [] : Object.keys(json as object);
+  const label = Array.isArray(json) ? `${json.length} ${json.length === 1 ? "item" : "items"}` : `${keys.slice(0, 2).map(keyInWords).join(", ")}${keys.length > 2 ? ` +${keys.length - 2}` : ""}`;
+  const body = Array.isArray(json) ? jsonValue(json) : jsonList(json as Record<string, unknown>, false);
+  const pretty = JSON.stringify(json, null, 2);
+  return `<button type="button" class="sds-json-chip" popovertarget="${id}" aria-label="Show ${esc(label)} as a list">${esc(label)}</button>`
+    + `<div id="${id}" popover class="sds-json-pop">${body}<button type="button" class="sds-json-copy" data-json="${pretty.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;")}">Copy JSON</button></div>`;
+}
+
+/** A fact's value drawn inline: a JSON object or list as a chip with its popover, anything else as words (`inline`). */
+function factHtml(value: string): string {
+  const json = jsonOf(value);
+  return json === null ? inline(value) : jsonFact(json);
+}
+
 /** A fact's value: words as written, or tags where the value is only bracketed codes (`[UNIT] [COMPONENT]`), each drawn as a badge, for a value from a closed set. */
 export function factValue(value: string): string {
   const tags = /^\s*(\[[^\]\[]+\]\s*)+$/.test(value) ? [...value.matchAll(/\[([^\]]+)\]/g)].map((m) => m[1].trim()) : null;
-  return tags ? `<span class="sds-tags">${tags.map((tag) => `<span class="sds-badge">${esc(tag)}</span>`).join(" ")}</span>` : inline(value);
+  return tags ? `<span class="sds-tags">${tags.map((tag) => `<span class="sds-badge">${esc(tag)}</span>`).join(" ")}</span>` : factHtml(value);
 }
 
 /** Every fact name a set of items holds, in first-seen order; a keyless fact (tags alone) names none. */
@@ -657,7 +715,7 @@ function catalogHtml(items: CatalogItem[], layout: string | null, media: string 
   if (inGroup && kind === "LIST" && !media) {
     const rows = items.map((item) => {
       const tags = item.facts.find(([, value]) => /^\s*(\[[^\]\[]+\]\s*)+$/.test(value));
-      const small = item.facts.filter((fact) => fact !== tags).map(([key, value]) => `${key ? `<span class="sds-fact-key">${inline(key)}</span>` : ""}<span class="sds-fact-value">${inline(value)}</span>`);
+      const small = item.facts.filter((fact) => fact !== tags).map(([key, value]) => `${key ? `<span class="sds-fact-key">${inline(key)}</span>` : ""}<span class="sds-fact-value">${factHtml(value)}</span>`);
       const badge = tags ? factValue(tags[1]) : "";
       return `      <tr><td><p><strong>${inline(item.name)}</strong></p>${item.line ? `<p>${inline(item.line)}</p>` : ""}${small.length ? `<span class="sds-small sds-facts">${small.join(" &middot; ")}</span>` : ""}${guidanceHtml(item)}</td>${items.some((one) => one.facts.some(([, value]) => /^\s*(\[[^\]\[]+\]\s*)+$/.test(value))) ? `<td>${badge}</td>` : ""}</tr>`;
     });
@@ -1175,6 +1233,7 @@ export function renderPage(opts: {
   const previousRewrite = rewriteHref, previousRoot = pageRoot;
   rewriteHref = opts.link ?? ((h) => h);
   pageRoot = opts.root ?? null;
+  jsonPopovers = 0;
   try {
     return renderPageBody(opts);
   } finally {

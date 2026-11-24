@@ -650,3 +650,12 @@ try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(
     });
   });
 })();
+
+/* A JSON FACT'S POPOVER opens by itself (the native popover); the script only copies its JSON. */
+document.addEventListener('click', function (e) {
+  var b = e.target && e.target.closest && e.target.closest('.sds-json-copy');
+  if (!b) return;
+  var done = function () { b.textContent = 'Copied'; b.classList.add('sds-is-copied'); setTimeout(function () { b.textContent = 'Copy JSON'; b.classList.remove('sds-is-copied'); }, 1400); };
+  var text = b.getAttribute('data-json') || '';
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, done); else done();
+});

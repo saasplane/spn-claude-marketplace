@@ -1652,6 +1652,55 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   letter-spacing: normal;
 }
 .sds-facts .sds-fact-key { margin-right: .3em; }
+/* A FACT WHOSE VALUE IS JSON (rule 580): a chip in the inline-fact look naming its keys, and a native popover (the docs palette's raised surface,
+   light and dark) that lists each key in words with its value. The browser owns the open state, the focus return and Escape. */
+.sds-json-chip {
+  display: inline;
+  margin: 0;
+  padding: .05em .55em;
+  font: inherit;
+  color: var(--sds-text-title-card);
+  background: var(--sds-card);
+  border: 1px solid var(--sds-rule);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.sds-json-chip:hover { border-color: var(--sds-accent); }
+.sds-json-chip:focus-visible,
+.sds-json-copy:focus-visible { outline: 2px solid var(--sds-accent); outline-offset: 2px; }
+.sds-json-pop {
+  box-sizing: border-box;
+  max-width: min(36rem, calc(100vw - 2rem));
+  max-height: 60vh;
+  overflow: auto;
+  margin: auto;
+  padding: .9rem 1rem;
+  color: var(--sds-ink);
+  background: var(--sds-paper);
+  border: 1px solid var(--sds-rule);
+  border-radius: .6rem;
+  box-shadow: 0 .75rem 2rem color-mix(in srgb, var(--sds-ink) 22%, transparent);
+  font-size: var(--sds-sm);
+}
+.sds-json-pop::backdrop { background: color-mix(in srgb, var(--sds-ink) 18%, transparent); }
+.sds-json-pop dl { margin: 0; }
+.sds-json-pop dl > div { display: grid; grid-template-columns: minmax(6rem, max-content) 1fr; column-gap: .8rem; padding: .3rem 0; }
+.sds-json-pop dt { color: var(--sds-text-fact-card); font-weight: var(--font-weight-medium); }
+.sds-json-pop dd { margin: 0; color: var(--sds-text-title-card); overflow-wrap: anywhere; }
+.sds-json-pop dl.sds-json-nest { margin-top: .2rem; padding-left: .8rem; border-left: 2px solid var(--sds-rule); }
+.sds-json-pop dl.sds-json-nest > div { grid-template-columns: 1fr; padding: .15rem 0; }
+.sds-json-pop code { font-size: inherit; }
+.sds-json-copy {
+  margin-top: .7rem;
+  padding: .2rem .7rem;
+  font: inherit;
+  color: var(--sds-text-title-card);
+  background: var(--sds-card);
+  border: 1px solid var(--sds-rule);
+  border-radius: .4rem;
+  cursor: pointer;
+}
+.sds-json-copy.sds-is-copied { border-color: var(--sds-accent); }
 .sds-tile .sds-tile-facts code {
   font-size: inherit;
 }
