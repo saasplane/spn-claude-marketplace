@@ -8306,6 +8306,27 @@
 .sds-fold.sds-guidance > p:last-child {
   margin-bottom: .3rem;
 }
+.sds-fold.sds-guidance > ul {
+  margin: .15rem 0 .3rem;
+  padding: 0 0 0 2.1em;
+  font-family: inherit;
+  font-size: var(--sds-xs, .75rem);
+  line-height: 1.45;
+  color: var(--sds-text-description-card);
+}
+.sds-fold.sds-guidance > ul > li {
+  margin: .15rem 0;
+  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+.sds-fold.sds-guidance > ul > li > strong {
+  margin-right: .4rem;
+  font-size: inherit;
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--sds-text-title-card);
+}
 .sds-fold.sds-guidance > p > strong {
   margin-right: .4rem;
   font-size: inherit;
