@@ -7225,13 +7225,14 @@
   display: block;
   font-size: var(--font-content-sm-size);
   line-height: var(--font-content-sm-line-height);
+  font-family: inherit;
 }
 .sds-group-body .sds-fact-key {
   color: var(--sds-text-fact-card);
   font-weight: var(--font-weight-medium);
 }
 .sds-group-body .sds-fact-value {
-  color: var(--sds-text-description-card);
+  color: var(--sds-text-title-card);
 }
 .sds-tile .sds-tile-facts code {
   font-size: inherit;
