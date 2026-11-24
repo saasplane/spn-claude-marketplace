@@ -7722,6 +7722,47 @@
   border: 0;
   border-radius: 0 0 var(--radius) var(--radius);
 }
+.sds-fold.sds-guidance {
+  margin: .35rem 0 0;
+  border: 0;
+  background: none;
+}
+.sds-fold.sds-guidance > summary {
+  min-height: 0;
+  padding: 0 .75rem;
+  font-family: inherit;
+  font-size: var(--sds-xs, .75rem);
+  line-height: 1.4;
+  color: var(--sds-text-description);
+}
+.sds-fold.sds-guidance[open] > summary {
+  border-bottom: 0;
+}
+.sds-fold.sds-guidance > p {
+  margin: .15rem 0 0;
+  padding: 0 .75rem;
+  font-size: var(--sds-xs, .75rem);
+  line-height: 1.4;
+}
+.sds-fold.sds-guidance > p:last-child {
+  margin-bottom: .25rem;
+}
+.sds-fold.sds-guidance > p > strong {
+  margin-right: .4rem;
+  font-weight: 600;
+}
+.sds-guidance-ids {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: .1rem .3rem;
+  vertical-align: top;
+  font-family: var(--font-code);
+  font-size: .7rem;
+  color: var(--sds-text-description);
+}
+.sds-guidance-ids > span {
+  white-space: nowrap;
+}
 .sds-unit-pair {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

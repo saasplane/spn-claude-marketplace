@@ -462,7 +462,7 @@ console.log("\n=== the page renderer — group fences are panels");
   const gl = made(fence("catalog layout=LIST facts=AFTER_DESCRIPTION", guided));
   const fold = (h) => (h.match(/<details class="sds-fold sds-guidance"><summary>Guidance<\/summary>/g) ?? []).length === 1 && !/<details[^>]* open/.test(h)
     && h.includes("<strong>For</strong> VISITOR") && h.includes("<strong>Choose when</strong> a site with few pages") && (h.match(/<strong>Not when<\/strong>/g) ?? []).length === 2
-    && h.includes("<strong>Not when</strong> the pages are many → RAIL") && h.includes("<strong>Rules</strong> RULE.SUPPORT.SURFACE.206");
+    && h.includes("<strong>Not when</strong> the pages are many → RAIL") && h.includes('<strong>Rules</strong> <span class="sds-guidance-ids"><span>RULE.SUPPORT.SURFACE.206</span></span>');
   ok("[MKT.SCRIPTS.642] an item's For, Choose when, Not when (one a case) and Rules lines are one closed fold titled Guidance under its row, in a group's Plan-style list and in a plain LIST, and are no facts of the row",
     fold(gp.html) && fold(gl.html) && gp.findings.length === 0 && gl.findings.length === 0, gp.html + gl.html + JSON.stringify([gp.findings, gl.findings]));
   const open = made("~~~group Never closed\n" + fence("catalog", "A | a"));

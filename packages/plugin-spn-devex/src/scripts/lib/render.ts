@@ -483,7 +483,7 @@ type CatalogItem = { name: string; line: string; third: string; facts: [string, 
 const GUIDANCE_KEYS = ["For", "Choose when", "Not when", "Rules"];
 function guidanceHtml(item: CatalogItem): string {
   if (!item.guidance?.length) return "";
-  return `<details class="sds-fold sds-guidance"><summary>Guidance</summary>${item.guidance.map(([key, value]) => `<p class="sds-small"><strong>${esc(key)}</strong> ${inline(value)}</p>`).join("")}</details>`;
+  return `<details class="sds-fold sds-guidance"><summary>Guidance</summary>${item.guidance.map(([key, value]) => key === "Rules" ? `<p class="sds-small"><strong>${esc(key)}</strong> <span class="sds-guidance-ids">${value.split(/\s+/).filter(Boolean).map((id) => `<span>${esc(id)}</span>`).join("")}</span></p>` : `<p class="sds-small"><strong>${esc(key)}</strong> ${inline(value)}</p>`).join("")}</details>`;
 }
 type CatalogGroup = { name: string | null; items: CatalogItem[] };
 
