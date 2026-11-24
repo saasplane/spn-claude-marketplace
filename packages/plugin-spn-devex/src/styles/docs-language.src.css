@@ -1620,6 +1620,19 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   color: var(--sds-text-description-card);
   overflow-wrap: anywhere;
 }
+/* A fact line in a group's rows: the key in the fact tone and the value in the description tone, as a tile's vertical facts show them, at the CONTENT_SM step. */
+.sds-group-body td > .sds-small {
+  display: block;
+  font-size: var(--font-content-sm-size);
+  line-height: var(--font-content-sm-line-height);
+}
+.sds-group-body .sds-fact-key {
+  color: var(--sds-text-fact-card);
+  font-weight: var(--font-weight-medium);
+}
+.sds-group-body .sds-fact-value {
+  color: var(--sds-text-description-card);
+}
 .sds-tile .sds-tile-facts code {
   font-size: inherit;
 }

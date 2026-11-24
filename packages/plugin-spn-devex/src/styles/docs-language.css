@@ -7221,6 +7221,18 @@
   color: var(--sds-text-description-card);
   overflow-wrap: anywhere;
 }
+.sds-group-body td > .sds-small {
+  display: block;
+  font-size: var(--font-content-sm-size);
+  line-height: var(--font-content-sm-line-height);
+}
+.sds-group-body .sds-fact-key {
+  color: var(--sds-text-fact-card);
+  font-weight: var(--font-weight-medium);
+}
+.sds-group-body .sds-fact-value {
+  color: var(--sds-text-description-card);
+}
 .sds-tile .sds-tile-facts code {
   font-size: inherit;
 }
