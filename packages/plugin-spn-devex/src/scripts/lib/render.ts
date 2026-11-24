@@ -341,7 +341,7 @@ const bold = (html: string): string => /^<strong>[\s\S]*<\/strong>$/.test(html) 
  * with nothing to say is left out. The stylesheet tones and spaces the levels, so the cell carries no style.
  */
 function itemCell(title: string, line: string, facts: [string, string][]): string {
-  const said = facts.filter(([, value]) => !isBlank(value)).map(([key, value]) => `<span class="sds-fact-key">${esc(key)}</span><span class="sds-fact-value">${factHtml(value)}</span>`);
+  const said = facts.filter(([, value]) => !isBlank(value)).map(([key, value]) => `<span class="sds-fact-key">${esc(key)}</span><span class="sds-fact-value">${factHtml(value, key)}</span>`);
   return [
     isBlank(title) ? "" : `<p>${title}</p>`,
     isBlank(line) ? "" : `<p>${inline(line)}</p>`,
@@ -637,10 +637,10 @@ function jsonScalar(v: unknown): string {
   return `<code>${esc(String(v))}</code>`;
 }
 
-/** One JSON value for the popover: a scalar, a list of scalars joined with ` · `, or an indented list of keys (a list of objects is one entry each). */
+/** One JSON value in words: a scalar, a list of scalars as small tags, or an indented list of keys (a list of objects is one entry each). */
 function jsonValue(v: unknown): string {
   if (Array.isArray(v)) {
-    if (v.every((one) => one === null || typeof one !== "object")) return v.map(jsonScalar).join(" &middot; ");
+    if (v.every((one) => one === null || typeof one !== "object")) return `<ul class="sds-json-tags">${v.map((one) => `<li>${jsonScalar(one)}</li>`).join("")}</ul>`;
     return `<dl class="sds-json-nest">${v.map((one, i) => `<div><dt>${i + 1}</dt><dd>${jsonValue(one)}</dd></div>`).join("")}</dl>`;
   }
   if (v !== null && typeof v === "object") return jsonList(v as Record<string, unknown>, true);
@@ -651,30 +651,51 @@ function jsonList(obj: Record<string, unknown>, nested: boolean): string {
   return `<dl class="${nested ? "sds-json-nest" : "sds-json-list"}">${Object.entries(obj).map(([key, v]) => `<div><dt>${esc(keyInWords(key))}</dt><dd>${jsonValue(v)}</dd></div>`).join("")}</dl>`;
 }
 
-/**
- * A fact whose value is a JSON object or list (RULE.DEVEX.WORKSPACE.580): a chip naming its keys, bound to a native popover that lists each key in
- * words with its value, a nested value indented under its key, and a button that copies the JSON. No script is needed to open it.
- */
-function jsonFact(json: unknown): string {
-  const id = `sds-json-${++jsonPopovers}`;
-  const keys = Array.isArray(json) ? [] : Object.keys(json as object);
-  const label = Array.isArray(json) ? `${json.length} ${json.length === 1 ? "item" : "items"}` : `${keys.slice(0, 2).map(keyInWords).join(", ")}${keys.length > 2 ? ` +${keys.length - 2}` : ""}`;
-  const body = Array.isArray(json) ? jsonValue(json) : jsonList(json as Record<string, unknown>, false);
-  const pretty = JSON.stringify(json, null, 2);
-  return `<button type="button" class="sds-json-chip" popovertarget="${id}" aria-label="Show ${esc(label)} as a list">${esc(label)}</button>`
-    + `<div id="${id}" popover class="sds-json-pop">${body}<button type="button" class="sds-json-copy" data-json="${pretty.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;")}">Copy JSON</button></div>`;
+/** The pretty JSON with quiet colours: a key, a string, a number, and a boolean or null each take their own class. */
+function jsonColoured(pretty: string): string {
+  return esc(pretty).replace(/("(?:[^"\\\n]|\\.)*")(\s*:)?|\b(true|false|null)\b|(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/g,
+    (m, str, colon, word, num) => str ? (colon ? `<span class="sds-jk">${str}</span>${colon}` : `<span class="sds-js">${str}</span>`) : word ? `<span class="sds-jb">${word}</span>` : `<span class="sds-jn">${num}</span>`);
 }
 
-/** A fact's value drawn inline: a JSON object or list as a chip with its popover, anything else as words (`inline`). */
-function factHtml(value: string): string {
+/**
+ * A fact whose value is a JSON object or list (RULE.DEVEX.WORKSPACE.580): a chip with a tree icon, its first keys in words and its count, and a native dialog it
+ * opens (the page script calls showModal). The dialog's head names the fact, with Copy JSON and a close button; its body is two panels,
+ * the value in words and the formatted JSON.
+ */
+function jsonFact(json: unknown, name: string): string {
+  const id = `sds-json-${++jsonPopovers}`;
+  const keys = Array.isArray(json) ? [] : Object.keys(json as object);
+  const count = Array.isArray(json) ? json.length : keys.length;
+  const size = `${count} ${Array.isArray(json) ? (count === 1 ? "item" : "items") : (count === 1 ? "key" : "keys")}`;
+  const title = name.replace(/<[^>]*>/g, "").trim() || (Array.isArray(json) ? "List" : "Values");
+  const label = Array.isArray(json) ? title : keys.slice(0, 2).map(keyInWords).join(", ");
+  const body = Array.isArray(json) ? jsonValue(json) : jsonList(json as Record<string, unknown>, false);
+  const pretty = JSON.stringify(json, null, 2);
+  const attr = pretty.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+  // The design system's overlay scale (extent.ts): two panels side by side need XL (720px) or more, so a short value (at most 24 formatted lines, none over 56 characters) takes XL and a longer one FIT (capped at 85vw).
+  const lines = pretty.split("\n");
+  const extent = lines.length <= 24 && Math.max(...lines.map((l) => l.length)) <= 56 ? "XL" : "FIT";
+  const close = `<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><path d="M3.5 3.5l9 9m0-9l-9 9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+  const tree = `<svg class="sds-json-mark" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12h-8"/><path d="M21 6H8"/><path d="M21 18h-8"/><path d="M3 6v4c0 1.1.9 2 2 2h3"/><path d="M3 10v6c0 1.1.9 2 2 2h3"/></svg>`;
+  return `<button type="button" class="sds-json-chip" data-json-open="${id}" aria-haspopup="dialog" aria-expanded="false" aria-label="Open ${esc(title)} (${esc(size)}) as words and JSON">${tree}<span class="sds-json-label">${esc(label)}</span><span class="sds-json-n">${size}</span></button>`
+    + `<dialog id="${id}" class="sds-json-dialog" data-extent="${extent}" aria-labelledby="${id}-t">`
+    + `<div class="sds-json-head"><div class="sds-json-titles"><h2 id="${id}-t">${esc(title)}</h2><div class="sds-json-count">${size}</div></div>`
+    + `<button type="button" class="sds-json-copy" data-json="${attr}">Copy JSON</button>`
+    + `<button type="button" class="sds-json-close" aria-label="Close" autofocus>${close}</button></div>`
+    + `<div class="sds-json-body"><section class="sds-json-words" role="region" tabindex="0" aria-label="In words"><div class="sds-json-cap">In words</div>${body}</section>`
+    + `<section class="sds-json-code" role="region" tabindex="0" aria-label="JSON"><div class="sds-json-cap">JSON</div><pre><code>${jsonColoured(pretty)}</code></pre></section></div></dialog>`;
+}
+
+/** A fact's value drawn inline: a JSON object or list as a chip with its dialog (named by the fact's key), anything else as words (`inline`). */
+function factHtml(value: string, key = ""): string {
   const json = jsonOf(value);
-  return json === null ? inline(value) : jsonFact(json);
+  return json === null ? inline(value) : jsonFact(json, key);
 }
 
 /** A fact's value: words as written, or tags where the value is only bracketed codes (`[UNIT] [COMPONENT]`), each drawn as a badge, for a value from a closed set. */
-export function factValue(value: string): string {
+export function factValue(value: string, key = ""): string {
   const tags = /^\s*(\[[^\]\[]+\]\s*)+$/.test(value) ? [...value.matchAll(/\[([^\]]+)\]/g)].map((m) => m[1].trim()) : null;
-  return tags ? `<span class="sds-tags">${tags.map((tag) => `<span class="sds-badge">${esc(tag)}</span>`).join(" ")}</span>` : factHtml(value);
+  return tags ? `<span class="sds-tags">${tags.map((tag) => `<span class="sds-badge">${esc(tag)}</span>`).join(" ")}</span>` : factHtml(value, key);
 }
 
 /** Every fact name a set of items holds, in first-seen order; a keyless fact (tags alone) names none. */
@@ -686,7 +707,7 @@ function factKeys(items: CatalogItem[]): string[] {
 
 /** One fact as a definition: its key over its value, or, with no key, the value's tags alone. */
 function factCell(key: string, value: string): string {
-  return key ? `<div><dt>${inline(key)}</dt><dd>${factValue(value)}</dd></div>` : `<div class="sds-tile-fact-bare"><dt hidden>Tags</dt><dd>${factValue(value)}</dd></div>`;
+  return key ? `<div><dt>${inline(key)}</dt><dd>${factValue(value, key)}</dd></div>` : `<div class="sds-tile-fact-bare"><dt hidden>Tags</dt><dd>${factValue(value)}</dd></div>`;
 }
 
 /** The cards of one set of items, as the fence's layout and media draw them. Without either, and with no facts, the one-line tile of old. */
@@ -715,7 +736,7 @@ function catalogHtml(items: CatalogItem[], layout: string | null, media: string 
   if (inGroup && kind === "LIST" && !media) {
     const rows = items.map((item) => {
       const tags = item.facts.find(([, value]) => /^\s*(\[[^\]\[]+\]\s*)+$/.test(value));
-      const small = item.facts.filter((fact) => fact !== tags).map(([key, value]) => `${key ? `<span class="sds-fact-key">${inline(key)}</span>` : ""}<span class="sds-fact-value">${factHtml(value)}</span>`);
+      const small = item.facts.filter((fact) => fact !== tags).map(([key, value]) => `${key ? `<span class="sds-fact-key">${inline(key)}</span>` : ""}<span class="sds-fact-value">${factHtml(value, key)}</span>`);
       const badge = tags ? factValue(tags[1]) : "";
       return `      <tr><td><p><strong>${inline(item.name)}</strong></p>${item.line ? `<p>${inline(item.line)}</p>` : ""}${small.length ? `<span class="sds-small sds-facts">${small.join(" &middot; ")}</span>` : ""}${guidanceHtml(item)}</td>${items.some((one) => one.facts.some(([, value]) => /^\s*(\[[^\]\[]+\]\s*)+$/.test(value))) ? `<td>${badge}</td>` : ""}</tr>`;
     });

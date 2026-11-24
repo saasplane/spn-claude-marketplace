@@ -1652,55 +1652,121 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   letter-spacing: normal;
 }
 .sds-facts .sds-fact-key { margin-right: .3em; }
-/* A FACT WHOSE VALUE IS JSON (rule 580): a chip in the inline-fact look naming its keys, and a native popover (the docs palette's raised surface,
-   light and dark) that lists each key in words with its value. The browser owns the open state, the focus return and Escape. */
+/* A FACT WHOSE VALUE IS JSON (rule 580): a chip (a tree icon, the first keys in words, a muted count) that opens a native dialog of two panels:
+   the value in words, and the formatted JSON. Every value is a token the sheet already has, so both modes follow the page. The icon is Lucide's
+   list-tree (ISC licence, (c) Lucide Contributors; THIRD-PARTY-NOTICES.md), drawn inline by the writer. */
 .sds-json-chip {
-  display: inline;
+  --chip-ink: var(--surface-brand-fg, var(--sds-accent));
+  display: inline-flex;
+  align-items: center;
+  gap: .4em;
+  box-sizing: border-box;
+  height: 1.5em;
   margin: 0;
-  padding: .05em .55em;
+  padding: 0 .65em 0 .5em;
+  vertical-align: middle;
   font: inherit;
-  color: var(--sds-text-title-card);
-  background: var(--sds-card);
-  border: 1px solid var(--sds-rule);
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--chip-ink);
+  background: color-mix(in srgb, var(--sds-accent) 10%, var(--sds-paper));
+  border: 1px solid color-mix(in srgb, var(--sds-accent) 30%, var(--sds-paper));
   border-radius: 999px;
   cursor: pointer;
+  transition: background-color var(--motion-hover, 150ms) ease-out, border-color var(--motion-hover, 150ms) ease-out;
 }
-.sds-json-chip:hover { border-color: var(--sds-accent); }
+.sds-json-chip:hover { background: color-mix(in srgb, var(--sds-accent) 18%, var(--sds-paper)); border-color: color-mix(in srgb, var(--sds-accent) 42%, var(--sds-paper)); }
+.sds-json-chip[aria-expanded="true"] { background: color-mix(in srgb, var(--sds-accent) 24%, var(--sds-paper)); border-color: var(--sds-accent); }
 .sds-json-chip:focus-visible,
-.sds-json-copy:focus-visible { outline: 2px solid var(--sds-accent); outline-offset: 2px; }
-.sds-json-pop {
+.sds-json-copy:focus-visible,
+.sds-json-close:focus-visible { outline: 2px solid var(--sds-accent); outline-offset: 2px; }
+.sds-json-chip .sds-json-mark { flex: none; width: 14px; height: 14px; }
+.sds-json-chip .sds-json-n { padding-left: .55em; border-left: 1px solid color-mix(in srgb, var(--sds-accent) 30%, var(--sds-paper)); color: var(--sds-faint); }
+.sds-json-dialog {
   box-sizing: border-box;
-  max-width: min(36rem, calc(100vw - 2rem));
-  max-height: 60vh;
-  overflow: auto;
+  width: min(720px, 95vw);
+  max-width: 95vw;
+  max-height: 80vh;
   margin: auto;
-  padding: .9rem 1rem;
+  padding: 0;
+  overflow: hidden;
+  flex-direction: column;
   color: var(--sds-ink);
   background: var(--sds-paper);
   border: 1px solid var(--sds-rule);
-  border-radius: .6rem;
-  box-shadow: 0 .75rem 2rem color-mix(in srgb, var(--sds-ink) 22%, transparent);
-  font-size: var(--sds-sm);
+  border-radius: var(--size-md-radius);
+  box-shadow: 0 25px 50px -12px var(--shadow-color);
+  font-family: var(--sds-ui);
+  font-size: var(--sds-small);
+  line-height: var(--sds-small-lh);
+  font-weight: var(--font-weight-regular);
+  letter-spacing: normal;
+  text-transform: none;
+  text-align: left;
+  white-space: normal;
 }
-.sds-json-pop::backdrop { background: color-mix(in srgb, var(--sds-ink) 18%, transparent); }
-.sds-json-pop dl { margin: 0; }
-.sds-json-pop dl > div { display: grid; grid-template-columns: minmax(6rem, max-content) 1fr; column-gap: .8rem; padding: .3rem 0; }
-.sds-json-pop dt { color: var(--sds-text-fact-card); font-weight: var(--font-weight-medium); }
-.sds-json-pop dd { margin: 0; color: var(--sds-text-title-card); overflow-wrap: anywhere; }
-.sds-json-pop dl.sds-json-nest { margin-top: .2rem; padding-left: .8rem; border-left: 2px solid var(--sds-rule); }
-.sds-json-pop dl.sds-json-nest > div { grid-template-columns: 1fr; padding: .15rem 0; }
-.sds-json-pop code { font-size: inherit; }
-.sds-json-copy {
-  margin-top: .7rem;
-  padding: .2rem .7rem;
-  font: inherit;
-  color: var(--sds-text-title-card);
-  background: var(--sds-card);
-  border: 1px solid var(--sds-rule);
-  border-radius: .4rem;
-  cursor: pointer;
+.sds-json-dialog[data-extent="FIT"] { width: fit-content; min-width: min(720px, 95vw); max-width: 85vw; }
+.sds-json-dialog[open] { display: flex; animation: sds-json-rise var(--motion-dialog) var(--motion-ease-enter); }
+.sds-json-dialog::backdrop { background: var(--surface-overlay); }
+.sds-json-dialog[open]::backdrop { animation: sds-json-fade var(--motion-dialog) var(--motion-ease-enter); }
+@keyframes sds-json-rise { from { opacity: 0; scale: .96; } to { opacity: 1; scale: 1; } }
+@keyframes sds-json-fade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .sds-json-dialog[open], .sds-json-dialog[open]::backdrop { animation: none; } .sds-json-chip { transition: none; } }
+.sds-json-head { display: flex; align-items: center; gap: .5rem; flex: none; padding: 1.25rem; border-bottom: 1px solid var(--sds-rule); }
+.sds-json-titles { flex: 1 1 auto; min-width: 0; }
+.sds-json-dialog h2 { margin: 0; padding: 0; border: 0; font-family: inherit; font-size: var(--sds-part-title); line-height: var(--sds-part-title-lh); font-weight: var(--font-weight-semibold); color: var(--sds-ink); letter-spacing: normal; text-transform: none; }
+.sds-json-count { margin-top: .1rem; font-size: var(--sds-xs); line-height: var(--sds-caption-lh); color: var(--sds-faint); }
+.sds-json-copy, .sds-json-close {
+  flex: none; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; min-height: 2.5rem; margin: 0;
+  font: inherit; font-size: var(--sds-small); line-height: 1; color: var(--sds-slate); background: transparent; border: 1px solid transparent; border-radius: var(--radius-md); cursor: pointer;
 }
-.sds-json-copy.sds-is-copied { border-color: var(--sds-accent); }
+.sds-json-copy { padding: 0 .9rem; border-color: var(--sds-rule); }
+.sds-json-close { width: 2.5rem; padding: 0; }
+.sds-json-copy:hover, .sds-json-close:hover { color: var(--sds-ink); background: var(--surface-hover, var(--sds-card)); }
+.sds-json-copy.sds-is-copied { color: var(--sds-ink); border-color: var(--sds-accent); }
+.sds-json-body { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); }
+/* Each panel scrolls on its own, down and across, with a thin scrollbar and a soft shadow at an edge where more lies beyond (the cover gradients
+   scroll with the content, the shadow gradients stay: a shadow shows only where the cover has moved off). The dialog itself never scrolls. */
+.sds-json-body > section {
+  --pane: var(--sds-paper);
+  --edge: color-mix(in srgb, var(--sds-ink) 16%, transparent);
+  min-width: 0; padding: 1.25rem; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--surface-border-strong) transparent;
+  background:
+    linear-gradient(var(--pane) 30%, transparent) top / 100% 2rem no-repeat local,
+    linear-gradient(transparent, var(--pane) 70%) bottom / 100% 2rem no-repeat local,
+    linear-gradient(90deg, var(--pane) 30%, transparent) left / 2rem 100% no-repeat local,
+    linear-gradient(270deg, var(--pane) 30%, transparent) right / 2rem 100% no-repeat local,
+    radial-gradient(farthest-side at 50% 0, var(--edge), transparent) top / 100% .6rem no-repeat scroll,
+    radial-gradient(farthest-side at 50% 100%, var(--edge), transparent) bottom / 100% .6rem no-repeat scroll,
+    radial-gradient(farthest-side at 0 50%, var(--edge), transparent) left / .6rem 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, var(--edge), transparent) right / .6rem 100% no-repeat scroll,
+    var(--pane);
+}
+.sds-json-body > section:focus-visible { outline: 2px solid var(--sds-accent); outline-offset: -2px; }
+.sds-json-code { --pane: var(--sds-card); border-left: 1px solid var(--sds-rule); }
+.sds-json-cap { margin: 0 0 .8rem; font-size: var(--sds-xs); line-height: var(--sds-caption-lh); font-weight: var(--font-weight-medium); letter-spacing: .06em; text-transform: uppercase; color: var(--sds-faint); }
+.sds-json-dialog dl { margin: 0; }
+.sds-json-dialog dl > div { padding: .45rem 0; }
+.sds-json-dialog dl > div + div { border-top: 1px solid var(--surface-divider, var(--sds-rule)); }
+.sds-json-dialog dt { margin: 0 0 .2rem; font-size: var(--sds-xs); line-height: var(--sds-caption-lh); font-weight: var(--font-weight-medium); color: var(--sds-faint); }
+.sds-json-dialog dd { margin: 0; color: var(--sds-ink); overflow-wrap: anywhere; }
+.sds-json-dialog dl.sds-json-nest { margin: .35rem 0 .1rem; padding-left: .9rem; border-left: 2px solid var(--sds-rule); }
+.sds-json-dialog dl.sds-json-nest > div { padding: .3rem 0; border-top: 0; }
+.sds-json-dialog code { font-family: var(--sds-mono); font-size: .85em; padding: .08em .45em; color: var(--sds-ink); background: var(--sds-card); border: 1px solid var(--sds-rule); border-radius: var(--radius-sm); }
+.sds-json-tags { display: flex; flex-wrap: wrap; gap: .35rem; margin: 0; padding: 0; list-style: none; }
+.sds-json-tags li { margin: 0; padding: 0; font-size: var(--sds-small); line-height: 1.4; }
+.sds-json-tags li:not(:has(code)) { padding: .08em .6em; background: var(--sds-card); border: 1px solid var(--sds-rule); border-radius: 999px; }
+.sds-json-code pre { margin: 0; padding: 0; background: none; border: 0; border-radius: 0; overflow: visible; width: max-content; min-width: 100%; font-family: var(--sds-mono); font-size: var(--sds-small); line-height: 1.6; color: var(--sds-ink); white-space: pre; }
+.sds-json-code pre code { padding: 0; font-size: inherit; background: none; border: 0; border-radius: 0; }
+.sds-json-code .sds-jk { color: var(--sds-ink); }
+.sds-json-code .sds-js { color: var(--sds-tk-s); }
+.sds-json-code .sds-jn { color: var(--sds-tk-n); }
+.sds-json-code .sds-jb { color: var(--sds-tk-k); }
+@media (max-width: 47.99rem) {
+  .sds-json-dialog, .sds-json-dialog[data-extent="FIT"] { width: 95vw; min-width: 0; max-width: 95vw; }
+  .sds-json-body { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); }
+  .sds-json-code { border-left: 0; border-top: 1px solid var(--sds-rule); }
+}
 .sds-tile .sds-tile-facts code {
   font-size: inherit;
 }

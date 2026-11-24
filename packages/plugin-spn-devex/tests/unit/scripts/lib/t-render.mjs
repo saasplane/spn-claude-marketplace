@@ -672,19 +672,32 @@ console.log("\n=== the page renderer — the page's name and its title are two t
   // A fact whose value is JSON opens in a popover (rule 580).
   const catalog = (value) => produced("```catalog layout=LIST\nRoom | the room\n  Value: " + value + "\n```\n");
   const obj = catalog('`{"roomAndLayouts": {"kind": "SPLIT", "sizes": [1, 2]}, "tone": "WARM", "tags": ["A", "B"]}`');
-  ok("[MKT.SCRIPTS.660] a JSON object fact draws a chip naming its keys, bound to a native popover",
-    /<button type="button" class="sds-json-chip" popovertarget="(sds-json-\d+)"[^>]*>Room and layouts, Tone \+1<\/button><div id="\1" popover class="sds-json-pop">/.test(obj), obj.slice(-900));
-  ok("[MKT.SCRIPTS.660] the popover lists each key in words, an enum code in code, a list joined with a dot, a nested object indented",
-    obj.includes("<dt>Room and layouts</dt><dd><dl class=\"sds-json-nest\">") && obj.includes("<dt>Kind</dt><dd><code>SPLIT</code></dd>") && obj.includes("<code>A</code> &middot; <code>B</code>"), obj.slice(-1400));
-  ok("[MKT.SCRIPTS.660] the popover holds a copy button with the JSON, quotes escaped", obj.includes('class="sds-json-copy" data-json="{\n  &quot;roomAndLayouts&quot;'));
-  ok("[MKT.SCRIPTS.660] and the fact no longer draws the JSON as one line of code", !obj.includes("<code>{"));
+  ok("[MKT.SCRIPTS.660] a JSON object fact draws a chip with a tree icon, its first keys in words and its count, bound to a dialog",
+    /<button type="button" class="sds-json-chip" data-json-open="(sds-json-\d+)" aria-haspopup="dialog" aria-expanded="false"[^>]*><svg class="sds-json-mark"[^>]*aria-hidden="true"[\s\S]*?<\/svg><span class="sds-json-label">Room and layouts, Tone<\/span><span class="sds-json-n">3 keys<\/span><\/button><dialog id="\1" class="sds-json-dialog"/.test(obj), obj.slice(-1200));
+  ok("[MKT.SCRIPTS.660] the dialog's head names the fact, with a count, Copy JSON and a close button",
+    obj.includes('<h2 id=') && obj.includes('>Value</h2><div class="sds-json-count">3 keys</div>') && obj.includes('class="sds-json-copy" data-json="{\n  &quot;roomAndLayouts&quot;') && obj.includes('class="sds-json-close" aria-label="Close"'), obj.slice(-2400));
+  ok("[MKT.SCRIPTS.660] the words panel lists each key in words, an enum code in code, a list as tags, a nested object indented",
+    obj.includes('<section class="sds-json-words"') && obj.includes("<dt>Room and layouts</dt><dd><dl class=\"sds-json-nest\">") && obj.includes("<dt>Kind</dt><dd><code>SPLIT</code></dd>") && obj.includes('<ul class="sds-json-tags"><li><code>A</code></li><li><code>B</code></li></ul>'), obj.slice(-2400));
+  ok("[MKT.SCRIPTS.660] the JSON panel holds the indented JSON with its keys, strings and numbers marked, and the fact no longer draws one line of code",
+    obj.includes('<span class="sds-jk">"roomAndLayouts"</span>:') && obj.includes('<span class="sds-js">"SPLIT"</span>') && obj.includes('<span class="sds-jn">1</span>') && !/<dd><code>\{/.test(obj));
   const arr = catalog('`["ONE", "TWO", "THREE"]`');
-  ok("[MKT.SCRIPTS.660] a JSON list draws a chip counting its items", arr.includes('>3 items</button>') && arr.includes("<code>ONE</code> &middot; <code>TWO</code>"), arr.slice(-700));
-  ok("[MKT.SCRIPTS.660] a value that is not JSON draws as before, and no popover stands for it",
-    !catalog("`PLAIN`").includes("popover") && catalog("`PLAIN`").includes("<code>PLAIN</code>") && !catalog("`{not json}`").includes("popover") && catalog("a sentence").includes("a sentence"));
+  ok("[MKT.SCRIPTS.660] a JSON list draws a chip counting its items", arr.includes('<span class="sds-json-n">3 items</span>') && arr.includes("<li><code>ONE</code></li>"), arr.slice(-900));
+  ok("[MKT.SCRIPTS.660] a value that is not JSON draws as before, and no dialog stands for it",
+    !catalog("`PLAIN`").includes("<dialog") && catalog("`PLAIN`").includes("<code>PLAIN</code>") && !catalog("`{not json}`").includes("<dialog") && catalog("a sentence").includes("a sentence"));
+  ok("[MKT.SCRIPTS.660] a short value takes the design system's XL extent, and each panel is focusable and labelled",
+    obj.includes('class="sds-json-dialog" data-extent="XL"') && obj.includes('role="region" tabindex="0" aria-label="In words"') && obj.includes('role="region" tabindex="0" aria-label="JSON"'));
+  const long = catalog('`{"alpha": ' + JSON.stringify(Array.from({ length: 30 }, (_, i) => "ITEM_" + i)) + '}`');
+  ok("[MKT.SCRIPTS.660] a value of more than 24 formatted lines takes the FIT extent", long.includes('class="sds-json-dialog" data-extent="FIT"'));
+  const wide = catalog('`{"note": "' + "w".repeat(60) + '"}`');
+  ok("[MKT.SCRIPTS.660] a value with a line over 56 characters takes FIT",
+    wide.includes('data-extent="FIT"') && !wide.includes('data-extent="XL"'));
   const css = (await import("node:fs")).readFileSync(resolve(HERE, "src", "styles", "docs-language.src.css"), "utf8");
-  ok("[MKT.SCRIPTS.660] the stylesheet styles the chip and the popover, 36rem wide at most and scrolling inside past 60vh",
-    /\.sds-json-chip\s*\{/.test(css) && /\.sds-json-pop\s*\{[^}]*max-width:\s*min\(36rem[^}]*max-height:\s*60vh[^}]*overflow:\s*auto/.test(css));
+  ok("[MKT.SCRIPTS.660] the stylesheet gives the dialog the XL width capped at 95vw, FIT capped at 85vw, 80vh at most, panels that scroll alone, and panels stacking under 48rem",
+    /\.sds-json-chip\s*\{/.test(css) && /\.sds-json-dialog\s*\{[^}]*width:\s*min\(720px, 95vw\)[^}]*max-height:\s*80vh/.test(css) && /data-extent="FIT"\][^}]*max-width:\s*85vw/.test(css)
+    && /\.sds-json-body > section\s*\{[^}]*overflow:\s*auto/.test(css) && /max-width:\s*47\.99rem/.test(css));
+  const js = (await import("node:fs")).readFileSync(resolve(HERE, "src", "styles", "docs-page.js"), "utf8");
+  ok("[MKT.SCRIPTS.660] the page script opens with showModal, closes on the button and outside, returns focus to the chip and copies the JSON",
+    js.includes("showModal") && js.includes(".sds-json-close") && js.includes("chip.focus()") && js.includes("navigator.clipboard.writeText"));
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-render` : `\n  all ${total} passed — t-render`);

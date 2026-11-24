@@ -508,7 +508,7 @@ Home | the first page
 
   <h4 id="b-json-fact">A JSON fact</h4>
   <p class="sds-small"><strong>Use when</strong> a fact holds an object or a list that one line of JSON would make unreadable: a language&rsquo;s own values, a config, a list of records.</p>
-  <p>The fact is written as JSON in backticks. The page shows a chip naming its first keys, or a list&rsquo;s item count; pressing it opens a popover with each key in words and its value, a nested value indented under its key, a code in code font, and a button that copies the JSON. A value that is not JSON stays as written.</p>
+  <p>The fact is written as JSON in backticks. The page shows a chip with a tree icon, its first keys in words and a muted count; pressing it opens a dialog of two panels. One gives each key in words with its value, a code as a code chip, a list as small tags and a nested value indented under its key; the other gives the formatted JSON. The head holds Copy JSON and a close button, and each panel scrolls on its own. A value that is not JSON stays as written.</p>
   <pre data-lang="text">```catalog layout=LIST facts=AFTER_DESCRIPTION
 Room | where a page sits
   Value: `{"roomAndLayouts": {"width": "WIDE", "gutters": ["SM", "LG"]}, "tone": "WARM"}`
@@ -516,7 +516,7 @@ Room | where a page sits
 ```</pre>
   <div class="sds-tiles" data-layout="LIST">
     <div class="sds-tile"><div class="sds-tile-body"><h4>Room</h4><p>where a page sits</p>
-      <dl class="sds-tile-facts" data-columns="2"><div><dt>Value</dt><dd><button type="button" class="sds-json-chip" popovertarget="sds-json-1" aria-label="Show Room and layouts, Tone as a list">Room and layouts, Tone</button><div id="sds-json-1" popover class="sds-json-pop"><dl class="sds-json-list"><div><dt>Room and layouts</dt><dd><dl class="sds-json-nest"><div><dt>Width</dt><dd><code>WIDE</code></dd></div><div><dt>Gutters</dt><dd><code>SM</code> &middot; <code>LG</code></dd></div></dl></dd></div><div><dt>Tone</dt><dd><code>WARM</code></dd></div></dl><button type="button" class="sds-json-copy" data-json="{
+      <dl class="sds-tile-facts" data-columns="2"><div><dt>Value</dt><dd><button type="button" class="sds-json-chip" data-json-open="sds-json-1" aria-haspopup="dialog" aria-expanded="false" aria-label="Open Value (2 keys) as words and JSON"><svg class="sds-json-mark" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12h-8"/><path d="M21 6H8"/><path d="M21 18h-8"/><path d="M3 6v4c0 1.1.9 2 2 2h3"/><path d="M3 10v6c0 1.1.9 2 2 2h3"/></svg><span class="sds-json-label">Room and layouts, Tone</span><span class="sds-json-n">2 keys</span></button><dialog id="sds-json-1" class="sds-json-dialog" data-extent="XL" aria-labelledby="sds-json-1-t"><div class="sds-json-head"><div class="sds-json-titles"><h2 id="sds-json-1-t">Value</h2><div class="sds-json-count">2 keys</div></div><button type="button" class="sds-json-copy" data-json="{
   &quot;roomAndLayouts&quot;: {
     &quot;width&quot;: &quot;WIDE&quot;,
     &quot;gutters&quot;: [
@@ -525,7 +525,16 @@ Room | where a page sits
     ]
   },
   &quot;tone&quot;: &quot;WARM&quot;
-}">Copy JSON</button></div></dd></div><div><dt>Code</dt><dd><span class="sds-tags"><span class="sds-badge">OWN</span></span></dd></div></dl></div></div>
+}">Copy JSON</button><button type="button" class="sds-json-close" aria-label="Close" autofocus><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><path d="M3.5 3.5l9 9m0-9l-9 9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button></div><div class="sds-json-body"><section class="sds-json-words" role="region" tabindex="0" aria-label="In words"><div class="sds-json-cap">In words</div><dl class="sds-json-list"><div><dt>Room and layouts</dt><dd><dl class="sds-json-nest"><div><dt>Width</dt><dd><code>WIDE</code></dd></div><div><dt>Gutters</dt><dd><ul class="sds-json-tags"><li><code>SM</code></li><li><code>LG</code></li></ul></dd></div></dl></dd></div><div><dt>Tone</dt><dd><code>WARM</code></dd></div></dl></section><section class="sds-json-code" role="region" tabindex="0" aria-label="JSON"><div class="sds-json-cap">JSON</div><pre><code>{
+  <span class="sds-jk">"roomAndLayouts"</span>: {
+    <span class="sds-jk">"width"</span>: <span class="sds-js">"WIDE"</span>,
+    <span class="sds-jk">"gutters"</span>: [
+      <span class="sds-js">"SM"</span>,
+      <span class="sds-js">"LG"</span>
+    ]
+  },
+  <span class="sds-jk">"tone"</span>: <span class="sds-js">"WARM"</span>
+}</code></pre></section></div></dialog></dd></div><div><dt>Code</dt><dd><span class="sds-tags"><span class="sds-badge">OWN</span></span></dd></div></dl></div></div>
   </div>
 
   <h3 id="b-fold">FOLD &mdash; extra detail</h3>

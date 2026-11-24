@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "section": "The blocks — what a page reaches for instead of prose",
-      "seen": "6c62c9f8"
+      "seen": "0b7e95de"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
@@ -29,7 +29,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "section": "Group panels, and the rows and folds inside them",
-      "seen": "48a3b5e2"
+      "seen": "f81727fb"
     }
   ]
 }

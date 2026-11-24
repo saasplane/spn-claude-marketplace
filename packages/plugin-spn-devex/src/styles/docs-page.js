@@ -651,9 +651,25 @@ try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(
   });
 })();
 
-/* A JSON FACT'S POPOVER opens by itself (the native popover); the script only copies its JSON. */
+/* A JSON FACT'S DIALOG: its chip opens it with showModal and focus goes to the close button; the close button, Escape and a click outside close it,
+   and focus returns to the chip. Copy JSON copies the value's formatted JSON. */
 document.addEventListener('click', function (e) {
-  var b = e.target && e.target.closest && e.target.closest('.sds-json-copy');
+  var t = e.target && e.target.closest ? e.target : null;
+  if (!t) return;
+  var chip = t.closest('.sds-json-chip');
+  if (chip) {
+    var dlg = document.getElementById(chip.getAttribute('data-json-open'));
+    if (dlg && dlg.showModal && !dlg.open) {
+      chip.setAttribute('aria-expanded', 'true');
+      dlg.addEventListener('close', function () { chip.setAttribute('aria-expanded', 'false'); chip.focus(); }, { once: true });
+      dlg.showModal();
+      var x = dlg.querySelector('.sds-json-close'); if (x) x.focus();
+    }
+    return;
+  }
+  if (t.closest('.sds-json-close')) { t.closest('dialog').close(); return; }
+  if (t.classList && t.classList.contains('sds-json-dialog')) { t.close(); return; }
+  var b = t.closest('.sds-json-copy');
   if (!b) return;
   var done = function () { b.textContent = 'Copied'; b.classList.add('sds-is-copied'); setTimeout(function () { b.textContent = 'Copy JSON'; b.classList.remove('sds-is-copied'); }, 1400); };
   var text = b.getAttribute('data-json') || '';
