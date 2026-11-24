@@ -29,7 +29,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md",
-      "seen": "c6635913"
+      "seen": "4a2ce389"
     },
     {
       "path": "spn-foundation/CONCEPT.md",

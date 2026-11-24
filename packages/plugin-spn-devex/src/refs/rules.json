@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "82f94a32"
+    "commit": "a9ed4b3c"
   },
   "rules": [
     {
@@ -14114,7 +14114,7 @@
       "level": "GUIDE",
       "params": {},
       "class": "guidance",
-      "sentence": "Facts below an item's line stand in the same column on every item of the list, one column for each fact name",
+      "sentence": "A catalog list names where its facts stand, `facts=END` or `facts=AFTER_DESCRIPTION`, and the page writer never guesses it",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "heading": "Which block a content takes, and how its fence is written",
       "decision": null,
