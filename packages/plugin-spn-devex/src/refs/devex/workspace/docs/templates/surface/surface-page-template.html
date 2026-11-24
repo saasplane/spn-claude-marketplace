@@ -1,7 +1,7 @@
 <!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § The surface preview
      and docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc carries its specification, or names the note that holds it
      This file holds the structure of a surface page and states no rule: the bar with the page's title and its three switches,
-     the frame, the notes layer above it, the page's own markup in one template for each device and mode that was rendered
+     the frame, the badges layer above it, the notes panel beside it, the page's own markup in one template for each device and mode that was rendered
      (`page-LIGHT-DESKTOP`, `page-DARK-PHONE` and so on), the notes in one JSON list outside the page, the two metas that name
      the design system's version and the app's stylesheet, and the two lines that load the shared stylesheet and script. The script
      builds the frame's document from the template the switches pick: it links design-system.css from the folder it was served from,
@@ -15,7 +15,7 @@
      {{APP-CSS}} the app's stylesheet, a relative path, or empty for Surface's own look with no brand
      {{NAME}} the page's short name, at most three words (RULE.DEVEX.WORKSPACE.517): the block's title, written in the `<title>`, the outline's title, the eyebrow's last segment, the breadcrumb of a page below it and the page's entry in an index
      {{MARKUP}} the page's markup: replace the sample page between a template's tags with what `spnutils apps surface render` prints for that device and mode, untouched. Write one `<template id="page-<MODE>-<DEVICE>">` for each device (DESKTOP, TABLET, PHONE) and mode (LIGHT, DARK) that was rendered, and no more
-     {{NOTES}} the JSON list in `<script type="application/json" id="sample-notes">`: one `{ "n", "kind", "case", "status", "text", "href" }` for each top-level section, `n` its place among the page's top-level sections counted from 0, `text` one plain sentence (the section pattern and the question it answers), `href` the anchor of the kind's entry on the catalogue page, `#<category>-<kind>`; the link reads "<Kind title> in the catalogue" -->
+     {{NOTES}} the JSON list in `<script type="application/json" id="sample-notes">`: one `{ "n", "kind", "case", "text" }` for each top-level section, `n` its place among the page's top-level sections counted from 0, `kind` the kind's name and `case` its case in words where that matters (the note's short title), `text` one plain sentence (why the section is there, or "Planned: needs <unit>"). A note is its number, a short title and that sentence: no status, no link -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="surface-ds" content="11.21.0">
@@ -41,15 +41,18 @@
       <button type="button" data-surface="notes">Notes</button>
     </div>
   </header>
-  <main class="sds-surface-stage">
-    <iframe class="sds-surface-frame" title="{{NAME}}"></iframe>
-    <div class="sds-surface-notes" aria-live="polite" hidden></div>
-  </main>
+  <div class="sds-surface-body">
+    <main class="sds-surface-stage">
+      <iframe class="sds-surface-frame" title="{{NAME}}"></iframe>
+      <div class="sds-surface-notes" hidden></div>
+    </main>
+    <aside class="sds-surface-panel" aria-label="Notes" hidden></aside>
+  </div>
 </div>
 <script type="application/json" id="sample-notes">
 [
-  {"n": 0, "kind": "HERO", "case": "", "status": "BUILT", "text": "The hero: the page's first section, and the question it answers is what the product is, in one line.", "href": ""},
-  {"n": 1, "kind": "FEATURE", "case": "", "status": "BUILT", "text": "A feature section: a heading and a line under it, and the question it answers is why the reader should go on.", "href": ""}
+  {"n": 0, "kind": "Hero", "case": "", "text": "The hero: the page's first section, and the question it answers is what the product is, in one line."},
+  {"n": 1, "kind": "Feature", "case": "", "text": "A feature section: a heading and a line under it, and the question it answers is why the reader should go on."}
 ]
 </script>
 <template id="page-LIGHT-DESKTOP">

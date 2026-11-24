@@ -520,14 +520,15 @@ try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(
    for it they restyle the nearest one only (mode on the frame's `<html>`, width on the frame). The frame's document holds the template's
    markup and nothing else, linking `design-system.css` from the folder this script was served from (the cut of the design system that
    `<meta name="surface-ds">` names) and the app's stylesheet at the path `<meta name="surface-app-css">` names. Notes live outside the page, in
-   `<script type="application/json" id="sample-notes">`, a list of { n, kind, case, status, text, href }, `n` the place of a top-level section
-   counted from 0; the Notes switch draws a numbered label over each section's box in a layer above the frame, and nothing when off. A `#<id>` in
+   `<script type="application/json" id="sample-notes">`, a list of { n, kind, case, status, text }, `n` the place of a top-level section
+   counted from 0; a note is a number, a short title and one plain sentence, with no link; the Notes switch opens a panel beside the stage and puts a small numbered badge over each section's top-left, and does neither when off. A `#<id>` in
    the page's address scrolls the frame to that element. The choice is kept in this browser (05-pages.md, The surface preview). */
 (function () {
   var root = document.querySelector('.sds-surface'); if (!root) return;
   var frame = root.querySelector('.sds-surface-frame');
   var stage = root.querySelector('.sds-surface-stage');
   var layer = root.querySelector('.sds-surface-notes');
+  var panel = root.querySelector('.sds-surface-panel');
   var state = { width: 'desktop', mode: 'light', notes: false };
   try { var kept = JSON.parse(localStorage.getItem('sds-surface') || '{}'); for (var k in state) if (k in kept) state[k] = kept[k]; } catch (e) {}
   function meta(name) { var m = document.querySelector('meta[name="' + name + '"]'); return m ? (m.getAttribute('content') || '').trim() : ''; }
@@ -587,28 +588,32 @@ try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(
     left = Math.max(0, (room - w * scale) / 2);
     frame.style.marginLeft = left + 'px';
   }
-  // A note's link names what it opens: "<Kind title> in the catalogue", and its title attribute names the page and the category ("Surface Catalogue (03), Marketing").
-  function cap(w) { return w ? w.charAt(0).toUpperCase() + w.slice(1) : ''; }
-  function linkText(note) { return cap(String(note.kind || '').replace(/[-_]+/g, ' ').trim().toLowerCase()) + ' in the catalogue'; }
-  function linkTitle(note) {
-    var hash = String(note.href || '').split('#')[1] || '', category = cap(decodeURIComponent(hash).split('-')[0]);
-    return 'Surface Catalogue (03)' + (category ? ', ' + category : '');
-  }
-  // The notes layer: one label over each top-level section's box, in the layer's own coordinates, drawn only while Notes is on.
+  // A note's short title: the kind's name and, where it matters, its case in words.
+  function words(w) { w = String(w || '').replace(/[-_]+/g, ' ').trim(); return w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : ''; }
+  function title(note) { return [words(note.kind), note.case ? String(note.case).trim() : ''].filter(Boolean).join(' \u00b7 '); }
+  var NOTICE = 'All words, names, dates and figures on this page are sample values.';
+  // Notes opens a panel beside the stage (a sheet under it on a narrow window), solid, listing the notes in order; the page itself carries
+  // only a small numbered badge at each section's top-left, in the page's side room. A note scrolls the frame to its section.
   function drawNotes() {
-    layer.hidden = !state.notes; layer.textContent = '';
-    var doc = inner(); if (!state.notes || !doc || !notes.length) return;
-    var list = sections(doc), win = frame.contentWindow, html = '';
-    notes.forEach(function (note) {
+    panel.hidden = !state.notes; layer.hidden = !state.notes; layer.textContent = '';
+    if (!state.notes) { panel.textContent = ''; return; }
+    if (!panel.firstChild) {
+      var html = '<p>' + text(NOTICE) + '</p><ol>';
+      notes.forEach(function (note, i) {
+        var line = text(String(note.text || '').split(NOTICE).join('').trim());
+        html += '<li data-note="' + i + '"><b>' + (i + 1) + '</b><strong title="' + attr(title(note)) + '">' + text(title(note)) + '</strong>' + (line ? '<span>' + line + '</span>' : '') + '</li>';
+      });
+      panel.innerHTML = html + '</ol>';
+    }
+    var doc = inner(); if (!doc || !notes.length) return;
+    var list = sections(doc), badges = '';
+    notes.forEach(function (note, i) {
       var section = list[note.n | 0]; if (!section) return;
-      var box = section.getBoundingClientRect(), top = box.top * scale, x = left + box.left * scale;
-      if (top + 24 < 0 || top > stage.clientHeight) return;
-      var what = [note.kind, note.case, note.status].filter(Boolean).join(' · ');
-      html += '<div class="sds-surface-note" tabindex="0" style="top:' + Math.max(8, top + 8) + 'px;left:' + Math.max(8, x + 8) + 'px"><b>' + text((note.n | 0) + 1) + '</b><span>' +
-        (what ? '<small>' + text(what) + '</small>' : '') + text(note.text) +
-        (note.href ? ' <a href="' + attr(note.href) + '" title="' + attr(linkTitle(note)) + '">' + text(linkText(note)) + '</a>' : '') + '</span></div>';
+      var box = section.getBoundingClientRect(), top = box.top * scale + 3;
+      if (top + 20 < 0 || top > stage.clientHeight) return;
+      badges += '<span class="sds-surface-badge" data-note="' + i + '" style="top:' + Math.max(3, top) + 'px;left:' + (left + Math.max(0, box.left) * scale + 3) + 'px">' + (i + 1) + '</span>';
     });
-    layer.innerHTML = html;
+    layer.innerHTML = badges;
   }
   // A `#<id>` scrolls the frame to the element of that id; failing that, to the first section whose note's kind is that word.
   function anchor() {
@@ -624,6 +629,7 @@ try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(
   }
   function apply() {
     root.setAttribute('data-width', state.width);
+    panel.hidden = !state.notes;
     fit();
     Array.prototype.forEach.call(root.querySelectorAll('[data-surface]'), function (b) {
       var key = b.getAttribute('data-surface'), value = b.getAttribute('data-value');
@@ -636,6 +642,13 @@ try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(
   addEventListener('resize', function () { fit(); drawNotes(); });
   addEventListener('hashchange', anchor);
   root.addEventListener('click', function (e) {
+    var n = e.target.closest('[data-note]');
+    if (n) {
+      var i = +n.getAttribute('data-note'), doc = inner();
+      if (n.classList.contains('sds-surface-badge')) { var item = panel.querySelector('li[data-note="' + i + '"]'); if (item) item.scrollIntoView({ block: 'nearest' }); }
+      else if (doc && notes[i]) { var target = sections(doc)[notes[i].n | 0]; if (target) target.scrollIntoView(); }
+      return;
+    }
     var b = e.target.closest('[data-surface]'); if (!b) return;
     var key = b.getAttribute('data-surface');
     if (key === 'notes') state.notes = !state.notes; else state[key] = b.getAttribute('data-value');

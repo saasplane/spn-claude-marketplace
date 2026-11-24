@@ -1228,6 +1228,7 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
    Desktop and the device's width at Tablet and Phone, centred on the sunken ground. The page scrolls inside the frame, so the bar never
    leaves. No rail, no masthead: the page is the content (developer, 2026-11-19: "also can we keep that bar sticky"). */
 .sds-surface { position: fixed; inset: 0; display: flex; flex-direction: column; background: var(--surface-sunken); }
+.sds-surface-body { flex: 1; min-height: 0; display: flex; }
 .sds-surface-bar { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: nowrap; align-items: center; gap: .5rem 1.5rem; padding: .5rem calc(max(0px, (100% - var(--sds-page-max)) / 2) + var(--sds-page-pad));
   background: var(--surface); border-bottom: 1px solid var(--surface-border);
   font-family: var(--font-text); font-size: var(--font-content-md-size); line-height: var(--font-content-md-line-height); color: var(--fg); }
@@ -1236,19 +1237,28 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 .sds-surface-switch button { font: inherit; color: var(--fg-muted); background: none; border: 0; border-radius: var(--radius-md); padding: .2rem .7rem; cursor: pointer; }
 .sds-surface-switch button:hover { color: var(--fg); }
 .sds-surface-switch button[aria-pressed="true"] { color: var(--fg); background: var(--surface); box-shadow: 0 0 0 1px var(--surface-border); }
-.sds-surface-stage { flex: 1; min-height: 0; position: relative; overflow: hidden; }
+.sds-surface-stage { flex: 1; min-width: 0; min-height: 0; position: relative; overflow: hidden; }
 /* The script gives the frame its device's width (desktop 1440, tablet 768, phone 390) and scales it to the stage; it is never narrowed. */
 .sds-surface-frame { display: block; width: 1440px; height: 100%; border: 0; background: var(--surface); transform-origin: 0 0; }
 .sds-surface[data-width="tablet"] .sds-surface-frame, .sds-surface[data-width="phone"] .sds-surface-frame { box-shadow: 0 0 0 1px var(--surface-border); }
 @media (max-width: 40rem) { .sds-surface-bar { flex-wrap: wrap; gap: .4rem .75rem; padding-inline: 16px; } .sds-surface-title { flex-basis: 100%; } }
-/* THE NOTES LAYER lies over the frame and never inside it: a numbered label at the top-left of each top-level section's box, drawn only while Notes is on. */
+/* THE NOTES: Notes opens a panel beside the stage, so nothing lies over the page's words. The panel is plain and solid (the raised surface, its border, the page's
+   text colour, no alpha, no blur); over the page there are only the numbered badges, in the page's side room at each section's top-left. */
+.sds-surface-panel { flex: none; box-sizing: border-box; width: 20rem; overflow: auto; padding: 1rem 1.25rem 1.5rem; color: var(--fg); background: var(--surface-raised); border-left: 1px solid var(--surface-border);
+  font-family: var(--font-text); font-size: var(--font-content-md-size); line-height: var(--font-content-md-line-height); }
+.sds-surface-panel > p { margin: 0 0 1rem; color: var(--fg-quiet); }
+.sds-surface-panel ol { margin: 0; padding: 0; list-style: none; }
+.sds-surface-panel li { display: grid; grid-template-columns: 1.5rem 1fr; gap: .15rem .6rem; padding: .7rem 0; border-top: 1px solid var(--surface-border); cursor: pointer; }
+.sds-surface-panel li:hover { background: var(--surface-hover); }
+.sds-surface-panel li > b, .sds-surface-badge { display: inline-grid; place-items: center; width: 1.5rem; height: 1.5rem; font-size: var(--font-content-xs-size); font-weight: var(--font-weight-semibold); color: var(--fg); background: var(--surface-raised); border: 1px solid var(--surface-border-strong); border-radius: 999px; box-shadow: var(--shadow-elevation-sm); }
+.sds-surface-panel li > strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: var(--font-weight-semibold); }
+.sds-surface-panel li > span { grid-column: 2; color: var(--fg); }
 .sds-surface-notes { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; }
-.sds-surface-note { position: absolute; display: flex; align-items: flex-start; gap: .4rem; max-width: min(20rem, 70%); pointer-events: auto; font-family: var(--font-text); font-size: var(--font-content-md-size); line-height: var(--font-content-md-line-height); color: var(--on-warning-subtle); }
-.sds-surface-note > b { flex: none; display: inline-grid; place-items: center; min-width: 1.5rem; height: 1.5rem; padding: 0 .35rem; font-weight: var(--font-weight-semibold); color: var(--on-warning-subtle); background: var(--warning-subtle); border: 1px solid var(--warning); border-radius: 999px; box-shadow: var(--shadow-elevation-sm); }
-.sds-surface-note > span { display: none; padding: .4rem .6rem; background: var(--warning-subtle); border: 1px solid var(--warning); border-radius: var(--radius-md); box-shadow: var(--shadow-elevation-md); }
-.sds-surface-note:hover > span, .sds-surface-note:focus-within > span { display: block; }
-.sds-surface-note > span small { display: block; color: var(--fg-quiet); font-size: var(--font-content-xs-size); }
-.sds-surface-note a { color: inherit; }
+.sds-surface-badge { position: absolute; width: 1.125rem; height: 1.125rem; font-size: .6875rem; pointer-events: auto; cursor: pointer; }
+@media (max-width: 47.99rem) {
+  .sds-surface-body { flex-direction: column; }
+  .sds-surface-panel { width: auto; flex: 0 0 40%; border-left: 0; border-top: 1px solid var(--surface-border); }
+}
 }
 
 /* BLOCKS (N017): the info-card CATALOG in three layouts and with media, TABS, the group panels, the fold and the inline UNIT. Folded in from the sample's docs-language-additions.css, unlayered as the sample loads it so each rule wins over the layered base. Every colour, size and radius is a token above, so both themes follow. */
