@@ -19,6 +19,7 @@ import { tmpdir } from "node:os";
 import { draw, figureOf, type Spec } from "./draw.ts";
 import { readsAsCondition } from "./block-fit.ts";
 import { sentenceColumn } from "./item-cells.ts";
+import { colours, linesOf } from "./code-colour.ts";
 import { isSeatFile, producedPageOf, visibilityOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { stylesDir } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { RULE_ID_SRC, chipOf, parseFields } from "../../../../plugin-support-lib/src/lib/rule-mark.ts";
@@ -195,50 +196,13 @@ function unitFrame(body: string[], findings: Finding[]): string {
 }
 
 /**
- * The units the design system builds, which `scripts/build-unit-styles.mjs` writes beside `design-system-units.css` as `design-system-units.json` from the
- * design system's surface snapshot. Null where the list cannot be read, and then no skeleton is held against it.
+ * A docs page draws a built unit as a skeleton of its structure, naming its showcase page (N017, 2026-11-24), so a `dg` skeleton that
+ * names a built unit no longer stops the write. A `unit` fence draws a render, which belongs on a surface sample page (a design
+ * language's samples or a surface page preview), so on a docs page it stops the write. `"planned": true` still marks a shape not built yet.
  */
-export type BuiltUnits = ReadonlySet<string> | null;
-function readBuiltUnits(): BuiltUnits {
-  const styles = stylesDir(import.meta.dirname);
-  if (!styles || !existsSync(join(styles, "design-system-units.json"))) return null;
-  try {
-    const list = JSON.parse(readFileSync(join(styles, "design-system-units.json"), "utf8"))?.units;
-    return Array.isArray(list) ? new Set(list.filter((name: unknown): name is string => typeof name === "string")) : null;
-  } catch { return null; }
-}
-let builtUnits: BuiltUnits | undefined;
-/** Replace the list of built units, or give back the file's with no argument. A test names its own. */
-export function setBuiltUnits(units?: Iterable<string> | null): void { builtUnits = units === undefined ? undefined : units === null ? null : new Set(units); }
-
-/** Each unit a skeleton spec names: the `unit` of any frame or section in it, however deep. */
-function skeletonUnits(spec: unknown, found: Set<string> = new Set()): Set<string> {
-  if (Array.isArray(spec)) spec.forEach((one) => skeletonUnits(one, found));
-  else if (spec && typeof spec === "object") {
-    for (const [key, value] of Object.entries(spec)) {
-      if (key === "unit" && typeof value === "string") found.add(value);
-      else skeletonUnits(value, found);
-    }
-  }
-  return found;
-}
-
-/**
- * A SKELETON OF A UNIT THE DESIGN SYSTEM BUILDS stops the write, because the page then shows a sketch of what a `unit` fence draws for
- * real. A skeleton of a shape that is not built yet carries `"planned": true`; once the design system builds it, this finding is the
- * page's cue to change it to a `unit`.
- */
-function builtSkeleton(spec: Spec, findings: Finding[]): void {
-  if (spec.kind !== "skeleton" || spec.planned === true) return;
-  const built = (builtUnits === undefined ? (builtUnits = readBuiltUnits()) : builtUnits);
-  if (!built) return;
-  const named = [...skeletonUnits(spec)].filter((name) => built.has(name));
-  if (!named.length) return;
-  findings.push({
-    message: `a \`dg\` skeleton names ${named.map((name) => `\`${name}\``).join(", ")}, which the design system builds: draw it with a \`unit\` fence, or set \`"planned": true\` on the skeleton where it shows a shape that is not built yet`,
-    stops: true,
-  });
-}
+let unitFenceAllowed = false;
+/** Let a `unit` fence be drawn (a test of the drawing itself); a docs page never does. */
+export function setUnitFence(allowed = false): void { unitFenceAllowed = allowed; }
 
 const LENS_LABEL: Record<string, string> = {
   LEAD: "Engineering leader", BUSINESS: "Business manager", PRODUCT: "Product manager",
@@ -377,11 +341,11 @@ const bold = (html: string): string => /^<strong>[\s\S]*<\/strong>$/.test(html) 
  * with nothing to say is left out. The stylesheet tones and spaces the levels, so the cell carries no style.
  */
 function itemCell(title: string, line: string, facts: [string, string][]): string {
-  const said = facts.filter(([, value]) => !isBlank(value)).map(([key, value]) => `${key}: ${inline(value)}`);
+  const said = facts.filter(([, value]) => !isBlank(value)).map(([key, value]) => `<span class="sds-fact-key">${esc(key)}</span><span class="sds-fact-value">${inline(value)}</span>`);
   return [
     isBlank(title) ? "" : `<p>${title}</p>`,
     isBlank(line) ? "" : `<p>${inline(line)}</p>`,
-    said.length ? `<span class="sds-small">${said.join(" &middot; ")}</span>` : "",
+    said.length ? `<span class="sds-small sds-facts">${said.join(" &middot; ")}</span>` : "",
   ].join("");
 }
 
@@ -453,12 +417,35 @@ function sentenceShape(head: string[], rows: string[][]): (typeof ITEM_SHAPES)[n
   };
 }
 
+/**
+ * A table whose first column is only a number (RULE.DEVEX.WORKSPACE.569): the number and the item's title, the second column, stand on one
+ * line, and a column of sentences after them is the line under the title. Every other column stays, as written.
+ */
+function numberedShape(head: string[], rows: string[][]): (typeof ITEM_SHAPES)[number] | undefined {
+  if (head.length < 2 || !rows.length || !rows.every((r) => /^\d+[.)]?$/.test((r[0] ?? "").trim()))) return undefined;
+  const folded = head.map((_, at) => at).filter((at) => at > 1 && sentenceColumn(rows.map((r) => inline(r[at] ?? ""))).sentences);
+  const kept = head.map((_, at) => at).filter((at) => at > 1 && !folded.includes(at));
+  const sentences = sentenceColumn(rows.map((r) => inline(r[1] ?? ""))).sentences;
+  return {
+    head: [],
+    columns: [inline(head[1]), ...kept.map((at) => inline(head[at]))],
+    row: (cells) => {
+      const title = inline(cells[1] ?? "");
+      const lines = folded.map((at) => cells[at] ?? "").filter((cell) => !isBlank(cell)).map((cell) => `<p>${inline(cell)}</p>`);
+      const number = `<span class="sds-num">${esc(cells[0].trim().replace(/[.)]$/, ""))}</span>`;
+      return [`<p>${number} ${sentences ? title : bold(title)}</p>${lines.join("")}`, ...kept.map((at) => inline(cells[at] ?? ""))];
+    },
+  };
+}
+
 /** A plain table that reads as a catalog: a name column, a description column, and more than four rows. */
 const NAME_HEAD = /^(?:name|term|item|block|unit|command|page|check|field|option|figure|kind|type|tool|file|rule|view|layout|part)s?$/i;
 const DESCRIPTION_HEAD = /^(?:description|meaning|purpose|summary|what (?:it|this)\b.*|use|uses|does|about)$/i;
 const bare = (cell: string): string => cell.replace(/[`*]/g, "").trim();
 /** The description column's name where the table reads as a catalog, else null. */
 function readsAsCatalog(head: string[], rows: string[][]): string | null {
+  // A glossary, a Terms table and a Binds table stay tables: the docs tools build the glossary and the rules index from them (RULE.DEVEX.WORKSPACE.577).
+  if (/^(?:term|rule)$/i.test(bare(head[0]))) return null;
   const at = head.findIndex((name, k) => k > 0 && DESCRIPTION_HEAD.test(bare(name)));
   return rows.length > 4 && head.length <= 3 && NAME_HEAD.test(bare(head[0])) && at > 0 ? bare(head[at]) : null;
 }
@@ -470,13 +457,22 @@ function table(lines: string[], findings: Finding[] = []): string {
   const head = cells(lines[0]);
   const rows = lines.slice(2).map(cells);
   const shape = ITEM_SHAPES.find((one) => one.head.length === head.length && one.head.every((name, at) => name.test(head[at])))
-    ?? sentenceShape(head, rows);
+    ?? numberedShape(head, rows) ?? sentenceShape(head, rows);
   // SOFT: a table of names and what each is, past four rows, is a catalog a reader browses (the block table in 05-pages.md).
   const described = ITEM_SHAPES.includes(shape as (typeof ITEM_SHAPES)[number]) ? null : readsAsCatalog(head, rows);
   if (described) findings.push({ message: `a table of ${rows.length} rows reads as a catalog, a \`${bare(head[0])}\` column and a \`${described}\` column: a \`catalog\` fence (\`layout=GRID\`, or \`LIST\` where the names are long) lets a reader browse them, and a plain table is for a wide comparison of attributes` });
-  const th = (shape ? shape.columns : head.map(inline)).map((c) => `<th>${c}</th>`).join("");
-  const tb = rows.map((r) => `<tr>${(shape ? shape.row(r) : r.map(inline)).map((c) => `<td>${c}</td>`).join("")}</tr>`).join("\n      ");
-  return `  <div class="sds-scroll"><table${shape?.tableClass ? ` class="${shape.tableClass}"` : ""}>\n    <thead><tr>${th}</tr></thead>\n    <tbody>\n      ${tb}\n    </tbody>\n  </table></div>`;
+  let columns = shape ? shape.columns : head.map(inline);
+  let drawn = rows.map((r) => shape ? shape.row(r) : r.map(inline));
+  let tableClass = shape?.tableClass;
+  // A Terms table whose Contract term cells are all empty or a dash draws no Contract term column (RULE.DEVEX.WORKSPACE.574).
+  if (tableClass === "sds-terms" && drawn.length && drawn.every((cells) => cells[1] === "")) {
+    columns = columns.filter((_, at) => at !== 1);
+    drawn = drawn.map((cells) => cells.filter((_, at) => at !== 1));
+    tableClass = "sds-terms sds-terms-two";
+  }
+  const th = columns.map((c) => `<th>${c}</th>`).join("");
+  const tb = drawn.map((cells) => `<tr>${cells.map((c) => `<td>${c}</td>`).join("")}</tr>`).join("\n      ");
+  return `  <div class="sds-scroll"><table${tableClass ? ` class="${tableClass}"` : ""}>\n    <thead><tr>${th}</tr></thead>\n    <tbody>\n      ${tb}\n    </tbody>\n  </table></div>`;
 }
 
 function anchorOf(text: string): string {
@@ -515,7 +511,13 @@ const WIRES: Record<string, string> = {
   canvas: '<rect class="box" x="50" y="22" width="60" height="52" rx="3"/><rect class="line" x="60" y="32" width="40" height="4" rx="2"/><rect class="line" x="60" y="44" width="40" height="6" rx="2"/><rect class="nav" x="60" y="58" width="40" height="8" rx="2"/>',
 };
 
-type CatalogItem = { name: string; line: string; third: string; facts: [string, string][]; quote?: string; note?: [string, string] };
+type CatalogItem = { name: string; line: string; third: string; facts: [string, string][]; quote?: string; note?: [string, string]; guidance?: [string, string][] };
+/** The detail lines of an item that open under its row as one fold, "Guidance" (S77, the developer, 2026-11-24: "a row opens to its guidance"). */
+const GUIDANCE_KEYS = ["For", "Choose when", "Not when", "Rules"];
+function guidanceHtml(item: CatalogItem): string {
+  if (!item.guidance?.length) return "";
+  return `<details class="sds-fold sds-guidance"><summary>Guidance</summary>${item.guidance.map(([key, value]) => key === "Rules" ? `<p class="sds-small"><strong>${esc(key)}</strong> <span class="sds-guidance-ids">${value.split(/\s+/).filter(Boolean).map((id) => `<span>${esc(id)}</span>`).join("")}</span></p>` : `<p class="sds-small"><strong>${esc(key)}</strong> ${inline(value)}</p>`).join("")}</details>`;
+}
 type CatalogGroup = { name: string | null; items: CatalogItem[] };
 
 /** A fence tag's `key=value` words, and the bare words beside them. */
@@ -547,6 +549,8 @@ function catalogLines(body: string[], findings: Finding[]): CatalogGroup[] {
       if (quote) { item.quote = quote[1].trim(); continue; }
       const note = /^\s+~\s*([^:]+?):\s+(\S.*)$/.exec(raw);
       if (note) { item.note = [note[1].trim(), note[2].trim()]; continue; }
+      const detail = GUIDANCE_KEYS.find((key) => key !== "For" && fact?.[1].trim() === key);
+      if (fact && detail) { (item.guidance ??= []).push([detail, fact[2].trim()]); continue; }
       // A line of tags alone is a fact with no key, drawn as bare badges; it is allowed only as the item's one fact (S75).
       if (/^\s+(\[[^\]\[]+\]\s*)+$/.test(raw)) { item.facts.push(["", raw.trim()]); continue; }
       if (!fact || fact[1].trim().split(/\s+/).length > 3) { findings.push({ message: `a \`catalog\` fact is \`Key: value\`, with a key of a word or two, never a sentence: "${raw.trim()}"` }); continue; }
@@ -556,6 +560,11 @@ function catalogLines(body: string[], findings: Finding[]): CatalogGroup[] {
     if (raw.startsWith("#")) continue;
     const [name, line = "", third = ""] = raw.trim().replace(/^[-*]\s+/, "").split(/\s+\|\s+/).map((cell) => cell.trim());
     groups[groups.length - 1].items.push({ name, line, third, facts: [] });
+  }
+  // A `For:` line is guidance only beside another guidance line; alone it stays the fact it always was.
+  for (const group of groups) for (const item of group.items) {
+    const forAt = item.facts.findIndex(([key]) => key === "For");
+    if (item.guidance?.length && forAt >= 0) item.guidance.unshift(["For", item.facts.splice(forAt, 1)[0][1]]);
   }
   if (!groups[0].items.length) groups.shift();
   return groups;
@@ -598,7 +607,7 @@ export function shortFact(value: string): boolean {
  * (RULE.DEVEX.WORKSPACE.563), so one item with no fact never sends the whole list's facts under the line.
  */
 export function sideFactKeys(items: CatalogItem[]): string[] | null {
-  if (!items.some((item) => item.facts.length) || items.some((item) => item.facts.length > 2 || item.facts.some(([, value]) => !shortFact(value)))) return null;
+  if (!items.some((item) => item.facts.length) || items.some((item) => item.facts.length > 2 || item.facts.some(([key, value]) => !key || !shortFact(value)))) return null;
   const keys: string[] = [];
   for (const item of items) for (const [key] of item.facts) if (!keys.includes(key)) keys.push(key);
   return keys.length <= 2 ? keys : null;
@@ -619,12 +628,12 @@ function factKeys(items: CatalogItem[]): string[] {
 
 /** One fact as a definition: its key over its value, or, with no key, the value's tags alone. */
 function factCell(key: string, value: string): string {
-  return key ? `<div><dt>${inline(key)}</dt><dd>${factValue(value)}</dd></div>` : `<div class="sds-tile-fact-bare"><dd>${factValue(value)}</dd></div>`;
+  return key ? `<div><dt>${inline(key)}</dt><dd>${factValue(value)}</dd></div>` : `<div class="sds-tile-fact-bare"><dt hidden>Tags</dt><dd>${factValue(value)}</dd></div>`;
 }
 
 /** The cards of one set of items, as the fence's layout and media draw them. Without either, and with no facts, the one-line tile of old. */
 function catalogHtml(items: CatalogItem[], layout: string | null, media: string | null, findings: Finding[], compact = false, factsAt: string | null = null): string {
-  const hasFacts = items.some((item) => item.facts.length || item.quote || item.note);
+  const hasFacts = items.some((item) => item.facts.length || item.quote || item.note || item.guidance?.length);
   const words = (text: string): number => text.trim().split(/\s+/).filter(Boolean).length;
   const longForCards = items.some((item) => words(item.name) > 4 || words(item.line ?? "") > 15 || item.facts.length > 3 || item.facts.some(([, value]) => words(value) > 5));
   if (!layout && longForCards) findings.push({ message: "these items are long for cards: layout=LIST (rule 549)" });
@@ -635,6 +644,25 @@ function catalogHtml(items: CatalogItem[], layout: string | null, media: string 
     return `  <div class="sds-tiles">\n${tiles.join("\n")}\n  </div>`;
   }
   const kind = layout ?? "GRID";
+  // A LIST HOLDS UP TO THREE FACT KEYS (RULE.DEVEX.WORKSPACE.576): four or more are a table's columns, not a row's facts.
+  if (kind === "LIST") {
+    // In a group panel a fact of bracketed codes is the row's badge, drawn at its end and not on the facts line, so it is not counted.
+    const badge = (key: string): boolean => inGroup && items.every((item) => item.facts.every(([name, value]) => name !== key || /^\s*(\[[^\]\[]+\]\s*)+$/.test(value)));
+    const named = factKeys(items).filter((key) => !badge(key));
+    if (named.length >= 4) findings.push({ message: `a \`catalog layout=LIST\` holds up to three fact keys, this list names ${named.length} (${named.join(", ")}): fold a phrase into the item's line, or write a table`, stops: true });
+    if (factsAt === "END" && !items.some((item) => item.facts.length)) findings.push({ message: "`facts=END` draws a column for each fact, and no item of this list holds one: write the facts under their items, or leave `facts=END` out (rule 563)" });
+  }
+  // IN A GROUP PANEL A LIST IS THE PLAN TABLE'S ROWS (the approach page's Plan): a line between rows, the name in bold, the description under it,
+  // the facts on one small line under that joined with ` · `, and a fact that is only bracketed codes as a badge at the row's end.
+  if (inGroup && kind === "LIST" && !media) {
+    const rows = items.map((item) => {
+      const tags = item.facts.find(([, value]) => /^\s*(\[[^\]\[]+\]\s*)+$/.test(value));
+      const small = item.facts.filter((fact) => fact !== tags).map(([key, value]) => `${key ? `<span class="sds-fact-key">${inline(key)}</span>` : ""}<span class="sds-fact-value">${inline(value)}</span>`);
+      const badge = tags ? factValue(tags[1]) : "";
+      return `      <tr><td><p><strong>${inline(item.name)}</strong></p>${item.line ? `<p>${inline(item.line)}</p>` : ""}${small.length ? `<span class="sds-small sds-facts">${small.join(" &middot; ")}</span>` : ""}${guidanceHtml(item)}</td>${items.some((one) => one.facts.some(([, value]) => /^\s*(\[[^\]\[]+\]\s*)+$/.test(value))) ? `<td>${badge}</td>` : ""}</tr>`;
+    });
+    return `  <div class="sds-scroll"><table>\n    <tbody>\n${rows.join("\n")}\n    </tbody>\n  </table></div>`;
+  }
   if (kind === "TABLE") {
     if (media) findings.push({ message: `a \`catalog\` in TABLE has no media; \`media=${media}\` is not drawn` });
     const keys: string[] = [];
@@ -686,7 +714,7 @@ function catalogHtml(items: CatalogItem[], layout: string | null, media: string 
       const shown = below && item.facts.length && !bare
         ? `<dl class="sds-tile-facts" data-columns="${Math.min(below.length, 3)}">${below.map((key) => { const found = item.facts.find(([name]) => name === key); return found ? factCell(key, found[1]) : `<div class="sds-tile-fact-none"></div>`; }).join("")}</dl>`
         : facts;
-      return `    <div class="sds-tile">${mediaHtml}<div class="sds-tile-body">${words}\n      ${shown}</div></div>`;
+      return `    <div class="sds-tile">${mediaHtml}<div class="sds-tile-body">${words}\n      ${shown}${guidanceHtml(item)}</div></div>`;
     }
     if (kept === "MEDIA_TOP") return `    <div class="sds-tile"${count}>${mediaOf(kept, item, findings)}\n      <div class="sds-tile-head"><div>${words}</div></div>\n      ${facts}</div>`;
     if (kept) return `    <div class="sds-tile"${count}><div class="sds-tile-head">${mediaOf(kept, item, findings)}<div>${words}</div></div>\n      ${facts}</div>`;
@@ -698,6 +726,8 @@ function catalogHtml(items: CatalogItem[], layout: string | null, media: string 
 
 /** Group ids already used on the page, so a second catalog's group of the same name gets its own anchor. */
 let groupIds = new Set<string>();
+/** True while a group panel's body is drawn: a catalog LIST there is the Plan table's rows. */
+let inGroup = false;
 
 /**
  * A `catalog` fence: ```catalog layout=GRID|LIST|TABLE media=ICON|MARK|AVATAR|AVATAR_GROUP|MEDIA_TOP facts=END|AFTER_DESCRIPTION (LIST only). The item line is
@@ -750,6 +780,69 @@ function catalogBlock(tag: string, body: string[], findings: Finding[]): string 
   return out.join("\n");
 }
 
+// ---------------------------------------------------------------------------- the GROUP panel
+
+/** The line after a tilde fence's opening line where it closes: a `~~~tabs` or `~~~group` line opens one level and a line of three tildes alone closes the innermost, so a group holding tabs closes on its own line. -1 where it is never closed. */
+function tildeFenceEnd(lines: string[], open: number): number {
+  let depth = 1;
+  for (let k = open + 1; k < lines.length; k++) {
+    if (/^~~~(?:tabs|group|fold)\b/.test(lines[k])) depth++;
+    else if (/^~~~\s*$/.test(lines[k]) && --depth === 0) return k;
+  }
+  return -1;
+}
+
+/** What a group panel counts: the tabs of the `tabs` fence it holds, or the items of its `catalog`; null where it holds neither. */
+function groupCount(body: string[]): { n: number; noun: string } | null {
+  const at = body.findIndex((line) => line.trim());
+  if (at < 0) return null;
+  if (/^~~~tabs\b/.test(body[at])) {
+    let fenced = false, n = 0;
+    for (const line of body.slice(at + 1)) { if (/^```/.test(line)) fenced = !fenced; else if (!fenced && /^---\s+\S/.test(line)) n++; }
+    return { n, noun: n === 1 ? "tab" : "tabs" };
+  }
+  if (/^```catalog\b/.test(body[at])) {
+    const inner: string[] = [];
+    for (let k = at + 1; k < body.length && !/^```/.test(body[k]); k++) inner.push(body[k]);
+    const n = catalogLines(inner, []).reduce((sum, group) => sum + group.items.length, 0);
+    return { n, noun: n === 1 ? "item" : "items" };
+  }
+  return null;
+}
+
+/**
+ * A fence of tildes tagged `group <name>` or `group <name> | <description>`, holding one `tabs` or `catalog` fence, is one panel: the name and the
+ * count of its members in its head, the description a line under the name, the block in its body. It closes on the line of three tildes that
+ * matches its opening, counting the `~~~tabs` it holds, so no fence takes a different closing line when it holds tabs. Consecutive groups
+ * (only blank lines between) share one row of links above the panels.
+ */
+function drawnInGroup(body: string[], findings: Finding[]): string {
+  const before = inGroup;
+  inGroup = true;
+  try { return renderBody(body, findings).trim(); } finally { inGroup = before; }
+}
+
+function groupPanels(heads: { name: string; description: string; body: string[] }[], findings: Finding[]): string {
+  const panels = heads.map((group) => {
+    let id = `g-${anchorOf(group.name)}`;
+    for (let n = 2; groupIds.has(id); n++) id = `g-${anchorOf(group.name)}-${n}`;
+    groupIds.add(id);
+    if (group.body.some((line) => /^~~~group\b/.test(line))) findings.push({ message: `a \`group\` fence holds one \`tabs\` or \`catalog\` fence, and groups never nest: "${group.name}"`, stops: true });
+    const counted = groupCount(group.body);
+    if (!counted) findings.push({ message: `a \`group\` fence holds a \`tabs\` or a \`catalog\` fence, "${group.name}" holds neither`, stops: true });
+    const count = counted ? `${counted.n} ${counted.noun}` : "";
+    const title = `<h5 id="${id}-title">${inline(group.name)}</h5>`;
+    const head = group.description
+      ? `<div class="sds-group-head"><div class="sds-group-title">${title}<p class="sds-group-line">${inline(group.description)}</p></div>${count ? `<span class="sds-group-count">${count}</span>` : ""}</div>`
+      : `<div class="sds-group-head">${title}${count ? `<span class="sds-group-count">${count}</span>` : ""}</div>`;
+    const html = `<section class="sds-group" id="${id}" aria-labelledby="${id}-title">\n  ${head}\n  <div class="sds-group-body">${drawnInGroup(group.body, findings)}</div>\n</section>`;
+    return { id, group, n: counted?.n ?? 0, html };
+  });
+  // Fenced group panels draw no row of jump links: each panel's head already names it, and the page's own
+  // outline reaches each one (the developer, 2026-11-24: "can we drop these pills").
+  return panels.map((p) => p.html).join("\n");
+}
+
 // ---------------------------------------------------------------------------- the TABS block
 
 const TAB_LOOKS = ["LINE", "SWITCH", "PILL"];
@@ -766,7 +859,7 @@ function tabsBlock(tag: string, body: string[], findings: Finding[], nested: boo
   const { options } = tagWords(tag);
   const look = options.look ?? "LINE";
   if (!TAB_LOOKS.includes(look)) return stop(`a \`tabs\` look is one of ${TAB_LOOKS.join(", ")}, not \`${look}\``);
-  if (nested || body.some((line) => /^~~~\S/.test(line))) return stop("tabs inside tabs are refused: a panel holds ordinary blocks, and a second set of alternatives is a fold or a part of its own");
+  if (nested || body.some((line) => /^~~~(?:tabs|group)\b/.test(line))) return stop("tabs inside tabs are refused: a panel holds ordinary blocks, and a second set of alternatives is a fold or a part of its own");
   const panels: { label: string; lines: string[] }[] = [];
   let fenced = false;
   for (const line of body) {
@@ -814,6 +907,44 @@ function spelled(kind: string, body: string[], findings: Finding[]): string {
   return `  <div class="sds-nextnav">\n${doors.join("\n")}\n  </div>`;
 }
 
+/** A code frame folds past this many lines, and shows this many of them while shut (RULE.DEVEX.WORKSPACE.573). */
+const FOLD_PAST = 20, PEEK = 10;
+
+/** A `mark=` value, `3-5,9`, as the set of line numbers it names; null where it is not that. */
+function markedLines(value: string): Set<number> | null {
+  const set = new Set<number>();
+  for (const part of value.split(",")) {
+    const m = /^(\d+)(?:-(\d+))?$/.exec(part);
+    if (!m) return null;
+    const from = Number(m[1]), to = m[2] ? Number(m[2]) : from;
+    if (to < from) return null;
+    for (let n = from; n <= to; n++) set.add(n);
+  }
+  return set;
+}
+
+/**
+ * The code frame of a file excerpt, a marked line or code past twenty lines (RULE.DEVEX.WORKSPACE.573): the path (linking the whole file
+ * where its repository has a github.com remote) and the lines as the title, the language as a badge, every line its own element so a
+ * marked line can be shaded and the gutter can number it, the colours written in, and a fold that shows the first lines while shut.
+ */
+function codeFrame(o: { path: string | null; range: string | null; href: string | null; lang: string; lines: string[]; first: number; marks: Set<number>; numbered: boolean; folded: boolean }): string {
+  const runs = colours(o.lang) ? linesOf(o.lines.join("\n"), o.lang) : o.lines.map((text) => [{ cls: null as string | null, text }]);
+  const drawn = o.lines.map((_, k) => {
+    const n = o.first + k;
+    const text = (runs[k] ?? []).map((r) => r.cls ? `<span class="sds-tk-${r.cls}">${escapedCode(r.text)}</span>` : escapedCode(r.text)).join("");
+    return `<span class="sds-ln${o.marks.has(n) ? " sds-mark" : ""}" data-n="${n}">${text}</span>`;
+  });
+  const attr = o.lang ? ` data-lang="${o.lang}"` : "";
+  const long = drawn.length > FOLD_PAST;
+  const shown = long ? drawn.slice(0, PEEK) : drawn;
+  const rest = long ? drawn.slice(PEEK) : [];
+  const where = o.path ? (o.href ? `<a class="sds-file-path" href="${esc(o.href)}">${esc(o.path)}${o.range ? `<span class="sds-file-lines">:${o.range}</span>` : ""}</a>` : `<span class="sds-file-path">${esc(o.path)}${o.range ? `<span class="sds-file-lines">:${o.range}</span>` : ""}</span>`) : `<span class="sds-file-path"></span>`;
+  const more = rest.length ? `\n    <details class="sds-more"><summary>Show ${rest.length} more lines</summary><pre${attr}>${rest.join("\n")}</pre></details>` : "";
+  const frame = `  <figure class="sds-file sds-code${o.numbered ? " sds-code-numbered" : ""}">\n    <figcaption>${where}${o.lang ? `<span class="sds-file-lang">${esc(o.lang)}</span>` : ""}</figcaption>\n    <pre${attr}>${shown.join("\n")}</pre>${more}\n  </figure>`;
+  return o.folded && o.path ? `  <details class="sds-fold">\n    <summary>${esc(o.path)}${o.range ? `:${o.range}` : ""}</summary>\n${frame}\n  </details>` : frame;
+}
+
 /** One section's body: paragraphs, tables, lists, fenced blocks and figures. */
 function renderBody(lines: string[], findings: Finding[], nested = false): string {
   const out: string[] = [];
@@ -843,13 +974,45 @@ function renderBody(lines: string[], findings: Finding[], nested = false): strin
       out.push(`  <h${level} id="${anchorOf(t)}">${inline(t)}</h${level}>`);
       i++; continue;
     }
+    // A fence of tildes tagged `group` is a panel; groups in a row share one row of jump links.
+    if (/^~~~group\b/.test(l)) {
+      flush();
+      const heads: { name: string; description: string; body: string[] }[] = [];
+      while (i < lines.length && /^~~~group\b/.test(lines[i])) {
+        const tag = lines[i].replace(/^~~~group\s*/, "").trim();
+        const [name, ...rest] = tag.split(/\s+\|\s+/);
+        const end = tildeFenceEnd(lines, i);
+        if (!name.trim()) findings.push({ message: "a `group` fence is tagged with its name: `~~~group <name>` or `~~~group <name> | <description>`", stops: true });
+        if (end < 0) { findings.push({ message: `a \`group\` fence is never closed with \`~~~\`: "${name.trim()}"`, stops: true }); heads.push({ name: name.trim() || "Group", description: rest.join(" | ").trim(), body: lines.slice(i + 1) }); i = lines.length; break; }
+        heads.push({ name: name.trim(), description: rest.join(" | ").trim(), body: lines.slice(i + 1, end) });
+        i = end + 1;
+        let peek = i;
+        while (peek < lines.length && !lines[peek].trim()) peek++;
+        if (peek < lines.length && /^~~~group\b/.test(lines[peek])) i = peek;
+      }
+      out.push(groupPanels(heads, findings));
+      continue;
+    }
+    // A FENCE OF TILDES TAGGED `fold <summary>` is a fold over ordinary blocks, a long table above all (RULE.DEVEX.WORKSPACE.575): shut, with the summary as its line.
+    if (/^~~~fold\b/.test(l)) {
+      flush();
+      const summary = l.replace(/^~~~fold\s*/, "").trim();
+      const end = tildeFenceEnd(lines, i);
+      if (!summary) findings.push({ message: "a `fold` fence is tagged with its summary: `~~~fold <summary>`", stops: true });
+      if (end < 0) { findings.push({ message: `a \`fold\` fence is never closed with \`~~~\`: "${summary}"`, stops: true }); i = lines.length; continue; }
+      out.push(`  <details class="sds-fold sds-fold-block">\n    <summary>${inline(summary)}</summary>\n${renderBody(lines.slice(i + 1, end), findings, nested)}\n  </details>`);
+      i = end + 1;
+      continue;
+    }
     // A fence of tildes is the TABS block, closed by a line of three tildes alone.
     if (/^~~~tabs\b/.test(l)) {
       flush();
       const tag = l.replace(/^~~~/, "").trim();
       const body: string[] = [];
+      // The fence closes on the line of three tildes that matches its opening, counting the fences it holds (a fold, a refused set of tabs).
+      const close = tildeFenceEnd(lines, i);
       i++;
-      while (i < lines.length && !/^~~~\s*$/.test(lines[i])) body.push(lines[i++]);
+      while (i < lines.length && (close < 0 ? !/^~~~\s*$/.test(lines[i]) : i < close)) body.push(lines[i++]);
       if (i >= lines.length) findings.push({ message: "a `tabs` fence is never closed with `~~~`", stops: true });
       i++;
       out.push(tabsBlock(tag, body, findings, nested));
@@ -861,34 +1024,64 @@ function renderBody(lines: string[], findings: Finding[], nested = false): strin
       // A fence tag is a language, and may carry `file=<path>`: the block then stands in a FILE frame titled by that path,
       // and the word `fold` draws that frame inside a `details` whose summary is the path.
       const fileAt = /\bfile=(\S+)/.exec(tag);
+      const linesAt = /\blines=(\S+)/.exec(tag);
+      const markAt = /\bmark=(\S+)/.exec(tag);
       const folded = /(?:^|\s)fold(?=\s|$)/.test(tag);
-      const lang = tag.replace(/\bfile=\S+/, "").replace(/(?:^|\s)fold(?=\s|$)/, " ").trim();
+      const lang = tag.replace(/\b(?:file|lines|mark)=\S+/g, "").replace(/(?:^|\s)fold(?=\s|$)/, " ").trim();
       const kind = lang.split(/\s+/)[0];
       const body: string[] = [];
       i++;
       while (i < lines.length && !/^```/.test(lines[i])) body.push(lines[i++]);
       i++;
+      // A FILE EXCERPT: `lines=a-b` with an empty body reads those lines of the file (RULE.DEVEX.WORKSPACE.573). A path that is not there,
+      // a range outside the file, or a body beside `lines=` stops the write.
+      let first = 1, range: string | null = null, href: string | null = null;
+      if (linesAt) {
+        const stop = (message: string) => { findings.push({ message, stops: true }); };
+        const span = /^(\d+)-(\d+)$/.exec(linesAt[1]);
+        const where = fileAt && pageRoot ? resolve(pageRoot, fileAt[1]) : null;
+        if (!fileAt) { stop("`lines=a-b` reads a file: the fence's tag needs `file=<path>` too"); continue; }
+        if (!span || Number(span[1]) < 1 || Number(span[2]) < Number(span[1])) { stop(`\`lines=${linesAt[1]}\` is a range of two line numbers, \`lines=a-b\`, a from 1 and b from a`); continue; }
+        if (body.some((line) => line.trim())) { stop("a fence with `lines=` holds no body: the excerpt is read from the file, never pasted"); continue; }
+        if (!where || !existsSync(where)) { stop(`\`lines=${linesAt[1]}\` reads \`${fileAt[1]}\` from the repository root${pageRoot ? "" : " (the page's folder holding `docs/` is not known)"}, and no file is there`); continue; }
+        const all = readFileSync(where, "utf8").replace(/\n$/, "").split("\n");
+        if (Number(span[2]) > all.length) { stop(`\`lines=${linesAt[1]}\` runs past the end of \`${fileAt[1]}\`, which holds ${all.length} lines`); continue; }
+        first = Number(span[1]);
+        range = `${span[1]}-${span[2]}`;
+        body.length = 0;
+        body.push(...all.slice(first - 1, Number(span[2])));
+        href = githubAddress(where);
+      }
       // A FOLDED FENCE WITH NO BODY READS ITS FILE: the path is relative to the folder holding `docs/`, so a page shows a spec
       // without copying it into the markdown. A path that is not there stops the write.
-      if (folded && fileAt && !body.some((line) => line.trim())) {
+      if (!linesAt && folded && fileAt && !body.some((line) => line.trim())) {
         const where = pageRoot ? resolve(pageRoot, fileAt[1]) : null;
         if (!where || !existsSync(where)) {
-          findings.push({ message: `a folded fence with no body reads \`${fileAt[1]}\` from the repository root${pageRoot ? "" : " (the page's folder holding `docs/` is not known)"}, and no file is there`, stops: true });
+          findings.push({ message: `a folded fence with no body reads \`${fileAt[1]}\` from the repository root${pageRoot ? "" : " (the page's folder holding \`docs/\` is not known)"}, and no file is there`, stops: true });
           continue;
         }
         body.push(...readFileSync(where, "utf8").replace(/\n$/, "").split("\n"));
+      }
+      let marks = new Set<number>();
+      if (markAt) {
+        const read = markedLines(markAt[1]);
+        if (!read) { findings.push({ message: `\`mark=${markAt[1]}\` names lines as \`a-b\` or \`a\`, joined by commas`, stops: true }); continue; }
+        const last = first + body.length - 1;
+        const outside = [...read].filter((n) => n < first || n > last);
+        if (outside.length) { findings.push({ message: `\`mark=${markAt[1]}\` names line ${outside[0]}, outside the lines this fence shows (${first}-${last})`, stops: true }); continue; }
+        marks = read;
       }
       if (kind === "catalog") {
         out.push(catalogBlock(lang, body, findings));
       } else if (lang === "cards" || lang === "next") {
         out.push(spelled(lang, body, findings));
       } else if (lang === "unit") {
-        out.push(unitFrame(body, findings));
+        if (unitFenceAllowed) out.push(unitFrame(body, findings));
+        else findings.push({ message: "a `unit` fence draws a render, and a render belongs on a surface sample page (a design language's samples or a surface page preview): on a docs page draw the unit's structure as a `dg` skeleton and name its showcase page", stops: true });
       } else if (lang === "dg") {
         let spec: Spec | null = null;
         try { spec = JSON.parse(body.join("\n")); } catch (e) { findings.push({ message: `a \`dg\` figure is not strict JSON — ${(e as Error).message}` }); }
         if (spec) {
-          builtSkeleton(spec, findings);
           const { svg, findings: df } = draw(spec);
           for (const m of df) findings.push({ message: m });
           if (svg) {
@@ -900,11 +1093,14 @@ function renderBody(lines: string[], findings: Finding[], nested = false): strin
       } else if (lang === "html") {
         out.push(body.join("\n"));
       } else {
-        // The page holds plain code, tagged with its language. The shared script colours the block
-        // when the page opens, so no colour is written here.
+        // Plain code is tagged with its language, and the shared script colours it when the page opens. An excerpt, a marked line
+        // or a long block is drawn by `codeFrame`, which writes its colours.
         const pre = `<pre${lang ? ` data-lang="${lang}"` : ""}>${lang ? escapedCode(body.join("\n")) : esc(body.join("\n"))}</pre>`;
         if (folded && !fileAt) findings.push({ message: "the word `fold` needs a `file=<path>` in the same fence tag: the fold's summary is the path" });
-        if (fileAt) {
+        // A frame of its own: an excerpt, a marked line, or code past twenty lines (never a shell command, which the page script frames, nor a tree).
+        const framed = linesAt || markAt || (body.length > FOLD_PAST && kind !== "sh" && kind !== "bash" && kind !== "tree");
+        if (framed) out.push(codeFrame({ path: fileAt ? fileAt[1] : null, range, href, lang, lines: body, first, marks, numbered: !!linesAt, folded }));
+        else if (fileAt) {
           const frame = `  <figure class="sds-file">\n    <figcaption><span class="sds-file-path">${esc(fileAt[1])}</span>${lang ? `<span class="sds-file-lang">${esc(lang)}</span>` : ""}</figcaption>\n    ${pre}\n  </figure>`;
           out.push(folded ? `  <details class="sds-fold">\n    <summary>${esc(fileAt[1])}</summary>\n${frame}\n  </details>` : frame);
         } else out.push(`  ${pre}`);
@@ -991,15 +1187,16 @@ function renderPageBody(opts: Parameters<typeof renderPage>[0]): { html: string;
   const findings: Finding[] = [];
   const { block } = opts;
   const lines = opts.markdown.split("\n");
-  tabsDrawn = 0; groupIds = new Set(); unitUsed = false; unitStylesheet = opts.furniture.stylesheet;
+  tabsDrawn = 0; groupIds = new Set(); inGroup = false; unitUsed = false; unitStylesheet = opts.furniture.stylesheet;
 
   // Everything above the first `##` is the lead: the h1 and the tag line are the masthead's,
   // so they are dropped here rather than rendered twice.
   // A `## ` line inside a fence is not a section: a catalog fence uses it for its groups.
   const sectionAt = new Set<number>();
-  for (let k = 0, fence = ""; k < lines.length; k++) {
-    if (fence) { if (fence === "```" ? /^```/.test(lines[k]) : /^~~~\s*$/.test(lines[k])) fence = ""; continue; }
-    if (/^```/.test(lines[k])) fence = "```"; else if (/^~~~tabs\b/.test(lines[k])) fence = "~~~"; else if (/^##\s/.test(lines[k])) sectionAt.add(k);
+  for (let k = 0; k < lines.length; k++) {
+    if (/^```/.test(lines[k])) { k++; while (k < lines.length && !/^```/.test(lines[k])) k++; continue; }
+    if (/^~~~(?:tabs|group|fold)\b/.test(lines[k])) { const end = tildeFenceEnd(lines, k); k = end < 0 ? lines.length : end; continue; }
+    if (/^##\s/.test(lines[k])) sectionAt.add(k);
   }
   const firstSection = lines.findIndex((_, k) => sectionAt.has(k));
   const leadLines = lines.slice(0, firstSection < 0 ? lines.length : firstSection)

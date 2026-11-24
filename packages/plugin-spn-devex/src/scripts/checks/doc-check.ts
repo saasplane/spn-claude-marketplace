@@ -864,6 +864,29 @@ export function slotsLeft(text: string): string[] {
  * slot list, each section whose heading has nothing under it, and each section whose only content is a placeholder. A file under a
  * `templates/` folder is exempt, and a heading that is followed by a deeper heading is a section with parts, not an empty one.
  */
+/**
+ * A page's boxes open and close in pairs (RULE.DEVEX.WORKSPACE.579). One stray `</section>` closes its parent early, and every
+ * block after it falls out of the section and loses the section's look: the blocks template's FOLD and COMPARISON did, on
+ * 2026-11-24, and `docs look` passed it because its layout held. Read with comments, scripts, styles and `pre` blanked out.
+ */
+const PAIRED = /<(\/?)(section|div|details|table|main|article|aside|nav|header|footer)\b[^>]*>/gi;
+export function unpairedTags(text: string): Finding[] {
+  const blank = (m: string) => m.replace(/[^\n]/g, " ");
+  const bare = text.replace(/<!--[\s\S]*?-->/g, blank).replace(/<(script|style|pre|textarea)\b[\s\S]*?<\/\1>/gi, blank);
+  const lineAt = (at: number) => bare.slice(0, at).split("\n").length;
+  const open: Array<{ tag: string; line: number }> = [];
+  for (const m of bare.matchAll(PAIRED)) {
+    const tag = m[2].toLowerCase();
+    if (!m[1]) { if (!m[0].endsWith("/>")) open.push({ tag, line: lineAt(m.index!) }); continue; }
+    const top = open[open.length - 1];
+    if (top?.tag === tag) { open.pop(); continue; }
+    const where = top ? `, where the open box is the <${top.tag}> of line ${top.line}` : ", with no box open";
+    return [["RULE", `line ${lineAt(m.index!)} closes a </${tag}>${where}: a box closed twice drops every block after it out of its section; close each box once (RULE.DEVEX.WORKSPACE.579)`]];
+  }
+  if (open.length) { const last = open[open.length - 1]; return [["RULE", `the <${last.tag}> of line ${last.line} is never closed; close each box once (RULE.DEVEX.WORKSPACE.579)`]]; }
+  return [];
+}
+
 export function unfilledPage(path: string, text: string): Finding[] {
   if (isTemplatePath(path) || !/\.html?$/i.test(path)) return [];
   const out: Finding[] = [];
@@ -1549,6 +1572,7 @@ export function check(path: string, text: string, fragment = false): Finding[] {
   const prose = proseOf(text, isHtml);
   const out: Finding[] = structural(path);
   if (isHtml) out.push(...uncutVersions(text));
+  if (isHtml && !fragment) out.push(...unpairedTags(text));
   // Every page that carries a rail owes it the shared script, a preview and a samples index as much
   // as an approach page: a page rewritten whole and short of that line shows an empty outline.
   if (isHtml && !fragment) out.push(...pageFurniture(text));

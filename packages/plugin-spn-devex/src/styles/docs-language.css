@@ -3478,11 +3478,14 @@
   table.sds-terms th:nth-child(1) {
     width: 22%;
   }
-  table.sds-terms th:nth-child(2) {
+  table.sds-terms:not(.sds-terms-two) th:nth-child(2) {
     width: 26%;
   }
-  table.sds-terms td:nth-child(2) code {
+  table.sds-terms:not(.sds-terms-two) td:nth-child(2) code {
     overflow-wrap: anywhere;
+  }
+  table.sds-terms-two th:nth-child(1) {
+    width: 30%;
   }
   table.sds-terms th[scope="rowgroup"] {
     color: var(--sds-text-title);
@@ -3519,6 +3522,13 @@
     font-family: var(--sds-ui);
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
+  }
+  .sds-num {
+    font-family: var(--sds-ui);
+    color: var(--sds-accent);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--font-weight-bold);
+    margin-right: .35em;
   }
   .sds-yes {
     color: var(--on-success-subtle);
@@ -7042,7 +7052,7 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
-  padding: .8rem var(--sds-frame-head-px);
+  padding: .5rem var(--sds-frame-head-px);
   border-bottom: 1px solid var(--sds-rule);
   border-radius: calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0 0;
   background: var(--muted);
@@ -7055,6 +7065,17 @@
   text-transform: none;
   letter-spacing: normal;
 }
+.sds-group-title {
+  min-width: 0;
+}
+.sds-group-line {
+  margin: .1rem 0 0;
+  font-size: var(--sds-sm);
+  color: var(--sds-text-fact);
+}
+.sds-group-body .sds-scroll {
+  margin: 0;
+}
 .sds-group-count {
   font-size: var(--sds-xs);
   color: var(--sds-text-fact);
@@ -7062,6 +7083,35 @@
 }
 .sds-group-body {
   padding: 1rem 1.1rem;
+}
+.sds-group-body:has(> .sds-tabset, > .sds-scroll) {
+  padding: 0;
+}
+.sds-group-body > .sds-tabset {
+  margin: 0;
+}
+.sds-group-body > .sds-tabset > .sds-tabset-scroll > .sds-tabset-bar, .sds-group-body > .sds-tabset > .sds-tabset-bar {
+  margin-top: 0;
+  padding-left: calc(var(--sds-frame-head-px) - .8rem);
+}
+.sds-group-body .sds-tabset-panel > :first-child {
+  margin-top: 0;
+}
+.sds-group-body .sds-scroll, .sds-group-body .sds-tabset-panel > .sds-scroll {
+  border: 0;
+  border-radius: 0;
+  background: none;
+  margin: 0;
+}
+.sds-group-body .sds-scroll tr:last-child > td {
+  border-bottom: 0;
+}
+.sds-group-body td > .sds-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  justify-content: flex-end;
+  padding-top: .05rem;
 }
 .sds-group-body > .sds-tiles {
   margin: 0;
@@ -7172,14 +7222,37 @@
   grid-template-columns: minmax(6.5rem, max-content) 1fr;
   column-gap: .6rem;
 }
-.sds-tile .sds-tile-facts dt {
-  color: var(--sds-text-fact-card);
+.sds-tile-facts dt, .sds-fact-key {
+  font-family: inherit;
+  font-style: normal;
+  font-size: var(--sds-xs);
   font-weight: var(--font-weight-medium);
+  letter-spacing: .02em;
+  line-height: 1.25;
+  color: var(--sds-text-fact-card);
 }
-.sds-tile .sds-tile-facts dd {
+.sds-tile-facts dd, .sds-fact-value {
   margin: 0;
-  color: var(--sds-text-description-card);
+  font-family: inherit;
+  font-style: normal;
+  font-size: var(--sds-sm);
+  color: var(--sds-text-title-card);
   overflow-wrap: anywhere;
+}
+.sds-facts {
+  display: block;
+  margin-top: .5rem;
+  font-family: inherit;
+  font-size: var(--font-content-sm-size);
+  line-height: var(--font-content-sm-line-height);
+}
+.sds-facts .sds-fact-key, .sds-facts .sds-fact-value {
+  font-size: inherit;
+  line-height: inherit;
+  letter-spacing: normal;
+}
+.sds-facts .sds-fact-key {
+  margin-right: .3em;
 }
 .sds-tile .sds-tile-facts code {
   font-size: inherit;
@@ -7239,15 +7312,6 @@
   border-top: 1px solid var(--sds-rule);
   padding-top: .65rem;
   margin-top: .15rem;
-}
-.sds-tiles[data-layout='GRID'] .sds-tile-facts dt {
-  font-size: var(--sds-xs);
-  letter-spacing: .02em;
-  line-height: 1.25;
-}
-.sds-tiles[data-layout='GRID'] .sds-tile-facts dd {
-  font-size: var(--sds-sm);
-  color: var(--sds-text-title-card);
 }
 .sds-tile-head {
   display: flex;
@@ -7427,14 +7491,6 @@
   flex-direction: column;
   gap: 0;
 }
-.sds-tiles[data-layout='LIST'] .sds-tile-facts dt {
-  font-size: var(--sds-xs);
-  letter-spacing: .02em;
-  line-height: 1.25;
-}
-.sds-tiles[data-layout='LIST'] .sds-tile-facts dd {
-  color: var(--sds-text-title-card);
-}
 .sds-tiles[data-layout='LIST'] .sds-tile-fact-wide {
   grid-column: 1 / -1;
 }
@@ -7448,16 +7504,10 @@
   align-items: baseline;
   column-gap: .6rem;
 }
-.sds-tiles[data-layout='LIST'] .sds-tile-facts-one dt {
-  font-size: var(--sds-caption);
-  font-weight: var(--font-weight-regular, 400);
-  color: var(--sds-text-fact-card);
-}
-.sds-tiles[data-layout='LIST'] .sds-tile-facts-one dd {
-  font-style: italic;
-  font-size: var(--sds-caption);
-  color: var(--sds-text-description-card);
-  line-height: 1.5;
+.sds-tiles[data-layout='LIST'] .sds-tile-facts-one dt, .sds-tiles[data-layout='LIST'] .sds-tile-facts-one dd {
+  font-size: var(--font-content-sm-size);
+  line-height: var(--font-content-sm-line-height);
+  letter-spacing: normal;
 }
 .sds-tiles[data-layout='LIST'] .sds-tile-body > .sds-tile-facts-one {
   margin-top: .2rem;
@@ -7493,8 +7543,8 @@
     display: none;
   }
 }
-.sds-tile .sds-tile-facts > .sds-tile-fact-bare {
-  display: block;
+.sds-tile-fact-bare > dt {
+  display: none;
 }
 .sds-tiles[data-layout='LIST'][data-facts='side'] > .sds-tile, .sds-tiles[data-layout='LIST'][data-facts='side'] > .sds-tiles-head {
   grid-column: 1 / -1;
@@ -7681,6 +7731,119 @@
   margin: 0;
   border: 0;
   border-radius: 0 0 var(--radius) var(--radius);
+}
+.sds-code .sds-ln {
+  display: inline-block;
+  box-sizing: border-box;
+  min-width: calc(100% + 2.2rem);
+  margin: 0 -1.1rem;
+  padding: 0 1.1rem;
+}
+.sds-code .sds-ln:empty::after {
+  content: ' ';
+}
+.sds-code .sds-ln.sds-mark {
+  background: var(--sds-accent-soft);
+  box-shadow: inset 2px 0 0 var(--sds-accent);
+}
+.sds-code-numbered .sds-ln::before {
+  content: attr(data-n);
+  display: inline-block;
+  width: 3ch;
+  margin-right: 1.4ch;
+  text-align: right;
+  color: var(--sds-tk-c);
+  user-select: none;
+}
+.sds-code .sds-file-lines {
+  color: var(--sds-text-description);
+}
+.sds-code a.sds-file-path {
+  color: inherit;
+  text-decoration: none;
+}
+.sds-code a.sds-file-path:hover {
+  color: var(--sds-accent);
+  text-decoration: underline;
+}
+.sds-code > .sds-more {
+  border-top: 1px dashed var(--sds-rule);
+}
+.sds-code > .sds-more > summary {
+  cursor: pointer;
+  padding: .35rem var(--sds-frame-head-px);
+  font-family: var(--font-code);
+  font-size: var(--font-content-xs-size);
+  color: var(--sds-text-description);
+}
+.sds-code > .sds-more > summary:hover {
+  color: var(--sds-accent);
+}
+.sds-code > .sds-more > pre {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  padding-top: 0;
+}
+.sds-fold-block > .sds-scroll {
+  margin: 0;
+  border: 0;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+.sds-fold-block > .sds-scroll > table {
+  border: 0;
+  border-radius: 0;
+}
+.sds-fold-block > :not(summary):not(.sds-scroll) {
+  margin-left: var(--sds-frame-head-px);
+  margin-right: var(--sds-frame-head-px);
+}
+.sds-fold.sds-guidance {
+  margin: .35rem 0 0;
+  border: 0;
+  background: none;
+}
+.sds-fold.sds-guidance > summary {
+  min-height: 0;
+  padding: 0;
+  width: fit-content;
+  list-style-position: inside;
+  font-family: inherit;
+  font-size: var(--sds-xs, .75rem);
+  line-height: 1.4;
+  color: var(--sds-text-description);
+}
+.sds-fold.sds-guidance[open] > summary {
+  border-bottom: 0;
+}
+.sds-fold.sds-guidance > p {
+  margin: .15rem 0 0;
+  padding: 0 0 0 1.05em;
+  font-family: inherit;
+  font-size: var(--sds-xs, .75rem);
+  line-height: 1.45;
+  color: var(--sds-text-description-card);
+}
+.sds-fold.sds-guidance > p:last-child {
+  margin-bottom: .3rem;
+}
+.sds-fold.sds-guidance > p > strong {
+  margin-right: .4rem;
+  font-size: inherit;
+  line-height: inherit;
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--sds-text-title-card);
+}
+.sds-guidance-ids {
+  display: inline;
+  font-family: var(--font-code);
+  font-size: .7rem;
+  color: var(--sds-text-description);
+}
+.sds-guidance-ids > span {
+  display: inline-block;
+  margin-right: .4rem;
+  white-space: nowrap;
 }
 .sds-unit-pair {
   display: grid;

@@ -325,8 +325,9 @@
      meaning. A construct's header row in a glossary, one cell across three columns, reads as a group heading. */
   table.sds-terms{table-layout:fixed}
   table.sds-terms th:nth-child(1){width:22%}
-  table.sds-terms th:nth-child(2){width:26%}
-  table.sds-terms td:nth-child(2) code{overflow-wrap:anywhere}
+  table.sds-terms:not(.sds-terms-two) th:nth-child(2){width:26%}
+  table.sds-terms:not(.sds-terms-two) td:nth-child(2) code{overflow-wrap:anywhere}
+  table.sds-terms-two th:nth-child(1){width:30%}
   table.sds-terms th[scope="rowgroup"]{color:var(--sds-text-title); padding-top:1rem}
   @media (max-width:40rem){
     table.sds-terms{min-width:0}
@@ -337,6 +338,7 @@
     table.sds-terms th[scope="rowgroup"]{display:block; border:0; padding:.1rem .75rem}
   }
   .sds-number-cell{@apply font-ui text-right whitespace-nowrap; font-variant-numeric:tabular-nums}
+  .sds-num{@apply font-ui text-accent; font-variant-numeric:tabular-nums; font-weight:var(--font-weight-bold); margin-right:.35em}
   .sds-yes{@apply text-ok-ink; font-weight:var(--font-weight-semibold)}
   .sds-no{@apply text-gap-ink; font-weight:var(--font-weight-semibold)}
   .sds-small,.sds-code{@apply font-mono text-fact; font-family:var(--font-code)}
@@ -1433,7 +1435,7 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
-  padding: .8rem var(--sds-frame-head-px);
+  padding: .5rem var(--sds-frame-head-px);
   border-bottom: 1px solid var(--sds-rule);
   border-radius: calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0 0;
   background: var(--muted);
@@ -1446,6 +1448,15 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   text-transform: none;
   letter-spacing: normal;
 }
+.sds-group-title {
+  min-width: 0;
+}
+.sds-group-line {
+  margin: .1rem 0 0;
+  font-size: var(--sds-sm);
+  color: var(--sds-text-fact);
+}
+.sds-group-body .sds-scroll { margin: 0; }
 .sds-group-count {
   font-size: var(--sds-xs);
   color: var(--sds-text-fact);
@@ -1453,6 +1464,42 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 }
 .sds-group-body {
   padding: 1rem 1.1rem;
+}
+/* A GROUP PANEL HOLDING TABS OR A CATALOG IS ONE PANEL (the developer, 2026-11-24: "match tabs edge to edge in panel", "such can be merged no
+   need extra padding"): the body has no inset and no band under the head, the tab row and its underline run from the panel's left edge to its
+   right edge with the first tab's text at the head title's inset, and the rows of a list run edge to edge with a divider between rows and no
+   box of their own. Outside a group panel nothing changes. */
+.sds-group-body:has(> .sds-tabset, > .sds-scroll) {
+  padding: 0;
+}
+.sds-group-body > .sds-tabset {
+  margin: 0;
+}
+.sds-group-body > .sds-tabset > .sds-tabset-scroll > .sds-tabset-bar,
+.sds-group-body > .sds-tabset > .sds-tabset-bar {
+  margin-top: 0;
+  padding-left: calc(var(--sds-frame-head-px) - .8rem);
+}
+.sds-group-body .sds-tabset-panel > :first-child {
+  margin-top: 0;
+}
+.sds-group-body .sds-scroll,
+.sds-group-body .sds-tabset-panel > .sds-scroll {
+  border: 0;
+  border-radius: 0;
+  background: none;
+  margin: 0;
+}
+.sds-group-body .sds-scroll tr:last-child > td {
+  border-bottom: 0;
+}
+/* Tags at a row's end: the badge keeps its own padding, an even gap between tags and between wrapped lines, the first tag level with the row's first line. */
+.sds-group-body td > .sds-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  justify-content: flex-end;
+  padding-top: .05rem;
 }
 .sds-group-body > .sds-tiles {
   margin: 0;
@@ -1566,15 +1613,45 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   grid-template-columns: minmax(6.5rem, max-content) 1fr;
   column-gap: .6rem;
 }
-.sds-tile .sds-tile-facts dt {
-  color: var(--sds-text-fact-card);
+/* AN INLINE FACT HAS ONE LOOK (rule 568), whatever block draws it: a tile's facts, a group row's small line, an item cell's line and an
+   after-description cell. The text font; the key in the fact colour at medium weight, close to its value; the value in the card title colour.
+   A key over its value takes the key at the extra-small step and the value at the small step; a fact on one line takes both at the small
+   step. Only a fact in a column of its own (`facts=END`, a table's column) keeps the column's look, and none of these rules is repeated per block. */
+.sds-tile-facts dt,
+.sds-fact-key {
+  font-family: inherit;
+  font-style: normal;
+  font-size: var(--sds-xs);
   font-weight: var(--font-weight-medium);
+  letter-spacing: .02em;
+  /* A key sits right on its value: no gap, and a line no taller than its letters need. */
+  line-height: 1.25;
+  color: var(--sds-text-fact-card);
 }
-.sds-tile .sds-tile-facts dd {
+.sds-tile-facts dd,
+.sds-fact-value {
   margin: 0;
-  color: var(--sds-text-description-card);
+  font-family: inherit;
+  font-style: normal;
+  font-size: var(--sds-sm);
+  color: var(--sds-text-title-card);
   overflow-wrap: anywhere;
 }
+/* The facts of one item on one line: the small step for the key and the value alike, the key close to its value. */
+.sds-facts {
+  display: block;
+  margin-top: .5rem;
+  font-family: inherit;
+  font-size: var(--font-content-sm-size);
+  line-height: var(--font-content-sm-line-height);
+}
+.sds-facts .sds-fact-key,
+.sds-facts .sds-fact-value {
+  font-size: inherit;
+  line-height: inherit;
+  letter-spacing: normal;
+}
+.sds-facts .sds-fact-key { margin-right: .3em; }
 .sds-tile .sds-tile-facts code {
   font-size: inherit;
 }
@@ -1636,17 +1713,6 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   border-top: 1px solid var(--sds-rule);
   padding-top: .65rem;
   margin-top: .15rem;
-}
-.sds-tiles[data-layout='GRID'] .sds-tile-facts dt {
-  font-size: var(--sds-xs);
-  letter-spacing: .02em;
-  /* A key sits right on its value: no gap, and a line no taller than its letters need (the developer, 2026-11-24:
-     "a fact's key (title) and its value (description) ... do we need this space?"). */
-  line-height: 1.25;
-}
-.sds-tiles[data-layout='GRID'] .sds-tile-facts dd {
-  font-size: var(--sds-sm);
-  color: var(--sds-text-title-card);
 }
 
 /* MEDIA: a catalog names one media for all its items, in DSItem's and DSFeature's own terms (DSItemMediaType, DSFeatureType),
@@ -1815,16 +1881,6 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   flex-direction: column;
   gap: 0;
 }
-.sds-tiles[data-layout='LIST'] .sds-tile-facts dt {
-  font-size: var(--sds-xs);
-  letter-spacing: .02em;
-  /* A key sits right on its value: no gap, and a line no taller than its letters need (the developer, 2026-11-24:
-     "a fact's key (title) and its value (description) ... do we need this space?"). */
-  line-height: 1.25;
-}
-.sds-tiles[data-layout='LIST'] .sds-tile-facts dd {
-  color: var(--sds-text-title-card);
-}
 /* A fact that is a sentence takes the whole row; the short ones share a row in columns. */
 .sds-tiles[data-layout='LIST'] .sds-tile-fact-wide {
   grid-column: 1 / -1;
@@ -1843,16 +1899,11 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   align-items: baseline;
   column-gap: .6rem;
 }
-.sds-tiles[data-layout='LIST'] .sds-tile-facts-one dt {
-  font-size: var(--sds-caption);
-  font-weight: var(--font-weight-regular, 400);
-  color: var(--sds-text-fact-card);
-}
+.sds-tiles[data-layout='LIST'] .sds-tile-facts-one dt,
 .sds-tiles[data-layout='LIST'] .sds-tile-facts-one dd {
-  font-style: italic;
-  font-size: var(--sds-caption);
-  color: var(--sds-text-description-card);
-  line-height: 1.5;
+  font-size: var(--font-content-sm-size);
+  line-height: var(--font-content-sm-line-height);
+  letter-spacing: normal;
 }
 /* The one line sits tight under the description, in the small size of its key (the developer, 2026-11-24: "can we redec space
    between facts and descriptio n and also use small fonts for facts?"). */
@@ -1885,8 +1936,8 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   .sds-tiles[data-layout='LIST'] .sds-tile-facts[data-columns] { grid-template-columns: 1fr; }
   .sds-tiles[data-layout='LIST'] .sds-tile-facts[data-columns] > .sds-tile-fact-none { display: none; }
 }
-/* A LINE OF TAGS WITH NO KEY (S75): an item's one fact, drawn as its badges alone; the sentence before the catalog names them. */
-.sds-tile .sds-tile-facts > .sds-tile-fact-bare { display: block; }
+/* A LINE OF TAGS WITH NO KEY (S75): an item's one fact, drawn as its badges alone; the sentence before the catalog names them. Its `dt` is hidden, for a reader of the markup. */
+.sds-tile-fact-bare > dt { display: none; }
 .sds-tiles[data-layout='LIST'][data-facts='side'] > .sds-tile,
 .sds-tiles[data-layout='LIST'][data-facts='side'] > .sds-tiles-head {
   grid-column: 1 / -1;
@@ -2042,6 +2093,59 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 .sds-fold > summary:hover { color: var(--sds-accent); }
 .sds-fold[open] > summary { border-bottom: 1px solid var(--sds-rule); }
 .sds-fold > .sds-file { margin: 0; border: 0; border-radius: 0 0 var(--radius) var(--radius); }
+
+/* CODE FRAME: an excerpt of a file, a marked line, or code past twenty lines. Every line is its own element: a marked line is shaded edge to edge,
+   an excerpt's lines carry their file line numbers in a gutter (drawn, never copied), and the lines past the tenth sit behind a fold. */
+.sds-code .sds-ln { display: inline-block; box-sizing: border-box; min-width: calc(100% + 2.2rem); margin: 0 -1.1rem; padding: 0 1.1rem; }
+.sds-code .sds-ln:empty::after { content: ' '; }
+.sds-code .sds-ln.sds-mark { background: var(--sds-accent-soft); box-shadow: inset 2px 0 0 var(--sds-accent); }
+.sds-code-numbered .sds-ln::before { content: attr(data-n); display: inline-block; width: 3ch; margin-right: 1.4ch; text-align: right; color: var(--sds-tk-c); user-select: none; }
+.sds-code .sds-file-lines { color: var(--sds-text-description); }
+.sds-code a.sds-file-path { color: inherit; text-decoration: none; }
+.sds-code a.sds-file-path:hover { color: var(--sds-accent); text-decoration: underline; }
+.sds-code > .sds-more { border-top: 1px dashed var(--sds-rule); }
+.sds-code > .sds-more > summary { cursor: pointer; padding: .35rem var(--sds-frame-head-px); font-family: var(--font-code); font-size: var(--font-content-xs-size); color: var(--sds-text-description); }
+.sds-code > .sds-more > summary:hover { color: var(--sds-accent); }
+.sds-code > .sds-more > pre { margin: 0; border: 0; border-radius: 0; padding-top: 0; }
+
+.sds-fold-block > .sds-scroll { margin: 0; border: 0; border-radius: 0 0 var(--radius) var(--radius); }
+.sds-fold-block > .sds-scroll > table { border: 0; border-radius: 0; }
+.sds-fold-block > :not(summary):not(.sds-scroll) { margin-left: var(--sds-frame-head-px); margin-right: var(--sds-frame-head-px); }
+
+/* GUIDANCE: the fold under a catalog row. A small gap under the row's facts, none after it; the summary and the open lines
+   share one inset; the lines are tight, label and value on one line; rules are a run of small ids. */
+.sds-fold.sds-guidance { margin: .35rem 0 0; border: 0; background: none; }
+.sds-fold.sds-guidance > summary {
+  min-height: 0;
+  padding: 0;
+  width: fit-content;
+  list-style-position: inside;
+  font-family: inherit;
+  font-size: var(--sds-xs, .75rem);
+  line-height: 1.4;
+  color: var(--sds-text-description);
+}
+.sds-fold.sds-guidance[open] > summary { border-bottom: 0; }
+/* The open guidance stands under the word Guidance, past the marker, in the text font: labels in the card title colour, set heavier,
+   values in the description's colour, as the facts line pairs them. */
+.sds-fold.sds-guidance > p {
+  margin: .15rem 0 0;
+  padding: 0 0 0 1.05em;
+  font-family: inherit;
+  font-size: var(--sds-xs, .75rem);
+  line-height: 1.45;
+  color: var(--sds-text-description-card);
+}
+.sds-fold.sds-guidance > p:last-child { margin-bottom: .3rem; }
+.sds-fold.sds-guidance > p > strong {
+  margin-right: .4rem;
+  font-size: inherit;
+  line-height: inherit;
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--sds-text-title-card);
+}
+.sds-guidance-ids { display: inline; font-family: var(--font-code); font-size: .7rem; color: var(--sds-text-description); }
+.sds-guidance-ids > span { display: inline-block; margin-right: .4rem; white-space: nowrap; }
 
 /* UNIT: the unit's own markup stands in the page, once in light and once in dark, side by side. ds-unit.css, the design
    system's stylesheet scoped under .sds-unit, styles what is inside; these rules only place the two. */

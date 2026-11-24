@@ -25,6 +25,11 @@ change. Do not re-derive a hint, and do not go looking for more files.
 - **Detail folds away** where a unit's second half is reference a reader opens on demand.
 - **A matching figure is added beside a passage** that walks through three or more steps, relations, states or layers. The passage
   keeps its words. Every box of the figure is a thing the passage names, in its words; every link is a relation it states.
+- **A named set that needs a head becomes a group panel** (rule 565; `refs/devex/workspace/docs/blocks.md`, *Group panels*): `~~~group <name> | <description>` over one `catalog layout=LIST facts=AFTER_DESCRIPTION` for a set of items, or over one `tabs` fence for a set split into two to six sub-sets. A list with nothing above it to name stays a plain `catalog`, alternatives with no group to name stay `tabs`, and more than six items in groups read as one list take `## Group` lines. A fenced group draws no row of links, and groups never nest.
+- **Code is an excerpt read from its file** (rule 573): `file=<path> lines=a-b`, an empty body, `mark=a-b` on the lines that matter; never paste code the file holds. Two forms of one thing are `tabs`.
+- **A long table folds** (rule 575): `~~~fold <summary>` over the table. A numbered table keeps its number and title on one line (rule 569), a Terms table with no contract term loses that column (rule 574), and a glossary, a Terms table and a Binds table stay tables (rule 577).
+- **An item's `For:`, `Choose when:`, `Not when:` (`condition → instead`) and `Rules:` lines stay lines under it**; the writer draws them as a closed Guidance fold (rule 567).
+- **A `unit` fence on a docs page is a skeleton** of its parts in their design-system names, with a line naming the showcase page, and a single component keeps its words only (rule 571).
 - A condition list stays a table (rule 549), and a tree stays a `tree` block (rule 238).
 
 ## What you keep

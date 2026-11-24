@@ -105,6 +105,9 @@ export async function run(args: string[]): Promise<number> {
     "({ page: document.documentElement.scrollWidth, window: window.innerWidth })");
   await page.emulateMedia({ colorScheme: "light" });
   const layout: string[] = await page.evaluate(LAYOUT_PROBE);
+  // THE PINNED KEY COLUMN IS READ IN DARK, where a fill the light page gets from a token can be missing (RULE.DEVEX.WORKSPACE.576).
+  await page.emulateMedia({ colorScheme: "dark" });
+  const pinned: string[] = await page.evaluate(PINNED_PROBE);
   await browser!.close();
 
   console.log(`${basename(file)}: rendered in light and in dark`);
@@ -118,6 +121,8 @@ export async function run(args: string[]): Promise<number> {
     : `  width            fits the window (${wider.window}px)`);
   console.log(`  layout           ${layout.length ? `${layout.length} finding(s)` : "no text drawn over other text, every one-fact line on one line, and every END column under its heading"}`);
   for (const line of layout) console.log(`    ${line}`);
+  console.log(`  pinned (dark)    ${pinned.length ? `${pinned.length} finding(s)` : "every pinned key column takes its row's fill"}`);
+  for (const line of pinned) console.log(`    ${line}`);
   return 0;
 }
 
@@ -165,6 +170,37 @@ export const LAYOUT_PROBE = `(() => {
         const off = Math.round(textLeft(dd) - textLeft(heads[i]));
         if (Math.abs(off) > 1) found.push('column   "' + name(tile) + '": its "' + heads[i].textContent.trim() + '" value starts ' + off + 'px from its heading');
       });
+    }
+  }
+  return found;
+})()`;
+
+/**
+ * A TABLE catalog's key column stays at the start while the table scrolls, so it must take its row's fill, or a value scrolled beneath it
+ * shows through. Run in DARK, where the fills are the tokens' dark values: each pinned key cell must be opaque and draw the colour its row's
+ * value cells sit on. Exported for the probe's own test.
+ */
+export const PINNED_PROBE = `(() => {
+  const found = [];
+  const fill = (el) => {
+    for (let n = el; n; n = n.parentElement) {
+      const c = getComputedStyle(n).backgroundColor;
+      const m = /rgba?\\(([^)]+)\\)/.exec(c);
+      if (!m) continue;
+      const [r, g, b, a = '1'] = m[1].split(',').map((x) => x.trim());
+      if (parseFloat(a) > 0) return { r, g, b, a: parseFloat(a) };
+    }
+    return { r: '255', g: '255', b: '255', a: 1 };
+  };
+  const same = (x, y) => x.r === y.r && x.g === y.g && x.b === y.b;
+  for (const table of document.querySelectorAll('.sds-catalog-table')) {
+    const label = ((table.querySelector('thead th:nth-child(2)') || table).textContent || '').trim().replace(/\\s+/g, ' ').slice(0, 40);
+    for (const row of table.querySelectorAll('tbody > tr')) {
+      const key = row.querySelector(':scope > th'), value = row.querySelector(':scope > td');
+      if (!key || !value) continue;
+      const own = getComputedStyle(key).backgroundColor;
+      if (/rgba\\([^)]*,\\s*0\\)$/.test(own) || own === 'transparent') { found.push('pinned   "' + label + '": the key "' + key.textContent.trim() + '" has no fill in dark, so a value scrolled beneath it shows through'); break; }
+      if (!same(fill(key), fill(value))) { found.push('pinned   "' + label + '": the key "' + key.textContent.trim() + '" is not the fill of its row in dark'); break; }
     }
   }
   return found;
