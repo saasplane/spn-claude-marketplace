@@ -1730,7 +1730,7 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 @keyframes sds-json-rise { from { opacity: 0; scale: .96; } to { opacity: 1; scale: 1; } }
 @keyframes sds-json-fade { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .sds-json-dialog[open], .sds-json-dialog[open]::backdrop { animation: none; } .sds-json-chip { transition: none; } }
-.sds-json-head { display: flex; align-items: center; gap: .5rem; flex: none; padding: 1rem 1rem 1rem 1.25rem; border-bottom: 1px solid var(--sds-rule); }
+.sds-json-head { display: flex; align-items: center; gap: .5rem; flex: none; padding: 1rem .75rem 1rem 1.25rem; border-bottom: 1px solid var(--sds-rule); }
 .sds-json-titles { flex: 1 1 auto; min-width: 0; }
 .sds-json-dialog .sds-json-title { margin: 0; padding: 0; border: 0; font-family: var(--font-heading); font-size: var(--font-heading-xs-size); line-height: var(--font-heading-xs-line-height); font-weight: var(--font-weight-semibold); color: var(--sds-ink); letter-spacing: normal; text-transform: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }  /* the design system's dialog title: a CONTAINER-level header item, HEADING_XS, 18px semibold */
 .sds-json-copy, .sds-json-close {
@@ -1738,6 +1738,7 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   font: inherit; line-height: 1; color: var(--sds-slate); background: transparent; border: 1px solid transparent; border-radius: var(--radius-md); cursor: pointer;
 }
 .sds-json-close::after { content: ""; position: absolute; inset: -4px; }
+.sds-json-close { margin: -.5rem 0; }
 .sds-json-copy:hover, .sds-json-close:hover { color: var(--sds-ink); background: var(--surface-hover, var(--sds-card)); }
 .sds-json-copy .sds-json-ico-check { display: none; }
 .sds-json-copy.sds-is-copied { color: var(--sds-ink); border-color: var(--sds-accent); }
