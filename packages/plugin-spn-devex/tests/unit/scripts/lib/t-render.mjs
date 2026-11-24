@@ -457,6 +457,14 @@ console.log("\n=== the page renderer — group fences are panels");
   ok("[MKT.SCRIPTS.640] consecutive groups share one row of jump links above the panels, and the prose after them is a paragraph",
     two.html.includes('<nav class="sds-group-jumps" aria-label="Groups"><a class="sds-group-jump" href="#g-structure">Structure <span>2</span></a> <a class="sds-group-jump" href="#g-style">Style <span>3</span></a></nav>')
       && two.html.indexOf("sds-group-jumps") < two.html.indexOf('<section class="sds-group"') && two.html.includes("<p>After prose.</p>") && (two.html.match(/<section class="sds-group"/g) ?? []).length === 2 && two.findings.length === 0, two.html + JSON.stringify(two.findings));
+  const guided = "Topnav | a bar\n  Code: [TOPNAV]\n  For: VISITOR\n  Choose when: a site with few pages\n  Not when: the pages are many → RAIL\n  Not when: the page is an app → DOCK\n  Rules: RULE.SUPPORT.SURFACE.206";
+  const gp = made(tilde("group Structure | how pages are built", tilde("tabs", "--- Layouts\n" + fence("catalog layout=LIST facts=AFTER_DESCRIPTION", guided) + "--- Pages\nNone yet.")));
+  const gl = made(fence("catalog layout=LIST facts=AFTER_DESCRIPTION", guided));
+  const fold = (h) => (h.match(/<details class="sds-fold sds-guidance"><summary>Guidance<\/summary>/g) ?? []).length === 1 && !/<details[^>]* open/.test(h)
+    && h.includes("<strong>For</strong> VISITOR") && h.includes("<strong>Choose when</strong> a site with few pages") && (h.match(/<strong>Not when<\/strong>/g) ?? []).length === 2
+    && h.includes("<strong>Not when</strong> the pages are many → RAIL") && h.includes("<strong>Rules</strong> RULE.SUPPORT.SURFACE.206");
+  ok("[MKT.SCRIPTS.642] an item's For, Choose when, Not when (one a case) and Rules lines are one closed fold titled Guidance under its row, in a group's Plan-style list and in a plain LIST, and are no facts of the row",
+    fold(gp.html) && fold(gl.html) && gp.findings.length === 0 && gl.findings.length === 0, gp.html + gl.html + JSON.stringify([gp.findings, gl.findings]));
   const open = made("~~~group Never closed\n" + fence("catalog", "A | a"));
   ok("[MKT.SCRIPTS.641] a group never closed stops the write, and so does one holding neither tabs nor a catalog",
     open.findings.some((f) => f.stops && f.message.includes("never closed")) && made(tilde("group Empty", "Just words.")).findings.some((f) => f.stops && f.message.includes("neither")));

@@ -478,7 +478,13 @@ const WIRES: Record<string, string> = {
   canvas: '<rect class="box" x="50" y="22" width="60" height="52" rx="3"/><rect class="line" x="60" y="32" width="40" height="4" rx="2"/><rect class="line" x="60" y="44" width="40" height="6" rx="2"/><rect class="nav" x="60" y="58" width="40" height="8" rx="2"/>',
 };
 
-type CatalogItem = { name: string; line: string; third: string; facts: [string, string][]; quote?: string; note?: [string, string] };
+type CatalogItem = { name: string; line: string; third: string; facts: [string, string][]; quote?: string; note?: [string, string]; guidance?: [string, string][] };
+/** The detail lines of an item that open under its row as one fold, "Guidance" (S77, the developer, 2026-11-24: "a row opens to its guidance"). */
+const GUIDANCE_KEYS = ["For", "Choose when", "Not when", "Rules"];
+function guidanceHtml(item: CatalogItem): string {
+  if (!item.guidance?.length) return "";
+  return `<details class="sds-fold sds-guidance"><summary>Guidance</summary>${item.guidance.map(([key, value]) => `<p class="sds-small"><strong>${esc(key)}</strong> ${inline(value)}</p>`).join("")}</details>`;
+}
 type CatalogGroup = { name: string | null; items: CatalogItem[] };
 
 /** A fence tag's `key=value` words, and the bare words beside them. */
@@ -510,6 +516,8 @@ function catalogLines(body: string[], findings: Finding[]): CatalogGroup[] {
       if (quote) { item.quote = quote[1].trim(); continue; }
       const note = /^\s+~\s*([^:]+?):\s+(\S.*)$/.exec(raw);
       if (note) { item.note = [note[1].trim(), note[2].trim()]; continue; }
+      const detail = GUIDANCE_KEYS.find((key) => key !== "For" && fact?.[1].trim() === key);
+      if (fact && detail) { (item.guidance ??= []).push([detail, fact[2].trim()]); continue; }
       // A line of tags alone is a fact with no key, drawn as bare badges; it is allowed only as the item's one fact (S75).
       if (/^\s+(\[[^\]\[]+\]\s*)+$/.test(raw)) { item.facts.push(["", raw.trim()]); continue; }
       if (!fact || fact[1].trim().split(/\s+/).length > 3) { findings.push({ message: `a \`catalog\` fact is \`Key: value\`, with a key of a word or two, never a sentence: "${raw.trim()}"` }); continue; }
@@ -519,6 +527,11 @@ function catalogLines(body: string[], findings: Finding[]): CatalogGroup[] {
     if (raw.startsWith("#")) continue;
     const [name, line = "", third = ""] = raw.trim().replace(/^[-*]\s+/, "").split(/\s+\|\s+/).map((cell) => cell.trim());
     groups[groups.length - 1].items.push({ name, line, third, facts: [] });
+  }
+  // A `For:` line is guidance only beside another guidance line; alone it stays the fact it always was.
+  for (const group of groups) for (const item of group.items) {
+    const forAt = item.facts.findIndex(([key]) => key === "For");
+    if (item.guidance?.length && forAt >= 0) item.guidance.unshift(["For", item.facts.splice(forAt, 1)[0][1]]);
   }
   if (!groups[0].items.length) groups.shift();
   return groups;
@@ -587,7 +600,7 @@ function factCell(key: string, value: string): string {
 
 /** The cards of one set of items, as the fence's layout and media draw them. Without either, and with no facts, the one-line tile of old. */
 function catalogHtml(items: CatalogItem[], layout: string | null, media: string | null, findings: Finding[], compact = false, factsAt: string | null = null): string {
-  const hasFacts = items.some((item) => item.facts.length || item.quote || item.note);
+  const hasFacts = items.some((item) => item.facts.length || item.quote || item.note || item.guidance?.length);
   const words = (text: string): number => text.trim().split(/\s+/).filter(Boolean).length;
   const longForCards = items.some((item) => words(item.name) > 4 || words(item.line ?? "") > 15 || item.facts.length > 3 || item.facts.some(([, value]) => words(value) > 5));
   if (!layout && longForCards) findings.push({ message: "these items are long for cards: layout=LIST (rule 549)" });
@@ -605,7 +618,7 @@ function catalogHtml(items: CatalogItem[], layout: string | null, media: string 
       const tags = item.facts.find(([, value]) => /^\s*(\[[^\]\[]+\]\s*)+$/.test(value));
       const small = item.facts.filter((fact) => fact !== tags).map(([key, value]) => `${key ? `${inline(key)} ` : ""}${inline(value)}`);
       const badge = tags ? factValue(tags[1]) : "";
-      return `      <tr><td><p><strong>${inline(item.name)}</strong></p>${item.line ? `<p>${inline(item.line)}</p>` : ""}${small.length ? `<span class="sds-small">${small.join(" &middot; ")}</span>` : ""}</td>${items.some((one) => one.facts.some(([, value]) => /^\s*(\[[^\]\[]+\]\s*)+$/.test(value))) ? `<td>${badge}</td>` : ""}</tr>`;
+      return `      <tr><td><p><strong>${inline(item.name)}</strong></p>${item.line ? `<p>${inline(item.line)}</p>` : ""}${small.length ? `<span class="sds-small">${small.join(" &middot; ")}</span>` : ""}${guidanceHtml(item)}</td>${items.some((one) => one.facts.some(([, value]) => /^\s*(\[[^\]\[]+\]\s*)+$/.test(value))) ? `<td>${badge}</td>` : ""}</tr>`;
     });
     return `  <div class="sds-scroll"><table>\n    <tbody>\n${rows.join("\n")}\n    </tbody>\n  </table></div>`;
   }
@@ -660,7 +673,7 @@ function catalogHtml(items: CatalogItem[], layout: string | null, media: string 
       const shown = below && item.facts.length && !bare
         ? `<dl class="sds-tile-facts" data-columns="${Math.min(below.length, 3)}">${below.map((key) => { const found = item.facts.find(([name]) => name === key); return found ? factCell(key, found[1]) : `<div class="sds-tile-fact-none"></div>`; }).join("")}</dl>`
         : facts;
-      return `    <div class="sds-tile">${mediaHtml}<div class="sds-tile-body">${words}\n      ${shown}</div></div>`;
+      return `    <div class="sds-tile">${mediaHtml}<div class="sds-tile-body">${words}\n      ${shown}${guidanceHtml(item)}</div></div>`;
     }
     if (kept === "MEDIA_TOP") return `    <div class="sds-tile"${count}>${mediaOf(kept, item, findings)}\n      <div class="sds-tile-head"><div>${words}</div></div>\n      ${facts}</div>`;
     if (kept) return `    <div class="sds-tile"${count}><div class="sds-tile-head">${mediaOf(kept, item, findings)}<div>${words}</div></div>\n      ${facts}</div>`;
