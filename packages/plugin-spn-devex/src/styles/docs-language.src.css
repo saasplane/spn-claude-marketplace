@@ -2102,9 +2102,9 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 .sds-fold.sds-guidance[open] > summary { border-bottom: 0; }
 .sds-fold.sds-guidance > p { margin: .15rem 0 0; padding: 0 .75rem; font-size: var(--sds-xs, .75rem); line-height: 1.4; }
 .sds-fold.sds-guidance > p:last-child { margin-bottom: .25rem; }
-.sds-fold.sds-guidance > p > strong { margin-right: .4rem; font-weight: 600; }
-.sds-guidance-ids { display: inline-flex; flex-wrap: wrap; gap: .1rem .3rem; vertical-align: top; font-family: var(--font-code); font-size: .7rem; color: var(--sds-text-description); }
-.sds-guidance-ids > span { white-space: nowrap; }
+.sds-fold.sds-guidance > p > strong { margin-right: .4rem; font-size: inherit; line-height: inherit; font-weight: 600; }
+.sds-guidance-ids { display: inline; font-family: var(--font-code); font-size: .7rem; color: var(--sds-text-description); }
+.sds-guidance-ids > span { display: inline-block; margin-right: .4rem; white-space: nowrap; }
 
 /* UNIT: the unit's own markup stands in the page, once in light and once in dark, side by side. ds-unit.css, the design
    system's stylesheet scoped under .sds-unit, styles what is inside; these rules only place the two. */

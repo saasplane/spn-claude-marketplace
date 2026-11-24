@@ -7749,18 +7749,19 @@
 }
 .sds-fold.sds-guidance > p > strong {
   margin-right: .4rem;
+  font-size: inherit;
+  line-height: inherit;
   font-weight: 600;
 }
 .sds-guidance-ids {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: .1rem .3rem;
-  vertical-align: top;
+  display: inline;
   font-family: var(--font-code);
   font-size: .7rem;
   color: var(--sds-text-description);
 }
 .sds-guidance-ids > span {
+  display: inline-block;
+  margin-right: .4rem;
   white-space: nowrap;
 }
 .sds-unit-pair {
