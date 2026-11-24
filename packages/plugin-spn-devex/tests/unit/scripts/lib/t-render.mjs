@@ -454,9 +454,8 @@ console.log("\n=== the page renderer — group fences are panels");
   ok("[MKT.SCRIPTS.639] a group holding a catalog is one panel with the item count, and one group has no jump row",
     c.html.includes('<h5 id="g-data-entry-title">Data entry</h5><span class="sds-group-count">2 items</span>') && c.html.includes('<div class="sds-tiles">') && !c.html.includes("sds-group-jumps") && !c.html.includes("sds-group-line") && c.findings.length === 0, c.html);
   const two = made(inTabs + "\n" + tilde("group Style | how pages look", tilde("tabs", "--- Theme\nColours.\n--- Media\nPictures.\n--- Words\nText.")) + "\n\nAfter prose.");
-  ok("[MKT.SCRIPTS.640] consecutive groups share one row of jump links above the panels, and the prose after them is a paragraph",
-    two.html.includes('<nav class="sds-group-jumps" aria-label="Groups"><a class="sds-group-jump" href="#g-structure">Structure <span>2</span></a> <a class="sds-group-jump" href="#g-style">Style <span>3</span></a></nav>')
-      && two.html.indexOf("sds-group-jumps") < two.html.indexOf('<section class="sds-group"') && two.html.includes("<p>After prose.</p>") && (two.html.match(/<section class="sds-group"/g) ?? []).length === 2 && two.findings.length === 0, two.html + JSON.stringify(two.findings));
+  ok("[MKT.SCRIPTS.640] consecutive fenced groups stand as panels with no row of jump links, and the prose after them is a paragraph",
+    !two.html.includes("sds-group-jumps") && two.html.includes("<p>After prose.</p>") && (two.html.match(/<section class="sds-group"/g) ?? []).length === 2 && two.findings.length === 0, two.html + JSON.stringify(two.findings));
   const guided = "Topnav | a bar\n  Code: [TOPNAV]\n  For: VISITOR\n  Choose when: a site with few pages\n  Not when: the pages are many → RAIL\n  Not when: the page is an app → DOCK\n  Rules: RULE.SUPPORT.SURFACE.206";
   const gp = made(tilde("group Structure | how pages are built", tilde("tabs", "--- Layouts\n" + fence("catalog layout=LIST facts=AFTER_DESCRIPTION", guided) + "--- Pages\nNone yet.")));
   const gl = made(fence("catalog layout=LIST facts=AFTER_DESCRIPTION", guided));

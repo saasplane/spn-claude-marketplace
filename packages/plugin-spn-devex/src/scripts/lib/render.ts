@@ -797,10 +797,9 @@ function groupPanels(heads: { name: string; description: string; body: string[] 
     const html = `<section class="sds-group" id="${id}" aria-labelledby="${id}-title">\n  ${head}\n  <div class="sds-group-body">${drawnInGroup(group.body, findings)}</div>\n</section>`;
     return { id, group, n: counted?.n ?? 0, html };
   });
-  const jumps = panels.length > 1
-    ? [`  <nav class="sds-group-jumps" aria-label="Groups">${panels.map((p) => `<a class="sds-group-jump" href="#${p.id}">${inline(p.group.name)} <span>${p.n}</span></a>`).join(" ")}</nav>`]
-    : [];
-  return [...jumps, ...panels.map((p) => p.html)].join("\n");
+  // Fenced group panels draw no row of jump links: each panel's head already names it, and the page's own
+  // outline reaches each one (the developer, 2026-11-24: "can we drop these pills").
+  return panels.map((p) => p.html).join("\n");
 }
 
 // ---------------------------------------------------------------------------- the TABS block
