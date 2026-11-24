@@ -22,7 +22,7 @@ Tests is the folder a plugin proves itself from, arranged so a reader can find t
 
 A plugin is code, so it owes proof, and what makes that proof its own construct rather than an implementation detail is where the files sit.
 
-The tree answers two questions in a fixed order. **The tier comes first and the mirror second**, because the tier answers *what kind of proof is this* and the mirror answers *of what*. Put the mirror first and a second tier for the same file has nowhere to go; put the tier first and an integration suite for a file that already has a unit suite lands at the same path under a different tier, without colliding.
+The tree answers its questions in a fixed order. **The tier comes first and the mirror second**, because the tier answers *what kind of proof is this* and the mirror answers *of what*. Put the mirror first and a second tier for the same file has nowhere to go; put the tier first and an integration suite for a file that already has a unit suite lands at the same path under a different tier, without colliding.
 
 The second promise is about what happens the next time the tree moves. **Nothing here counts a `..` hop.** Moving these suites once broke every one of them at the same moment, because each computed its own depth from where it happened to sit.
 
@@ -39,7 +39,7 @@ The second promise is about what happens the next time the tree moves. **Nothing
 
 ## Model
 
-A suite's address is derived, never chosen. Read it outward from the folder every plugin's proof sits in.
+A suite's address is derived, never chosen. Read it outward from the folder every plugin's proof sits in: first the tier, then the mirror, and the mirror ends at the suite.
 
 ```dg
 { "kind": "map",

@@ -36,16 +36,17 @@ This construct realizes the book's `01-devex/02-agent/04-plugins`.
 
 ## Model
 
-The runner walks the tier, runs each suite in its own process, and reads the exit code as the verdict.
+The runner walks the tier, runs each suite in its own process, and reads the exit code as the verdict. Each suite is written against the harness, which finds the plugin root once and is never counted as a case.
 
 ```dg
 { "kind": "map",
+  "title": "How the runner reaches a verdict",
   "caption": "The exit code is the verdict; the summary line only says how many cases there were.",
   "boxes": [
     { "id": "a", "label": "the runner", "note": "tests/run.mjs walks the tier" },
     { "id": "b", "label": "a suite", "note": "t-<name>.mjs at its source file's path" },
     { "id": "c", "label": "the harness", "note": "the plugin root, found and never counted" },
-    { "id": "d", "label": "the verdict", "note": "the exit code, one line per suite" }
+    { "id": "d", "label": "the verdict", "note": "the exit code, one line per suite", "em": true }
   ],
   "links": [
     { "from": "a", "to": "b", "label": "runs" },
@@ -56,19 +57,19 @@ The runner walks the tier, runs each suite in its own process, and reads the exi
 
 ## Parts
 
-### Mirror — The mirror puts a test where its source is
+### Mirror — the mirror puts a test where its source is
 
 A test for `scripts/checks/figma-connector.ts` sits at `tests/unit/scripts/checks/t-figma-connector.mjs`. Moving a source file moves its test with it.
 
-### Bundle proof — A suite is proven against the bundle as well as the source
+### Bundle proof — a suite is proven against the bundle as well as the source
 
 The bundle-parity suite runs the committed bundle and the source over the same recorded calls and requires the same answer, and the staleness suite refuses a bundle older than its sources, so a hook never runs a rule nobody wrote.
 
-### Launcher and tiers — The launcher and the tiers file are held to the code
+### Launcher and tiers — the launcher and the tiers file are held to the code
 
 The launcher answers as the entry does from any folder, and the tiers file names exactly the groups the plugin ships.
 
-### Exit code — The runner judges on an exit code
+### Exit code — the runner judges on an exit code
 
 A suite that prints a passing line and exits non-zero is red, and one that passes in different words is green. The runner never reads text to decide.
 

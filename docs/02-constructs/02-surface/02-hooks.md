@@ -37,43 +37,39 @@ This construct realizes the book's `01-devex/02-agent/04-plugins`.
 
 ## Model
 
-One moment, narrowed to one tool name, behind one command.
+One moment, narrowed to one tool name, behind one command. A connector call about to run is matched by the one entry, the entry runs the dispatcher, and the dispatcher hands the call to the connector check and returns a verdict.
 
 ```dg
-{ "kind": "map",
+{ "kind": "chain",
+  "title": "A connector call, from the matcher to a verdict",
   "caption": "The matcher is applied by the harness first, so a session that never draws in Figma never starts this plugin's process.",
   "boxes": [
     { "id": "a", "label": "a connector call about to run", "note": "mcp__figma__use_figma, and no other tool" },
-    { "id": "b", "label": "the one entry", "note": "hooks.json — one command, one timeout" },
+    { "id": "b", "label": "the one entry", "note": "hooks.json, one command and one timeout" },
     { "id": "c", "label": "the dispatcher", "note": "hands the call to the connector check" },
-    { "id": "d", "label": "a verdict", "note": "a refusal, advice, or silence" }
-  ],
-  "links": [
-    { "from": "a", "to": "b", "label": "matched by" },
-    { "from": "b", "to": "c", "label": "runs" },
-    { "from": "c", "to": "d", "label": "returns" }
+    { "id": "d", "label": "a verdict", "note": "a refusal, advice, or silence", "em": true }
   ] }
 ```
 
 ## Parts
 
-### One moment — One moment, and why the others are not claimed
+### One moment — one moment, and why the others are not claimed
 
 The moment a call is about to run is the only one that can still stop it, and a rule about a script's text has nothing to say at any other. A moment claimed for the sake of symmetry is an interpreter start-up on every call in a session, paid for an answer nobody asked for.
 
-### Matcher — The matcher is the first and cheapest filter
+### Matcher — the matcher is the first and cheapest filter
 
 The entry narrows to the connector's script runner. Every other call a session makes never reaches this plugin at all, which is a filter the harness applies before any process of this plugin's starts.
 
-### Text refusal — The check refuses only what the text shows
+### Text refusal — the check refuses only what the text shows
 
 The connector check blanks comment and string bodies, then refuses a script that calls an API the connector does not support or one that throws there. It notes, and lets the call go, what the text cannot settle: a second page switch, and a call that passes no `skillNames`. It reads no file, calls no network and runs no command.
 
-### Throwing checks — A check that throws is skipped, never fatal
+### Throwing checks — a check that throws is skipped, never fatal
 
 A gate that crashes the chain removes every other gate with it, which is worse than any single miss. The dispatcher treats a check that throws as silence.
 
-### Plugin root — The wiring names the plugin root, never a checkout
+### Plugin root — the wiring names the plugin root, never a checkout
 
 The command is written against the installed folder rather than against a path in this repository, so the entry works wherever the plugin was installed.
 

@@ -29,6 +29,20 @@ The design skill answers a request to design, lay out or draw a page, a screen o
 5. the tasks;
 6. only then the blocks.
 
+```dg
+{ "kind": "chain",
+  "title": "The order the design skill decides a page in",
+  "caption": "The blocks come last: each step is decided before the one after it.",
+  "boxes": [
+    { "id": "a", "label": "the person" },
+    { "id": "b", "label": "the flow" },
+    { "id": "c", "label": "the pattern" },
+    { "id": "d", "label": "the panels" },
+    { "id": "e", "label": "the tasks" },
+    { "id": "f", "label": "the blocks", "em": true }
+  ] }
+```
+
 This construct realizes the book's `01-devex/02-agent/02-skills`.
 
 ## Terms
@@ -63,23 +77,23 @@ The ask is matched to the skill, the skill orders the decisions and reads the re
 
 ## Parts
 
-### Page first — The skill states a page before its code is written
+### Page first — the skill states a page before its code is written
 
 You ask it to design, lay out or draw a page, a screen or a flow of pages. It picks the layout, decides the containers, chooses the pattern for each task, and then names the blocks. Its result is one tree for each page: every block by the name the book gives it, with its props. Deciding what a feature is stays with the core plugin's `ideate`, and writing the screen stays with the build skill of the apps plugin.
 
-### Stackless steps — A step that names no stack stays in the skill's own folder
+### Stackless steps — a step that names no stack stays in the skill's own folder
 
-The skill has two steps, `draw` and `change-library`. `draw` draws the page in Figma from the published libraries, and `change-library` walks a change of a library file through the connector, with the scripts the skill ships to read a page and to lay out a set. Neither names a language, so no provider holds them. The skill reads them only where the window holds the Figma connector and the work reaches them. A window with no connector never loads them, and the design is complete without them.
+The skill has the steps `draw` and `change-library`. `draw` draws the page in Figma from the published libraries, and `change-library` walks a change of a library file through the connector, with the scripts the skill ships to read a page and to lay out a set. Neither names a language, so no provider holds them. The skill reads them only where the window holds the Figma connector and the work reaches them. A window with no connector never loads them, and the design is complete without them.
 
-### Ideate stage — The skill serves the ideate stage
+### Ideate stage — the skill serves the ideate stage
 
 A skill and a stage are separate closed sets mapped many to one, and the mapping is what makes *which standards apply to this request* derivable from the skill that was invoked. A page is designed before its code is written, so this skill answers to the ideate stage.
 
-### Builder and partner — One skill serves the builder and a partner alike
+### Builder and partner — one skill serves the builder and a partner alike
 
 Both design from the refs and the specs this plugin carries, and neither needs the book open. The skill is the same for both.
 
-### Skill stamp — A skill carries a stamp, so a chapter it fell behind can say so
+### Skill stamp — a skill carries a stamp, so a chapter it fell behind can say so
 
 A skill is prose the agent loads, and prose drifts from the book silently because nothing compares it. The skill opens with a block naming the chapters it restates and the hash last read from each, so a drift run reads it exactly as it reads a ref.
 

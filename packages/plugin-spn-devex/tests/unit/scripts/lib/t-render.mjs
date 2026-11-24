@@ -80,15 +80,15 @@ ok("a table that is not the Terms table carries no such class",
 const { cutVersions, integrityTable, newestVersion, linesFor } = await import(pathToFileURL(resolve(HERE, "..", "plugin-support-lib", "src", "lib", "page-styles.ts")).href);
 const { readFileSync } = await import("node:fs");
 const STYLES_HOME = resolve(HERE, "src", "styles");
-ok("the newest version of the shared styles is 1.16.0, which serves design-system-units.css and design-system.css, so every page writer links it",
-  newestVersion(Object.keys(cutVersions(STYLES_HOME))) === "1.16.0");
+ok("the newest version of the shared styles is 1.16.1, which serves design-system-units.css and design-system.css, so every page writer links it",
+  newestVersion(Object.keys(cutVersions(STYLES_HOME))) === "1.16.1");
 ok("and 1.10.0 serves the Terms shares: a fixed layout, and the stacked rows under 40rem",
   /table\.sds-terms\{table-layout:fixed\}|table\.sds-terms\s*\{[^}]*table-layout:\s*fixed/.test(readFileSync(resolve(HERE, "..", "..", "public", "assets", "docs", "1.10.0", "sds-docs.css"), "utf8"))
   && readFileSync(resolve(HERE, "..", "..", "public", "assets", "docs", "1.10.0", "sds-docs.css"), "utf8").includes("max-width:40rem"));
 for (const name of ["construct", "overview", "blocks"]) {
   const template = readFileSync(resolve(HERE, "src", "refs", "devex", "workspace", "docs", "templates", "docs", "pages", `${name}-template.html`), "utf8");
-  ok(`the ${name} template links 1.16.0, the version every page writer links, with its hash`,
-    template.includes(linesFor("1.16.0", undefined, integrityTable(STYLES_HOME)["1.16.0"]).stylesheet) && !template.includes("/1.15.0/"));
+  ok(`the ${name} template links 1.16.1, the version every page writer links, with its hash`,
+    template.includes(linesFor("1.16.1", undefined, integrityTable(STYLES_HOME)["1.16.1"]).stylesheet) && !template.includes("/1.15.0/"));
 }
 const binds = rowsOf(produced(table(["Rule", "What it decides", "Weight"], ["`RD.X.1`", "what every provider delivers", "MUST"])), "<thead>");
 ok("Binds keeps the Weight a reader compares down, and folds what a rule decides into the rule's cell",
@@ -339,27 +339,31 @@ console.log("\n=== the page renderer — a catalog in three layouts, with media 
   ok("[MKT.SCRIPTS.614] today's catalog spelling draws exactly as it did: one tile each, no data attribute",
     legacy.html.includes('  <div class="sds-tiles">\n    <div class="sds-tile"><h4>Name</h4><p>one line</p><p class="sds-small"><code>literal</code></p></div>\n    <div class="sds-tile"><h4>Other</h4><p>more</p></div>\n  </div>') && legacy.findings.length === 0, legacy.html);
   const grid = made(fence("catalog", "`RAIL` | a sidebar\n  Navigation: at the side\n  Takes: DASHBOARD; RESOURCES\nCANVAS | the body alone\n  Navigation: none"));
-  ok("[MKT.SCRIPTS.614] facts under an item draw a GRID card: a data-facts count, the line, and a dl of key and value",
-    grid.html.includes('<div class="sds-tiles" data-layout="GRID">') && grid.html.includes('<div class="sds-tile" data-facts="2"><h4><code>RAIL</code></h4><p class="sds-tile-line">a sidebar</p>')
-      && grid.html.includes('<dl class="sds-tile-facts"><div><dt>Navigation</dt><dd>at the side</dd></div><div><dt>Takes</dt><dd>DASHBOARD; RESOURCES</dd></div></dl>') && grid.html.includes('data-facts="1"') && grid.findings.length === 0, grid.html);
+  ok("[MKT.SCRIPTS.614] facts under an item draw a GRID card: a data-facts count, the line, and a dl of key and value; two short facts share one row (S77)",
+    grid.html.includes('<div class="sds-tiles" data-layout="GRID">') && grid.html.includes('<div class="sds-tile" data-facts="1"><h4><code>RAIL</code></h4><p class="sds-tile-line">a sidebar</p>')
+      && grid.html.includes('<dl class="sds-tile-facts"><div class="sds-tile-fact-row"><div><dt>Navigation</dt><dd>at the side</dd></div><div><dt>Takes</dt><dd>DASHBOARD; RESOURCES</dd></div></div></dl>')
+      && grid.html.includes('<dl class="sds-tile-facts"><div><dt>Navigation</dt><dd>none</dd></div></dl>') && grid.findings.length === 0, grid.html);
+  const mixed = made(fence("catalog", "PORTAL | an app many Everyday users use for themselves\n  Category: APP\n  Person: Everyday users\n  Example: the SPNHiring job portal, and a customer's own account"));
+  ok("[MKT.SCRIPTS.614] a GRID card's short facts stand in one row and a longer fact stacks under them, counted as two rows (S77)",
+    mixed.html.includes('data-facts="2"') && mixed.html.includes('<div class="sds-tile-fact-row"><div><dt>Category</dt><dd>APP</dd></div><div><dt>Person</dt><dd>Everyday users</dd></div></div><div class="sds-tile-fact-wide"><dt>Example</dt>'), mixed.html);
   const list = made(fence("catalog layout=LIST", "MARKETING | a site\n  Layouts: `TOPNAV` for the site\n  Sections: every site section"));
   ok("[MKT.SCRIPTS.614] layout=LIST draws one card a row, its words and its facts in a body",
     list.html.includes('data-layout="LIST"') && list.html.includes('<div class="sds-tile"><div class="sds-tile-body"><h4>MARKETING</h4><p>a site</p>') && list.html.includes("<dt>Layouts</dt><dd><code>TOPNAV</code> for the site</dd>") && !list.html.includes("data-facts"), list.html);
   ok("[MKT.SCRIPTS.614] a LIST card with one fact says so, for the stylesheet", made(fence("catalog layout=LIST", "A | a\n  Key: one longer phrase of a value")).html.includes("sds-tile-facts sds-tile-facts-one"));
-  const sideList = made(fence("catalog layout=LIST", "A | a\n  Weight: MUST\nB | b\n  Weight: GUIDE"));
-  ok("[MKT.SCRIPTS.614] a LIST whose every item holds one or two short facts marks the list data-facts=side, names the column once in a head row and draws no one-line fact",
+  const sideList = made(fence("catalog layout=LIST facts=END", "A | a\n  Weight: MUST\nB | b\n  Weight: GUIDE"));
+  ok("[MKT.SCRIPTS.614] a LIST with facts=END marks the list data-facts=side, names the column once in a head row and draws no one-line fact",
     sideList.html.includes('data-layout="LIST" data-facts="side" data-columns="1"') && sideList.html.includes('<div class="sds-tiles-head" aria-hidden="true"><span>Item</span><span>Weight</span></div>')
       && sideList.html.includes('<div class="sds-tile-main"><div class="sds-tile-body"><h4>A</h4><p>a</p></div></div>') && sideList.html.includes('<dl class="sds-tile-facts"><div><dt>Weight</dt><dd>MUST</dd></div></dl>') && !sideList.html.includes("facts-one"), sideList.html);
-  const quoted = made(fence("catalog layout=LIST", "Block | what it catches\n  > a table of 6 rows reads as a catalog\n  ~ When: only on a seat file\n  Grade: soft"));
+  const quoted = made(fence("catalog layout=LIST facts=END", "Block | what it catches\n  > a table of 6 rows reads as a catalog\n  ~ When: only on a seat file\n  Grade: soft"));
   ok("[MKT.SCRIPTS.614] a > line under an item is a quoted italic line and a ~ line is a note, both in the body under the description, beside a side fact",
     quoted.html.includes('<p>what it catches</p><p class="sds-tile-quote">&ldquo;a table of 6 rows reads as a catalog&rdquo;</p><p class="sds-tile-note"><span>When</span> <em>only on a seat file</em></p></div></div>') && quoted.html.includes('data-facts="side"') && quoted.findings.length === 0, quoted.html);
-  const counted = made(fence("catalog layout=LIST name=Form", "Trees | boxes\n  Items: 11\n  State: new\nTables | rows\n  Items: 24\n  State: old"));
-  ok("[MKT.SCRIPTS.614] a list with side columns heads the main column with name= and every side column with its key; a column of numbers is set at the end",
-    counted.html.includes('<div class="sds-tiles-head" aria-hidden="true"><span>Form</span><span data-align="end">Items</span><span>State</span></div>') && counted.html.includes('<div data-align="end"><dt>Items</dt><dd>11</dd></div>') && !counted.html.includes('<div data-align="end"><dt>State'), counted.html);
+  const counted = made(fence("catalog layout=LIST facts=END name=Form", "Trees | boxes\n  Items: 11\n  State: new\nTables | rows\n  Items: 24\n  State: old"));
+  ok("[MKT.SCRIPTS.614] a list with side columns heads the main column with name= and every side column with its key, each heading and value set at the start (S75)",
+    counted.html.includes('<div class="sds-tiles-head" aria-hidden="true"><span>Form</span><span>Items</span><span>State</span></div>') && counted.html.includes('<div><dt>Items</dt><dd>11</dd></div>') && !counted.html.includes('data-align'), counted.html);
   const below = made(fence("catalog layout=LIST", "ORG | members\n  Per call: the record's organization is the caller\n  Writes: as permitted\nPARENT_ORG | above\n  Per call: the platform: no filter; otherwise the record's parent organization is the caller\nCHILD_ORG | below\n  Per call: the child column is the caller"));
   ok("[MKT.SCRIPTS.614] facts below the line stand in one column per fact name on every item: no fact takes the row, and a missing fact keeps its column empty",
     !below.html.includes("sds-tile-fact-wide") && below.html.includes('<dl class="sds-tile-facts"><div><dt>Per call</dt><dd>the platform: no filter; otherwise the record&#39;s parent organization is the caller</dd></div><div class="sds-tile-fact-none"></div></dl>') || (!below.html.includes("sds-tile-fact-wide") && below.html.includes('<div><dt>Per call</dt><dd>the child column is the caller</dd></div><div class="sds-tile-fact-none"></div></dl>')));
-  const tagged = made(fence("catalog layout=LIST", "TOOLCHAIN | the bases resolve\n  Owes: [UNIT]\nAPP_WEB | the UI face\n  Owes: [JOURNEY] [COMPONENT]"));
+  const tagged = made(fence("catalog layout=LIST facts=END", "TOOLCHAIN | the bases resolve\n  Owes: [UNIT]\nAPP_WEB | the UI face\n  Owes: [JOURNEY] [COMPONENT]"));
   ok("[MKT.SCRIPTS.614] a fact written as bracketed codes draws one badge for each, and up to three tags stand in a side column",
     tagged.html.includes('data-facts="side"') && tagged.html.includes('<dd><span class="sds-tags"><span class="sds-badge">JOURNEY</span> <span class="sds-badge">COMPONENT</span></span></dd>'));
   ok("[MKT.SCRIPTS.614] one long fact, a sentence, or three facts keeps the facts under the description",
@@ -367,7 +371,10 @@ console.log("\n=== the page renderer — a catalog in three layouts, with media 
       && !made(fence("catalog layout=LIST", "A | a\n  Weight: Do it. Now")).html.includes("data-facts")
       && !made(fence("catalog layout=LIST", "A | a\n  K1: x\n  K2: y\n  K3: z")).html.includes("data-facts"));
   ok("[MKT.SCRIPTS.614] two short facts make two columns, an empty cell where an item has none of a key",
-    made(fence("catalog layout=LIST", "A | a\n  Weight: MUST\n  Since: 1.2\nB | b\n  Since: 1.3")).html.includes('data-columns="2"') && made(fence("catalog layout=LIST", "A | a\n  Weight: MUST\n  Since: 1.2\nB | b\n  Since: 1.3")).html.includes('<div class="sds-tile-fact-none"></div>'));
+    made(fence("catalog layout=LIST facts=END", "A | a\n  Weight: MUST\n  Since: 1.2\nB | b\n  Since: 1.3")).html.includes('data-columns="2"') && made(fence("catalog layout=LIST facts=END", "A | a\n  Weight: MUST\n  Since: 1.2\nB | b\n  Since: 1.3")).html.includes('<div class="sds-tile-fact-none"></div>'));
+  const bare = made(fence("catalog layout=LIST facts=END", "Kinds | which rules are shared?\n  Terms: Kind of surface\nLevels | what does each level own?\n  Terms: Level · Block\nOwes | what does every page owe?"));
+  ok("[MKT.SCRIPTS.614] an item with no fact keeps the list's short facts in a side column, its own cell empty (RULE.DEVEX.WORKSPACE.563)",
+    bare.html.includes('data-columns="1"') && bare.html.includes('<div class="sds-tile-fact-none"></div>') && !bare.html.includes("sds-tile-facts-one"));
   const tab = made(fence("catalog layout=TABLE", "A | first\n  Layouts: x\n  Pages: p\nB | second\n  Layouts: y\n  Sections: s"));
   ok("[MKT.SCRIPTS.614] layout=TABLE makes the things columns and each fact key a row, an empty cell where a thing has none",
     tab.html.includes('<table class="sds-catalog-table">') && tab.html.includes("<thead><tr><th></th><th><h4>A</h4><p>first</p></th><th><h4>B</h4><p>second</p></th></tr></thead>")
@@ -390,8 +397,30 @@ console.log("\n=== the page renderer — a catalog in three layouts, with media 
   ok("[MKT.SCRIPTS.614] a fact whose key is a sentence is a finding, and so is a GRID card of four facts",
     made(fence("catalog", "A | a\n  This is a whole sentence of a key: value")).findings.some((f) => f.message.includes("never a sentence"))
       && made(fence("catalog", "A | a\n  One: 1\n  Two: 2\n  Three: 3\n  Four: 4")).findings.some((f) => f.message.includes("up to three facts")));
+  // S75 (the developer, 2026-11-24): the fence names where a LIST's facts stand, and the writer never infers it.
+  const guess = made(fence("catalog layout=LIST", "A | a\n  Weight: MUST\nB | b\n  Weight: GUIDE"));
+  ok("[RULE.DEVEX.WORKSPACE.563] a LIST with no facts= draws its facts after the description, and short facts alone are a soft finding that names facts=END",
+    !guess.html.includes('data-facts="side"') && guess.html.includes("sds-tile-facts-one") && guess.findings.length === 1 && !guess.findings[0].stops && guess.findings[0].message.includes("`facts=END`"), JSON.stringify(guess.findings));
+  const tooLong = made(fence("catalog layout=LIST facts=END", "A | a\n  Weight: MUST\nB | b\n  Weight: this value is longer than twenty"));
+  ok("[RULE.DEVEX.WORKSPACE.563] facts=END with a value past a short fact stops the write, naming the item, the key and facts=AFTER_DESCRIPTION",
+    tooLong.findings.some((f) => f.stops && f.message.includes("B: Weight") && f.message.includes("`facts=AFTER_DESCRIPTION`")), JSON.stringify(tooLong.findings));
+  ok("[RULE.DEVEX.WORKSPACE.563] facts=END holds up to three columns, and a fourth key stops the write",
+    made(fence("catalog layout=LIST facts=END", "A | a\n  K1: x\n  K2: y\n  K3: z\n  K4: w")).findings.some((f) => f.stops && f.message.includes("up to three columns")));
+  const one = made(fence("catalog layout=LIST facts=AFTER_DESCRIPTION", "Move | going to another place\n  Blocks: the layout · `DSNavList` · `DSNavMenu` · `DSTabs`\nFind | search and filter\n  Blocks: `DSFilterBar` · `DSDataTable`"));
+  ok("[RULE.DEVEX.WORKSPACE.563] one fact name across the list is one Key: value line under the description",
+    one.html.includes('<dl class="sds-tile-facts sds-tile-facts-one"><div><dt>Blocks</dt>') && !one.html.includes("data-columns") && one.findings.length === 0, one.html);
+  const cells = made(fence("catalog layout=LIST facts=AFTER_DESCRIPTION", "MARKETING | a site\n  Example: saasplane.ai, and the SPNHiring site\n  For: a Visitor deciding whether a product is for them\nDOCS | pages\n  Example: the book's pages, and a help centre"));
+  ok("[RULE.DEVEX.WORKSPACE.563] two or more fact names are cells, a column per key in the same place on every item, an empty cell kept",
+    cells.html.includes('<dl class="sds-tile-facts" data-columns="2"><div><dt>Example</dt>') && cells.html.includes('<div class="sds-tile-fact-none"></div></dl>') && !cells.html.includes("sds-tile-fact-wide"), cells.html);
+  const bareTags = made(fence("catalog layout=GRID", "MARKETING | a site\n  [UNIT] [PAGE]"));
+  ok("[RULE.DEVEX.WORKSPACE.564] a line of tags with no key is the item's one fact, drawn as its badges alone",
+    bareTags.html.includes('<div class="sds-tile-fact-bare"><dd><span class="sds-tags"><span class="sds-badge">UNIT</span> <span class="sds-badge">PAGE</span></span></dd></div>') && !bareTags.html.includes("<dt>") && bareTags.findings.length === 0, bareTags.html);
+  ok("[RULE.DEVEX.WORKSPACE.564] tags with no key beside another fact are a finding, and facts= on a GRID is a finding",
+    made(fence("catalog layout=GRID", "MARKETING | a site\n  [UNIT]\n  Person: Visitor")).findings.some((f) => f.message.includes("tags stand bare only"))
+      && made(fence("catalog layout=GRID facts=END", "A | a\n  K: v")).findings.some((f) => f.message.includes("in LIST only"))
+      && made(fence("catalog layout=LIST facts=BELOW", "A | a\n  K: v")).findings.some((f) => f.stops && f.message.includes("END, AFTER_DESCRIPTION")));
   ok("[MKT.SCRIPTS.614] a media in TABLE and MEDIA_TOP in LIST are findings, not silent",
-    made(fence("catalog layout=TABLE media=ICON", "A | a\n  K: v")).findings.length === 1 && made(fence("catalog layout=LIST media=MEDIA_TOP", "A | a\n  K: v")).findings.length === 1);
+    made(fence("catalog layout=TABLE media=ICON", "A | a\n  K: v")).findings.length === 1 && made(fence("catalog layout=LIST media=MEDIA_TOP facts=AFTER_DESCRIPTION", "A | a\n  K: v")).findings.length === 1);
 }
 
 console.log("\n=== the page renderer — groups in a catalog are panels");

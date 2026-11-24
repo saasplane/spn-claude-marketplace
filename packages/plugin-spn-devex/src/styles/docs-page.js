@@ -1,4 +1,4 @@
-/* RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § One stylesheet, served in versions
+/* RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/08-stylesheet.md § One stylesheet, served in versions
    The one script every page loads: the rail, the fold under each section, the link beside each
    heading, the reader's own time on a report, and the colour of a code block. Every class it sets or
    reads opens with sds-. */
@@ -518,7 +518,7 @@ try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(
    the frame's document from it, linking `design-system.css` from the folder this script was served from, the cut of the design system
    that `<meta name="surface-ds">` names, and the app's stylesheet at the path `<meta name="surface-app-css">` names. Width sizes the frame; mode sets
    `data-mode` on the frame's own `<html>`, and notes shows or hides each `[data-note]` in it, both set directly with no message. The
-   choice is kept in this browser, so the next page opens in the same view (05-artifacts.md, The surface preview). */
+   choice is kept in this browser, so the next page opens in the same view (05-pages.md, The surface preview). */
 (function () {
   var root = document.querySelector('.sds-surface'); if (!root) return;
   var frame = root.querySelector('.sds-surface-frame');

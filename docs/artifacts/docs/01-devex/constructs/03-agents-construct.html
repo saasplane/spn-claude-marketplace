@@ -4,18 +4,16 @@
 {"id":"agent-set","variant":"construct","title":"Agents","subtitle":"A second reader, convened for just one turn, who holds only what its own file grants it.","lenses":["LEAD","ARCHITECT"],"status":"PLANNING","dependsOn":["plugin-set","ref-set"],"summary":"An agent here is a named persona a session can call in the middle of a turn, for a second, independent read on a change.","keywords":["agent","brief","persona","lens","panel","authority"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-z6T3Ju/mWAnv24wb8AFXMHYMyXMd5U/g7N2hA3X1uCys4Ty2Yy7TcMXWe+SMPck0" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../devex-overview.html">&larr; spn-devex</a>
   <div class="sds-rail-title">Agents</div>
 </nav>
 <div class="sds-wrap">
-
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Agents</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Engineering leader</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <div class="sds-eyebrow"><span class="sds-line1"><a href="../../concept-overview.html">SaaS Plane</a> &middot; <a href="../devex-overview.html">Claude Marketplace</a> &middot; Agents</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Engineering leader</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>Agents</h1>
   <p class="sds-subtitle">A second reader, convened for just one turn, who holds only what its own file grants it.</p>
   <p class="sds-standfirst">An agent here is a named persona a session can call in the middle of a turn, for a second, independent read on a change. Read this page before you write a new persona, or if you need to know what one is allowed to decide. It covers the file that decides when a persona answers, the authority its own file grants it, and the viewpoint — called a lens — it is handed when convened.</p>
@@ -53,7 +51,7 @@
 <!-- 02 -->
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
-  <p>A session names a persona. The brief decides what that persona may do, and where the convening carries a viewpoint name, the lens file narrows it further.</p>
+  <p>A session names a persona. The brief decides what that persona may do, and where the convening carries a viewpoint name, the lens file narrows it further. What is left is the authority: what may be refused, what may only be advised, and what may be written.</p>
 <figure class="dl-figure">
 <div class="dl-frame">
 <svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="Authority comes from the files rather than from the caller, so a caller cannot ask a reviewing persona to edit.">
@@ -109,7 +107,7 @@
   <h3 id="read-only-promise-where-a-read-only-prom">Read-only promise — Where a read-only promise is actually bound</h3>
   <p>A brief declaring <code>tools</code> is bound by it: the permission is a fact about the convening rather than an instruction the persona is asked to follow. A brief that declares no <code>tools</code> inherits everything the session has, and its promise not to write is prose (rule RULE.CLAUDE_MARKETPLACE.DEVEX.004). Both kinds exist here, and telling them apart matters when a reviewer's independence is what the brief is for.</p>
   <h3 id="a-fixed-persona">A fixed persona</h3>
-  <p>A brief with no argument is always one voice. Three briefs are of that kind:</p>
+  <p>A brief with no argument is always one voice. The briefs of that kind are:</p>
   <ul>
     <li>an engineering lead;</li>
     <li>a prose rewriter;</li>
@@ -168,4 +166,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-yDkvlVaxZfr5SBqgjOk8GZPsDngeCYQxHHaY1aPfty/M6hFe1DXJz++VjJ+i+082" crossorigin="anonymous"></script>

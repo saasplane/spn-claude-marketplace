@@ -45,7 +45,7 @@ This construct realizes the book's `01-devex/02-agent/01-agent`.
 
 ## Model
 
-There are two ways into this folder and one body of code behind them. A moment reaches a check; a person or a skill reaches a tool. What either one asks is decided in the same place.
+There are two ways into this folder and one body of code behind them: a call or a command reaches a script. A moment reaches a check; a person or a skill reaches a tool. What either one asks is decided in the same place, which is the rule.
 
 ```dg
 { "kind": "map",
@@ -71,10 +71,12 @@ A refusal ends a chain, because anything said after an answer is noise. Advice d
 
 The whole tree sits under `scripts/`, and the plugin's `hooks/` folder holds the wiring file alone. Each of the four folders holds one kind of file:
 
-- `checks/` holds the files a moment's dispatcher composes.
-- `events/` holds one file per moment, which is the only code the wiring names.
-- `tools/` holds the files nothing wires, reached by typing a path.
-- `lib/` holds what more than one of the others reads and what none of them owns.
+```catalog layout=LIST name=Folder
+`checks/` | the files a moment's dispatcher composes
+`events/` | one file per moment, which is the only code the wiring names
+`tools/` | the files nothing wires, reached by typing a path
+`lib/` | what more than one of the others reads and what none of them owns
+```
 
 ### Check header — A check is a file, and its header names its source
 
@@ -136,10 +138,12 @@ One tool here writes. It reads the files of the one run it is told to read and p
 
 An author writes markdown and a reader opens HTML, and the whole of what sits between the two is a job of the documents tool:
 
-- `page` produces.
-- `face` writes the generated regions of a face.
-- `figures` measures every drawing.
-- `audit` produces a page again and compares it byte for byte, so a hand edit is found rather than inherited.
+```catalog layout=LIST name=Job
+`page` | produces
+`face` | writes the generated regions of a face
+`figures` | measures every drawing
+`audit` | produces a page again and compares it byte for byte, so a hand edit is found rather than inherited
+```
 
 What the tool must not decide is what a page is made of. **The block vocabulary, the figure grammar and the furniture a page carries are the foundation's**, stated in `spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md` with the templates beside it, and this folder only realizes them. Where the two disagree, the chapter wins.
 

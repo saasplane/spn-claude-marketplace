@@ -4,18 +4,16 @@
 {"id":"apps-tests","variant":"construct","title":"Tests","subtitle":"How this plugin proves the rules it holds every other repository to.","lenses":["QA","SERVER_DEV"],"status":"PLANNING","dependsOn":["stack-checks","apps-providers"],"summary":"This plugin ships rules that other repositories are held to, so it owes proof of its own, carried in a Tests folder built the same way this domain asks every project it governs to build one.","keywords":["tests","tier","mirror","runner","harness","discovery"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-z6T3Ju/mWAnv24wb8AFXMHYMyXMd5U/g7N2hA3X1uCys4Ty2Yy7TcMXWe+SMPck0" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../apps-overview.html">&larr; spn-apps</a>
   <div class="sds-rail-title">Tests</div>
 </nav>
 <div class="sds-wrap">
-
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Tests</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Quality engineer</span><span class="sds-badge sds-lens">Backend developer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <div class="sds-eyebrow"><span class="sds-line1"><a href="../../concept-overview.html">SaaS Plane</a> &middot; <a href="../apps-overview.html">Claude Marketplace</a> &middot; Tests</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Quality engineer</span><span class="sds-badge sds-lens">Backend developer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>Tests</h1>
   <p class="sds-subtitle">How this plugin proves the rules it holds every other repository to.</p>
   <p class="sds-standfirst">This plugin ships rules that other repositories are held to, so it owes proof of its own, carried in a Tests folder built the same way this domain asks every project it governs to build one. Read this page before you add a new suite, or when you want to know why one level of proof is missing on purpose. It explains the one deliberate exception to that convention, and the rule that nothing here may count its own depth.</p>
@@ -47,7 +45,7 @@
 <!-- 02 -->
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
-  <p>The tier comes first and the mirror second, because the tier answers <em>what kind of proof is this</em> and the mirror answers <em>of what</em>.</p>
+  <p>The tier comes first and the mirror second, because the tier answers <em>what kind of proof is this</em> and the mirror answers <em>of what</em>. The runner walks the folder into each tier, the mirror sits under the tier, and a suite stands at the end of it.</p>
 <figure class="dl-figure">
 <div class="dl-frame">
 <svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="Tier before mirror: a second kind of proof for the same file lands beside the first without colliding with it.">
@@ -99,6 +97,28 @@
   <div class="sds-section-head"><h2>Parts</h2></div>
   <h3 id="tier-folder-the-tier-is-the-first-folder">Tier folder — The tier is the first folder, and the mirror sits under it</h3>
   <p>Putting the mirror first would leave nowhere to file a second kind of proof for the same file. With the tier first, a wired proof of something a unit suite already covers lands under its own tier at the same path, and neither collides with the other.</p>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 68" role="img" aria-label="Where a second proof of the same file lands">
+  <rect class="dl-tile" x="236" y="16" width="116" height="36" rx="10"/>
+  <text class="dl-name" x="248" y="37">Its own tier</text>
+  <path class="dl-wire" d="M352 34 L408 34"/>
+  <rect class="dl-tile" x="408" y="16" width="116" height="36" rx="10"/>
+  <text class="dl-name" x="420" y="37">The same path</text>
+  <path class="dl-wire" d="M524 34 L580 34"/>
+  <rect class="dl-tile" x="580" y="16" width="116" height="36" rx="10"/>
+  <text class="dl-name" x="592" y="37">A wired proof</text>
+</svg>
+</div>
+<figcaption>Look at the middle box: the path stays the same, so only the tier tells the two proofs apart.</figcaption>
+</figure>
+  <!-- dg:source
+{ "kind": "chain",
+  "title": "Where a second proof of the same file lands",
+  "caption": "Look at the middle box: the path stays the same, so only the tier tells the two proofs apart.",
+  "boxes": [{ "id": "a", "label": "Its own tier" }, { "id": "b", "label": "The same path" },
+            { "id": "c", "label": "A wired proof" }] }
+  -->
   <h3 id="empty-tiers-a-tier-with-nothing-in-it-ha">Empty tiers — A tier with nothing in it has no folder</h3>
   <p>There is no folder for a tier this plugin proves nothing at, and none for a setup the runner does not need. This is the same rule the gate already states about a realization that is absent: an empty folder teaches a reader that the thing works, where a missing one says what is true.</p>
   <h3 id="exact-mirror-the-mirror-is-exact-so-a-ru">Exact mirror — The mirror is exact, so a rule and its proof move together</h3>
@@ -154,4 +174,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-yDkvlVaxZfr5SBqgjOk8GZPsDngeCYQxHHaY1aPfty/M6hFe1DXJz++VjJ+i+082" crossorigin="anonymous"></script>

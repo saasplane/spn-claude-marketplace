@@ -37,7 +37,7 @@ This construct realizes the book's `01-devex/02-agent/04-plugins`.
 
 ## Model
 
-The tier comes first and the mirror second, because the tier answers *what kind of proof is this* and the mirror answers *of what*.
+The tier comes first and the mirror second, because the tier answers *what kind of proof is this* and the mirror answers *of what*. The runner walks the folder into each tier, the mirror sits under the tier, and a suite stands at the end of it.
 
 ```dg
 { "kind": "map",
@@ -60,6 +60,14 @@ The tier comes first and the mirror second, because the tier answers *what kind 
 ### Tier folder — The tier is the first folder, and the mirror sits under it
 
 Putting the mirror first would leave nowhere to file a second kind of proof for the same file. With the tier first, a wired proof of something a unit suite already covers lands under its own tier at the same path, and neither collides with the other.
+
+```dg
+{ "kind": "chain",
+  "title": "Where a second proof of the same file lands",
+  "caption": "Look at the middle box: the path stays the same, so only the tier tells the two proofs apart.",
+  "boxes": [{ "id": "a", "label": "Its own tier" }, { "id": "b", "label": "The same path" },
+            { "id": "c", "label": "A wired proof" }] }
+```
 
 ### Empty tiers — A tier with nothing in it has no folder
 

@@ -23,7 +23,7 @@
 }
 -->
 
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-z6T3Ju/mWAnv24wb8AFXMHYMyXMd5U/g7N2hA3X1uCys4Ty2Yy7TcMXWe+SMPck0" crossorigin="anonymous">
 <div class="sds-page">
 <nav class="sds-rail" id="rail">
   <a class="sds-home" href="../concept-overview.html">&larr; the hub</a>
@@ -37,7 +37,7 @@
   <p class="sds-standfirst">spn-infra is the plugin an estate repository loads, and this page reads it one folder at a time, around the one boundary every folder keeps. Read it before you add a rule about what an estate declaration may contain, or when you want to know what this plugin catches and what it leaves to the tool. It takes each folder in turn and sends you to the page that states it in full.</p>
 </header>
 
-<section id="s0">
+<section id="s0" data-block="reasons">
   <div class="sds-section-head"><h2>Overview</h2></div>
   <p>An estate declaration says what infrastructure should exist, and some things must never appear in one: a credential, an account identifier a tool finds for itself, a cloud's own string outside the entry allowed to hold it. <code>spn-infra</code> catches those at the moment they are written, and explains the estate's words to a reader who may never open the book.</p>
   <p>This page is for a DevOps engineer or an architect working in an estate repository, and for anyone about to add a rule or a cloud to this plugin. It assumes you know what a plugin is; if you do not, the <a href="../01-devex/devex-overview.html">spn-devex overview</a> comes first. After it you know where each estate rule is enforced, and what this plugin will never do for you.</p>
@@ -50,22 +50,22 @@
   </ul>
 </section>
 
-<section id="s1">
-  <div class="sds-section-head"><h2>Plugin &mdash; spn-infra as a delivery unit</h2></div>
+<section id="s1" data-block="reasons">
+  <div class="sds-section-head"><h2>Plugin &mdash; the one folder that carries the estate rules into a session</h2></div>
   <p><code>spn-infra</code> is the folder that carries the estate standard into a session working on an estate: one manifest, one entry in the marketplace list, and the folders beneath it. Its version belongs to the set and moves with its two siblings whether or not anything here changed. Its description belongs to this plugin alone, and it is what a session matches against when it decides whether to load the plugin at all.</p>
   <p><em>Decide here:</em> whether the description says enough for a session in an estate repository to load this plugin.</p>
   <p><a class="sds-more" href="constructs/01-plugin-construct.html">Read Plugin &rarr;</a></p>
 </section>
 
-<section id="s2">
-  <div class="sds-section-head"><h2>Hooks &mdash; one moment, every write</h2></div>
+<section id="s2" data-block="reasons">
+  <div class="sds-section-head"><h2>Hooks &mdash; the one moment before a file is written, when a bad write can still be stopped</h2></div>
   <p>Every rule this plugin holds is about what a file contains, so the wiring is as narrow as the rules: the moment before a call writes or edits a file, and nothing else. That is the only moment that can still stop a write. An estate leak is cheap to catch while somebody writes it and expensive to find later, so this plugin claims that moment and no other.</p>
   <p><em>Decide here:</em> whether a new estate rule can be checked from the text being written.</p>
   <p><a class="sds-more" href="constructs/02-hooks-construct.html">Read Hooks &rarr;</a></p>
 </section>
 
-<section id="s3">
-  <div class="sds-section-head"><h2>Skills &mdash; the doors an estate is changed through</h2></div>
+<section id="s3" data-block="reasons">
+  <div class="sds-section-head"><h2>Skills &mdash; the steps for changing an estate, each one ending at the tool's command</h2></div>
   <p>An estate is changed by editing what it declares itself to be, then letting a tool render and apply that declaration. The skills cover that walk, from starting a new piece to releasing a finished one.</p>
   <figure class="dl-figure">
   <div class="dl-frame">
@@ -93,8 +93,8 @@
   <p><a class="sds-more" href="constructs/03-skills-construct.html">Read Skills &rarr;</a></p>
 </section>
 
-<section id="s4">
-  <div class="sds-section-head"><h2>Scripts &mdash; the write-time gate and what runs it</h2></div>
+<section id="s4" data-block="reasons">
+  <div class="sds-section-head"><h2>Scripts &mdash; the gate that catches a bad write, and the three parts that run it</h2></div>
   <p>The scripts tree is the catch, and it runs in three parts, one after the other.</p>
   <figure class="dl-figure">
   <div class="dl-frame">
@@ -119,22 +119,22 @@
   <p><a class="sds-more" href="constructs/04-scripts-construct.html">Read Scripts &rarr;</a></p>
 </section>
 
-<section id="s5">
-  <div class="sds-section-head"><h2>Refs &mdash; the estate's vocabulary, restated as cards</h2></div>
+<section id="s5" data-block="reasons">
+  <div class="sds-section-head"><h2>Refs &mdash; the estate's words, written out as cards you can read without the book</h2></div>
   <p>An estate is declared in a small vocabulary where every word is exact: which file marks a node, which layer owns which act, how a resource name is built, what a declaration must never contain. A card restates one of those subjects in full, for a reader who may never open the book. A card is a ref, so it carries a stamp and adds no rule. Every value in it is grammar, never a real one: no organization's environment, region or account appears.</p>
   <p><em>Decide here:</em> where to read an estate word before writing it, and what a card may never hold.</p>
   <p><a class="sds-more" href="constructs/05-refs-construct.html">Read Refs &rarr;</a></p>
 </section>
 
-<section id="s6">
-  <div class="sds-section-head"><h2>Providers &mdash; one folder per cloud, scripts half only</h2></div>
+<section id="s6" data-block="reasons">
+  <div class="sds-section-head"><h2>Providers &mdash; one folder for each cloud, holding its parsing and no skills</h2></div>
   <p>Everything that differs between clouds sits in <code>providers/</code>, one folder per cloud, so admitting the next cloud is adding a folder. Here each folder holds a scripts half and no skills half. A skills half is earned when the instance changes what an author writes, and a cloud does not: a declaration is provider-neutral, and every rendering is written against OpenTofu whichever cloud it reaches. So the rule is the domain's and the parsing is the provider's.</p>
   <p><em>Decide here:</em> what a new cloud must bring, and why it brings no skills.</p>
   <p><a class="sds-more" href="constructs/06-providers-construct.html">Read Providers &rarr;</a></p>
 </section>
 
-<section id="s7">
-  <div class="sds-section-head"><h2>Tests &mdash; the tier, the mirror, and a runner that walks</h2></div>
+<section id="s7" data-block="reasons">
+  <div class="sds-section-head"><h2>Tests &mdash; how each rule is proven both ways, and why a proof moves with its source</h2></div>
   <p>A gate nobody proves is a gate nobody can trust to be narrow. The rules here are patterns over text somebody is about to write, and a pattern one character too wide refuses correct files until somebody turns the whole gate off. So each rule is proven against what it must refuse and against what it must let through. The tier comes first and the mirror second, so moving a source file moves its proof with it.</p>
   <p><em>Decide here:</em> what a new rule must be proven against, and where that proof goes.</p>
   <p><a class="sds-more" href="constructs/07-tests-construct.html">Read Tests &rarr;</a></p>
@@ -206,16 +206,16 @@
 </section>
 
 <section id="s9" data-block="next">
-  <div class="sds-section-head"><h2>Next — Where to go next</h2></div>
-  <ul>
-    <li>What each instrument is, before this domain adds to it &rarr; <a href="../01-devex/devex-overview.html">spn-devex</a></li>
-    <li>The surface plugin, which holds what a person sees and touches &rarr; <a href="../02-surface/surface-overview.html">spn-surface</a></li>
-    <li>The stack plugin, whose provider carries both halves &rarr; <a href="../03-apps/apps-overview.html">spn-apps</a></li>
-    <li>What each chapter here is held to in this plugin's own source &rarr; <a href="../../../04-capabilities/04-infra/plugin-spn-infra/README.md">capabilities: spn-infra</a></li>
-    <li>What an estate engineer is promised &rarr; <a href="../../../03-behaviors/04-infra/README.md">behaviours: infra</a></li>
-    <li>Every construct of this domain, in reading order &rarr; <a href="../../../02-constructs/04-infra/README.md">constructs: infra</a></li>
-    <li>Back to the whole model &rarr; <a href="../concept-overview.html">the hub</a></li>
-  </ul>
+  <div class="sds-section-head"><h2>Next &mdash; where to go next</h2></div>
+  <div class="sds-tiles">
+    <a class="sds-tile sds-door" href="../01-devex/devex-overview.html"><span class="sds-door-kicker">Instruments</span><span class="sds-door-title">spn-devex<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span><span class="sds-door-line">What each instrument is, before this domain adds to it</span></a>
+    <a class="sds-tile sds-door" href="../02-surface/surface-overview.html"><span class="sds-door-kicker">Surface</span><span class="sds-door-title">spn-surface<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span><span class="sds-door-line">The surface plugin, which holds what a person sees and touches</span></a>
+    <a class="sds-tile sds-door" href="../03-apps/apps-overview.html"><span class="sds-door-kicker">Stack</span><span class="sds-door-title">spn-apps<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span><span class="sds-door-line">The stack plugin, whose provider carries both halves</span></a>
+    <a class="sds-tile sds-door" href="../../../04-capabilities/04-infra/plugin-spn-infra/README.md"><span class="sds-door-kicker">Held to</span><span class="sds-door-title">Capabilities: spn-infra<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span><span class="sds-door-line">What each chapter here is held to in this plugin's own source</span></a>
+    <a class="sds-tile sds-door" href="../../../03-behaviors/04-infra/README.md"><span class="sds-door-kicker">Promised</span><span class="sds-door-title">Behaviours: infra<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span><span class="sds-door-line">What an estate engineer is promised</span></a>
+    <a class="sds-tile sds-door" href="../../../02-constructs/04-infra/README.md"><span class="sds-door-kicker">In order</span><span class="sds-door-title">Constructs: infra<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span><span class="sds-door-line">Every construct of this domain, in reading order</span></a>
+    <a class="sds-tile sds-door" href="../concept-overview.html"><span class="sds-door-kicker">Whole model</span><span class="sds-door-title">The hub<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span><span class="sds-door-line">Back to the whole model</span></a>
+  </div>
 </section>
 
 </div>
@@ -225,4 +225,4 @@
   Sources: <a href="../../../../CONCEPT.md">CONCEPT.md</a> &sect; infra; the constructs it links.
 </footer>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-yDkvlVaxZfr5SBqgjOk8GZPsDngeCYQxHHaY1aPfty/M6hFe1DXJz++VjJ+i+082" crossorigin="anonymous"></script>

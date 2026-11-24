@@ -1,4 +1,4 @@
-/* RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § One stylesheet, served in versions
+/* RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/08-stylesheet.md § One stylesheet, served in versions
    The chapter is the source of truth; a rule change is edited there first, then here.
 
    The Tailwind source of the one stylesheet every page loads. Every class and token of ours opens with
@@ -1221,7 +1221,7 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 .dl-skeleton .dl-glyph { stroke: var(--fg-muted); }
 .dl-skeleton .dl-glyph-solid { fill: var(--fg-muted); }
 
-/* THE SURFACE PAGE PREVIEW (05-artifacts.md, The surface page preview): one page of a site or an app, shown as the page itself in a
+/* THE SURFACE PAGE PREVIEW (05-pages.md, The surface preview): one page of a site or an app, shown as the page itself in a
    frame under a bar that stays at the top. The bar holds the page's title and three switches; the frame takes the whole width left at
    Desktop and the device's width at Tablet and Phone, centred on the sunken ground. The page scrolls inside the frame, so the bar never
    leaves. No rail, no masthead: the page is the content (developer, 2026-11-19: "also can we keep that bar sticky"). */
@@ -1594,6 +1594,13 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   row-gap: .55rem;
   align-content: start;
 }
+/* A tile with no facts has nothing to line up with its neighbours, so it is not a subgrid: it stacks its own title, line
+   and any line under them. As a subgrid it held one row, and its line was drawn over its title. */
+.sds-tiles[data-layout='GRID'] > .sds-tile:not([data-facts]) {
+  display: flex;
+  flex-direction: column;
+  row-gap: .55rem;
+}
 .sds-tiles[data-layout='GRID'] > .sds-tile[data-facts='1'] { grid-row: span 3; }
 .sds-tiles[data-layout='GRID'] > .sds-tile[data-facts='2'] { grid-row: span 4; }
 .sds-tiles[data-layout='GRID'] > .sds-tile[data-facts='3'] { grid-row: span 5; }
@@ -1607,7 +1614,23 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 .sds-tiles[data-layout='GRID'] .sds-tile-facts > div {
   display: flex;
   flex-direction: column;
-  gap: .15rem;
+  gap: 0;
+}
+/* S77 (the developer, 2026-11-24: "if small side by side else vertical and when vertical add some spece between facts"): a
+   card's short facts share one row, each key over its value, and its longer facts stack under them with more room between. */
+.sds-tiles[data-layout='GRID'] .sds-tile-facts > .sds-tile-fact-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr));
+  gap: .55rem 1rem;
+}
+.sds-tiles[data-layout='GRID'] .sds-tile-fact-row > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+}
+.sds-tiles[data-layout='GRID'] .sds-tile-facts > div + div {
+  margin-top: .35rem;
 }
 .sds-tiles[data-layout='GRID'] .sds-tile-facts > div:first-child {
   border-top: 1px solid var(--sds-rule);
@@ -1617,6 +1640,9 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 .sds-tiles[data-layout='GRID'] .sds-tile-facts dt {
   font-size: var(--sds-xs);
   letter-spacing: .02em;
+  /* A key sits right on its value: no gap, and a line no taller than its letters need (the developer, 2026-11-24:
+     "a fact's key (title) and its value (description) ... do we need this space?"). */
+  line-height: 1.25;
 }
 .sds-tiles[data-layout='GRID'] .sds-tile-facts dd {
   font-size: var(--sds-sm);
@@ -1787,11 +1813,14 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 .sds-tiles[data-layout='LIST'] .sds-tile-facts > div {
   display: flex;
   flex-direction: column;
-  gap: .15rem;
+  gap: 0;
 }
 .sds-tiles[data-layout='LIST'] .sds-tile-facts dt {
   font-size: var(--sds-xs);
   letter-spacing: .02em;
+  /* A key sits right on its value: no gap, and a line no taller than its letters need (the developer, 2026-11-24:
+     "a fact's key (title) and its value (description) ... do we need this space?"). */
+  line-height: 1.25;
 }
 .sds-tiles[data-layout='LIST'] .sds-tile-facts dd {
   color: var(--sds-text-title-card);
@@ -1805,8 +1834,11 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 }
 /* ONE FACT IS ONE LINE under the description, never a stacked label and value: a small muted label, then the value in italic in the
    description colour, on the same line (the developer, 2026-11-23: "cant we use something like italic or diff color etc.. taking too much apsces"). */
+/* One short fact is one line: the label, then the value (the developer, 2026-11-23). The facts rule above stacks them in a
+   column, so the row is restated here. */
 .sds-tiles[data-layout='LIST'] .sds-tile-facts-one > div {
   display: flex;
+  flex-direction: row;
   flex-wrap: wrap;
   align-items: baseline;
   column-gap: .6rem;
@@ -1818,8 +1850,14 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 }
 .sds-tiles[data-layout='LIST'] .sds-tile-facts-one dd {
   font-style: italic;
+  font-size: var(--sds-caption);
   color: var(--sds-text-description-card);
   line-height: 1.5;
+}
+/* The one line sits tight under the description, in the small size of its key (the developer, 2026-11-24: "can we redec space
+   between facts and descriptio n and also use small fonts for facts?"). */
+.sds-tiles[data-layout='LIST'] .sds-tile-body > .sds-tile-facts-one {
+  margin-top: .2rem;
 }
 @media (max-width: 720px) {
   .sds-tiles[data-layout='LIST'] .sds-tile-facts {
@@ -1833,16 +1871,30 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
    under the description, label above value. */
 .sds-tiles[data-layout='LIST'][data-facts='side'] {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) repeat(var(--sds-side-columns, 1), 8.5rem);
+  grid-template-columns: minmax(0, 1fr) repeat(var(--sds-side-columns, 1), minmax(8.5rem, max-content));
   column-gap: 0;
   row-gap: 0;
 }
 .sds-tiles[data-layout='LIST'][data-facts='side'][data-columns='2'] { --sds-side-columns: 2; }
+.sds-tiles[data-layout='LIST'][data-facts='side'][data-columns='3'] { --sds-side-columns: 3; }
+/* FACTS AFTER THE DESCRIPTION, two or more names (S75): cells, each key over its value, one column per key in the same place on
+   every item, so a reader reads one key down the list; three across at most, and one on a phone. */
+.sds-tiles[data-layout='LIST'] .sds-tile-facts[data-columns='2'] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.sds-tiles[data-layout='LIST'] .sds-tile-facts[data-columns='3'] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 720px) {
+  .sds-tiles[data-layout='LIST'] .sds-tile-facts[data-columns] { grid-template-columns: 1fr; }
+  .sds-tiles[data-layout='LIST'] .sds-tile-facts[data-columns] > .sds-tile-fact-none { display: none; }
+}
+/* A LINE OF TAGS WITH NO KEY (S75): an item's one fact, drawn as its badges alone; the sentence before the catalog names them. */
+.sds-tile .sds-tile-facts > .sds-tile-fact-bare { display: block; }
 .sds-tiles[data-layout='LIST'][data-facts='side'] > .sds-tile,
 .sds-tiles[data-layout='LIST'][data-facts='side'] > .sds-tiles-head {
   grid-column: 1 / -1;
   display: grid;
   grid-template-columns: subgrid;
+  /* A subgrid with a gap of its own moves its items by half the difference from the list's gap (0), so a row's facts stood 7px
+     right of their heading (the developer, 2026-11-24: "Why Owes title and text is not aligned"). The rows keep the list's gap. */
+  column-gap: 0;
   align-items: start;
 }
 .sds-tiles[data-layout='LIST'][data-facts='side'] .sds-tile-main {
@@ -1932,6 +1984,37 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   font-size: var(--sds-sm);
   font-weight: var(--font-weight-medium);
   color: var(--sds-text-fact);
+}
+/* THE KEY COLUMN IS PINNED AS DSTable PINS A COLUMN (S75): the head row keeps the head's muted fill, and the key column takes the
+   row's own fill, never a fill of its own; it stays at the start while the table scrolls sideways, and casts one edge shadow
+   only while content runs under it, as DSTable's `ds-table-pin-right` does. With no script on a docs page, the shadow follows a
+   scroll timeline: shown from the first pixel scrolled. */
+.sds-scroll:has(> .sds-catalog-table) { scroll-timeline: --sds-catalog-x inline; }
+.sds-catalog-table tr > :first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+.sds-catalog-table tbody th { background-color: var(--surface); }
+.sds-catalog-table tbody tr:last-child > th { border-bottom: none; }
+/* A striped row's key cell takes the stripe as its cells do, under the same condition the table stripe has. */
+.sds-catalog-table:has(> thead > tr > th:nth-child(3)):not(:has(td > p + p)) > tbody > tr:nth-child(even) > th { background-color: var(--surface-sunken); }
+.sds-catalog-table tr > :first-child::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -8px;
+  width: 8px;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(to right, color-mix(in oklab, var(--fg) 12%, transparent), transparent);
+  animation: sds-pin-shadow linear both;
+  animation-timeline: --sds-catalog-x;
+}
+@keyframes sds-pin-shadow {
+  0% { opacity: 0; }
+  1%, 100% { opacity: 1; }
 }
 .sds-catalog-table tbody td {
   vertical-align: top;

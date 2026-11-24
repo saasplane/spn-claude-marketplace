@@ -7,11 +7,11 @@ description: Realize the estate - bring a layer up, take it down, read its statu
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "f9709d35"
+      "seen": "00d468e8"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
-      "seen": "ce593b71"
+      "seen": "1e3741bc"
     }
   ]
 }

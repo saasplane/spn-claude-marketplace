@@ -24,6 +24,15 @@ A gate nobody proves is a gate nobody can trust to be narrow. This plugin's refu
 
 **The tier comes first and the mirror second.** `unit/` answers *what kind of proof is this*, and the path under it answers *of what* by repeating the source file's own path. That order is what lets a second tier be added later without a collision: an integration suite for a file that already has a unit suite lands at the same path under a different tier.
 
+```dg
+{ "kind": "chain",
+  "title": "How a suite's path is read",
+  "caption": "Look at the order: the tier is read first and the mirror second, so a second tier lands beside the first.",
+  "boxes": [{ "id": "a", "label": "The tier", "note": "what kind of proof this is" },
+            { "id": "b", "label": "The mirror", "note": "of what, by repeating the source file's own path", "em": true },
+            { "id": "c", "label": "The suite", "note": "a second tier lands at the same path" }] }
+```
+
 This construct realizes the book's `01-devex/02-agent/04-plugins`.
 
 ## Terms
@@ -40,7 +49,7 @@ This construct realizes the book's `01-devex/02-agent/04-plugins`.
 
 ## Model
 
-Two fixed folders and one file, and the shape of the path carries the meaning.
+Two fixed folders and one file, and the shape of the path carries the meaning. `run.mjs` walks the whole tree and runs every suite it finds. `helpers/` holds the harness, which every suite loads. `unit/` is the tier, the first thing the path says, and `unit/<source path>` is the mirror, where the suite sits at its source's own path.
 
 ```dg
 { "kind": "map",
@@ -62,19 +71,19 @@ Two fixed folders and one file, and the shape of the path carries the meaning.
 
 ## Parts
 
-### What is proven — What is proven, and both sides of every rule
+### What is proven — what is proven, and both sides of every rule
 
 One suite proves the estate laws — what each rule refuses, what it allows, and where the credential length boundary sits, stated as cases so nobody re-derives it from a regular expression. Another proves the subject resolution: each cloud's own spellings refused, each cloud's sanctioned homes still allowed, and the case that matters most — a region belonging to the **other** cloud caught as well, because a write-time gate cannot know which cloud the estate will resolve to.
 
-### Load-bearing suite — The suite is proven load-bearing, not merely green
+### Load-bearing suite — the suite is proven load-bearing, not merely green
 
 A passing suite proves the code does what the suite says; it does not prove the suite would notice if the code stopped. So the discovery was tested by moving the Google provider folder aside: exactly the two Google cases went red and every other case stayed green, and restoring the folder returned the whole run. That is the difference between a suite that reads the tree and a suite that agrees with it.
 
-### Runner — The runner walks, and it judges on the exit code
+### Runner — the runner walks, and it judges on the exit code
 
 `run.mjs` finds every suite by walking the tree and taking each file whose name marks it as one, so a suite is discovered by where its source sits rather than by being added to a list. It reads each suite's own exit code as the verdict and uses the printed summary only for the count, because a suite that exits non-zero while printing a cheerful last line would otherwise read as green. Standard error is discarded rather than inherited, so a fixture's warnings do not appear in the run as this run's findings.
 
-### Folder counting — Nothing counts folders to find the code
+### Folder counting — nothing counts folders to find the code
 
 Moving the suites once broke every one of them at the same moment, because each computed its own depth back to the plugin. So each part does one thing:
 
@@ -84,26 +93,26 @@ Moving the suites once broke every one of them at the same moment, because each 
 
 **A suite that types a depth is a suite the next move breaks**, and nothing here types one.
 
-### Real verdict — A case runs the real process and reads the real verdict
+### Real verdict — a case runs the real process and reads the real verdict
 
 The harness writes a hook event to a fresh process on standard input and parses the decision back out, so what a case proves is what the harness would see rather than what a function returns. A case states the decision it expects and, for a refusal, a fragment the message must carry — which is how a rule that fires for the wrong reason is caught rather than counted as a pass.
 
-### Absences — What is absent, and the absence is the statement
+### Absences — what is absent, and the absence is the statement
 
 There is no `integration/` folder and no `setup/` folder. Nothing runs at that tier in this plugin, and the runner needs no fixture stood up before it starts. **An empty folder would teach a reader that the tier works**, so neither exists, which is the same rule a cloud with no validator follows.
 
-### Replayed payloads — The payload a case replays sits beside the suites, once per event
+### Replayed payloads — the payload a case replays sits beside the suites, once per event
 
 `tests/fixtures/payloads/pretooluse/` holds one recorded call for the one event this plugin wires, and a suite reads it rather than constructing its own. A payload is an input, never a generated answer, so a stale one is a fixture problem and never a passing case that stopped proving anything.
 
-### Bundle cases — Two more cases prove the bundle, not one file
+### Bundle cases — two more cases prove the bundle, not one file
 
 `unit/t-dist-current.mjs` and `unit/t-bundle-parity.mjs` sit at the tree's root rather than under any one mirror, because each proves a property of the whole plugin:
 
-| Case | What it proves |
-| --- | --- |
-| `unit/t-dist-current.mjs` | recomputes a bundle's declared sources against the banner esbuild wrote into it |
-| `unit/t-bundle-parity.mjs` | runs a recorded payload through the source and through the committed bundle and asserts the two agree |
+```catalog layout=LIST
+`unit/t-dist-current.mjs` | recomputes a bundle's declared sources against the banner esbuild wrote into it
+`unit/t-bundle-parity.mjs` | runs a recorded payload through the source and through the committed bundle and asserts the two agree
+```
 
 Both call the one shared harness the foundation's plugins realization states, `packages/plugin-support-lib/tests/helpers/`, so the build and the check can never quietly disagree. This plugin ships no `commands/`, but `hooks.json` still runs a built `dist/events/pretooluse.mjs`, so it owes both cases exactly as its two siblings do.
 

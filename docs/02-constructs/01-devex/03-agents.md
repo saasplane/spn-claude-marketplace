@@ -45,7 +45,7 @@ This construct realizes the book's `01-devex/02-agent/01-agent`.
 
 ## Model
 
-A session names a persona. The brief decides what that persona may do, and where the convening carries a viewpoint name, the lens file narrows it further.
+A session names a persona. The brief decides what that persona may do, and where the convening carries a viewpoint name, the lens file narrows it further. What is left is the authority: what may be refused, what may only be advised, and what may be written.
 
 ```dg
 { "kind": "map",
@@ -77,7 +77,7 @@ A brief declaring `tools` is bound by it: the permission is a fact about the con
 
 ### A fixed persona
 
-A brief with no argument is always one voice. Three briefs are of that kind:
+A brief with no argument is always one voice. The briefs of that kind are:
 
 - an engineering lead;
 - a prose rewriter;

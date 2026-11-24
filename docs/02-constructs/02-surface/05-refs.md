@@ -20,7 +20,10 @@ Refs carries, inside this plugin, the Surface rules a partner needs but has no c
 
 ## Overview
 
-Two rules keep the folder honest. **A ref states and never executes**: it says what is true of a surface, and anything a skill performs lives elsewhere. And **a ref restates and adds nothing**: the book governs, the copy carries, and the copy says which version of the book it was read at, so a copy that has fallen behind can be reported rather than believed.
+These rules keep the folder honest:
+
+- **A ref states and never executes**: it says what is true of a surface, and anything a skill performs lives elsewhere.
+- **A ref restates and adds nothing**: the book governs, the copy carries, and the copy says which version of the book it was read at, so a copy that has fallen behind can be reported rather than believed.
 
 This construct realizes the book's `01-devex/02-agent/04-plugins`.
 
@@ -38,43 +41,47 @@ This construct realizes the book's `01-devex/02-agent/04-plugins`.
 
 ## Model
 
-The book is the source. A ref is the copy that travels with the plugin, arranged so its shape tells a reader where to look before they have read anything.
+The book is the source. A ref is the copy that travels with the plugin, arranged so its shape tells a reader where to look before they have read anything. Each ref carries the stamp, which names every chapter it restates and the hash last read there, and a drift run reads the stamp and reports a copy that fell behind.
 
 ```dg
-{ "kind": "map",
+{ "kind": "chain",
+  "title": "From the book to a drift run",
   "caption": "The reader holds the plugin and not the book, so the copy is complete and says which version it copied.",
   "boxes": [
-    { "id": "a", "label": "the book", "note": "the foundation's own chapters — the source that governs" },
+    { "id": "a", "label": "the book", "note": "the foundation's own chapters, the source that governs" },
     { "id": "b", "label": "a ref", "note": "a self-contained leaf, complete without the book beside it" },
     { "id": "c", "label": "the stamp", "note": "each chapter it restates, and the hash last read there" },
-    { "id": "d", "label": "a drift run", "note": "compares the hash and reports a copy that fell behind" }
-  ],
-  "links": [
-    { "from": "a", "to": "b", "label": "restated as" },
-    { "from": "b", "to": "c", "label": "carries" },
-    { "from": "c", "to": "d", "label": "read by" }
+    { "id": "d", "label": "a drift run", "note": "compares the hash and reports a copy that fell behind", "em": true }
   ] }
 ```
 
 ## Parts
 
-### Domain folder — One folder holds the whole domain, one file to a construct
+### Domain folder — one folder holds the whole domain, one file to a construct
 
-`refs/support/surface/` holds the standards of content and interaction, the patterns, the architecture of the design system with its names, layouts and widgets, the providers a design system needs, and the library and showcase deliveries. The path is the one the book's domain has, so a reader who knows the book finds the ref.
+`refs/support/surface/` holds:
 
-### Spec copies — The specs are copies, owned by the book
+- the standards of content and interaction;
+- the patterns;
+- the architecture of the design system, with its names, layouts and widgets;
+- the providers a design system needs;
+- the library and showcase deliveries.
+
+The path is the one the book's domain has, so a reader who knows the book finds the ref.
+
+### Spec copies — the specs are copies, owned by the book
 
 The app patterns and the site patterns each have a folder of skeleton specs. They are byte-identical to the book's, an index in each folder lists them with the hash of their contents, and `restates files` writes and checks them. A builder changes a spec in the book, and the export carries it.
 
-### Construct snapshot — The CONSTRUCT snapshot sits beside the refs
+### Construct snapshot — the CONSTRUCT snapshot sits beside the refs
 
 `refs/support/surface/construct.snapshot.json` is the CONSTRUCT snapshot, written from the book alone with `spnutils apps surface construct --out` for each release of the plugin. It holds every unit's props, its usage, its cases, the index by value of each choice table and the units their place sizes, and its `source.readFrom` names the book's release it was written from. It is the one snapshot a repository holds, because it carries nothing of a machine. `unit show` reads it, with the restated tables beside it, and reads nothing else outside the plugin but the symbol index of the repository it runs in, or, from a workspace's root, of each repository in it, for a unit the snapshot does not hold.
 
-### Stack half — The stack-specific half is the apps plugin's
+### Stack half — the stack-specific half is the apps plugin's
 
 How a block is built in TypeScript, and the layout of a web module, belong to the stack, so those refs sit in the apps plugin and a ref here points at them by name rather than by link.
 
-### Stale refs — A ref that fell behind says so
+### Stale refs — a ref that fell behind says so
 
 Every ref carries the chapters it restates and the hash last read from each. A drift run compares them and reports a ref whose chapter has moved.
 

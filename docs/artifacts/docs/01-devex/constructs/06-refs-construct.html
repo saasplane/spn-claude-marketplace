@@ -4,18 +4,16 @@
 {"id":"ref-set","variant":"construct","title":"Refs","subtitle":"A copy of a rule that says the moment it has fallen behind.","lenses":["VOICE","ARCHITECT"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"A ref is a markdown restatement of one or more foundation chapters, carrying a hash of the exact text it last read.","keywords":["ref","spn:restates","seen","hash","drift","unstamped"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-z6T3Ju/mWAnv24wb8AFXMHYMyXMd5U/g7N2hA3X1uCys4Ty2Yy7TcMXWe+SMPck0" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../devex-overview.html">&larr; spn-devex</a>
   <div class="sds-rail-title">Refs</div>
 </nav>
 <div class="sds-wrap">
-
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Refs</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Editor</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <div class="sds-eyebrow"><span class="sds-line1"><a href="../../concept-overview.html">SaaS Plane</a> &middot; <a href="../devex-overview.html">Claude Marketplace</a> &middot; Refs</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Editor</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>Refs</h1>
   <p class="sds-subtitle">A copy of a rule that says the moment it has fallen behind.</p>
   <p class="sds-standfirst">A ref is a markdown restatement of one or more foundation chapters, carrying a hash of the exact text it last read. Read this page before you write a new ref, or when a drift check tells you one has fallen behind. It explains how the hash lets a run report a chapter that moved, and the three ways a restatement can fail to be comparable at all.</p>
@@ -48,7 +46,7 @@
 <!-- 02 -->
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
-  <p>The hash is taken once, when the copy is made. Everything afterwards is a comparison.</p>
+  <p>The hash is taken once, when the copy is made: a chapter is copied into the restatement, the restatement carries a stamp, and the drift run reads the stamp. Everything afterwards is a comparison.</p>
 <figure class="dl-figure">
 <div class="dl-frame">
 <svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="The stamp stands between the copy and the drift run, which is what lets a run name the chapter that moved.">
@@ -112,8 +110,15 @@
   <h3 id="block-credit-a-block-used-to-get-credit-">Block credit — A block used to get credit for what it left out</h3>
   <p>A check that walks only the block can validate only what the file declared, so a source named in the file's own prose and omitted from the block was unreachable rather than unstamped, and both runs printed green over it. The check now reads the file's own source line and compares it against the block. The comparison is loose in one direction only: a name in prose counts as declared when some declared path contains it.</p>
   <h3 id="restatement-failures-three-ways-a-restat">Restatement failures — Three ways a restatement fails, and they are not the same finding</h3>
-  <p><strong>Undeclared</strong> is prose naming a source the block leaves out, which no run can see. <strong>Unstamped</strong> is a file saying what it restates and carrying no block at all, so nothing machine-readable exists to compare. <strong>Unread</strong> is a name no check can resolve to a file, which is an under-report rather than a hidden fault.</p>
-  <p>Follow one file through the checks and each finding falls out at its own question, which is why they are three findings and not one.</p>
+  <div class="sds-tiles" data-layout="LIST">
+    <div class="sds-tile"><div class="sds-tile-body"><h4>Undeclared</h4><p>prose naming a source the block leaves out, which no run can see</p>
+      </div></div>
+    <div class="sds-tile"><div class="sds-tile-body"><h4>Unstamped</h4><p>a file saying what it restates and carrying no block at all, so nothing machine-readable exists to compare</p>
+      </div></div>
+    <div class="sds-tile"><div class="sds-tile-body"><h4>Unread</h4><p>a name no check can resolve to a file, which is an under-report rather than a hidden fault</p>
+      </div></div>
+  </div>
+  <p>Follow one file through the checks. A file that says what it restates is asked its questions in turn. Does it carry a block? If not, it is Unstamped. Does its prose name a source the block omits? If so, it is Undeclared. Does every name resolve to a file? If not, it is Unread. Only then do the checks compare the stamps. Each finding falls out at its own question, which is why they are separate findings and not one.</p>
 <figure class="dl-figure">
 <div class="dl-frame">
 <svg class="dl-svg" viewBox="0 0 928 652" role="img" aria-label="A file reaches the comparison only after it has a block, names nothing the block leaves out, and every name resolves to a file.">
@@ -216,4 +221,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-yDkvlVaxZfr5SBqgjOk8GZPsDngeCYQxHHaY1aPfty/M6hFe1DXJz++VjJ+i+082" crossorigin="anonymous"></script>

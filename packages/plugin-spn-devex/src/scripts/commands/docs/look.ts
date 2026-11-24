@@ -103,6 +103,8 @@ export async function run(args: string[]): Promise<number> {
   }
   const wider: { page: number; window: number } = await page.evaluate(
     "({ page: document.documentElement.scrollWidth, window: window.innerWidth })");
+  await page.emulateMedia({ colorScheme: "light" });
+  const layout: string[] = await page.evaluate(LAYOUT_PROBE);
   await browser!.close();
 
   console.log(`${basename(file)}: rendered in light and in dark`);
@@ -114,5 +116,56 @@ export async function run(args: string[]): Promise<number> {
   console.log(wider.page > wider.window
     ? `  width            the page is ${wider.page}px wide in a window of ${wider.window}px`
     : `  width            fits the window (${wider.window}px)`);
+  console.log(`  layout           ${layout.length ? `${layout.length} finding(s)` : "no text drawn over other text, every one-fact line on one line, and every END column under its heading"}`);
+  for (const line of layout) console.log(`    ${line}`);
   return 0;
 }
+
+/**
+ * WHAT THE MARKUP CANNOT SHOW, MEASURED ON THE DRAWN PAGE (RULE.DEVEX.WORKSPACE.277: a page is checked by its computed values).
+ * A page check reads the markup, so a stylesheet that draws a tile's line over its title passes it. This reads the boxes the
+ * browser drew: two pieces of text inside one tile whose boxes overlap, and a one-fact item whose label and value do not share a
+ * line although they would fit on one (the developer, 2026-11-23: "a catalog item with one short fact draws it as one line").
+ * Exported for the probe's own test and for a run over many pages.
+ */
+export const LAYOUT_PROBE = `(() => {
+  const found = [];
+  const name = (tile) => ((tile.querySelector('h4, .sds-door-title') || tile).textContent || '').trim().replace(/\\s+/g, ' ').slice(0, 60);
+  const boxes = (els) => els.map((el) => ({ el, r: el.getBoundingClientRect() })).filter((b) => b.r.width > 0 && b.r.height > 0);
+  for (const tile of document.querySelectorAll('.sds-tile')) {
+    const parts = boxes([...tile.querySelectorAll('h4, p, dt, dd, .sds-door-title, .sds-door-line')]);
+    let hit = null;
+    for (let i = 0; i < parts.length && !hit; i++) for (let j = i + 1; j < parts.length && !hit; j++) {
+      const a = parts[i], b = parts[j];
+      if (a.el.contains(b.el) || b.el.contains(a.el)) continue;
+      const w = Math.min(a.r.right, b.r.right) - Math.max(a.r.left, b.r.left);
+      const h = Math.min(a.r.bottom, b.r.bottom) - Math.max(a.r.top, b.r.top);
+      if (w > 4 && h > 4) hit = a.el.tagName.toLowerCase() + ' and ' + b.el.tagName.toLowerCase();
+    }
+    if (hit) found.push('overlap  "' + name(tile) + '": its ' + hit + ' are drawn over each other');
+  }
+  for (const one of document.querySelectorAll('.sds-tile-facts-one > div')) {
+    const dt = one.querySelector('dt'), dd = one.querySelector('dd');
+    if (!dt || !dd) continue;
+    const t = dt.getBoundingClientRect(), d = dd.getBoundingClientRect(), row = one.getBoundingClientRect();
+    if (d.top - t.top > t.height * 0.6 && t.width + d.width + 12 < row.width)
+      found.push('stacked  "' + name(one.closest('.sds-tile') || one) + '": its one fact draws "' + dt.textContent.trim() + '" above its value, not on one line');
+  }
+  // An END list's header names each column once, so a heading starts where its column's values start (the developer,
+  // 2026-11-24: "Why Owes title and text is not aligned"; a row's own column gap had moved its cells 7px).
+  const textLeft = (el) => { const r = document.createRange(); r.selectNodeContents(el); return r.getBoundingClientRect().left; };
+  for (const list of document.querySelectorAll('.sds-tiles[data-facts="side"]')) {
+    const heads = [...list.querySelectorAll(':scope > .sds-tiles-head > span')].slice(1);
+    if (!heads.length || !heads[0].getBoundingClientRect().width) continue;
+    for (const tile of list.querySelectorAll(':scope > .sds-tile')) {
+      const cells = [...tile.querySelectorAll('.sds-tile-facts > div')];
+      cells.forEach((cell, i) => {
+        const dd = cell.querySelector('dd');
+        if (!heads[i] || !dd || !dd.getBoundingClientRect().width) return;
+        const off = Math.round(textLeft(dd) - textLeft(heads[i]));
+        if (Math.abs(off) > 1) found.push('column   "' + name(tile) + '": its "' + heads[i].textContent.trim() + '" value starts ' + off + 'px from its heading');
+      });
+    }
+  }
+  return found;
+})()`;

@@ -7,11 +7,11 @@ description: How a change reaches a running setup - what must be true before a r
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "f9709d35"
+      "seen": "00d468e8"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/07-deliver.md",
-      "seen": "1d6cc7ef"
+      "seen": "be4e9978"
     }
   ]
 }

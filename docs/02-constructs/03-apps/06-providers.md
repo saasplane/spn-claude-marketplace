@@ -37,7 +37,7 @@ This construct realizes the book's `01-devex/02-agent/04-plugins`.
 
 ## Model
 
-The gate composes a path from the declaration and imports whatever is there. Nothing about the stack reaches the gate, and nothing about the gate is repeated in the provider.
+The gate composes a path from the declaration and imports whatever is there. Nothing about the stack reaches the gate, and nothing about the gate is repeated in the provider. The claim is the stack the nearest `sprepo.json` declares, and the composed path is `providers/<stack>/`. Under it the skills half holds the procedure a skill loads, and the scripts half holds the parse a gate imports and the private rules that read it.
 
 ```dg
 { "kind": "map",

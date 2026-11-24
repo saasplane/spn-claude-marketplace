@@ -20,7 +20,7 @@ Scripts holds everything this plugin executes, divided by what calls each file �
 
 ## Overview
 
-Two decisions shape the whole folder. **Nothing here names a stack** — the gate reads the declaration and resolves into a provider, so the code that knows a language sits outside this folder entirely. And **a tool writes only what a run found** — part of a behaviour row is somebody's decision, and a tool writing over that would turn a declaration into a guess.
+The decisions below shape the whole folder. **Nothing here names a stack** — the gate reads the declaration and resolves into a provider, so the code that knows a language sits outside this folder entirely. And **a tool writes only what a run found** — part of a behaviour row is somebody's decision, and a tool writing over that would turn a declaration into a guess.
 
 This construct realizes the book's `01-devex/02-agent/04-plugins`.
 
@@ -42,7 +42,7 @@ This construct realizes the book's `01-devex/02-agent/04-plugins`.
 
 ## Model
 
-The folder has two halves that never meet. One is reached by the wiring and answers about a single write. The other is reached by its own path and answers about a whole repository.
+The folder has two halves that never meet. One is reached by the wiring and answers about a single write. The other is reached by its own path and answers about a whole repository. The wired half asks the gate, which reads the declaration and resolves into the provider for it. The commanded half stands apart from both, and each reads the shared half, which holds what the two have in common.
 
 ```dg
 { "kind": "map",
@@ -106,7 +106,7 @@ A partial run that reset a whole register would make every status swing on every
 
 A status derived from a specification reports a case that exists as a case that ran. Crossing a route with a surface, or scanning a source tree for case titles, cannot see a case that was skipped or filtered out. So the writer reads the file the runner produced, and a row whose case never reached the runner says so.
 
-The figure follows one row of a register through the three sections above, from the run's start to what the writer leaves on it.
+The figure follows one row of a register through the three sections above, from the run's start to what the writer leaves on it. The writer asks its questions in turn. *Is it hand-checked?* If so, the row is left as it was. *Did the run cover its tier?* If not, the row is left as it was. *Did a case reach the runner with its id?* If not, the row says so; if so, the writer writes the two run cells, the status and the moment it was found.
 
 ```dg
 { "kind": "flowchart",

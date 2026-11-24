@@ -4,18 +4,16 @@
 {"id":"surface-refs","variant":"construct","title":"Refs","subtitle":"The foundation book's Surface rules, carried inside this plugin for a reader with no other copy.","lenses":["UX","ARCHITECT"],"status":"PLANNING","dependsOn":["ref-set"],"summary":"Refs carries, inside this plugin, the Surface rules a partner needs but has no checkout to read: the standards, the patterns, the architecture of the design system, its library and its delivery, and the specs a page starts from.","keywords":["ref","restatement","surface","stamp","patterns","specs"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-z6T3Ju/mWAnv24wb8AFXMHYMyXMd5U/g7N2hA3X1uCys4Ty2Yy7TcMXWe+SMPck0" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../surface-overview.html">&larr; spn-surface</a>
   <div class="sds-rail-title">Refs</div>
 </nav>
 <div class="sds-wrap">
-
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Refs</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">UX designer</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <div class="sds-eyebrow"><span class="sds-line1"><a href="../../concept-overview.html">SaaS Plane</a> &middot; <a href="../surface-overview.html">Claude Marketplace</a> &middot; Refs</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">UX designer</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>Refs</h1>
   <p class="sds-subtitle">The foundation book's Surface rules, carried inside this plugin for a reader with no other copy.</p>
   <p class="sds-standfirst">Refs carries, inside this plugin, the Surface rules a partner needs but has no checkout to read. Read this page to see what the folder holds, how it is arranged, and how a copy that has fallen behind the book is reported. It explains the folder and leaves each rule to the ref that states it.</p>
@@ -24,7 +22,11 @@
 <!-- 00 -->
 <section id="s0">
   <div class="sds-section-head"><h2>Overview</h2></div>
-  <p>Two rules keep the folder honest. <strong>A ref states and never executes</strong>: it says what is true of a surface, and anything a skill performs lives elsewhere. And <strong>a ref restates and adds nothing</strong>: the book governs, the copy carries, and the copy says which version of the book it was read at, so a copy that has fallen behind can be reported rather than believed.</p>
+  <p>These rules keep the folder honest:</p>
+  <ul>
+    <li><strong>A ref states and never executes</strong>: it says what is true of a surface, and anything a skill performs lives elsewhere.</li>
+    <li><strong>A ref restates and adds nothing</strong>: the book governs, the copy carries, and the copy says which version of the book it was read at, so a copy that has fallen behind can be reported rather than believed.</li>
+  </ul>
   <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
 </section>
 
@@ -48,29 +50,26 @@
 <!-- 02 -->
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
-  <p>The book is the source. A ref is the copy that travels with the plugin, arranged so its shape tells a reader where to look before they have read anything.</p>
+  <p>The book is the source. A ref is the copy that travels with the plugin, arranged so its shape tells a reader where to look before they have read anything. Each ref carries the stamp, which names every chapter it restates and the hash last read there, and a drift run reads the stamp and reports a copy that fell behind.</p>
 <figure class="dl-figure">
 <div class="dl-frame">
-<svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="The reader holds the plugin and not the book, so the copy is complete and says which version it copied.">
+<svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="From the book to a drift run">
   <rect class="dl-tile" x="336" y="16" width="260" height="64" rx="10"/>
   <text class="dl-name" x="348" y="37">the book</text>
-  <text class="dl-detail" x="348" y="52">the foundation's own chapters — the</text>
+  <text class="dl-detail" x="348" y="52">the foundation's own chapters, the</text>
   <text class="dl-detail" x="348" y="67">source that governs</text>
   <path class="dl-wire" d="M466 80 L466 120"/>
-  <text class="dl-wlabel" x="478" y="104">restated as</text>
   <rect class="dl-tile" x="336" y="120" width="260" height="64" rx="10"/>
   <text class="dl-name" x="348" y="141">a ref</text>
   <text class="dl-detail" x="348" y="156">a self-contained leaf, complete without</text>
   <text class="dl-detail" x="348" y="171">the book beside it</text>
   <path class="dl-wire" d="M466 184 L466 224"/>
-  <text class="dl-wlabel" x="478" y="208">carries</text>
   <rect class="dl-tile" x="336" y="224" width="260" height="64" rx="10"/>
   <text class="dl-name" x="348" y="245">the stamp</text>
   <text class="dl-detail" x="348" y="260">each chapter it restates, and the hash</text>
   <text class="dl-detail" x="348" y="275">last read there</text>
   <path class="dl-wire" d="M466 288 L466 328"/>
-  <text class="dl-wlabel" x="478" y="312">read by</text>
-  <rect class="dl-tile" x="336" y="328" width="260" height="64" rx="10"/>
+  <rect class="dl-tile-on" x="336" y="328" width="260" height="64" rx="10"/>
   <text class="dl-name" x="348" y="349">a drift run</text>
   <text class="dl-detail" x="348" y="364">compares the hash and reports a copy</text>
   <text class="dl-detail" x="348" y="379">that fell behind</text>
@@ -79,18 +78,14 @@
 <figcaption>The reader holds the plugin and not the book, so the copy is complete and says which version it copied.</figcaption>
 </figure>
   <!-- dg:source
-{ "kind": "map",
+{ "kind": "chain",
+  "title": "From the book to a drift run",
   "caption": "The reader holds the plugin and not the book, so the copy is complete and says which version it copied.",
   "boxes": [
-    { "id": "a", "label": "the book", "note": "the foundation's own chapters — the source that governs" },
+    { "id": "a", "label": "the book", "note": "the foundation's own chapters, the source that governs" },
     { "id": "b", "label": "a ref", "note": "a self-contained leaf, complete without the book beside it" },
     { "id": "c", "label": "the stamp", "note": "each chapter it restates, and the hash last read there" },
-    { "id": "d", "label": "a drift run", "note": "compares the hash and reports a copy that fell behind" }
-  ],
-  "links": [
-    { "from": "a", "to": "b", "label": "restated as" },
-    { "from": "b", "to": "c", "label": "carries" },
-    { "from": "c", "to": "d", "label": "read by" }
+    { "id": "d", "label": "a drift run", "note": "compares the hash and reports a copy that fell behind", "em": true }
   ] }
   -->
 </section>
@@ -98,15 +93,23 @@
 <!-- 03 -->
 <section id="s3">
   <div class="sds-section-head"><h2>Parts</h2></div>
-  <h3 id="domain-folder-one-folder-holds-the-whole">Domain folder — One folder holds the whole domain, one file to a construct</h3>
-  <p><code>refs/support/surface/</code> holds the standards of content and interaction, the patterns, the architecture of the design system with its names, layouts and widgets, the providers a design system needs, and the library and showcase deliveries. The path is the one the book's domain has, so a reader who knows the book finds the ref.</p>
-  <h3 id="spec-copies-the-specs-are-copies-owned-b">Spec copies — The specs are copies, owned by the book</h3>
+  <h3 id="domain-folder-one-folder-holds-the-whole">Domain folder — one folder holds the whole domain, one file to a construct</h3>
+  <p><code>refs/support/surface/</code> holds:</p>
+  <ul>
+    <li>the standards of content and interaction;</li>
+    <li>the patterns;</li>
+    <li>the architecture of the design system, with its names, layouts and widgets;</li>
+    <li>the providers a design system needs;</li>
+    <li>the library and showcase deliveries.</li>
+  </ul>
+  <p>The path is the one the book's domain has, so a reader who knows the book finds the ref.</p>
+  <h3 id="spec-copies-the-specs-are-copies-owned-b">Spec copies — the specs are copies, owned by the book</h3>
   <p>The app patterns and the site patterns each have a folder of skeleton specs. They are byte-identical to the book's, an index in each folder lists them with the hash of their contents, and <code>restates files</code> writes and checks them. A builder changes a spec in the book, and the export carries it.</p>
-  <h3 id="construct-snapshot-the-construct-snapsho">Construct snapshot — The CONSTRUCT snapshot sits beside the refs</h3>
+  <h3 id="construct-snapshot-the-construct-snapsho">Construct snapshot — the CONSTRUCT snapshot sits beside the refs</h3>
   <p><code>refs/support/surface/construct.snapshot.json</code> is the CONSTRUCT snapshot, written from the book alone with <code>spnutils apps surface construct --out</code> for each release of the plugin. It holds every unit's props, its usage, its cases, the index by value of each choice table and the units their place sizes, and its <code>source.readFrom</code> names the book's release it was written from. It is the one snapshot a repository holds, because it carries nothing of a machine. <code>unit show</code> reads it, with the restated tables beside it, and reads nothing else outside the plugin but the symbol index of the repository it runs in, or, from a workspace's root, of each repository in it, for a unit the snapshot does not hold.</p>
-  <h3 id="stack-half-the-stack-specific-half-is-th">Stack half — The stack-specific half is the apps plugin's</h3>
+  <h3 id="stack-half-the-stack-specific-half-is-th">Stack half — the stack-specific half is the apps plugin's</h3>
   <p>How a block is built in TypeScript, and the layout of a web module, belong to the stack, so those refs sit in the apps plugin and a ref here points at them by name rather than by link.</p>
-  <h3 id="stale-refs-a-ref-that-fell-behind-says-s">Stale refs — A ref that fell behind says so</h3>
+  <h3 id="stale-refs-a-ref-that-fell-behind-says-s">Stale refs — a ref that fell behind says so</h3>
   <p>Every ref carries the chapters it restates and the hash last read from each. A drift run compares them and reports a ref whose chapter has moved.</p>
 </section>
 
@@ -143,4 +146,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-yDkvlVaxZfr5SBqgjOk8GZPsDngeCYQxHHaY1aPfty/M6hFe1DXJz++VjJ+i+082" crossorigin="anonymous"></script>

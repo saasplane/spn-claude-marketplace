@@ -12,7 +12,7 @@
 }
 -->
 
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-z6T3Ju/mWAnv24wb8AFXMHYMyXMd5U/g7N2hA3X1uCys4Ty2Yy7TcMXWe+SMPck0" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -29,15 +29,15 @@
 <div class="sds-wrap">
 
 <header class="sds-masthead">
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Marketplace &nbsp;|&nbsp; Concept</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Overview</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">Backend developer</span><span class="sds-badge sds-lens">Partner / integrator</span></span></span><span class="sds-line"><span class="sds-badge">3 plugins</span><span class="sds-badge">5 instrument kinds</span><span class="sds-badge">declares GENERAL</span><span class="sds-badge">public, while the book is not</span></span></div>
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Marketplace &nbsp;|&nbsp; Concept</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Overview</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">Backend developer</span><span class="sds-badge sds-lens">Partner / integrator</span></span></span><span class="sds-line"><span class="sds-badge">4 plugins</span><span class="sds-badge">5 instrument kinds</span><span class="sds-badge">declares GENERAL</span><span class="sds-badge">public, while the book is not</span></span></div>
   <h1>Instruments, not rules.</h1>
   <p class="sds-subtitle">The plugins that carry SaaS Plane's rules into a running session, and the machinery that reads them.</p>
   <p class="sds-standfirst">This is the public marketplace that ships the instruments of the SaaS Plane agent — the plugins, and the machinery that reads their rules and runs them while somebody is working. Read this page to see how the pieces fit together before you open any one of them. Each area below links to the page that explains it in full.</p>
 </header>
 
 <!-- ─────────────────────────────────────────── 00 -->
-<section id="s0">
-  <h2>Overview</h2>
+<section id="s0" data-block="reasons">
+  <div class="sds-section-head"><h2>Overview</h2></div>
   <p>The foundation book states the rules; this repository delivers them. Every rule here restates a chapter written somewhere else, and a rule invented here is a defect. It ships four plugins carrying five kinds of instrument in all.</p>
   <p>A SaaS Plane workspace loads its agent instruments from here. They are
   hooks that fire on an event, tools somebody runs by name, skills that carry a stage's steps,
@@ -61,22 +61,17 @@
 </section>
 
 <!-- ─────────────────────────────────────────── 01 -->
-<section id="s1">
-  <h2>Boundary</h2>
+<section id="s1" data-block="reasons">
+  <div class="sds-section-head"><h2>Boundary &mdash; what the marketplace owns, and the one thing it refuses</h2></div>
   <p>The instruments themselves, as code and as files a runtime loads — and
   nothing about what those instruments say.</p>
 
-  <div class="sds-scroll">
-    <table>
-      <thead><tr><th>The line</th></tr></thead>
-      <tbody>
-        <tr><td><p><strong>What it owns</strong></p><p>how an instrument is shaped, what it may refuse, what it may never do, and how the set reaches a workspace — the hooks, the tools, the skills, the refs and the agent briefs, as files</p></td></tr>
-        <tr><td><p><strong>What it refuses</strong></p><p>authoring a rule. A rule true of every repository belongs in the foundation book, and a copy here is a second source that will drift</p></td></tr>
-        <tr><td><p><strong>How the refusal is kept</strong></p><p>every file carrying a rule declares the chapter it restates, and a drift checker compares this tree against the book's</p></td></tr>
-        <tr><td><p><strong>Why it is public</strong></p><p>an instrument is loaded by a runtime on your own machine, so you have to be able to reach it without a grant</p></td></tr>
-        <tr><td><p><strong>Why that forces restatement</strong></p><p>you cannot reach the book the same way. That, and only that, is why a ref restates a chapter instead of linking to one</p></td></tr>
-      </tbody>
-    </table>
+  <div class="sds-tiles" data-layout="LIST">
+    <div class="sds-tile"><div class="sds-tile-body"><h4>What it owns</h4><p>how an instrument is shaped, what it may refuse, what it may never do, and how the set reaches a workspace — the hooks, the tools, the skills, the refs and the agent briefs, as files</p></div></div>
+    <div class="sds-tile"><div class="sds-tile-body"><h4>What it refuses</h4><p>authoring a rule. A rule true of every repository belongs in the foundation book, and a copy here is a second source that will drift</p></div></div>
+    <div class="sds-tile"><div class="sds-tile-body"><h4>How the refusal is kept</h4><p>every file carrying a rule declares the chapter it restates, and a drift checker compares this tree against the book's</p></div></div>
+    <div class="sds-tile"><div class="sds-tile-body"><h4>Why it is public</h4><p>an instrument is loaded by a runtime on your own machine, so you have to be able to reach it without a grant</p></div></div>
+    <div class="sds-tile"><div class="sds-tile-body"><h4>Why that forces restatement</h4><p>you cannot reach the book the same way. That, and only that, is why a ref restates a chapter instead of linking to one</p></div></div>
   </div>
 
   <p>The last two rows are one argument, not two facts. Being public is not a convenience
@@ -108,35 +103,28 @@
 
   <div class="sds-pull sds-warning">
     <h4><span class="sds-badge sds-warning">gap</span> Boundary — no argument recorded</h4>
-    <div class="sds-scroll"><table><tbody>
-      <tr><th>Owed</th><td>why the drift checker compares a stamped hash rather than resolving
-        the chapter at read time, and what is given up by that choice</td></tr>
-      <tr><th>Stated today</th><td><a href="../../../CONCEPT.md">CONCEPT.md</a> § Boundary ·
-        <a href="01-devex/constructs/06-refs-construct.html">the Ref construct</a></td></tr>
-      <tr><th>Why none yet</th><td><strong>genuinely owed.</strong> The stamp is what makes a
+    <p><span class="sds-small">Owed</span> why the drift checker compares a stamped hash rather than resolving
+        the chapter at read time, and what is given up by that choice</p>
+<p><span class="sds-small">Stated today</span> <a href="../../../CONCEPT.md">CONCEPT.md</a> § Boundary ·
+        <a href="01-devex/constructs/06-refs-construct.html">the Ref construct</a></p>
+<p><span class="sds-small">Why none yet</span> <strong>The argument is genuinely owed.</strong> The stamp is what makes a
         moved chapter reportable rather than silently outrun, and it also means a ref can be
-        correct about a chapter that no longer says what it said</td></tr>
-      <tr><th>What would earn one</th><td>a chapter moving under a released ref, which is the
-        first time the cost is paid by somebody who did not choose it</td></tr>
-      <tr><th>Owner · lands at</th><td>this repo · <code>.spndevex/workstreams/</code></td></tr>
-    </tbody></table></div>
+        correct about a chapter that no longer says what it said</p>
+<p><span class="sds-small">What would earn one</span> a chapter moving under a released ref, which is the
+        first time the cost is paid by somebody who did not choose it</p>
+<p><span class="sds-small">Owner · lands at</span> this repo · <code>.spndevex/workstreams/</code></p>
   </div>
 </section>
 
 <!-- ─────────────────────────────────────────── 02 -->
-<section id="s2">
-  <h2>Who it serves</h2>
+<section id="s2" data-block="reasons">
+  <div class="sds-section-head"><h2>Who it serves &mdash; two readers who hold different halves of the same chain</h2></div>
   <p>Two readers hold different halves of the same chain, and the difference
   decides how every page here is written.</p>
 
-  <div class="sds-scroll">
-    <table>
-      <thead><tr><th>Reader</th></tr></thead>
-      <tbody>
-        <tr><td><p><strong>The partner</strong></p><p>every citation they meet here <em>names</em> a chapter rather than linking to one, and a ref carries enough of that chapter to be read in full without the book</p><span class="sds-small">Holds: this repository, and not the foundation book</span></td></tr>
-        <tr><td><p><strong>The builder</strong></p><p>the drift checker is theirs. It is the only thing in the workspace that reads across the two trees, and it is run here, before anything is published: <code>node packages/plugin-spn-devex/src/dist/cli.mjs restates check</code> (or <code>spn-devex restates check</code>, once installed)</p><span class="sds-small">Holds: both trees, side by side in one workspace</span></td></tr>
-      </tbody>
-    </table>
+  <div class="sds-tiles" data-layout="LIST">
+    <div class="sds-tile"><div class="sds-tile-body"><h4>The partner</h4><p>every citation they meet here <em>names</em> a chapter rather than linking to one, and a ref carries enough of that chapter to be read in full without the book. It holds this repository, and not the foundation book.</p></div></div>
+    <div class="sds-tile"><div class="sds-tile-body"><h4>The builder</h4><p>the drift checker is theirs. It is the only thing in the workspace that reads across the two trees, and it is run here, before anything is published: <code>node packages/plugin-spn-devex/src/dist/cli.mjs restates check</code> (or <code>spn-devex restates check</code>, once installed). It holds both trees, side by side in one workspace.</p></div></div>
   </div>
 
   <p>This is why a broken link is a worse defect here than in most repositories. A partner
@@ -144,40 +132,33 @@
 
   <div class="sds-pull sds-warning">
     <h4><span class="sds-badge sds-warning">gap</span> Who it serves — no argument recorded</h4>
-    <div class="sds-scroll"><table><tbody>
-      <tr><th>Owed</th><td>how much of a chapter a ref must carry before a partner can act on
-        it without the book, and who decides that a restatement is thin</td></tr>
-      <tr><th>Stated today</th><td><a href="../../../CONCEPT.md">CONCEPT.md</a> § Who it serves ·
-        <a href="../../01-purpose/03-who.md">01-purpose § who</a></td></tr>
-      <tr><th>Why none yet</th><td><strong>genuinely owed.</strong> Completeness is judged by
+    <p><span class="sds-small">Owed</span> how much of a chapter a ref must carry before a partner can act on
+        it without the book, and who decides that a restatement is thin</p>
+<p><span class="sds-small">Stated today</span> <a href="../../../CONCEPT.md">CONCEPT.md</a> § Who it serves ·
+        <a href="../../01-purpose/03-who.md">01-purpose § who</a></p>
+<p><span class="sds-small">Why none yet</span> <strong>The argument is genuinely owed.</strong> Completeness is judged by
         whoever writes the ref, and the reader who would notice the gap is the one reader who
-        cannot check it against the source</td></tr>
-      <tr><th>What would earn one</th><td>a partner reporting that a ref was not enough to act
-        on, which is the only evidence this question has</td></tr>
-      <tr><th>Owner · lands at</th><td>this repo · <code>.spndevex/workstreams/</code></td></tr>
-    </tbody></table></div>
+        cannot check it against the source</p>
+<p><span class="sds-small">What would earn one</span> a partner reporting that a ref was not enough to act
+        on, which is the only evidence this question has</p>
+<p><span class="sds-small">Owner · lands at</span> this repo · <code>.spndevex/workstreams/</code></p>
   </div>
 </section>
 
 <!-- ─────────────────────────────────────────── 03 -->
-<section id="s3">
-  <h2>Domains — The domains it holds</h2>
+<section id="s3" data-block="map">
+  <div class="sds-section-head"><h2>Domains &mdash; the plugins it holds, one domain for each</h2></div>
   <p>This repository is a monorepo of plugins, so it divides by plugin.</p>
 
   <p>A monorepo divides by the thing it holds many of, and what this one holds many of is Claude
   plugins for SaaS Plane. Each is a domain, with a section of its own in the concept and one
   folder of the same name in every <em>What</em> seat.</p>
 
-  <div class="sds-scroll">
-    <table>
-      <thead><tr><th>Domain</th></tr></thead>
-      <tbody>
-        <tr><td><p><strong><code>spn-devex</code></strong></p><p>the stack-agnostic plugin, loaded by every repository whatever world it declares</p><span class="sds-small">Instruments: all five kinds — plugins, hooks, skills, refs and agents</span></td></tr>
-        <tr><td><p><strong><code>spn-surface</code></strong></p><p>the surface plugin, stack-agnostic</p><span class="sds-small">Instruments: the Surface refs, the design skill and the guard over the Figma connector's scripts</span></td></tr>
-        <tr><td><p><strong><code>spn-apps</code></strong></p><p>the TypeScript stack plugin</p><span class="sds-small">Instruments: checks, tools, skills and refs, each true of that stack and nowhere else</span></td></tr>
-        <tr><td><p><strong><code>spn-infra</code></strong></p><p>the estate plugin</p><span class="sds-small">Instruments: one guard, plus the skills and refs that change an estate</span></td></tr>
-      </tbody>
-    </table>
+  <div class="sds-tiles" data-layout="LIST">
+    <div class="sds-tile"><div class="sds-tile-body"><h4><code>spn-devex</code></h4><p>the stack-agnostic plugin, loaded by every repository whatever world it declares. Its instruments are all five kinds — plugins, hooks, skills, refs and agents.</p></div></div>
+    <div class="sds-tile"><div class="sds-tile-body"><h4><code>spn-surface</code></h4><p>the surface plugin, stack-agnostic. Its instruments are the Surface refs, the design skill and the guard over the Figma connector's scripts.</p></div></div>
+    <div class="sds-tile"><div class="sds-tile-body"><h4><code>spn-apps</code></h4><p>the TypeScript stack plugin. Its instruments are checks, tools, skills and refs, each true of that stack and nowhere else.</p></div></div>
+    <div class="sds-tile"><div class="sds-tile-body"><h4><code>spn-infra</code></h4><p>the estate plugin. Its instruments are one guard, plus the skills and refs that change an estate.</p></div></div>
   </div>
 
   <h3 id="d1">devex &mdash; <code>spn-devex</code></h3>
@@ -247,8 +228,8 @@
 </section>
 
 <!-- ─────────────────────────────────────────── 04 -->
-<section id="s4">
-  <h2>Declared world — The world it declares</h2>
+<section id="s4" data-block="reasons">
+  <div class="sds-section-head"><h2>Declared world &mdash; the world with no stack in it</h2></div>
   <p>This repository declares <code>GENERAL</code>, which is a world with no stack in it.</p>
 
   <p>A repository's manifest declares which of four worlds it belongs to:</p>
@@ -281,8 +262,8 @@
 </section>
 
 <!-- ─────────────────────────────────────────── 05 -->
-<section id="s5">
-  <h2>Glossary</h2>
+<section id="s5" data-block="glossary">
+  <div class="sds-section-head"><h2>Glossary</h2></div>
   <p>The words this page leans on. Each is meant in the narrow sense this
   repository gives it, and where the foundation book defines one, the book wins.</p>
 
@@ -290,7 +271,7 @@
     <thead><tr><th>Word</th></tr></thead>
     <tbody>
       <tr><td><p><strong>the marketplace</strong></p><p>this repository, and the public listing at its root that tells a runtime which plugins exist and where each one sits</p></td></tr>
-      <tr><td><p><strong>a plugin</strong></p><p>one delivery unit — a manifest and a folder tree — holding any of the five instrument kinds. Three are shipped: <code>spn-devex</code>, <code>spn-apps</code>, <code>spn-infra</code></p></td></tr>
+      <tr><td><p><strong>a plugin</strong></p><p>one delivery unit — a manifest and a folder tree — holding any of the five instrument kinds. Four are shipped: <code>spn-devex</code>, <code>spn-surface</code>, <code>spn-apps</code>, <code>spn-infra</code></p></td></tr>
       <tr><td><p><strong>an instrument</strong></p><p>the house word for anything this repository delivers to a session: a hook, a tool, a skill, a ref, a lens or an agent brief</p></td></tr>
       <tr><td><p><strong>a hook</strong></p><p>code the runtime calls for you at a named moment of the loop. It returns a verdict rather than printing one, and only one of the four moments is allowed to refuse anything</p></td></tr>
       <tr><td><p><strong>a skill</strong></p><p>a stage's steps, in a folder with a description written to be <em>matched</em> against the work at hand rather than browsed by a person</p></td></tr>
@@ -304,24 +285,19 @@
 </section>
 
 <!-- ─────────────────────────────────────────── 06 -->
-<section id="s6">
-  <h2>Next — Where to go next</h2>
+<section id="s6" data-block="next">
+  <div class="sds-section-head"><h2>Next &mdash; where to go next</h2></div>
   <p>Pick the row that matches what you came for. Each is the shortest path from
   this page to the thing that states the answer in full.</p>
-
-  <div class="sds-scroll"><table>
-    <thead><tr><th>If you want</th></tr></thead>
-    <tbody>
-      <tr><td><p>the model, stated once and in full</p><p><a href="../../../CONCEPT.md"><code>CONCEPT.md</code></a> at the repository root</p></td></tr>
-      <tr><td><p>this repository's own doc set</p><p><a href="../../README.md"><code>docs/</code></a> — the five seats and the two pockets</p></td></tr>
-      <tr><td><p>why the marketplace exists at all</p><p><a href="../../01-purpose/README.md">01-purpose</a> — why, what, and who</p></td></tr>
-      <tr><td><p>what a hook, skill, ref or agent <em>is</em></p><p><a href="../../02-constructs/README.md">02-constructs</a>, one seat file per construct</p></td></tr>
-      <tr><td><p>what exists under <code>plugins/</code> today</p><p><a href="../../04-capabilities/README.md">04-capabilities</a> — a mirror per source folder that earns one</p></td></tr>
-      <tr><td><p>to install the plugins into a workspace</p><p><a href="../../05-guides/01-install-the-plugins.md">the install guide</a>, which names the commands in order</p></td></tr>
-      <tr><td><p>to prove the hooks still work</p><p><code>node packages/plugin-spn-devex/tests/run.mjs</code>, the suite runner this repository carries (or <code>pnpm run test</code>, every plugin's suite in one command)</p></td></tr>
-      <tr><td><p>the rules themselves, rather than the code that runs them</p><p>the foundation book. If you hold only this tree, the <a href="01-devex/constructs/06-refs-construct.html">refs</a> are the copy you can read</p></td></tr>
-    </tbody>
-  </table></div>
+  <div class="sds-tiles">
+    <a class="sds-tile sds-door" href="../../../CONCEPT.md"><span class="sds-door-kicker">The model</span><span class="sds-door-title">CONCEPT.md<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span><span class="sds-door-line">the model, stated once and in full, at the repository root</span></a>
+    <a class="sds-tile sds-door" href="../../README.md"><span class="sds-door-kicker">This repository</span><span class="sds-door-title">The docs folder<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span><span class="sds-door-line">this repository's own doc set: the five seats and the two pockets</span></a>
+    <a class="sds-tile sds-door" href="../../01-purpose/README.md"><span class="sds-door-kicker">Why</span><span class="sds-door-title">01-purpose<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span><span class="sds-door-line">why the marketplace exists at all: why, what, and who</span></a>
+    <a class="sds-tile sds-door" href="../../02-constructs/README.md"><span class="sds-door-kicker">What it is</span><span class="sds-door-title">02-constructs<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span><span class="sds-door-line">what a hook, skill, ref or agent is, one seat file per construct</span></a>
+    <a class="sds-tile sds-door" href="../../04-capabilities/README.md"><span class="sds-door-kicker">What exists</span><span class="sds-door-title">04-capabilities<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span><span class="sds-door-line">what exists under plugins/ today, a mirror per source folder that earns one</span></a>
+    <a class="sds-tile sds-door" href="../../05-guides/01-install-the-plugins.md"><span class="sds-door-kicker">Installing</span><span class="sds-door-title">The install guide<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span><span class="sds-door-line">to install the plugins into a workspace, with the commands in order</span></a>
+    <a class="sds-tile sds-door" href="01-devex/constructs/06-refs-construct.html"><span class="sds-door-kicker">The rules</span><span class="sds-door-title">The refs<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span><span class="sds-door-line">the rules themselves rather than the code that runs them: the foundation book, or, if you hold only this tree, the refs are the copy you can read</span></a>
+  </div>
 </section>
 
 <footer>
@@ -336,4 +312,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-yDkvlVaxZfr5SBqgjOk8GZPsDngeCYQxHHaY1aPfty/M6hFe1DXJz++VjJ+i+082" crossorigin="anonymous"></script>

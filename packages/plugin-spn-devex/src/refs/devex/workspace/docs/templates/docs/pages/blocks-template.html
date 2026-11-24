@@ -7,7 +7,7 @@
 
 
 
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-z6T3Ju/mWAnv24wb8AFXMHYMyXMd5U/g7N2hA3X1uCys4Ty2Yy7TcMXWe+SMPck0" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.1/docs-language.css" integrity="sha384-FSy6NEydzbJ7AjYW6VWuuBQAaLJgvNLMgLOuNB3LymgigG6f0vSMHnhDjOIFV/Nv" crossorigin="anonymous">
 <div class="sds-page">
 <nav class="sds-rail" id="rail">
   <div class="sds-rail-title">Blocks</div>
@@ -65,78 +65,97 @@
   </div>
   <h3 id="b-catalog">CATALOG &mdash; info cards</h3>
   <p class="sds-small"><strong>Use when</strong> the content is a set of named things with no order between them, or two to four things compared fact by fact.</p>
-  <p>A catalog is a set of named things with no order between them. Each card reads in three levels, as an item cell does: the name, one line saying what it is, then its facts, one <code>Key: value</code> a line. The fence names its layout, and <code>GRID</code> is the default. The three layouts are the design system&rsquo;s own names for a set of records, <code>DSDataTableConfigLayoutType</code>: <code>GRID</code>, <code>LIST</code> and <code>TABLE</code>. Headings and fact keys are words, never sentences.</p>
+  <p>A catalog is a set of named things with no order between them. The fence names its layout in the design system&rsquo;s own names for a set of records, <code>DSDataTableConfigLayoutType</code>: <code>GRID</code>, <code>LIST</code> and <code>TABLE</code>. A <code>LIST</code> also names where its facts stand, <code>facts=END</code> or <code>facts=AFTER_DESCRIPTION</code>. The page writer draws what the fence names and never guesses a form. Headings and fact keys are words, never sentences.</p>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Layout</th><th>Arrangement</th><th>Use</th></tr></thead>
+    <thead><tr><th>Fence</th><th>Arrangement</th><th>Use</th></tr></thead>
     <tbody>
-      <tr><td><strong><code>GRID</code></strong></td><td>two to four cards across</td><td>a set to browse, each card short: one line and up to three facts</td></tr>
-      <tr><td><strong><code>LIST</code></strong></td><td>one card a row, its name on the left and its facts on the right</td><td>each thing has many facts, or long names, and they are read one thing at a time</td></tr>
+      <tr><td><strong><code>GRID</code></strong></td><td>cards two to four across, each in <code>DSCardWidget</code>&rsquo;s parts: the title, the line, then the facts, each key over its value; a mark, an icon, an avatar or a picture only when the fence names <code>media=</code></td><td>a fixed set of types or kinds a reader picks from, each short enough for a card: a name of up to four words, a line of up to about fifteen words, up to three facts</td></tr>
+      <tr><td><strong><code>LIST facts=END</code></strong></td><td>one row a thing, its facts as columns at the row&rsquo;s end under a header row</td><td>things read one at a time whose every fact is short: a word, a number, a status, a version, or up to three tags</td></tr>
+      <tr><td><strong><code>LIST facts=AFTER_DESCRIPTION</code></strong></td><td>one row a thing, its facts under its description</td><td>facts that are phrases: one fact name is one <code>Key: value</code> line, and two or more are cells, a key over its value</td></tr>
       <tr><td><strong><code>TABLE</code></strong></td><td>the things side by side as columns, their facts lined up by key as rows</td><td>two to four things compared fact by fact</td></tr>
     </tbody>
   </table></div>
 
   <h4 id="b-catalog-grid">GRID layout</h4>
-  <p class="sds-small"><strong>Use when</strong> a reader browses a set and each card is short.</p>
-  <p>The layouts of Surface, as a set to browse. Each card is a widget: its name and line, then its facts as one group, each label above its value, and every row lined up across the cards. The fence:</p>
-  <pre data-lang="text">```catalog
-RAIL | a sidebar that opens and shuts
-  Navigation: at the side, several levels deep
-  Takes: DASHBOARD; RESOURCES for guides and API docs
-DOCK | a top bar over a column beside the page
-  Navigation: top and side
-  Takes: a person's or a thing's settings
+  <p class="sds-small"><strong>Use when</strong> the set is a fixed set of types or kinds a reader picks from, and each card is short.</p>
+  <p>The surface types, a fixed set a reader picks from. Each card is drawn in <code>DSCardWidget</code>&rsquo;s parts: its title, its line, then its facts, each key over its value. Its short facts stand side by side in one row, and a longer fact stacks under them across the card, with room between the facts that stack. A card keeps its keys, because two facts on one card come from two vocabularies: <code>SITE</code> is a category and <code>Visitor</code> a kind of person. A card needs no media: with no <code>media=</code>, the third part of an item&rsquo;s line is left out.</p>
+  <pre data-lang="text">```catalog layout=GRID
+MARKETING | a site for a Visitor, deciding whether a product is for them
+  Category: SITE
+  Person: Visitor
+  Example: saasplane.ai, and the SPNHiring site
+RESOURCES | a site for a Learner, reading to learn or to get a thing working
+  Category: SITE
+  Person: Learner
+  Example: the book's pages, and a help centre
+DASHBOARD | an app a Team works in as their job
+  Category: APP
+  Person: Team
+  Example: the consoles, and the Support apps
+PORTAL | an app many Everyday users use for themselves
+  Category: APP
+  Person: Everyday users
+  Example: the SPNHiring job portal
 ```</pre>
   <div class="sds-tiles" data-layout="GRID">
-    <div class="sds-tile" data-facts="2"><h4><code>RAIL</code></h4><p class="sds-tile-line">a sidebar that opens and shuts</p>
-      <dl class="sds-tile-facts"><div><dt>Navigation</dt><dd>at the side, several levels deep</dd></div><div><dt>Takes</dt><dd>DASHBOARD; RESOURCES for guides and API docs</dd></div></dl></div>
-    <div class="sds-tile" data-facts="2"><h4><code>DOCK</code></h4><p class="sds-tile-line">a top bar over a column beside the page</p>
-      <dl class="sds-tile-facts"><div><dt>Navigation</dt><dd>top and side</dd></div><div><dt>Takes</dt><dd>a person&rsquo;s or a thing&rsquo;s settings</dd></div></dl></div>
-    <div class="sds-tile" data-facts="2"><h4><code>TOPNAV</code></h4><p class="sds-tile-line">a bar across the top</p>
-      <dl class="sds-tile-facts"><div><dt>Navigation</dt><dd>one bar, the few entries that fit</dd></div><div><dt>Takes</dt><dd>MARKETING, PORTAL, a help centre</dd></div></dl></div>
-    <div class="sds-tile" data-facts="2"><h4><code>CANVAS</code></h4><p class="sds-tile-line">the body alone</p>
-      <dl class="sds-tile-facts"><div><dt>Navigation</dt><dd>none</dd></div><div><dt>Takes</dt><dd>sign-in, an app that cannot start, a landing page, a tool that fills the window</dd></div></dl></div>
+    <div class="sds-tile" data-facts="2"><h4>MARKETING</h4><p class="sds-tile-line">a site for a Visitor, deciding whether a product is for them</p>
+      <dl class="sds-tile-facts"><div class="sds-tile-fact-row"><div><dt>Category</dt><dd>SITE</dd></div><div><dt>Person</dt><dd>Visitor</dd></div></div><div><dt>Example</dt><dd>saasplane.ai, and the SPNHiring site</dd></div></dl></div>
+    <div class="sds-tile" data-facts="2"><h4>RESOURCES</h4><p class="sds-tile-line">a site for a Learner, reading to learn or to get a thing working</p>
+      <dl class="sds-tile-facts"><div class="sds-tile-fact-row"><div><dt>Category</dt><dd>SITE</dd></div><div><dt>Person</dt><dd>Learner</dd></div></div><div class="sds-tile-fact-wide"><dt>Example</dt><dd>the book's pages, and a help centre</dd></div></dl></div>
+    <div class="sds-tile" data-facts="2"><h4>DASHBOARD</h4><p class="sds-tile-line">an app a Team works in as their job</p>
+      <dl class="sds-tile-facts"><div class="sds-tile-fact-row"><div><dt>Category</dt><dd>APP</dd></div><div><dt>Person</dt><dd>Team</dd></div></div><div><dt>Example</dt><dd>the consoles, and the Support apps</dd></div></dl></div>
+    <div class="sds-tile" data-facts="2"><h4>PORTAL</h4><p class="sds-tile-line">an app many Everyday users use for themselves</p>
+      <dl class="sds-tile-facts"><div class="sds-tile-fact-row"><div><dt>Category</dt><dd>APP</dd></div><div><dt>Person</dt><dd>Everyday users</dd></div></div><div><dt>Example</dt><dd>the SPNHiring job portal</dd></div></dl></div>
+  </div>
+  <p>Most catalogs take no media. A card or a row takes it only when the picture tells a reader something its name does not: a person&rsquo;s face (<code>AVATAR</code>), the shape of a layout (<code>MEDIA_TOP</code>), or a mark a reader already knows the thing by. An icon added to every card for decoration is noise, so the four types above stand without one. The forms are under Media below.</p>
+  <p>An item whose one fact is tags may write them alone, with no key, and they stand as bare badges. The sentence before the catalog says what they are. Here it is the tiers each kind owes:</p>
+  <pre data-lang="text">```catalog layout=GRID
+`TOOLCHAIN` | the bases resolve, and a project extending them builds
+  [UNIT]
+`SUPPORT_UNIVERSAL` | runtime-free rules
+  [UNIT]
+`SUPPORT_WEB` | unit under a rendering harness, component in a real browser
+  [UNIT] [COMPONENT]
+```</pre>
+  <div class="sds-tiles" data-layout="GRID">
+    <div class="sds-tile" data-facts="1"><h4><code>TOOLCHAIN</code></h4><p class="sds-tile-line">the bases resolve, and a project extending them builds</p>
+      <dl class="sds-tile-facts"><div class="sds-tile-fact-bare"><dd><span class="sds-tags"><span class="sds-badge">UNIT</span></span></dd></div></dl></div>
+    <div class="sds-tile" data-facts="1"><h4><code>SUPPORT_UNIVERSAL</code></h4><p class="sds-tile-line">runtime-free rules</p>
+      <dl class="sds-tile-facts"><div class="sds-tile-fact-bare"><dd><span class="sds-tags"><span class="sds-badge">UNIT</span></span></dd></div></dl></div>
+    <div class="sds-tile" data-facts="1"><h4><code>SUPPORT_WEB</code></h4><p class="sds-tile-line">unit under a rendering harness, component in a real browser</p>
+      <dl class="sds-tile-facts"><div class="sds-tile-fact-bare"><dd><span class="sds-tags"><span class="sds-badge">UNIT</span> <span class="sds-badge">COMPONENT</span></span></dd></div></dl></div>
   </div>
 
-  <h4 id="b-catalog-list">LIST layout</h4>
-  <p class="sds-small"><strong>Use when</strong> each thing has many facts, or long names, and a reader takes them one at a time.</p>
-  <p>The surface types, read one at a time. In the fence, a card&rsquo;s facts go on the lines under it, indented:</p>
-  <pre data-lang="text">```catalog layout=LIST
-MARKETING · Visitor | a site for someone deciding whether the product is for them
-  Layouts: TOPNAV for the site · CANVAS for a landing page that stands alone
-  Sections: every site section
-  Standard pages: Text page, Not found
-  Audience: Visitor
-```</pre>
-  <p>A fact whose value is a sentence takes a whole row of its own; short facts share a row in columns.</p>
-  <div class="sds-tiles" data-layout="LIST" data-media="MARK">
-    <div class="sds-tile"><span class="sds-tile-media" data-media="MARK"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></span>
-      <div class="sds-tile-body"><h4>MARKETING &middot; Visitor</h4><p>a site for someone deciding whether the product is for them</p>
-      <dl class="sds-tile-facts"><div class="sds-tile-fact-wide"><dt>Layouts</dt><dd><code>TOPNAV</code> for the site &middot; <code>CANVAS</code> for a landing page that stands alone</dd></div><div><dt>Sections</dt><dd>every site section</dd></div><div><dt>Standard pages</dt><dd>Text page, Not found</dd></div><div><dt>Audience</dt><dd>Visitor</dd></div></dl></div></div>
-    <div class="sds-tile"><span class="sds-tile-media" data-media="MARK"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M10 4v4"/><path d="M2 8h20"/><path d="M6 4v4"/></svg></span>
-      <div class="sds-tile-body"><h4>DASHBOARD &middot; Team</h4><p>an app a team uses as their job; admin and console apps are dashboards</p>
-      <dl class="sds-tile-facts"><div class="sds-tile-fact-wide"><dt>Layouts</dt><dd><code>RAIL</code> for the app &middot; <code>DOCK</code> for settings &middot; <code>CANVAS</code> for sign-in, an app that cannot start, a tool</dd></div><div><dt>Standard pages</dt><dd>Not found, No access</dd></div></dl></div></div>
-    <div class="sds-tile"><span class="sds-tile-media" data-media="MARK"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></span>
-      <div class="sds-tile-body"><h4>RESOURCES &middot; Learner</h4><p>a site for someone learning how the product works</p>
-      <dl class="sds-tile-facts sds-tile-facts-one"><div><dt>Needed for</dt><dd>a decision, then a later arc once it is made</dd></div></dl></div></div>
-  </div>
-  <p>An item with exactly one fact draws it as one line under its description: a small muted label, then the value in italic. Two or more facts keep the columns.</p>
-  <p>Where every item in the list holds one or two short facts (a word, a number, a status, a version; up to about 20 characters, no sentence), the facts sit at the row&rsquo;s right end, one narrow column each, lined up down the list. The column&rsquo;s name shows once, above the list. A phrase that describes the item belongs in its line, not in a fact.</p>
-  <pre data-lang="text">```catalog layout=LIST name=Rule
-Reach | how far a reader gets before the page loses them
-  Weight: GUIDE
-Fit | whether each block takes the content it was written for
-  Weight: MUST
+  <h4 id="b-catalog-list">LIST, facts at the end</h4>
+  <p class="sds-small"><strong>Use when</strong> things are read one at a time and every fact is short.</p>
+  <p>The kinds and the tiers each owes. With <code>facts=END</code> the facts stand as columns at the row&rsquo;s end, under a header row that names the thing (<code>name=</code>) and each fact once, every heading and value set at the start. Up to three columns. A value longer than a short fact stops the write and names <code>facts=AFTER_DESCRIPTION</code>.</p>
+  <pre data-lang="text">```catalog layout=LIST facts=END name=Kind
+`TOOLCHAIN` | the bases resolve, and a project extending them builds
+  Owes: [UNIT]
+`SUPPORT_WEB` | unit under a rendering harness, component in a real browser
+  Owes: [UNIT] [COMPONENT]
+`APP_SERVER` | it **is** the runtime, so it owns the API face of every behaviour it composes
+  Owes: [CONTRACT]
+`APP_WEB` | it **is** the runtime, so it owns the UI face — actions, states, refusals, and whether a screen is offered
+  Owes: [JOURNEY] [COMPONENT]
+`APP_UTILITY` | integration is the invoked command, end to end, against the local stack alone
+  Owes: [UNIT] [INTEGRATION]
 ```</pre>
   <div class="sds-tiles" data-layout="LIST" data-facts="side" data-columns="1">
-    <div class="sds-tiles-head" aria-hidden="true"><span>Rule</span><span>Weight</span></div>
-    <div class="sds-tile"><div class="sds-tile-main"><div class="sds-tile-body"><h4>Reach</h4><p>how far a reader gets before the page loses them</p></div></div>
-      <dl class="sds-tile-facts"><div><dt>Weight</dt><dd>GUIDE</dd></div></dl></div>
-    <div class="sds-tile"><div class="sds-tile-main"><div class="sds-tile-body"><h4>Fit</h4><p>whether each block takes the content it was written for</p></div></div>
-      <dl class="sds-tile-facts"><div><dt>Weight</dt><dd>MUST</dd></div></dl></div>
+    <div class="sds-tiles-head" aria-hidden="true"><span>Kind</span><span>Owes</span></div>
+    <div class="sds-tile"><div class="sds-tile-main"><div class="sds-tile-body"><h4><code>TOOLCHAIN</code></h4><p>the bases resolve, and a project extending them builds</p></div></div>
+      <dl class="sds-tile-facts"><div><dt>Owes</dt><dd><span class="sds-tags"><span class="sds-badge">UNIT</span></span></dd></div></dl></div>
+    <div class="sds-tile"><div class="sds-tile-main"><div class="sds-tile-body"><h4><code>SUPPORT_WEB</code></h4><p>unit under a rendering harness, component in a real browser</p></div></div>
+      <dl class="sds-tile-facts"><div><dt>Owes</dt><dd><span class="sds-tags"><span class="sds-badge">UNIT</span> <span class="sds-badge">COMPONENT</span></span></dd></div></dl></div>
+    <div class="sds-tile"><div class="sds-tile-main"><div class="sds-tile-body"><h4><code>APP_SERVER</code></h4><p>it <strong>is</strong> the runtime, so it owns the API face of every behaviour it composes</p></div></div>
+      <dl class="sds-tile-facts"><div><dt>Owes</dt><dd><span class="sds-tags"><span class="sds-badge">CONTRACT</span></span></dd></div></dl></div>
+    <div class="sds-tile"><div class="sds-tile-main"><div class="sds-tile-body"><h4><code>APP_WEB</code></h4><p>it <strong>is</strong> the runtime, so it owns the UI face — actions, states, refusals, and whether a screen is offered</p></div></div>
+      <dl class="sds-tile-facts"><div><dt>Owes</dt><dd><span class="sds-tags"><span class="sds-badge">JOURNEY</span> <span class="sds-badge">COMPONENT</span></span></dd></div></dl></div>
+    <div class="sds-tile"><div class="sds-tile-main"><div class="sds-tile-body"><h4><code>APP_UTILITY</code></h4><p>integration is the invoked command, end to end, against the local stack alone</p></div></div>
+      <dl class="sds-tile-facts"><div><dt>Owes</dt><dd><span class="sds-tags"><span class="sds-badge">UNIT</span> <span class="sds-badge">INTEGRATION</span></span></dd></div></dl></div>
   </div>
-
-  <p>An item may carry a quoted line under its description: an indented <code>&gt;</code> line, drawn in quotation marks, as a message or a saying is shown. Side columns still hold the facts.</p>
-  <pre data-lang="text">```catalog layout=LIST name=Check
+  <p>An item may carry a quoted line under its description: an indented <code>&gt;</code> line, drawn in quotation marks, as a message or a saying is shown. The facts still stand at the end.</p>
+  <pre data-lang="text">```catalog layout=LIST facts=END name=Check
 Block | Catches a paragraph that does a block's job, or a table that reads as a catalog.
   &gt; a table of 6 rows reads as a catalog: a `catalog` fence lets a reader browse them
   Grade: soft finding
@@ -151,6 +170,52 @@ Figure | Catches a passage that walks through three or more steps with no figure
     <div class="sds-tile"><div class="sds-tile-main"><div class="sds-tile-body"><h4>Figure</h4><p>Catches a passage that walks through three or more steps with no figure beside it.</p><p class="sds-tile-quote">&ldquo;a learner would see this faster as a chain: add a <code>dg</code> figure beside it&rdquo;</p></div></div>
       <dl class="sds-tile-facts"><div><dt>Grade</dt><dd>rule finding</dd></div></dl></div>
   </div>
+
+  <h4 id="b-catalog-list-after">LIST, facts after the description</h4>
+  <p class="sds-small"><strong>Use when</strong> the facts are phrases a reader reads, not values compared down the list.</p>
+  <p>One fact name across the list is one line under each description: the key, then its value.</p>
+  <pre data-lang="text">```catalog layout=LIST facts=AFTER_DESCRIPTION name=Intent
+Move | going to another place, and knowing where you are
+  Blocks: the layout · `DSNavList` · `DSNavMenu` · `DSNavBarSide` · `DSNavBarTop` · `DSTabs` · `DSBreadcrumb` · `DSLink`
+Find | search, filter, sort, and paging through records
+  Blocks: `DSFilterBar` · `DSDataTable` · `DSCommandPalette` · `DSPagination`
+Enter | filling a field, the check on it, and sending a form
+  Blocks: `DSForm` and the entry fields
+Interrupt | a task that takes over the page for a moment
+  Blocks: `DSDialog` · `DSDrawer` · `DSSheet`
+```</pre>
+  <div class="sds-tiles" data-layout="LIST">
+    <div class="sds-tile"><div class="sds-tile-body"><h4>Move</h4><p>going to another place, and knowing where you are</p>
+      <dl class="sds-tile-facts sds-tile-facts-one"><div><dt>Blocks</dt><dd>the layout · <code>DSNavList</code> · <code>DSNavMenu</code> · <code>DSNavBarSide</code> · <code>DSNavBarTop</code> · <code>DSTabs</code> · <code>DSBreadcrumb</code> · <code>DSLink</code></dd></div></dl></div></div>
+    <div class="sds-tile"><div class="sds-tile-body"><h4>Find</h4><p>search, filter, sort, and paging through records</p>
+      <dl class="sds-tile-facts sds-tile-facts-one"><div><dt>Blocks</dt><dd><code>DSFilterBar</code> · <code>DSDataTable</code> · <code>DSCommandPalette</code> · <code>DSPagination</code></dd></div></dl></div></div>
+    <div class="sds-tile"><div class="sds-tile-body"><h4>Enter</h4><p>filling a field, the check on it, and sending a form</p>
+      <dl class="sds-tile-facts sds-tile-facts-one"><div><dt>Blocks</dt><dd><code>DSForm</code> and the entry fields</dd></div></dl></div></div>
+    <div class="sds-tile"><div class="sds-tile-body"><h4>Interrupt</h4><p>a task that takes over the page for a moment</p>
+      <dl class="sds-tile-facts sds-tile-facts-one"><div><dt>Blocks</dt><dd><code>DSDialog</code> · <code>DSDrawer</code> · <code>DSSheet</code></dd></div></dl></div></div>
+  </div>
+  <p>Two fact names or more are cells under the description, each key over its value, one column for each key in the same place on every item, so a reader reads one key down the list. An item without a fact keeps its cell empty. Three columns at most, and one on a phone.</p>
+  <pre data-lang="text">```catalog layout=LIST facts=AFTER_DESCRIPTION media=MARK
+MARKETING · Visitor | a site for someone deciding whether the product is for them | globe
+  Layouts: `TOPNAV` for the site; `CANVAS` for a landing page
+  Sections: every site section
+  Standard pages: Text page, Not found
+RESOURCES · Learner | a site for someone learning how the product works | file
+  Layouts: `RAIL` for guides and API docs, kept open; `TOPNAV` for a help centre
+  Sections: ten sections that serve a Learner, and Groups and their items
+  Standard pages: Text page, Not found
+DASHBOARD · Team | an app a team uses as their job; admin and console apps are dashboards | app-window
+  Layouts: `RAIL` for the app; `DOCK` for settings; `CANVAS` for sign-in, an app that cannot start, a tool
+  Standard pages: Not found, No access
+```</pre>
+  <div class="sds-tiles" data-layout="LIST" data-media="MARK">
+    <div class="sds-tile"><span class="sds-tile-media" data-media="MARK"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></span><div class="sds-tile-body"><h4>MARKETING · Visitor</h4><p>a site for someone deciding whether the product is for them</p>
+      <dl class="sds-tile-facts" data-columns="3"><div><dt>Layouts</dt><dd><code>TOPNAV</code> for the site; <code>CANVAS</code> for a landing page</dd></div><div><dt>Sections</dt><dd>every site section</dd></div><div><dt>Standard pages</dt><dd>Text page, Not found</dd></div></dl></div></div>
+    <div class="sds-tile"><span class="sds-tile-media" data-media="MARK"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/></svg></span><div class="sds-tile-body"><h4>RESOURCES · Learner</h4><p>a site for someone learning how the product works</p>
+      <dl class="sds-tile-facts" data-columns="3"><div><dt>Layouts</dt><dd><code>RAIL</code> for guides and API docs, kept open; <code>TOPNAV</code> for a help centre</dd></div><div><dt>Sections</dt><dd>ten sections that serve a Learner, and Groups and their items</dd></div><div><dt>Standard pages</dt><dd>Text page, Not found</dd></div></dl></div></div>
+    <div class="sds-tile"><span class="sds-tile-media" data-media="MARK"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M10 4v4"/><path d="M2 8h20"/><path d="M6 4v4"/></svg></span><div class="sds-tile-body"><h4>DASHBOARD · Team</h4><p>an app a team uses as their job; admin and console apps are dashboards</p>
+      <dl class="sds-tile-facts" data-columns="3"><div><dt>Layouts</dt><dd><code>RAIL</code> for the app; <code>DOCK</code> for settings; <code>CANVAS</code> for sign-in, an app that cannot start, a tool</dd></div><div class="sds-tile-fact-none"></div><div><dt>Standard pages</dt><dd>Not found, No access</dd></div></dl></div></div>
+  </div>
   <p>An item may also carry a note: an indented <code>~ Label: phrase</code> line, drawn as a small muted label and an italic phrase under the description.</p>
   <pre data-lang="text">```catalog layout=LIST
 Release chain | the order the repositories release in
@@ -163,13 +228,27 @@ Release chain | the order the repositories release in
 
   <h4 id="b-catalog-table">TABLE layout</h4>
   <p class="sds-small"><strong>Use when</strong> two to four things are compared fact by fact.</p>
-  <p>The surface types, compared fact by fact. The same fence with <code>layout=TABLE</code>: the cards become columns, and each fact key becomes a row.</p>
+  <p>The surface types, compared fact by fact. The same fence with <code>layout=TABLE</code>: the cards become columns, and each fact key becomes a row. The head row keeps the head&rsquo;s fill. The key column takes the row&rsquo;s own fill and stays at the start while the table scrolls sideways, casting one edge shadow while the cells run under it, as <code>DSTable</code> pins a column.</p>
+  <pre data-lang="text">```catalog layout=TABLE
+MARKETING · Visitor | a site for someone deciding
+  Layouts: `TOPNAV` for the site; `CANVAS` for a landing page
+  Sections: every site section
+  Standard pages: Text page, Not found
+RESOURCES · Learner | a site for someone learning
+  Layouts: `RAIL` for guides and API docs, kept open; `TOPNAV` for a help centre
+  Sections: ten sections that serve a Learner, and Groups and their items
+  Standard pages: Text page, Not found
+DASHBOARD · Team | an app a team works in
+  Layouts: `RAIL` for the app; `DOCK` for settings; `CANVAS` for sign-in, an app that cannot start, a tool
+  Sections: every app pattern
+  Standard pages: Not found, No access
+PORTAL · Everyday users | an app people use for themselves
+  Layouts: `TOPNAV` for the app; `DOCK` for an account; `CANVAS` for sign-in, an app that cannot start, a tool
+  Sections: the eight app patterns that serve Everyday users
+  Standard pages: Not found, No access
+```</pre>
   <div class="sds-scroll"><table class="sds-catalog-table">
-    <thead><tr><th></th>
-      <th><h4>MARKETING &middot; Visitor</h4><p>a site for someone deciding</p></th>
-      <th><h4>RESOURCES &middot; Learner</h4><p>a site for someone learning</p></th>
-      <th><h4>DASHBOARD &middot; Team</h4><p>an app a team works in</p></th>
-      <th><h4>PORTAL &middot; Everyday users</h4><p>an app people use for themselves</p></th></tr></thead>
+    <thead><tr><th></th><th><h4>MARKETING · Visitor</h4><p>a site for someone deciding</p></th><th><h4>RESOURCES · Learner</h4><p>a site for someone learning</p></th><th><h4>DASHBOARD · Team</h4><p>an app a team works in</p></th><th><h4>PORTAL · Everyday users</h4><p>an app people use for themselves</p></th></tr></thead>
     <tbody>
       <tr><th>Layouts</th><td><code>TOPNAV</code> for the site; <code>CANVAS</code> for a landing page</td><td><code>RAIL</code> for guides and API docs, kept open; <code>TOPNAV</code> for a help centre</td><td><code>RAIL</code> for the app; <code>DOCK</code> for settings; <code>CANVAS</code> for sign-in, an app that cannot start, a tool</td><td><code>TOPNAV</code> for the app; <code>DOCK</code> for an account; <code>CANVAS</code> for sign-in, an app that cannot start, a tool</td></tr>
       <tr><th>Sections</th><td>every site section</td><td>ten sections that serve a Learner, and Groups and their items</td><td>every app pattern</td><td>the eight app patterns that serve Everyday users</td></tr>
@@ -2732,4 +2811,4 @@ deploy:
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-yDkvlVaxZfr5SBqgjOk8GZPsDngeCYQxHHaY1aPfty/M6hFe1DXJz++VjJ+i+082" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.1/docs-page.js" integrity="sha384-Yh+Ztg5bVhxgDDtxHr+EPMzSUK9lZBPyEbf6lX6l64JeEy5SMSsRzxFEZUjVw6ui" crossorigin="anonymous"></script>

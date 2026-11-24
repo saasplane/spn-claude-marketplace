@@ -4,18 +4,16 @@
 {"id":"surface-scripts","variant":"construct","title":"Scripts","subtitle":"Every file this plugin runs, sorted by what calls it.","lenses":["WEB_DEV","ARCHITECT"],"status":"PLANNING","dependsOn":["surface-hooks","checks"],"summary":"Scripts holds everything this plugin executes, divided by what calls each file: the entry the wiring names, the check it asks, the command line a person types, and the libraries the others read from the shared support folder.","keywords":["dispatcher","check","cli","support-lib","mask","bundle"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-z6T3Ju/mWAnv24wb8AFXMHYMyXMd5U/g7N2hA3X1uCys4Ty2Yy7TcMXWe+SMPck0" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../surface-overview.html">&larr; spn-surface</a>
   <div class="sds-rail-title">Scripts</div>
 </nav>
 <div class="sds-wrap">
-
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Scripts</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Web developer</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <div class="sds-eyebrow"><span class="sds-line1"><a href="../../concept-overview.html">SaaS Plane</a> &middot; <a href="../surface-overview.html">Claude Marketplace</a> &middot; Scripts</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Web developer</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>Scripts</h1>
   <p class="sds-subtitle">Every file this plugin runs, sorted by what calls it.</p>
   <p class="sds-standfirst">Scripts holds everything this plugin executes, divided by what calls each file: the entry the wiring names, the check it asks, the command line a person types, and the libraries the others read from the shared support folder. Read this page to see what runs, what reads what, and which files this plugin does not own.</p>
@@ -24,18 +22,21 @@
 <!-- 00 -->
 <section id="s0">
   <div class="sds-section-head"><h2>Overview</h2></div>
-  <p>Today the plugin runs three checks:</p>
+  <p>Today the plugin runs these checks:</p>
   <ul>
     <li>the connector check;</li>
     <li>the Surface check;</li>
     <li>the read advice.</li>
   </ul>
-  <p><strong>The command line ships three commands</strong>:</p>
-  <ul>
-    <li><code>check scan</code> reads Surface code whole for every note the check gives.</li>
-    <li><code>unit find</code> names the units a task's words point to.</li>
-    <li><code>unit show</code> prints one unit from the CONSTRUCT snapshot the plugin carries, or a unit beyond the core from the symbol index of the repository it runs in, or, from a workspace's root, of each repository in it.</li>
-  </ul>
+  <p><strong>The command line ships these commands</strong>:</p>
+  <div class="sds-tiles" data-layout="LIST">
+    <div class="sds-tile"><div class="sds-tile-body"><h4><code>check scan</code></h4><p>reads Surface code whole for every note the check gives</p>
+      </div></div>
+    <div class="sds-tile"><div class="sds-tile-body"><h4><code>unit find</code></h4><p>names the units a task's words point to</p>
+      </div></div>
+    <div class="sds-tile"><div class="sds-tile-body"><h4><code>unit show</code></h4><p>prints one unit from the CONSTRUCT snapshot the plugin carries, or a unit beyond the core from the symbol index of the repository it runs in, or, from a workspace's root, of each repository in it</p>
+      </div></div>
+  </div>
   <p><code>--repo</code> narrows either lookup to one repository. The entry refuses an unknown group by name, and a command added later is a file under <code>commands/</code> and reachable as soon as it exists. The helpers a check needs, the masker that blanks comments and strings, the text a pending write would leave, and the stack of the repository that owns a path, live in the shared support folder and are bundled into each plugin that reads them, so no plugin reads a neighbour's file.</p>
   <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
 </section>
@@ -65,49 +66,47 @@
   <ol>
     <li>A call reaches the dispatcher through the wiring.</li>
     <li>The dispatcher asks the check.</li>
-    <li>The check reads the library.</li>
-    <li>The library is copied into the bundle.</li>
+    <li>The check reads the shared library.</li>
+    <li>The shared library is copied into the bundle.</li>
   </ol>
 <figure class="dl-figure">
 <div class="dl-frame">
-<svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="The shared helpers are imported by relative path and bundled in, so an installed plugin needs nothing outside its own folder.">
+<svg class="dl-svg" viewBox="0 0 928 512" role="img" aria-label="From the wiring to the bundle">
   <rect class="dl-tile" x="344" y="16" width="240" height="64" rx="10"/>
   <text class="dl-name" x="356" y="37">the wiring</text>
   <text class="dl-detail" x="356" y="52">hooks.json names</text>
   <text class="dl-detail" x="356" y="67">dist/events/pretooluse.mjs</text>
   <path class="dl-wire" d="M464 80 L464 120"/>
-  <text class="dl-wlabel" x="476" y="104">runs</text>
   <rect class="dl-tile" x="344" y="120" width="240" height="64" rx="10"/>
   <text class="dl-name" x="356" y="141">the dispatcher</text>
   <text class="dl-detail" x="356" y="156">events/pretooluse.ts</text>
   <path class="dl-wire" d="M464 184 L464 224"/>
-  <text class="dl-wlabel" x="476" y="208">asks</text>
   <rect class="dl-tile" x="344" y="224" width="240" height="64" rx="10"/>
-  <text class="dl-name" x="356" y="245">a check</text>
+  <text class="dl-name" x="356" y="245">the check</text>
   <text class="dl-detail" x="356" y="260">checks/figma-connector.ts</text>
   <path class="dl-wire" d="M464 288 L464 328"/>
-  <text class="dl-wlabel" x="476" y="312">reads</text>
   <rect class="dl-tile" x="344" y="328" width="240" height="64" rx="10"/>
   <text class="dl-name" x="356" y="349">the shared library</text>
   <text class="dl-detail" x="356" y="364">plugin-support-lib: payload, timing,</text>
   <text class="dl-detail" x="356" y="379">source</text>
+  <path class="dl-wire" d="M464 392 L464 432"/>
+  <rect class="dl-tile-on" x="344" y="432" width="240" height="64" rx="10"/>
+  <text class="dl-name" x="356" y="453">the bundle</text>
+  <text class="dl-detail" x="356" y="468">dist/, the committed build</text>
 </svg>
 </div>
 <figcaption>The shared helpers are imported by relative path and bundled in, so an installed plugin needs nothing outside its own folder.</figcaption>
 </figure>
   <!-- dg:source
-{ "kind": "map",
+{ "kind": "chain",
+  "title": "From the wiring to the bundle",
   "caption": "The shared helpers are imported by relative path and bundled in, so an installed plugin needs nothing outside its own folder.",
   "boxes": [
     { "id": "a", "label": "the wiring", "note": "hooks.json names dist/events/pretooluse.mjs" },
     { "id": "b", "label": "the dispatcher", "note": "events/pretooluse.ts" },
-    { "id": "c", "label": "a check", "note": "checks/figma-connector.ts" },
-    { "id": "d", "label": "the shared library", "note": "plugin-support-lib: payload, timing, source" }
-  ],
-  "links": [
-    { "from": "a", "to": "b", "label": "runs" },
-    { "from": "b", "to": "c", "label": "asks" },
-    { "from": "c", "to": "d", "label": "reads" }
+    { "id": "c", "label": "the check", "note": "checks/figma-connector.ts" },
+    { "id": "d", "label": "the shared library", "note": "plugin-support-lib: payload, timing, source" },
+    { "id": "e", "label": "the bundle", "note": "dist/, the committed build", "em": true }
   ] }
   -->
 </section>
@@ -115,17 +114,17 @@
 <!-- 03 -->
 <section id="s3">
   <div class="sds-section-head"><h2>Parts</h2></div>
-  <h3 id="dispatcher-the-dispatcher-runs-the-chain">Dispatcher — The dispatcher runs the chain and never takes it down</h3>
+  <h3 id="dispatcher-the-dispatcher-runs-the-chain">Dispatcher — the dispatcher runs the chain and never takes it down</h3>
   <p>The first refusal wins and stops the chain, because a refusal is an answer. Warnings accumulate, because two pieces of advice are better than one. A check that throws is skipped, never fatal.</p>
-  <h3 id="own-file-a-check-keeps-its-own-file-and-">Own file — A check keeps its own file and can run alone</h3>
+  <h3 id="own-file-a-check-keeps-its-own-file-and-">Own file — a check keeps its own file and can run alone</h3>
   <p>Each check exports a verdict function and can be run by hand against a payload on stdin, so a verdict from the dispatcher is the verdict the check gives alone.</p>
-  <h3 id="shared-timer-the-timer-is-the-shared-one">Shared timer — The timer is the shared one, bundled in</h3>
+  <h3 id="shared-timer-the-timer-is-the-shared-one">Shared timer — the timer is the shared one, bundled in</h3>
   <p>The dispatcher records its run through the shared timing library, which writes only while the developer has asked for it and can never fail a gate.</p>
-  <h3 id="shared-helpers-the-shared-helpers-have-o">Shared helpers — The shared helpers have one copy</h3>
+  <h3 id="shared-helpers-the-shared-helpers-have-o">Shared helpers — the shared helpers have one copy</h3>
   <p>The masker, the resulting text and the stack read are one copy each in the shared support folder, proven there once. This plugin imports them by relative path; the build copies them into its own bundle.</p>
-  <h3 id="bare-name-the-command-line-is-typed-by-i">Bare name — The command line is typed by its bare name</h3>
+  <h3 id="bare-name-the-command-line-is-typed-by-i">Bare name — the command line is typed by its bare name</h3>
   <p>A launcher under <code>bin/</code> puts the plugin's entry on the Bash tool's path while the plugin is enabled, and <code>tiers.json</code> declares the permission tier of each command group: <code>check</code> and <code>unit</code>, both allowed.</p>
-  <h3 id="unit-lookup-the-unit-lookup-reads-the-pl">Unit lookup — The unit lookup reads the plugin, and the repository's index for a unit beyond the core</h3>
+  <h3 id="unit-lookup-the-unit-lookup-reads-the-pl">Unit lookup — the unit lookup reads the plugin, and the repository's index for a unit beyond the core</h3>
   <p><code>spn-surface unit show &lt;Unit&gt;</code> prints one unit for the agent that designs or builds a page. Its props, its usage, its index by value and the units their place sizes come from <code>refs/support/surface/construct.snapshot.json</code>, the CONSTRUCT snapshot written from the book of each release.</p>
   <p>Its cases come from the unit's restated table in <code>architecture-components.md</code> or <code>architecture-widgets.md</code>, because the snapshot keeps only the cases that draw the unit, and a case such as <em>not a sheet: a DSDialog</em> draws nothing.</p>
   <p>A partner holds the plugin and not the book, so the command never opens the book, a sibling checkout or the machine's home folder. Its second line names the book's release the snapshot was written from. A unit the snapshot does not hold, the design system's own or a module's, has no table in the book, so its props and their descriptions carry its use. The command reads them from the symbol index of the repository it runs in, and never from source, looking in this order:</p>
@@ -142,7 +141,41 @@
     <li><strong>How it ranks.</strong> By how many of the words a unit carries, then by its name carrying them rather than its line.</li>
     <li><strong>What prints.</strong> The first eight, each with its package, its repository and the core block its name points to.</li>
   </ul>
-  <h3 id="lookup-first-a-read-of-a-unit-s-file-is-">Lookup first — A Read of a unit's file is advised to run the lookup first</h3>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="How unit find answers a task's words">
+  <rect class="dl-tile" x="340" y="16" width="248" height="64" rx="10"/>
+  <text class="dl-name" x="352" y="37">what it searches</text>
+  <text class="dl-detail" x="352" y="52">the snapshot and the symbol index</text>
+  <path class="dl-wire" d="M464 80 L464 120"/>
+  <rect class="dl-tile" x="340" y="120" width="248" height="64" rx="10"/>
+  <text class="dl-name" x="352" y="141">how a unit matches</text>
+  <text class="dl-detail" x="352" y="156">by its name, or by its line or intent</text>
+  <path class="dl-wire" d="M464 184 L464 224"/>
+  <rect class="dl-tile" x="340" y="224" width="248" height="64" rx="10"/>
+  <text class="dl-name" x="352" y="245">how it ranks</text>
+  <text class="dl-detail" x="352" y="260">words carried, then the name over the</text>
+  <text class="dl-detail" x="352" y="275">line</text>
+  <path class="dl-wire" d="M464 288 L464 328"/>
+  <rect class="dl-tile-on" x="340" y="328" width="248" height="64" rx="10"/>
+  <text class="dl-name" x="352" y="349">what prints</text>
+  <text class="dl-detail" x="352" y="364">the first eight</text>
+</svg>
+</div>
+<figcaption>Look at the order: a unit is found, then ranked, and only the first eight print.</figcaption>
+</figure>
+  <!-- dg:source
+{ "kind": "chain",
+  "title": "How unit find answers a task's words",
+  "caption": "Look at the order: a unit is found, then ranked, and only the first eight print.",
+  "boxes": [
+    { "id": "a", "label": "what it searches", "note": "the snapshot and the symbol index" },
+    { "id": "b", "label": "how a unit matches", "note": "by its name, or by its line or intent" },
+    { "id": "c", "label": "how it ranks", "note": "words carried, then the name over the line" },
+    { "id": "d", "label": "what prints", "note": "the first eight", "em": true }
+  ] }
+  -->
+  <h3 id="lookup-first-a-read-of-a-unit-s-file-is-">Lookup first — a Read of a unit's file is advised to run the lookup first</h3>
   <p>A unit's file is named for the unit, so a <code>Read</code> of <code>ForgotPasswordStep.tsx</code> is a read of the unit <code>ForgotPasswordStep</code>. That holds under a module's <code>src/entry/ui/</code> and under the design system's <code>src/ui/</code> alike. <strong>The read advice puts a note beside that Read</strong>, naming <code>spn-surface unit show ForgotPasswordStep</code> and saying to read the source only for what it leaves out. Three rounds of asks found a module's unit by reading its source, because the design skill's words never reached the window at that moment; the note stands beside the call it is about. It advises and never refuses, since a window may need what the index does not carry, and it decides from the path's text alone. A search gets no note: its words name a task, and <code>unit find</code> answers those.</p>
 </section>
 
@@ -180,4 +213,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-yDkvlVaxZfr5SBqgjOk8GZPsDngeCYQxHHaY1aPfty/M6hFe1DXJz++VjJ+i+082" crossorigin="anonymous"></script>

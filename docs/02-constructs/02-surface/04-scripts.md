@@ -20,17 +20,19 @@ Scripts holds everything this plugin executes, divided by what calls each file: 
 
 ## Overview
 
-Today the plugin runs three checks:
+Today the plugin runs these checks:
 
 - the connector check;
 - the Surface check;
 - the read advice.
 
-**The command line ships three commands**:
+**The command line ships these commands**:
 
-- `check scan` reads Surface code whole for every note the check gives.
-- `unit find` names the units a task's words point to.
-- `unit show` prints one unit from the CONSTRUCT snapshot the plugin carries, or a unit beyond the core from the symbol index of the repository it runs in, or, from a workspace's root, of each repository in it.
+```catalog layout=LIST
+`check scan` | reads Surface code whole for every note the check gives
+`unit find` | names the units a task's words point to
+`unit show` | prints one unit from the CONSTRUCT snapshot the plugin carries, or a unit beyond the core from the symbol index of the repository it runs in, or, from a workspace's root, of each repository in it
+```
 
 `--repo` narrows either lookup to one repository. The entry refuses an unknown group by name, and a command added later is a file under `commands/` and reachable as soon as it exists. The helpers a check needs, the masker that blanks comments and strings, the text a pending write would leave, and the stack of the repository that owns a path, live in the shared support folder and are bundled into each plugin that reads them, so no plugin reads a neighbour's file.
 
@@ -54,48 +56,45 @@ This construct realizes the book's `01-devex/02-agent/04-plugins`.
 
 1. A call reaches the dispatcher through the wiring.
 2. The dispatcher asks the check.
-3. The check reads the library.
-4. The library is copied into the bundle.
+3. The check reads the shared library.
+4. The shared library is copied into the bundle.
 
 ```dg
-{ "kind": "map",
+{ "kind": "chain",
+  "title": "From the wiring to the bundle",
   "caption": "The shared helpers are imported by relative path and bundled in, so an installed plugin needs nothing outside its own folder.",
   "boxes": [
     { "id": "a", "label": "the wiring", "note": "hooks.json names dist/events/pretooluse.mjs" },
     { "id": "b", "label": "the dispatcher", "note": "events/pretooluse.ts" },
-    { "id": "c", "label": "a check", "note": "checks/figma-connector.ts" },
-    { "id": "d", "label": "the shared library", "note": "plugin-support-lib: payload, timing, source" }
-  ],
-  "links": [
-    { "from": "a", "to": "b", "label": "runs" },
-    { "from": "b", "to": "c", "label": "asks" },
-    { "from": "c", "to": "d", "label": "reads" }
+    { "id": "c", "label": "the check", "note": "checks/figma-connector.ts" },
+    { "id": "d", "label": "the shared library", "note": "plugin-support-lib: payload, timing, source" },
+    { "id": "e", "label": "the bundle", "note": "dist/, the committed build", "em": true }
   ] }
 ```
 
 ## Parts
 
-### Dispatcher — The dispatcher runs the chain and never takes it down
+### Dispatcher — the dispatcher runs the chain and never takes it down
 
 The first refusal wins and stops the chain, because a refusal is an answer. Warnings accumulate, because two pieces of advice are better than one. A check that throws is skipped, never fatal.
 
-### Own file — A check keeps its own file and can run alone
+### Own file — a check keeps its own file and can run alone
 
 Each check exports a verdict function and can be run by hand against a payload on stdin, so a verdict from the dispatcher is the verdict the check gives alone.
 
-### Shared timer — The timer is the shared one, bundled in
+### Shared timer — the timer is the shared one, bundled in
 
 The dispatcher records its run through the shared timing library, which writes only while the developer has asked for it and can never fail a gate.
 
-### Shared helpers — The shared helpers have one copy
+### Shared helpers — the shared helpers have one copy
 
 The masker, the resulting text and the stack read are one copy each in the shared support folder, proven there once. This plugin imports them by relative path; the build copies them into its own bundle.
 
-### Bare name — The command line is typed by its bare name
+### Bare name — the command line is typed by its bare name
 
 A launcher under `bin/` puts the plugin's entry on the Bash tool's path while the plugin is enabled, and `tiers.json` declares the permission tier of each command group: `check` and `unit`, both allowed.
 
-### Unit lookup — The unit lookup reads the plugin, and the repository's index for a unit beyond the core
+### Unit lookup — the unit lookup reads the plugin, and the repository's index for a unit beyond the core
 
 `spn-surface unit show <Unit>` prints one unit for the agent that designs or builds a page. Its props, its usage, its index by value and the units their place sizes come from `refs/support/surface/construct.snapshot.json`, the CONSTRUCT snapshot written from the book of each release.
 
@@ -117,7 +116,19 @@ A partner holds the plugin and not the book, so the command never opens the book
 - **How it ranks.** By how many of the words a unit carries, then by its name carrying them rather than its line.
 - **What prints.** The first eight, each with its package, its repository and the core block its name points to.
 
-### Lookup first — A Read of a unit's file is advised to run the lookup first
+```dg
+{ "kind": "chain",
+  "title": "How unit find answers a task's words",
+  "caption": "Look at the order: a unit is found, then ranked, and only the first eight print.",
+  "boxes": [
+    { "id": "a", "label": "what it searches", "note": "the snapshot and the symbol index" },
+    { "id": "b", "label": "how a unit matches", "note": "by its name, or by its line or intent" },
+    { "id": "c", "label": "how it ranks", "note": "words carried, then the name over the line" },
+    { "id": "d", "label": "what prints", "note": "the first eight", "em": true }
+  ] }
+```
+
+### Lookup first — a Read of a unit's file is advised to run the lookup first
 
 A unit's file is named for the unit, so a `Read` of `ForgotPasswordStep.tsx` is a read of the unit `ForgotPasswordStep`. That holds under a module's `src/entry/ui/` and under the design system's `src/ui/` alike. **The read advice puts a note beside that Read**, naming `spn-surface unit show ForgotPasswordStep` and saying to read the source only for what it leaves out. Three rounds of asks found a module's unit by reading its source, because the design skill's words never reached the window at that moment; the note stands beside the call it is about. It advises and never refuses, since a window may need what the index does not carry, and it decides from the path's text alone. A search gets no note: its words name a task, and `unit find` answers those.
 

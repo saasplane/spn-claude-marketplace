@@ -47,7 +47,7 @@ This construct realizes the book's `01-devex/02-agent/04-plugins`.
 
 ## Model
 
-The moments run in the order a session meets them. Nothing chains one to the next: each is offered independently, and a plugin wires the ones it has something to say at.
+The moments run in the order a session meets them: the window opens, a prompt is sent, a call is about to run, a command finished, and the turn is ending. Nothing chains one to the next: each is offered independently, and a plugin wires the ones it has something to say at.
 
 ```dg
 { "kind": "map",
@@ -77,7 +77,7 @@ The moments run in the order a session meets them. Nothing chains one to the nex
 
 ### The window opening
 
-One script runs when a session starts, resumes or is cleared, and what it prints is the first screen a developer reads. Nothing in that screen is typed: the script reads it all from the workspace, along the path below.
+One script runs when a session starts, resumes or is cleared, and what it prints is the first screen a developer reads. Nothing in that screen is typed: the script reads it all from the workspace, along the path below. It asks first whether the workspace holds a manifest. If it does, the script reads each repository's manifest, checks the wiring that claim implies, and lists every workstream in each of its states. If it does not, there is nothing to read, so the screen's one act is to ask, and point at the day-zero skill.
 
 ```dg
 { "kind": "flowchart",
@@ -118,7 +118,7 @@ One script, no matcher. By the time it runs the turn is already written, so a re
 A warning makes the agent reply again, and the developer reads that reply. So the script asks first whether work runs, which it reads from the rows of the window's own arcs: work runs while one of them is marked in progress.
 
 - **A reply owes *Needs you* at its top in two cases.** A reply that raises a card holds the card there in full, once. A reply that waits names every card open from an earlier reply in one line. A progress reply owes no line for an older card.
-- **While work runs, only a finding about the reply sends the agent back.** Four findings are about the reply: a card not put in full, a decision put with no whole card, a handover block that is missing or not whole, and a first reply with no welcome.
+- **While work runs, only a finding about the reply sends the agent back.** The findings about the reply are these: a card not put in full, a decision put with no whole card, a handover block that is missing or not whole, and a first reply with no welcome.
 - **Every other finding is held until work stops.** At the first turn end where no row is in progress, each held finding that is still true is said whole, and one the agent fixed in between is not said.
 - **A handover block is asked for once.** After a reply that holds a whole block, a later reply that names the next window owes no second block while the rows of the window's arcs have not moved. Once they move, the old block no longer says where to start, and a block is owed again.
 
@@ -134,7 +134,7 @@ A check is a function returning `{ deny?, note? }` or nothing. The dispatcher ca
 
 ### One process — One process, and the order inside it
 
-The dispatcher imports every check and calls each in turn. Each check declares what it `applies` to, decided from the path or the command alone, and which fields it `needs`, so a call that cannot interest a check never reaches it. The order is a path test, then a file read, then a workspace walk. A check that throws is caught and passed over, and the rest still run.
+The dispatcher imports every check and calls each in turn. Each check declares what it `applies` to, decided from the path or the command alone, and which fields it `needs`, so a call that cannot interest a check never reaches it. The order is a path test, then a file read, then a workspace walk. A check that throws is caught and passed over, and the rest still run. Read the path left to right: `hooks.json` wires the event, the dispatcher runs each check that applies, and the verdict is what it answers with.
 
 ```dg
 { "kind": "map",

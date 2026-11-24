@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "eee770ce"
+    "commit": "a9ed4b3c"
   },
   "rules": [
     {
@@ -12,7 +12,7 @@
       "class": "guidance",
       "sentence": null,
       "chapter": "02-constructs/01-devex/02-agent/04-plugins.md",
-      "heading": "The four plugins",
+      "heading": "Plugins by domain",
       "decision": null,
       "restated": [
         {
@@ -29,7 +29,7 @@
       "class": "guidance",
       "sentence": null,
       "chapter": "02-constructs/01-devex/02-agent/02-skills.md",
-      "heading": "Step files — Skills and step files",
+      "heading": "Step files — never skills",
       "decision": null,
       "restated": []
     },
@@ -64,7 +64,7 @@
       "class": "stated in a skill",
       "sentence": "Each domain earns one plugin, and a stack or a cloud is a folder inside it",
       "chapter": "02-constructs/01-devex/02-agent/04-plugins.md",
-      "heading": "The four plugins",
+      "heading": "Plugins by domain",
       "decision": "DEC.DEVEX.AGENT.015",
       "restated": [
         {
@@ -326,7 +326,7 @@
       "class": "checked",
       "sentence": null,
       "chapter": "02-constructs/01-devex/02-agent/04-plugins.md",
-      "heading": "The four plugins",
+      "heading": "Plugins by domain",
       "decision": null,
       "restated": []
     },
@@ -2553,7 +2553,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/01-devex/01-function/03-ideate.md",
-      "heading": "Named ends — Both ends are named",
+      "heading": "Named ends — both ends are named",
       "decision": null,
       "restated": []
     },
@@ -2614,7 +2614,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/01-devex/01-function/04-develop.md",
-      "heading": "Layer limits — What each layer may do",
+      "heading": "Layer limits — what each layer may do",
       "decision": null,
       "restated": []
     },
@@ -2892,7 +2892,7 @@
       "class": "stated in a skill",
       "sentence": "A `hotfix/<subject>` is cut from `main` for production, or from `uat` or `qa` where only that environment needs the fix, never from `develop`. It merges by a pull request back into the branch it came from, and `spnutils repo backmerge <branch>` then merges it into each permanent branch below that one, in order, down to `develop`",
       "chapter": "02-constructs/01-devex/01-function/02-scm.md",
-      "heading": "Direction rules — Rules that keep direction",
+      "heading": "Direction rules — rules that keep direction",
       "decision": null,
       "restated": [
         {
@@ -3718,7 +3718,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/01-devex/03-utils/01-spnutils.md",
-      "heading": "Four command groups",
+      "heading": "Command groups",
       "decision": null,
       "restated": []
     },
@@ -14114,7 +14114,7 @@
       "level": "GUIDE",
       "params": {},
       "class": "guidance",
-      "sentence": "Facts below an item's line stand in the same column on every item of the list, one column for each fact name",
+      "sentence": "A catalog list names where its facts stand, `facts=END` or `facts=AFTER_DESCRIPTION`, and the page writer never guesses it",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "heading": "Which block a content takes, and how its fence is written",
       "decision": null,
@@ -14398,7 +14398,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/03-platform/01-core/02-identity.md",
-      "heading": "Hub — One hub and callbacks",
+      "heading": "Hub — one hub and callbacks",
       "decision": null,
       "restated": []
     },
@@ -14411,7 +14411,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/03-platform/01-core/02-identity.md",
-      "heading": "Hub — One hub and callbacks",
+      "heading": "Hub — one hub and callbacks",
       "decision": null,
       "restated": []
     },
@@ -14516,7 +14516,7 @@
       "class": "stated in a skill",
       "sentence": "Two resolution chains answer two different questions and neither absorbs the other: the chain along organizations (RULE.PLATFORM.CORE.026) and a chain along surfaces strictly inside the platform organization, which never crosses an organization",
       "chapter": "02-constructs/03-platform/01-core/03-surfaces.md",
-      "heading": "Three namespaces",
+      "heading": "Service namespaces",
       "decision": "DEC.PLATFORM.CORE.030",
       "restated": [
         {
@@ -15120,7 +15120,7 @@
       "class": "stated in a skill",
       "sentence": "An org's parent is the org that sells to it",
       "chapter": "02-constructs/03-platform/01-core/01-tenancy.md",
-      "heading": "Parent seller — The parent is the seller",
+      "heading": "Parent seller — the seller",
       "decision": null,
       "restated": [
         {
@@ -15144,7 +15144,7 @@
       "class": "stated in a skill",
       "sentence": "The tree records only who sells to whom",
       "chapter": "02-constructs/03-platform/01-core/01-tenancy.md",
-      "heading": "Parent seller — The parent is the seller",
+      "heading": "Parent seller — the seller",
       "decision": "DEC.PLATFORM.CORE.061",
       "restated": [
         {
@@ -15168,7 +15168,7 @@
       "class": "stated in a skill",
       "sentence": "A category never has itself as an ancestor",
       "chapter": "02-constructs/03-platform/01-core/01-tenancy.md",
-      "heading": "Parent seller — The parent is the seller",
+      "heading": "Parent seller — the seller",
       "decision": "DEC.PLATFORM.CORE.062",
       "restated": [
         {
@@ -15192,7 +15192,7 @@
       "class": "stated in a skill",
       "sentence": "No module knows how deep the tree is",
       "chapter": "02-constructs/03-platform/01-core/01-tenancy.md",
-      "heading": "Parent seller — The parent is the seller",
+      "heading": "Parent seller — the seller",
       "decision": "DEC.PLATFORM.CORE.063",
       "restated": [
         {
@@ -15465,7 +15465,7 @@
       "class": "stated in a skill",
       "sentence": "A module records beside its real send, and one audited read returns the value once",
       "chapter": "02-constructs/03-platform/01-core/02-identity.md",
-      "heading": "Test reads — A test reads the code",
+      "heading": "Test reads — sent codes",
       "decision": "DEC.PLATFORM.CORE.078",
       "restated": [
         {
@@ -17111,7 +17111,7 @@
       "class": "stated in a skill",
       "sentence": "A contract schema is `STRICT` and a state never uses `?`; tolerating an absent key is the entry's responsibility and never the type's",
       "chapter": "02-constructs/01-devex/01-function/04-develop.md",
-      "heading": "Layer limits — What each layer may do",
+      "heading": "Layer limits — what each layer may do",
       "decision": "DEC.SUPPORT.APPS.071",
       "restated": [
         {
@@ -21437,7 +21437,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/01-devex/02-agent/04-plugins.md",
-      "heading": "The four plugins",
+      "heading": "Plugins by domain",
       "decision": null,
       "restated": []
     },
@@ -21709,7 +21709,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/03-infra/06-modules.md",
-      "heading": "Module limits — What a module may stand",
+      "heading": "Module limits — what a module may stand",
       "decision": null,
       "restated": [
         {
@@ -22006,7 +22006,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/03-infra/04-resources.md",
-      "heading": "Module world — A module's own world",
+      "heading": "Module world — a module's own world",
       "decision": null,
       "restated": [
         {
@@ -22294,7 +22294,7 @@
       "class": "stated in a skill",
       "sentence": "singular for the whole company",
       "chapter": "02-constructs/02-support/03-infra/06-modules.md",
-      "heading": "Attach points — Where a module may attach",
+      "heading": "Attach points — where a module may attach",
       "decision": null,
       "restated": [
         {
@@ -22690,7 +22690,7 @@
       "class": "stated in a skill",
       "sentence": "A customer's hostname is issued and bound when the request to serve it arrives, through the edge seam, and never by an apply",
       "chapter": "02-constructs/02-support/03-infra/08-operate.md",
-      "heading": "Serving contract — The serving contract is dynamic",
+      "heading": "Serving contract — the serving contract is dynamic",
       "decision": null,
       "restated": [
         {
@@ -22879,7 +22879,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/03-infra/07-trust.md",
-      "heading": "Cloud acts — What a cloud act needs",
+      "heading": "Cloud acts — what a cloud act needs",
       "decision": null,
       "restated": [
         {
@@ -23074,7 +23074,7 @@
       "class": "stated in a skill",
       "sentence": "One tenant edge, stood by the platform layer, serves the customer hosts of every environment",
       "chapter": "02-constructs/02-support/03-infra/08-operate.md",
-      "heading": "Serving contract — The serving contract is dynamic",
+      "heading": "Serving contract — the serving contract is dynamic",
       "decision": null,
       "restated": [
         {
@@ -23394,7 +23394,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/03-infra/05-apps.md",
-      "heading": "Remote ports — Remote ports stay private",
+      "heading": "Remote ports — remote ports stay private",
       "decision": null,
       "restated": [
         {
@@ -23457,7 +23457,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/03-infra/05-apps.md",
-      "heading": "Route asks — What a route is asked",
+      "heading": "Route asks — what a route is asked",
       "decision": null,
       "restated": [
         {
@@ -23515,7 +23515,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/03-infra/05-apps.md",
-      "heading": "Route asks — What a route is asked",
+      "heading": "Route asks — what a route is asked",
       "decision": null,
       "restated": [
         {
@@ -24092,7 +24092,7 @@
       "class": "stated in a skill",
       "sentence": "The acting role trusts the estate repository's pipeline role by name, and no other principal becomes it",
       "chapter": "02-constructs/02-support/03-infra/07-trust.md",
-      "heading": "Acting role — Who may become the acting role",
+      "heading": "Acting role — who may become the acting role",
       "decision": null,
       "restated": [
         {
@@ -24111,7 +24111,7 @@
       "class": "stated in a skill",
       "sentence": "The deployments layer is applied by the pipeline alone, from a push, by digest",
       "chapter": "02-constructs/02-support/03-infra/07-trust.md",
-      "heading": "Acting role — Who may become the acting role",
+      "heading": "Acting role — who may become the acting role",
       "decision": null,
       "restated": [
         {
@@ -24250,7 +24250,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/03-infra/05-apps.md",
-      "heading": "Size and count — How big, and how many",
+      "heading": "Size and count — how big, and how many",
       "decision": null,
       "restated": [
         {
@@ -24269,7 +24269,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "02-constructs/02-support/03-infra/04-resources.md",
-      "heading": "Service sizes — Each data service its own size",
+      "heading": "Service sizes — each data service its own size",
       "decision": null,
       "restated": [
         {
@@ -24350,7 +24350,7 @@
       "class": "stated in a skill",
       "sentence": "An application is given a module's settings only when its row names the module",
       "chapter": "02-constructs/02-support/03-infra/06-modules.md",
-      "heading": "Named apps — Given only to the apps that name it",
+      "heading": "Named apps — given only to the apps that name it",
       "decision": null,
       "restated": [
         {
