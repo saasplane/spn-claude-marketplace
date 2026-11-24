@@ -4,12 +4,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "section": "The figures — what sits inside a block, and the closed set of them",
-      "seen": "0497b3fc"
+      "seen": "7a2364d7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "section": "A rendered unit is written as a tree",
-      "seen": "592755b8"
+      "seen": "4bfe16bc"
     }
   ]
 }

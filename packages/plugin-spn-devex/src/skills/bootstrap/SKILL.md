@@ -7,11 +7,11 @@ description: Open the door of an empty workspace and lay a partner's whole found
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "f9709d35"
+      "seen": "19f9504b"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/01-bootstrap.md",
-      "seen": "47ef9ac3"
+      "seen": "002601c4"
     }
   ]
 }

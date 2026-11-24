@@ -4,7 +4,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "section": "`SKELETON` — a mock of a layout",
-      "seen": "ba0dc4e4"
+      "seen": "f6e93189"
     },
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/06-architecture-components.md",

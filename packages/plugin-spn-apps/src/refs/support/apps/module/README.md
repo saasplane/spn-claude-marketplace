@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/03-module.md",
-      "seen": "0927d7b1"
+      "seen": "cca2aa84"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/",
@@ -154,7 +154,7 @@ Declare one discriminator, `mtype`, on a polymorphic family's base, typed as the
 
 **A handler is called for every transaction the framework closes** (`RULE.SUPPORT.APPS.224` · MUST · skill:spn-apps/implement). Work that belongs to every transaction, such as recording what changed, needs no call site: a module or the app registers handlers once, at boot, through `getTransactionHandlers`, and the framework calls them for every transaction it closes. Each module's handlers run in boot order, then the app's, so the app acts on what the modules left. A producer never names its handler: it collects what it wants handled under a typed key, and a handler takes what it handles from the transaction by that key, so a module mounted here, remote or absent changes no producer. Work collected under a key is handled by a keyed handler, which a manager answers through `getTransactionCollectHandlers` in the same way. A handler runs inside the transaction before it commits, and its throw rolls the transaction back. Work that may be lost, such as clearing a cache, uses the transaction's hooks; work that must not be lost uses a key with the phase `AFTER_COMMIT`.
 
-Work that is part of the save and work that must follow it are told apart by one question: must this succeed for the save to succeed? **A collect key fixes its phase, `BEFORE_COMMIT` or `AFTER_COMMIT`, and one keyed handler per key does the work** (`RULE.SUPPORT.APPS.224` · MUST · skill:spn-apps/implement). A `BEFORE_COMMIT` key is performed before the commit, and a throw rolls the save back. An `AFTER_COMMIT` key is kept with the transaction, performed after the commit, and retried until it succeeds. One handler shape serves both, so there is no second kind of handler for kept work. Eight rules hold it (`RULE.SUPPORT.APPS.260` · MUST · skill:spn-apps/implement):
+Work that is part of the save and work that must follow it are told apart by one question: must this succeed for the save to succeed? **A collect key fixes its phase, `BEFORE_COMMIT` or `AFTER_COMMIT`, and one keyed handler per key does the work** (`RULE.SUPPORT.APPS.224` · MUST · skill:spn-apps/implement). A `BEFORE_COMMIT` key is performed before the commit, and a throw rolls the save back. An `AFTER_COMMIT` key is kept with the transaction, performed after the commit, and retried until it succeeds. One handler shape serves both, so there is no second kind of handler for kept work. These rules hold it (`RULE.SUPPORT.APPS.260` · MUST · skill:spn-apps/implement):
 
 1. **The key fixes the phase.** A producer reads at its call site what it is promised, and a key's phase is the same in every service.
 2. **Kept work is data, never a function.** Only a key and an item can be stored and found again by a process that never saw the transaction.

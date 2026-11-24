@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/04-plugins.md",
       "section": "Apps into Surface",
-      "seen": "91f2b341"
+      "seen": "baf616fb"
     }
   ]
 }

@@ -7,11 +7,11 @@ description: Publishing an estate package - bump the version field in spinfrapkg
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "f9709d35"
+      "seen": "19f9504b"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/07-deliver.md",
-      "seen": "1d6cc7ef"
+      "seen": "be4e9978"
     }
   ]
 }
