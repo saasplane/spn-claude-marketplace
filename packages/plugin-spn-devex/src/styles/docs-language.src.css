@@ -1657,6 +1657,7 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
    list-tree (ISC licence, (c) Lucide Contributors; THIRD-PARTY-NOTICES.md), drawn inline by the writer. */
 .sds-json-chip {
   --chip-ink: var(--surface-brand-fg, var(--sds-accent));
+  --chip-text: color-mix(in oklch, var(--chip-ink) 75%, var(--sds-ink));
   display: inline-flex;
   align-items: center;
   gap: .4em;
@@ -1668,20 +1669,20 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   font: inherit;
   line-height: 1;
   white-space: nowrap;
-  color: var(--chip-ink);
-  background: color-mix(in srgb, var(--sds-accent) 10%, var(--sds-paper));
-  border: 1px solid color-mix(in srgb, var(--sds-accent) 30%, var(--sds-paper));
+  color: var(--chip-text);
+  background: color-mix(in oklch, var(--chip-ink) 12%, transparent);
+  border: 1px solid color-mix(in oklch, var(--chip-ink) 80%, transparent);
   border-radius: 999px;
   cursor: pointer;
   transition: background-color var(--motion-hover, 150ms) ease-out, border-color var(--motion-hover, 150ms) ease-out;
 }
-.sds-json-chip:hover { background: color-mix(in srgb, var(--sds-accent) 18%, var(--sds-paper)); border-color: color-mix(in srgb, var(--sds-accent) 42%, var(--sds-paper)); }
-.sds-json-chip[aria-expanded="true"] { background: color-mix(in srgb, var(--sds-accent) 24%, var(--sds-paper)); border-color: var(--sds-accent); }
+.sds-json-chip:hover { background: color-mix(in oklch, var(--chip-ink) 14%, transparent); border-color: var(--chip-ink); }
+.sds-json-chip[aria-expanded="true"] { background: color-mix(in oklch, var(--chip-ink) 14%, transparent); border-color: var(--chip-ink); box-shadow: 0 0 0 1px var(--chip-ink); }
 .sds-json-chip:focus-visible,
 .sds-json-copy:focus-visible,
 .sds-json-close:focus-visible { outline: 2px solid var(--sds-accent); outline-offset: 2px; }
 .sds-json-chip .sds-json-mark { flex: none; width: 14px; height: 14px; }
-.sds-json-chip .sds-json-n { padding-left: .55em; border-left: 1px solid color-mix(in srgb, var(--sds-accent) 30%, var(--sds-paper)); color: var(--sds-faint); }
+.sds-json-chip .sds-json-n { padding-left: .55em; border-left: 1px solid color-mix(in oklch, var(--chip-ink) 45%, transparent); color: color-mix(in oklch, var(--sds-slate) 85%, var(--sds-ink)); }
 .sds-json-dialog {
   box-sizing: border-box;
   width: min(720px, 95vw);

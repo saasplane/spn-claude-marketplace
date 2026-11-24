@@ -7256,6 +7256,10 @@
 }
 .sds-json-chip {
   --chip-ink: var(--surface-brand-fg, var(--sds-accent));
+  --chip-text: var(--chip-ink);
+  @supports (color: color-mix(in lab, red, red)) {
+    --chip-text: color-mix(in oklch, var(--chip-ink) 75%, var(--sds-ink));
+  }
   display: inline-flex;
   align-items: center;
   gap: .4em;
@@ -7267,35 +7271,33 @@
   font: inherit;
   line-height: 1;
   white-space: nowrap;
-  color: var(--chip-ink);
-  background: var(--sds-accent);
+  color: var(--chip-text);
+  background: var(--chip-ink);
   @supports (color: color-mix(in lab, red, red)) {
-    background: color-mix(in srgb, var(--sds-accent) 10%, var(--sds-paper));
+    background: color-mix(in oklch, var(--chip-ink) 12%, transparent);
   }
-  border: 1px solid var(--sds-accent);
+  border: 1px solid var(--chip-ink);
   @supports (color: color-mix(in lab, red, red)) {
-    border: 1px solid color-mix(in srgb, var(--sds-accent) 30%, var(--sds-paper));
+    border: 1px solid color-mix(in oklch, var(--chip-ink) 80%, transparent);
   }
   border-radius: 999px;
   cursor: pointer;
   transition: background-color var(--motion-hover, 150ms) ease-out, border-color var(--motion-hover, 150ms) ease-out;
 }
 .sds-json-chip:hover {
-  background: var(--sds-accent);
+  background: var(--chip-ink);
   @supports (color: color-mix(in lab, red, red)) {
-    background: color-mix(in srgb, var(--sds-accent) 18%, var(--sds-paper));
+    background: color-mix(in oklch, var(--chip-ink) 14%, transparent);
   }
-  border-color: var(--sds-accent);
-  @supports (color: color-mix(in lab, red, red)) {
-    border-color: color-mix(in srgb, var(--sds-accent) 42%, var(--sds-paper));
-  }
+  border-color: var(--chip-ink);
 }
 .sds-json-chip[aria-expanded="true"] {
-  background: var(--sds-accent);
+  background: var(--chip-ink);
   @supports (color: color-mix(in lab, red, red)) {
-    background: color-mix(in srgb, var(--sds-accent) 24%, var(--sds-paper));
+    background: color-mix(in oklch, var(--chip-ink) 14%, transparent);
   }
-  border-color: var(--sds-accent);
+  border-color: var(--chip-ink);
+  box-shadow: 0 0 0 1px var(--chip-ink);
 }
 .sds-json-chip:focus-visible, .sds-json-copy:focus-visible, .sds-json-close:focus-visible {
   outline: 2px solid var(--sds-accent);
@@ -7308,11 +7310,14 @@
 }
 .sds-json-chip .sds-json-n {
   padding-left: .55em;
-  border-left: 1px solid var(--sds-accent);
+  border-left: 1px solid var(--chip-ink);
   @supports (color: color-mix(in lab, red, red)) {
-    border-left: 1px solid color-mix(in srgb, var(--sds-accent) 30%, var(--sds-paper));
+    border-left: 1px solid color-mix(in oklch, var(--chip-ink) 45%, transparent);
   }
-  color: var(--sds-faint);
+  color: var(--sds-slate);
+  @supports (color: color-mix(in lab, red, red)) {
+    color: color-mix(in oklch, var(--sds-slate) 85%, var(--sds-ink));
+  }
 }
 .sds-json-dialog {
   box-sizing: border-box;
