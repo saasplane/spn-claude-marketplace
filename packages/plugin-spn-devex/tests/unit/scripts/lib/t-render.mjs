@@ -549,6 +549,15 @@ console.log("\n=== the page renderer — a LIST's fact keys, facts=END with no f
     !/\.sds-tile-facts > \.sds-tile-fact-bare\s*\{\s*display/.test(readFileSync(resolve(HERE, "src", "styles", "docs-language.src.css"), "utf8")));
 }
 
+console.log("\n=== the page renderer — the catalog check leaves Terms, glossary and Binds tables as tables");
+{
+  const many = (head, first) => table(head, ...Array.from({ length: 8 }, (_, k) => [`${first}${k}`, `what ${first}${k} means in this domain`, ...head.slice(2).map(() => "x")]));
+  const reads = (md) => made(md).findings.some((f) => f.message.includes("reads as a catalog"));
+  ok("[MKT.SCRIPTS.656] a glossary of eight terms with a Term and a Description column is not read as a catalog", !reads(many(["Term", "Description"], "T")));
+  ok("[MKT.SCRIPTS.656] a Terms table with a What it means column, and a Binds table with a What it decides column, are not read as one either", !reads(many(["Term", "What it means"], "T")) && !reads(many(["Rule", "What it decides"], "R")));
+  ok("[MKT.SCRIPTS.656] a table of names and descriptions that is neither still is", reads(many(["Name", "Description"], "N")) && reads(many(["Command", "What it does"], "C")));
+}
+
 console.log("\n=== the page renderer — a file frame that folds");
 {
   const plain = made("```json file=docs/specs/x.json\n{}\n```");

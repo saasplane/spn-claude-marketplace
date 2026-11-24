@@ -444,6 +444,8 @@ const DESCRIPTION_HEAD = /^(?:description|meaning|purpose|summary|what (?:it|thi
 const bare = (cell: string): string => cell.replace(/[`*]/g, "").trim();
 /** The description column's name where the table reads as a catalog, else null. */
 function readsAsCatalog(head: string[], rows: string[][]): string | null {
+  // A glossary, a Terms table and a Binds table stay tables: the docs tools build the glossary and the rules index from them (RULE.DEVEX.WORKSPACE.577).
+  if (/^(?:term|rule)$/i.test(bare(head[0]))) return null;
   const at = head.findIndex((name, k) => k > 0 && DESCRIPTION_HEAD.test(bare(name)));
   return rows.length > 4 && head.length <= 3 && NAME_HEAD.test(bare(head[0])) && at > 0 ? bare(head[at]) : null;
 }
