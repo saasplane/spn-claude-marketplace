@@ -1732,7 +1732,7 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 @media (prefers-reduced-motion: reduce) { .sds-json-dialog[open], .sds-json-dialog[open]::backdrop { animation: none; } .sds-json-chip { transition: none; } }
 .sds-json-head { display: flex; align-items: center; gap: .5rem; flex: none; padding: 1rem 1rem 1rem 1.25rem; border-bottom: 1px solid var(--sds-rule); }
 .sds-json-titles { flex: 1 1 auto; min-width: 0; }
-.sds-json-dialog .sds-json-title { margin: 0; padding: 0; border: 0; font-family: inherit; font-size: var(--sds-part-title); line-height: var(--sds-part-title-lh); font-weight: var(--font-weight-semibold); color: var(--sds-ink); letter-spacing: normal; text-transform: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sds-json-dialog .sds-json-title { margin: 0; padding: 0; border: 0; font-family: var(--font-heading); font-size: var(--font-heading-xs-size); line-height: var(--font-heading-xs-line-height); font-weight: var(--font-weight-semibold); color: var(--sds-ink); letter-spacing: normal; text-transform: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }  /* the design system's dialog title: a CONTAINER-level header item, HEADING_XS, 18px semibold */
 .sds-json-copy, .sds-json-close {
   position: relative; flex: none; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; width: 2rem; height: 2rem; margin: 0; padding: 0;
   font: inherit; line-height: 1; color: var(--sds-slate); background: transparent; border: 1px solid transparent; border-radius: var(--radius-md); cursor: pointer;

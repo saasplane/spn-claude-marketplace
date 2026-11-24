@@ -7483,9 +7483,9 @@
   margin: 0;
   padding: 0;
   border: 0;
-  font-family: inherit;
-  font-size: var(--sds-part-title);
-  line-height: var(--sds-part-title-lh);
+  font-family: var(--font-heading);
+  font-size: var(--font-heading-xs-size);
+  line-height: var(--font-heading-xs-line-height);
   font-weight: var(--font-weight-semibold);
   color: var(--sds-ink);
   letter-spacing: normal;
