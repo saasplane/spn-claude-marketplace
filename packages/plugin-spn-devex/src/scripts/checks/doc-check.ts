@@ -748,14 +748,17 @@ export function surfacePageShape(text: string): Finding[] {
   if (!/class="sds-surface-bar"/.test(bare) || !/class="sds-surface-title"/.test(bare)) parts.push("has no bar with the page's title");
   else if (switches.length) parts.push(`has no ${switches.join(" and no ")} switch in its bar`);
   if (!/<iframe\b[^>]*class="[^"]*sds-surface-frame[^"]*"[^>]*>/.test(bare)) parts.push("has no frame for the page");
-  if (!/<template\s+id="page"[^>]*>/.test(bare)) parts.push("has no `<template id=\"page\">` holding the page's markup");
+  if (!/<template\s+id="page(?:-(?:LIGHT|DARK)-(?:DESKTOP|TABLET|PHONE))?"[^>]*>/.test(bare)) parts.push("has no `<template id=\"page-<MODE>-<DEVICE>\">` holding the page's markup");
+  if (/<template\s+id="page-[^"]*"[\s\S]*?(?:data-section=|class="sds-note")/.test(bare)) parts.push("holds a section wrapper or a note aside in the page's markup (the frame holds the render's output and nothing else; notes live in `#sample-notes`)");
+  const notesJson = /<script\s+type="application\/json"\s+id="sample-notes"[^>]*>([\s\S]*?)<\/script>/.exec(bare)?.[1];
+  if (notesJson !== undefined) { try { if (!Array.isArray(JSON.parse(notesJson))) throw new Error("not a list"); } catch { parts.push("has a `#sample-notes` that is no JSON list"); } }
   const ds = /<meta\s+name="surface-ds"\s+content="([^"]*)"/.exec(bare)?.[1];
   if (ds === undefined) parts.push("has no `surface-ds` meta naming the design system's version");
   else if (!slots && !/^\d+\.\d+\.\d+$/.test(ds.trim())) parts.push(`names \`${ds}\` in its \`surface-ds\` meta, which is no version`);
   const app = /<meta\s+name="surface-app-css"\s+content="([^"]*)"/.exec(bare)?.[1];
   if (app === undefined) parts.push("has no `surface-app-css` meta naming the app's stylesheet");
   else if (!slots && app.trim() && /^([a-z][a-z0-9+.-]*:|\/)/i.test(app.trim())) parts.push("names an app stylesheet that is no relative path (it is empty for Surface's own look)");
-  const outside = bare.replace(/<template\b[\s\S]*?<\/template>/i, " ").replace(/<header\b[\s\S]*?<\/header>/i, "");
+  const outside = bare.replace(/<template\b[\s\S]*?<\/template>/gi, " ").replace(/<script\b[\s\S]*?<\/script>/gi, " ").replace(/<header\b[\s\S]*?<\/header>/i, "");
   if (/<(?:h2|h3|section|table|ul|ol|p)\b/i.test(outside)) parts.push("holds words of its own beside the bar and the template");
   if (!parts.length) return [];
   return [["RULE", `a surface page ${parts.join(", and ")} (RULE.DEVEX.WORKSPACE.535, .536) · keep to the template: the bar, the frame and the page's markup in its template, with the two metas`]];

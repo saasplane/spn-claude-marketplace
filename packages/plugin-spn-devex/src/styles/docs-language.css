@@ -6803,10 +6803,10 @@
     top: 0;
     z-index: 2;
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
     gap: .5rem 1.5rem;
-    padding: .5rem 1rem;
+    padding: .5rem calc(max(0px, (100% - var(--sds-page-max)) / 2) + var(--sds-page-pad));
     background: var(--surface);
     border-bottom: 1px solid var(--surface-border);
     font-family: var(--font-text);
@@ -6815,6 +6815,10 @@
     color: var(--fg);
   }
   .sds-surface-title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     margin: 0 auto 0 0;
     font-family: var(--font-heading);
     font-size: var(--font-title-lg-size);
@@ -6863,13 +6867,67 @@
   .sds-surface[data-width="tablet"] .sds-surface-frame, .sds-surface[data-width="phone"] .sds-surface-frame {
     box-shadow: 0 0 0 1px var(--surface-border);
   }
-  @media (max-width: 640px) {
+  @media (max-width: 40rem) {
     .sds-surface-bar {
+      flex-wrap: wrap;
       gap: .4rem .75rem;
+      padding-inline: 16px;
     }
     .sds-surface-title {
       flex-basis: 100%;
     }
+  }
+  .sds-surface-notes {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .sds-surface-note {
+    position: absolute;
+    display: flex;
+    align-items: flex-start;
+    gap: .4rem;
+    max-width: min(20rem, 70%);
+    pointer-events: auto;
+    font-family: var(--font-text);
+    font-size: var(--font-content-md-size);
+    line-height: var(--font-content-md-line-height);
+    color: var(--on-warning-subtle);
+  }
+  .sds-surface-note > b {
+    flex: none;
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    padding: 0 .35rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--on-warning-subtle);
+    background: var(--warning-subtle);
+    border: 1px solid var(--warning);
+    border-radius: 999px;
+    box-shadow: var(--shadow-elevation-sm);
+  }
+  .sds-surface-note > span {
+    display: none;
+    padding: .4rem .6rem;
+    background: var(--warning-subtle);
+    border: 1px solid var(--warning);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-elevation-md);
+  }
+  .sds-surface-note:hover > span, .sds-surface-note:focus-within > span {
+    display: block;
+  }
+  .sds-surface-note > span small {
+    display: block;
+    color: var(--fg-quiet);
+    font-size: var(--font-content-xs-size);
+  }
+  .sds-surface-note a {
+    color: inherit;
   }
 }
 :root, :root[data-mode='dark'] {

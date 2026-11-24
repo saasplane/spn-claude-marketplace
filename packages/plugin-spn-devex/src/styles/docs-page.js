@@ -515,53 +515,89 @@ try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(
   });
 })();
 
-/* THE SURFACE PAGE: the bar's three switches, and the frame's document. The page's markup stands in `<template id="page">`; this builds
-   the frame's document from it, linking `design-system.css` from the folder this script was served from, the cut of the design system
-   that `<meta name="surface-ds">` names, and the app's stylesheet at the path `<meta name="surface-app-css">` names. Width sizes the frame; mode sets
-   `data-mode` on the frame's own `<html>`, and notes shows or hides each `[data-note]` in it, both set directly with no message. The
-   choice is kept in this browser, so the next page opens in the same view (05-pages.md, The surface preview). */
+/* THE SURFACE PAGE: the bar's three switches, and the frame's document. The page's markup stands in one `<template id="page-<MODE>-<DEVICE>">`
+   for each device and mode that was rendered; the switches pick the template for the choice and swap the frame's markup, and where there is none
+   for it they restyle the nearest one only (mode on the frame's `<html>`, width on the frame). The frame's document holds the template's
+   markup and nothing else, linking `design-system.css` from the folder this script was served from (the cut of the design system that
+   `<meta name="surface-ds">` names) and the app's stylesheet at the path `<meta name="surface-app-css">` names. Notes live outside the page, in
+   `<script type="application/json" id="sample-notes">`, a list of { n, kind, case, status, text, href }, `n` the place of a top-level section
+   counted from 1; the Notes switch draws a numbered label over each section's box in a layer above the frame, and nothing when off. A `#<id>` in
+   the page's address scrolls the frame to that element. The choice is kept in this browser (05-pages.md, The surface preview). */
 (function () {
   var root = document.querySelector('.sds-surface'); if (!root) return;
   var frame = root.querySelector('.sds-surface-frame');
-  var template = document.getElementById('page');
+  var stage = root.querySelector('.sds-surface-stage');
+  var layer = root.querySelector('.sds-surface-notes');
   var state = { width: 'desktop', mode: 'light', notes: false };
   try { var kept = JSON.parse(localStorage.getItem('sds-surface') || '{}'); for (var k in state) if (k in kept) state[k] = kept[k]; } catch (e) {}
   function meta(name) { var m = document.querySelector('meta[name="' + name + '"]'); return m ? (m.getAttribute('content') || '').trim() : ''; }
   function attr(text) { return String(text).replace(/&/g, '&amp;').replace(/"/g, '&quot;'); }
+  function text(v) { return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
   var own = document.querySelector('script[src*="docs-page.js"]');
   var folder = own ? own.getAttribute('src').replace(/[^\/]*$/, '') : '';
   var appCss = meta('surface-app-css');
-  // A note is a sticky note: one class, the drawn from the design system's warning tokens, so it follows light, dark and the theme, drawn in the frame's document.
-  var NOTE_CSS = '.sds-note{position:absolute;top:12px;left:12px;z-index:60;max-width:300px;padding:8px 10px;border:1px solid var(--warning);border-radius:8px;background:var(--warning-subtle);color:var(--on-warning-subtle);font:500 13px/1.45 system-ui,sans-serif;box-shadow:0 4px 12px rgba(0,0,0,.18)}';
-  function pageDocument() {
+  var notes = []; try { var nj = document.getElementById('sample-notes'); notes = nj ? JSON.parse(nj.textContent || '[]') : []; } catch (e) {}
+  var templates = Array.prototype.slice.call(document.querySelectorAll('template[id^="page-"], template#page'));
+  var DEVICE = { desktop: 'DESKTOP', tablet: 'TABLET', phone: 'PHONE' };
+  // The template for the choice: the exact one, else the same device in the other mode, else the other devices in the same mode, else any.
+  function pick() {
+    var mode = state.mode.toUpperCase(), device = DEVICE[state.width] || 'DESKTOP';
+    function by(id) { return document.getElementById(id) && document.getElementById(id).tagName === 'TEMPLATE' ? document.getElementById(id) : null; }
+    var found = by('page-' + mode + '-' + device) || by('page-' + (mode === 'LIGHT' ? 'DARK' : 'LIGHT') + '-' + device);
+    for (var i = 0; i < templates.length && !found; i++) if (templates[i].id.indexOf('page-' + mode + '-') === 0) found = templates[i];
+    return found || templates[0] || null;
+  }
+  var shown = null;
+  function pageDocument(template) {
     return '<!doctype html><html lang="en" data-mode="' + state.mode + '"><head><meta charset="utf-8">' +
       '<meta name="viewport" content="width=device-width, initial-scale=1">' +
       '<link rel="stylesheet" href="' + attr(folder + 'design-system.css') + '">' +
       (appCss && appCss.charAt(0) !== '{' ? '<link rel="stylesheet" href="' + attr(appCss) + '">' : '') +
-      '<style>html,body{margin:0}body{background:var(--surface,var(--background));color:var(--foreground)}' + NOTE_CSS + '</style></head><body>' +
+      '<style>html,body{margin:0}body{background:var(--surface,var(--background));color:var(--foreground)}</style></head><body>' +
       (template ? template.innerHTML : '') + '</body></html>';
   }
-  // The mode and the notes are set on the frame's own document, which is this page's origin.
-  function set() {
-    try {
-      var inner = frame.contentDocument; if (!inner || !inner.documentElement) return;
-      inner.documentElement.setAttribute('data-mode', state.mode);
-      Array.prototype.forEach.call(inner.querySelectorAll('[data-note]'), function (n) { n.hidden = !state.notes; });
-    } catch (e) {}
+  function inner() { try { return frame.contentDocument && frame.contentDocument.documentElement ? frame.contentDocument : null; } catch (e) { return null; } }
+  // A top-level section: a section container that stands in no other section.
+  function sections(doc) {
+    return Array.prototype.filter.call(doc.querySelectorAll('section[data-slot="section-container"]'), function (s) { return !s.parentElement || !s.parentElement.closest('section'); });
   }
-  // Each device frames the page at its own width, so the page lays itself out as on that device; where the stage is
-  // narrower, the frame is scaled down whole and never narrowed, so Desktop never falls into the tablet's layout.
   var WIDTHS = { desktop: 1440, tablet: 768, phone: 390 };
-  var stage = root.querySelector('.sds-surface-stage');
+  var scale = 1, left = 0;
+  // The frame takes the stage's whole width: the device's width is scaled to fit it, never above 1, centred, so the right edge is never cropped.
   function fit() {
     var w = WIDTHS[state.width] || WIDTHS.desktop, room = stage.clientWidth, high = stage.clientHeight;
-    var scale = Math.min(1, room / w);
+    scale = Math.min(1, room / w);
     frame.style.width = w + 'px';
     frame.style.height = (high / scale) + 'px';
     frame.style.transform = scale < 1 ? 'scale(' + scale + ')' : '';
-    frame.style.marginLeft = Math.max(0, (room - w * scale) / 2) + 'px';
+    left = Math.max(0, (room - w * scale) / 2);
+    frame.style.marginLeft = left + 'px';
   }
-  addEventListener('resize', fit);
+  // The notes layer: one label over each top-level section's box, in the layer's own coordinates, drawn only while Notes is on.
+  function drawNotes() {
+    layer.hidden = !state.notes; layer.textContent = '';
+    var doc = inner(); if (!state.notes || !doc || !notes.length) return;
+    var list = sections(doc), win = frame.contentWindow, html = '';
+    notes.forEach(function (note) {
+      var section = list[(note.n | 0) - 1]; if (!section) return;
+      var box = section.getBoundingClientRect(), top = box.top * scale, x = left + box.left * scale;
+      if (top + 24 < 0 || top > stage.clientHeight) return;
+      var what = [note.kind, note.case, note.status].filter(Boolean).join(' · ');
+      html += '<div class="sds-surface-note" tabindex="0" style="top:' + Math.max(8, top + 8) + 'px;left:' + Math.max(8, x + 8) + 'px"><b>' + text(note.n) + '</b><span>' +
+        (what ? '<small>' + text(what) + '</small>' : '') + text(note.text) +
+        (note.href ? ' <a href="' + attr(note.href) + '">Open</a>' : '') + '</span></div>';
+    });
+    layer.innerHTML = html;
+  }
+  function anchor() {
+    var doc = inner(), id = decodeURIComponent((location.hash || '').slice(1)); if (!doc || !id) return;
+    var el = doc.getElementById(id); if (el && el.scrollIntoView) el.scrollIntoView();
+  }
+  function set() {
+    var doc = inner(); if (!doc) return;
+    doc.documentElement.setAttribute('data-mode', state.mode);
+    drawNotes();
+  }
   function apply() {
     root.setAttribute('data-width', state.width);
     fit();
@@ -570,16 +606,21 @@ try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(
       b.setAttribute('aria-pressed', String(key === 'notes' ? state.notes : state[key] === value));
     });
     try { localStorage.setItem('sds-surface', JSON.stringify(state)); } catch (e) {}
-    set();
+    var want = pick();
+    if (want !== shown) { shown = want; frame.srcdoc = pageDocument(want); } else set();
   }
+  addEventListener('resize', function () { fit(); drawNotes(); });
+  addEventListener('hashchange', anchor);
   root.addEventListener('click', function (e) {
     var b = e.target.closest('[data-surface]'); if (!b) return;
     var key = b.getAttribute('data-surface');
     if (key === 'notes') state.notes = !state.notes; else state[key] = b.getAttribute('data-value');
     apply();
   });
-  frame.addEventListener('load', set);
-  frame.srcdoc = pageDocument();
+  frame.addEventListener('load', function () {
+    set(); anchor();
+    var win = frame.contentWindow; if (win) { win.addEventListener('scroll', drawNotes, { passive: true }); win.addEventListener('resize', drawNotes); }
+  });
   apply();
 })();
 

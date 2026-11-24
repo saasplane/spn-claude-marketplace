@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "c9fa86ee"
+    "commit": "8c660b8e"
   },
   "rules": [
     {
@@ -13478,7 +13478,7 @@
         "skill": "spn-devex/ideate"
       },
       "class": "stated in a skill",
-      "sentence": "The page holds a bar and the page's markup, and nothing else",
+      "sentence": "The page holds a bar, the frame and the page's markup, and nothing else",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The surface preview",
       "decision": null,
@@ -13536,7 +13536,7 @@
         "skill": "spn-devex/ideate"
       },
       "class": "stated in a skill",
-      "sentence": "The frame's document, the metas and the note marker change only with a new stylesheet version",
+      "sentence": "The frame's document, the metas, the template names and the notes list change only with a new stylesheet version",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "The surface preview",
       "decision": null,

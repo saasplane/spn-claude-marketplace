@@ -73,9 +73,19 @@ console.log("\n=== the templates are laid out by where the made file lives, and 
   ok("[MKT.SCRIPTS.407] a template with a rail has its back link as the links of the eyebrow's first line, the breadcrumb, never a line above the masthead and never in the rail, and its name and its heading are two placeholders",
     withRail.every((page) => /<span class="sds-line1">[^<]*<a href="\{\{(?:HUB|UP)-HREF\}\}">/.test(page) && !/sds-crumb/.test(page) && !/\{\{UP\}\}/.test(page) && !/sds-home/.test(page) && /<title>\{\{NAME\}\}<\/title>/.test(page) && /<h1>\{\{TITLE\}\}<\/h1>/.test(page) && /class="sds-rail-title">\{\{NAME\}\}</.test(page)));
   const surface = text(join("surface", "surface-page-template.html"));
-  ok("[MKT.SCRIPTS.407] the surface page template holds a small sample page in its template, two sections each with a note, and the two metas, the app's stylesheet empty",
-    /<template id="page">[\s\S]*<\/template>/.test(surface) && (surface.match(/data-note="\d"/g) ?? []).length === 2 && (surface.match(/<section data-slot="section-container"/g) ?? []).length === 2
-      && /<meta name="surface-ds" content="\d+\.\d+\.\d+">/.test(surface) && /<meta name="surface-app-css" content="">/.test(surface) && surface.length < 14000 && !/<style|<script(?! src)/.test(surface), String(surface.length));
+  const frameOnly = surface.replace(/<!--[\s\S]*?-->/g, "");
+  const sampleNotes = (() => { try { return JSON.parse(/<script type="application\/json" id="sample-notes">([\s\S]*?)<\/script>/.exec(frameOnly)?.[1] ?? "null"); } catch { return null; } })();
+  ok("[MKT.SCRIPTS.407] the surface page template: the bar holds the title and the three switches, the frame stands over a notes layer, and the two metas stand, the app's stylesheet empty",
+    /<header class="sds-surface-bar">[\s\S]*sds-surface-title[\s\S]*data-surface="width"[\s\S]*data-surface="mode"[\s\S]*data-surface="notes"[\s\S]*<\/header>/.test(frameOnly) && /<iframe class="sds-surface-frame"/.test(frameOnly) && /<div class="sds-surface-notes"[^>]*hidden>/.test(frameOnly)
+      && /<meta name="surface-ds" content="\d+\.\d+\.\d+">/.test(frameOnly) && /<meta name="surface-app-css" content="">/.test(frameOnly) && !/<style/.test(frameOnly), String(surface.length));
+  ok("[MKT.SCRIPTS.407] the frame holds the render's output and nothing else: two sections, no section wrapper, no aside, no note attribute inside the template",
+    (frameOnly.match(/<section data-slot="section-container"/g) ?? []).length === 2 && !/data-section=|class="sds-note"|data-note=|<aside/.test(frameOnly));
+  ok("[MKT.SCRIPTS.407] the notes stand outside the page, as a JSON list of { n, kind, case, status, text, href }, one for each top-level section, n counted from 1",
+    Array.isArray(sampleNotes) && sampleNotes.length === 2 && sampleNotes.every((note, i) => note.n === i + 1 && ["kind", "case", "status", "text", "href"].every((key) => key in note)) && frameOnly.indexOf('id="sample-notes"') < frameOnly.indexOf("<template"));
+  ok("[MKT.SCRIPTS.407] the markup stands in one template for each device and mode rendered, named page-<MODE>-<DEVICE>, and the old one-template page is gone",
+    /<template id="page-LIGHT-DESKTOP">/.test(frameOnly) && !/<template id="page">/.test(frameOnly) && (frameOnly.match(/<template id="page-(LIGHT|DARK)-(DESKTOP|TABLET|PHONE)">/g) ?? []).length >= 1);
+  ok("[MKT.SCRIPTS.407] the template's own links are the published stylesheet and script, each with its integrity; a local copy drops it",
+    (frameOnly.match(/<link rel="stylesheet" href="https:[^>]*integrity="sha384-[^"]*"/g) ?? []).length === 1 && (frameOnly.match(/<script src="https:[^>]*integrity="sha384-[^"]*"/g) ?? []).length === 1 && surface.length < 15000);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — templates` : `\n  all ${total} passed — templates`);
