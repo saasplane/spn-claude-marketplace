@@ -10,7 +10,7 @@ import { execFileSync } from "node:child_process";
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
 const BASE = mkdtempSync(join(tmpdir(), "t-page-new-"));
 process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
-const { unfilledPage, slotsLeft, whatHowShape } = await import(join(CHECKS, "doc-check.ts"));
+const { unfilledPage, slotsLeft, whatHowShape, unpairedTags } = await import(join(CHECKS, "doc-check.ts"));
 const { checkUnfilledPage } = await import(join(CHECKS, "unfilled-page.ts"));
 
 let n = 0, failed = 0;
@@ -23,6 +23,15 @@ const has = (s) => (got) => String(got.out ?? got).includes(s);
 function run(args) {
   try { return { out: execFileSync(process.execPath, [TOOL, "docs", ...args], { encoding: "utf8", cwd: BASE, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: BASE } }), code: 0 }; }
   catch (e) { return { out: String(e.stdout ?? "") + String(e.stderr ?? ""), code: e.status }; }
+}
+
+console.log("=== unpairedTags");
+{
+  const ok = `<section><div><h2>A</h2></div><pre></section> in code</pre><!-- </div> --></section>`;
+  one("[MKT.SCRIPTS.657] boxes that open and close in pairs have no finding, and a tag in pre or a comment is not read", unpairedTags(ok).length, 0);
+  one("[MKT.SCRIPTS.657] known-bad: a section closed twice is a RULE naming its line",
+    unpairedTags(`<section>\n<section class="sds-group"></section>\n</section>\n</section>\n<h3>FOLD</h3>`), (f) => f.length === 1 && f[0][0] === "RULE" && f[0][1].startsWith("line 4 closes a </section>"));
+  one("[MKT.SCRIPTS.657] a box never closed is a RULE naming where it opened", unpairedTags(`<div>\n<section></section>`), (f) => f[0][1].includes("<div> of line 1 is never closed"));
 }
 
 console.log("=== unfilledPage");

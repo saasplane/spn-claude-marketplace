@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "b86382ca"
+    "commit": "177b5d79"
   },
   "rules": [
     {
@@ -14374,6 +14374,42 @@
       "sentence": "A domain's glossary, a Terms table and a Binds table stay tables, and the catalog check passes over them",
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "heading": "Which block a content takes, and how its fence is written",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/blocks.md",
+          "heading": "Group panels, and the rows and folds inside them"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.578",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "The Surface Catalogue and a design language's whole spec are each one generated block, written by `docs face` from their JSON and never edited inside their markers",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
+      "heading": "Generated surface blocks",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/blocks.md",
+          "heading": "Group panels, and the rows and folds inside them"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.579",
+      "level": "MUST",
+      "params": {
+        "check": "doc-check"
+      },
+      "class": "checked",
+      "sentence": "Every box on an HTML page opens and closes once",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
+      "heading": "The blocks are an HTML vocabulary; markdown keeps its own",
       "decision": null,
       "restated": [
         {

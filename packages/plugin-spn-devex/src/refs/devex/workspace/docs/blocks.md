@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "section": "The blocks — what a page reaches for instead of prose",
-      "seen": "375db6c6"
+      "seen": "a6e82e51"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
@@ -29,7 +29,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "section": "Group panels, and the rows and folds inside them",
-      "seen": "9e49fddb"
+      "seen": "1bb97e34"
     }
   ]
 }
@@ -345,3 +345,5 @@ The web's way.
 - **The writer holds a list to what it can draw** (`RULE.DEVEX.WORKSPACE.576` · GUIDE): a `LIST` with four or more fact keys stops the write; `facts=END` with no fact is a finding; bare tags never get the `facts=END` advice; `docs look` reads a `TABLE` catalog's pinned key column in dark.
 - **A glossary, a Terms table and a Binds table stay tables** (`RULE.DEVEX.WORKSPACE.577` · GUIDE): the catalog check skips a table whose first column is `Term` or `Rule`.
 - **A group's name and description are the construct's own words** (`RULE.DEVEX.WORKSPACE.570` · GUIDE).
+- **The Surface Catalogue and a language's whole spec are generated blocks** (`RULE.DEVEX.WORKSPACE.578` · GUIDE): `docs face write --block surface-catalogue` writes 03's Foundation Catalogue from `docs/specs/surface/catalogue.json`; `--block surface-design-language` writes the spec its marker names (`spec=<path from docs/>`), resolved against the catalogue and its parents, each kind tagged PICKED, INHERITED, CUSTOMISED, NEW or NOT_USED. Never edit inside the markers: change the JSON and write again.
+- **Every box on a page opens and closes once** (`RULE.DEVEX.WORKSPACE.579` · MUST · check:doc-check): a `section` or `div` closed twice drops every block after it out of its section; `docs page check` and the write check name the line.

@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/02-constructs/02-support/01-surface/03-standards-surface-catalogue.md · 12-language-design-language.md
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md
 // The chapters are the source of truth; a rule change is edited there first, then here.
 //
 // The catalogue and a language as generated regions (`docs face write --block surface-catalogue|surface-design-language`):
