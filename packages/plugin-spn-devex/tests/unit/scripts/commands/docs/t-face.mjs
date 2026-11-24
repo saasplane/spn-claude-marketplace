@@ -628,7 +628,7 @@ console.log("\n=== `docs face` needs its action as a word, and a `write` needs a
 
   one("[MKT.SCRIPTS.113] `check` with no path takes the repository the caller is in, from a folder inside it too",
     [run(root, ["face", "check"]), run(join(root, "docs", SEAT.capabilities), ["face", "check"])].map((said) => said.includes("would write 1 tag line")), (got) => got.every(Boolean));
-  one("[MKT.SCRIPTS.113] and exits 0, because a stale region is reported and is no RULE finding", exitIn(root, ["face", "check"]), 0);
+  one("[MKT.SCRIPTS.113] and exits 1, because a generated block that no longer matches its source is a RULE finding (S80)", exitIn(root, ["face", "check"]), 1);
   one("[MKT.SCRIPTS.113] `check` writes nothing", readAt(root, at), stale);
   one("[MKT.SCRIPTS.113] where the caller is in no repository, `check` with no path says to name one",
     run(BASE, ["face", "check"]),
