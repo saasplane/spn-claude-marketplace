@@ -706,5 +706,14 @@ console.log("\n=== the page renderer — the page's name and its title are two t
     js.includes("showModal") && js.includes(".sds-json-close") && js.includes("chip.focus()") && js.includes("navigator.clipboard.writeText"));
 }
 
+{
+  // A catalog item's `Anchor:` line is the id of its row or tile (S87: the entry a sample's note links to), and is no fact.
+  const tiles = produced("```catalog layout=LIST\nClosing call | What do I do now?\n  Code: [CLOSING_CALL]\n  Anchor: marketing-closing-call\n```\n");
+  ok("[MKT.SCRIPTS.661] an `Anchor:` line is the id of the item's tile, and no fact is drawn for it", tiles.includes('<div class="sds-tile" id="marketing-closing-call">') && !tiles.includes(">Anchor<"), tiles.slice(-600));
+  const row = produced("~~~group G | a group\n```catalog layout=LIST\nClosing call | What do I do now?\n  Code: [CLOSING_CALL]\n  Anchor: marketing-closing-call\n```\n~~~\n");
+  ok("[MKT.SCRIPTS.661] and in a group panel it is the id of the row", row.includes('<tr id="marketing-closing-call">') && !row.includes(">Anchor<"), row.slice(-700));
+  ok("[MKT.SCRIPTS.661] an item with no `Anchor:` gets no id", !produced("```catalog layout=LIST\nHero | what\n  Code: [HERO]\n```\n").includes('class="sds-tile" id='));
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-render` : `\n  all ${total} passed — t-render`);
 process.exit(failed ? 1 : 0);

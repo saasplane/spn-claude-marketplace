@@ -310,7 +310,7 @@ function kindLine(kind: Kind): string {
 const CATALOG = "```catalog layout=LIST facts=AFTER_DESCRIPTION";
 
 /** A tab's list of kinds. `resolved` carries a language's states; the catalogue passes none and the rows are the stand-in's. */
-function kindList(part: string, kinds: Array<{ kind: Kind; state?: State; definedIn?: string; change?: string; was?: State }>): string {
+function kindList(part: string, kinds: Array<{ kind: Kind; state?: State; definedIn?: string; change?: string; was?: State }>, anchors?: { category: string; seen: Set<string> }): string {
   const rows = [CATALOG];
   // The keys count across the whole list, one column each (RULE.DEVEX.WORKSPACE.576): where any row carries From or Change, every
   // row's config stands as one Config fact, so the list names three keys at most.
@@ -318,6 +318,9 @@ function kindList(part: string, kinds: Array<{ kind: Kind; state?: State; define
   for (const { kind, state, definedIn, change, was } of kinds) {
     const line = kindLine(kind);
     rows.push(kindName(kind) + (line ? ` | ${line}` : ""));
+    // The catalogue gives each kind's entry an anchor, `<category>-<kind>` in lower case with hyphens, which a sample's note links to; a kind that stands in a second part of a category keeps the first part's.
+    const anchor = anchors ? `${anchors.category}-${kind.code}`.toLowerCase().replace(/[^a-z0-9]+/g, "-") : "";
+    if (anchor && !anchors!.seen.has(anchor)) { anchors!.seen.add(anchor); rows.push(`  Anchor: ${anchor}`); }
     const facts = configFacts(part, kind);
     // The first fact that is only tags is the row's badge, so the state stands in it beside the code.
     rows.push(`  ${facts[0][0]}: ${facts[0][1]}${state ? ` [${state}]` : ""}`);
@@ -389,11 +392,12 @@ export function renderCatalogue(catalogue: Catalogue, jsonPath: string): string 
   const { outline } = catalogue;
   const out: string[] = [catalogueShared(outline), ""];
   for (const [cat, byPart] of Object.entries(catalogue.categories)) {
+    const seen = new Set<string>();
     out.push(`### ${cat} — ${clean(outline.categories[cat].description.split(", who")[0])}`, "");
     for (const g of outline.groups.filter((g) => g.code !== "SHARED")) {
       const tabs = g.parts.map((p) => {
         const kinds = byPart[p.code];
-        return { label: p.title, body: kinds.length ? kindList(p.code, kinds.map((kind) => ({ kind }))) : emptyList(outline.partNotes[cat]?.[p.code]?.none) };
+        return { label: p.title, body: kinds.length ? kindList(p.code, kinds.map((kind) => ({ kind })), { category: cat, seen }) : emptyList(outline.partNotes[cat]?.[p.code]?.none) };
       });
       out.push(groupPanel(g.title, clean(g.description), tabs) + "\n");
     }

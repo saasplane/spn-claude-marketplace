@@ -587,6 +587,13 @@ try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(
     left = Math.max(0, (room - w * scale) / 2);
     frame.style.marginLeft = left + 'px';
   }
+  // A note's link names what it opens: "<Kind title> in the catalogue", and its title attribute names the page and the category ("Surface Catalogue (03), Marketing").
+  function cap(w) { return w ? w.charAt(0).toUpperCase() + w.slice(1) : ''; }
+  function linkText(note) { return cap(String(note.kind || '').replace(/[-_]+/g, ' ').trim().toLowerCase()) + ' in the catalogue'; }
+  function linkTitle(note) {
+    var hash = String(note.href || '').split('#')[1] || '', category = cap(decodeURIComponent(hash).split('-')[0]);
+    return 'Surface Catalogue (03)' + (category ? ', ' + category : '');
+  }
   // The notes layer: one label over each top-level section's box, in the layer's own coordinates, drawn only while Notes is on.
   function drawNotes() {
     layer.hidden = !state.notes; layer.textContent = '';
@@ -599,7 +606,7 @@ try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(
       var what = [note.kind, note.case, note.status].filter(Boolean).join(' · ');
       html += '<div class="sds-surface-note" tabindex="0" style="top:' + Math.max(8, top + 8) + 'px;left:' + Math.max(8, x + 8) + 'px"><b>' + text((note.n | 0) + 1) + '</b><span>' +
         (what ? '<small>' + text(what) + '</small>' : '') + text(note.text) +
-        (note.href ? ' <a href="' + attr(note.href) + '">Open</a>' : '') + '</span></div>';
+        (note.href ? ' <a href="' + attr(note.href) + '" title="' + attr(linkTitle(note)) + '">' + text(linkText(note)) + '</a>' : '') + '</span></div>';
     });
     layer.innerHTML = html;
   }

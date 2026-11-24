@@ -84,6 +84,9 @@ console.log("\n=== the templates are laid out by where the made file lives, and 
     Array.isArray(sampleNotes) && sampleNotes.length === 2 && sampleNotes.every((note, i) => note.n === i && ["kind", "case", "status", "text", "href"].every((key) => key in note)) && frameOnly.indexOf('id="sample-notes"') < frameOnly.indexOf("<template"));
   ok("[MKT.SCRIPTS.407] the markup stands in one template for each device and mode rendered, named page-<MODE>-<DEVICE>, and the old one-template page is gone",
     /<template id="page-LIGHT-DESKTOP">/.test(frameOnly) && !/<template id="page">/.test(frameOnly) && (frameOnly.match(/<template id="page-(LIGHT|DARK)-(DESKTOP|TABLET|PHONE)">/g) ?? []).length >= 1);
+  const script = readFileSync(join(PLUGIN, "src", "styles", "docs-page.js"), "utf8");
+  ok("[MKT.SCRIPTS.407] a note's link names what it opens, \"<Kind title> in the catalogue\", with the page and category in its title, and is never \"Open\"",
+    script.includes("+ ' in the catalogue'") && script.includes("'Surface Catalogue (03)'") && script.includes("title=\"' + attr(linkTitle(note))") && !/>Open<\/a>/.test(script) && !script.includes("'Open'"));
   ok("[MKT.SCRIPTS.407] the template's own links are the published stylesheet and script, each with its integrity; a local copy drops it",
     (frameOnly.match(/<link rel="stylesheet" href="https:[^>]*integrity="sha384-[^"]*"/g) ?? []).length === 1 && (frameOnly.match(/<script src="https:[^>]*integrity="sha384-[^"]*"/g) ?? []).length === 1 && surface.length < 15000);
 }

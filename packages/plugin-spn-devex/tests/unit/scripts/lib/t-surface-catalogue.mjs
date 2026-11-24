@@ -37,6 +37,10 @@ ok("a part the outline names and a category lacks is refused", checkCatalogue({ 
 console.log("=== the catalogue frame");
 const text = renderCatalogue(catalogue, "docs/specs/surface/catalogue.json");
 ok("it opens with the Shared panel and one tab a part", text.startsWith("~~~group Shared | kept the same\n~~~tabs look=LINE\n--- Brand\n"));
+{
+  const anchors = [...text.matchAll(/^  Anchor: (\S+)$/gm)].map((m) => m[1]);
+  ok("every kind's entry carries an anchor, <category>-<kind> in lower case with hyphens, once", anchors.length > 0 && anchors.every((a) => /^[a-z]+-[a-z0-9-]+$/.test(a)) && new Set(anchors).size === anchors.length && anchors.some((a) => a.startsWith("marketing-")), anchors.slice(0, 5).join());
+}
 ok("a category is a heading and a Structure and a Style panel", text.includes("### MARKETING — a site for a Visitor\n\n~~~group Structure | how pages are built") && text.includes("~~~group Style | how pages look"));
 ok("a kind's code and its floor are tags in one fact, and no state is drawn", text.includes("  Code: [TOPNAV] [FLOOR]") && !text.includes("State"));
 ok("an empty part is its note as one row", text.includes("None defined yet | a site takes the one default theme"));

@@ -511,7 +511,7 @@ const WIRES: Record<string, string> = {
   canvas: '<rect class="box" x="50" y="22" width="60" height="52" rx="3"/><rect class="line" x="60" y="32" width="40" height="4" rx="2"/><rect class="line" x="60" y="44" width="40" height="6" rx="2"/><rect class="nav" x="60" y="58" width="40" height="8" rx="2"/>',
 };
 
-type CatalogItem = { name: string; line: string; third: string; facts: [string, string][]; quote?: string; note?: [string, string]; guidance?: [string, string][] };
+type CatalogItem = { name: string; line: string; third: string; anchor?: string; facts: [string, string][]; quote?: string; note?: [string, string]; guidance?: [string, string][] };
 /** The detail lines of an item that open under its row as one fold, "Guidance" (S77, the developer, 2026-11-24: "a row opens to its guidance"). */
 const GUIDANCE_KEYS = ["For", "Choose when", "Not when", "Rules"];
 function guidanceHtml(item: CatalogItem): string {
@@ -549,6 +549,7 @@ function catalogLines(body: string[], findings: Finding[]): CatalogGroup[] {
       if (quote) { item.quote = quote[1].trim(); continue; }
       const note = /^\s+~\s*([^:]+?):\s+(\S.*)$/.exec(raw);
       if (note) { item.note = [note[1].trim(), note[2].trim()]; continue; }
+      if (fact && fact[1].trim() === "Anchor" && /^[a-z0-9][a-z0-9-]*$/.test(fact[2].trim())) { item.anchor = fact[2].trim(); continue; }
       const detail = GUIDANCE_KEYS.find((key) => key !== "For" && fact?.[1].trim() === key);
       if (fact && detail) { (item.guidance ??= []).push([detail, fact[2].trim()]); continue; }
       // A line of tags alone is a fact with no key, drawn as bare badges; it is allowed only as the item's one fact (S75).
@@ -714,6 +715,9 @@ function factCell(key: string, value: string): string {
 }
 
 /** The cards of one set of items, as the fence's layout and media draw them. Without either, and with no facts, the one-line tile of old. */
+/** An item's anchor as the id of its row or tile: an item that holds an `Anchor:` line (S87: the entry a sample's note links to). */
+const anchorAttr = (item: CatalogItem): string => (item.anchor ? ` id="${item.anchor}"` : "");
+
 function catalogHtml(items: CatalogItem[], layout: string | null, media: string | null, findings: Finding[], compact = false, factsAt: string | null = null): string {
   const hasFacts = items.some((item) => item.facts.length || item.quote || item.note || item.guidance?.length);
   const words = (text: string): number => text.trim().split(/\s+/).filter(Boolean).length;
@@ -722,7 +726,7 @@ function catalogHtml(items: CatalogItem[], layout: string | null, media: string 
   const condition = items.find((item) => readsAsCondition(item.name));
   if (condition) findings.push({ message: `a \`catalog\` item "${condition.name}" reads as a condition: a first column of conditions is a table (rule 549)` });
   if (!layout && !media && !hasFacts) {
-    const tiles = items.map(({ name, line, third }) => `    <div class="sds-tile"><h4>${inline(name)}</h4>${line ? `<p>${inline(line)}</p>` : ""}${third ? `<p class="sds-small"><code>${esc(third.replace(/^`|`$/g, ""))}</code></p>` : ""}</div>`);
+    const tiles = items.map((item) => { const { name, line, third } = item; return `    <div class="sds-tile"${anchorAttr(item)}><h4>${inline(name)}</h4>${line ? `<p>${inline(line)}</p>` : ""}${third ? `<p class="sds-small"><code>${esc(third.replace(/^`|`$/g, ""))}</code></p>` : ""}</div>`; });
     return `  <div class="sds-tiles">\n${tiles.join("\n")}\n  </div>`;
   }
   const kind = layout ?? "GRID";
@@ -741,7 +745,7 @@ function catalogHtml(items: CatalogItem[], layout: string | null, media: string 
       const tags = item.facts.find(([, value]) => /^\s*(\[[^\]\[]+\]\s*)+$/.test(value));
       const small = item.facts.filter((fact) => fact !== tags).map(([key, value]) => `${key ? `<span class="sds-fact-key">${inline(key)}</span>` : ""}<span class="sds-fact-value">${factHtml(value, key)}</span>`);
       const badge = tags ? factValue(tags[1]) : "";
-      return `      <tr><td><p><strong>${inline(item.name)}</strong></p>${item.line ? `<p>${inline(item.line)}</p>` : ""}${small.length ? `<span class="sds-small sds-facts">${small.join(" &middot; ")}</span>` : ""}${guidanceHtml(item)}</td>${items.some((one) => one.facts.some(([, value]) => /^\s*(\[[^\]\[]+\]\s*)+$/.test(value))) ? `<td>${badge}</td>` : ""}</tr>`;
+      return `      <tr${anchorAttr(item)}><td><p><strong>${inline(item.name)}</strong></p>${item.line ? `<p>${inline(item.line)}</p>` : ""}${small.length ? `<span class="sds-small sds-facts">${small.join(" &middot; ")}</span>` : ""}${guidanceHtml(item)}</td>${items.some((one) => one.facts.some(([, value]) => /^\s*(\[[^\]\[]+\]\s*)+$/.test(value))) ? `<td>${badge}</td>` : ""}</tr>`;
     });
     return `  <div class="sds-scroll"><table>\n    <tbody>\n${rows.join("\n")}\n    </tbody>\n  </table></div>`;
   }
@@ -788,7 +792,7 @@ function catalogHtml(items: CatalogItem[], layout: string | null, media: string 
     if (kind === "LIST" && side) {
       const cells = side.map((key) => { const found = item.facts.find(([name]) => name === key); return found ? factCell(key, found[1]) : `<div class="sds-tile-fact-none"></div>`; });
       const mediaHtml = kept ? mediaOf(kept, item, findings) : "";
-      return `    <div class="sds-tile"><div class="sds-tile-main">${mediaHtml}<div class="sds-tile-body">${words}</div></div>\n      <dl class="sds-tile-facts">${cells.join("")}</dl></div>`;
+      return `    <div class="sds-tile"${anchorAttr(item)}><div class="sds-tile-main">${mediaHtml}<div class="sds-tile-body">${words}</div></div>\n      <dl class="sds-tile-facts">${cells.join("")}</dl></div>`;
     }
     if (kind === "LIST") {
       const mediaHtml = kept ? mediaOf(kept, item, findings) : "";
@@ -796,11 +800,11 @@ function catalogHtml(items: CatalogItem[], layout: string | null, media: string 
       const shown = below && item.facts.length && !bare
         ? `<dl class="sds-tile-facts" data-columns="${Math.min(below.length, 3)}">${below.map((key) => { const found = item.facts.find(([name]) => name === key); return found ? factCell(key, found[1]) : `<div class="sds-tile-fact-none"></div>`; }).join("")}</dl>`
         : facts;
-      return `    <div class="sds-tile">${mediaHtml}<div class="sds-tile-body">${words}\n      ${shown}${guidanceHtml(item)}</div></div>`;
+      return `    <div class="sds-tile"${anchorAttr(item)}>${mediaHtml}<div class="sds-tile-body">${words}\n      ${shown}${guidanceHtml(item)}</div></div>`;
     }
-    if (kept === "MEDIA_TOP") return `    <div class="sds-tile"${count}>${mediaOf(kept, item, findings)}\n      <div class="sds-tile-head"><div>${words}</div></div>\n      ${facts}</div>`;
-    if (kept) return `    <div class="sds-tile"${count}><div class="sds-tile-head">${mediaOf(kept, item, findings)}<div>${words}</div></div>\n      ${facts}</div>`;
-    return `    <div class="sds-tile"${count}><h4>${inline(item.name)}</h4>${item.line ? `<p class="sds-tile-line">${inline(item.line)}</p>` : ""}${item.third ? `<p class="sds-small"><code>${esc(item.third.replace(/^`|`$/g, ""))}</code></p>` : ""}\n      ${facts}</div>`;
+    if (kept === "MEDIA_TOP") return `    <div class="sds-tile"${anchorAttr(item)}${count}>${mediaOf(kept, item, findings)}\n      <div class="sds-tile-head"><div>${words}</div></div>\n      ${facts}</div>`;
+    if (kept) return `    <div class="sds-tile"${anchorAttr(item)}${count}><div class="sds-tile-head">${mediaOf(kept, item, findings)}<div>${words}</div></div>\n      ${facts}</div>`;
+    return `    <div class="sds-tile"${anchorAttr(item)}${count}><h4>${inline(item.name)}</h4>${item.line ? `<p class="sds-tile-line">${inline(item.line)}</p>` : ""}${item.third ? `<p class="sds-small"><code>${esc(item.third.replace(/^`|`$/g, ""))}</code></p>` : ""}\n      ${facts}</div>`;
   });
   const head = side ? `    <div class="sds-tiles-head" aria-hidden="true"><span>${inline(catalogNoun)}</span>${side.map((key) => `<span>${inline(key)}</span>`).join("")}</div>\n` : "";
   return `  <div class="sds-tiles${compact ? " sds-tiles-compact" : ""}" data-layout="${kind}"${side ? ` data-facts="side" data-columns="${side.length}"` : ""}${kept ? ` data-media="${kept}"` : ""}>\n${head}${tiles.join("\n")}\n  </div>`;
