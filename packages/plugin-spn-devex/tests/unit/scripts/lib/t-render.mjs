@@ -7,7 +7,7 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const HERE = resolve(import.meta.dirname, "..", "..", "..", "..");
-const { renderPage, setUnitRender, setBuiltUnits, designSystemVersion, pageFromRender, pagesFromRender, DEFAULT_RENDER_APP } = await import(pathToFileURL(resolve(HERE, "src", "scripts", "lib", "render.ts")).href);
+const { renderPage, setUnitRender, setUnitFence, designSystemVersion, pageFromRender, pagesFromRender, DEFAULT_RENDER_APP } = await import(pathToFileURL(resolve(HERE, "src", "scripts", "lib", "render.ts")).href);
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -166,6 +166,7 @@ ok("red: several columns of sentences are a paragraph each, led by the column's 
 
 console.log("\n=== the page renderer — a unit fence is drawn by the render and set in a frame");
 {
+  setUnitFence(true);
   const tree = { unit: "DSFeature", props: { pageLevel: "PAGE", type: "BACKDROP", title: "A title" } };
   const seen = [];
   setUnitRender((file) => { seen.push(JSON.parse(readFileSync(file, "utf8"))); return "<html><head></head><body><p class=\"x\">drawn & ready</p></body></html>"; });
@@ -273,6 +274,7 @@ console.log("\n=== the page renderer — a unit fence is drawn by the render and
   try { pagesFromRender(JSON.stringify({ renders: { LIGHT: { DESKTOP: { findings: [] } } } })); } catch (e) { refusedNew = e.message; }
   ok("[MKT.SCRIPTS.632] a mode with no html is refused by its name", refusedNew.includes("LIGHT") && refusedNew.includes("`html`"), refusedNew);
   setUnitRender();
+  setUnitFence();
 }
 
 const made = (markdown) => renderPage({
@@ -288,20 +290,16 @@ console.log("\n=== the page renderer — a skeleton of a built unit, and a table
     kind: "skeleton", caption: "A sketch", ...extra,
     frame: { label: "A frame", unit, rows: [{ label: "Row", items: [{ text: "One" }] }] },
   }));
-  setBuiltUnits(["DSFeature", "DSLayout"]);
   const built = made(skeleton({}));
-  ok("[MKT.SCRIPTS.629] a `dg` skeleton whose frame names a unit the design system builds stops the write, naming the unit and the `unit` fence",
-    built.findings.some((f) => f.stops === true && f.message.includes("`DSFeature`") && f.message.includes("`unit` fence") && f.message.includes('"planned": true')), JSON.stringify(built.findings));
-  ok("[MKT.SCRIPTS.629] a skeleton marked `\"planned\": true` is let through, and so is one whose unit the design system does not build",
-    !made(skeleton({ planned: true })).findings.some((f) => f.stops) && made(skeleton({}, "DSCard")).findings.length === 0, JSON.stringify(made(skeleton({ planned: true })).findings));
+  ok("[MKT.SCRIPTS.629] a `dg` skeleton whose frame names a unit the design system builds is drawn on a docs page, with no finding",
+    built.findings.length === 0 && built.html.includes("<svg"), JSON.stringify(built.findings));
+  ok("[MKT.SCRIPTS.629] a skeleton marked `\"planned\": true` and one whose unit is not built are drawn too",
+    made(skeleton({ planned: true })).findings.length === 0 && made(skeleton({}, "DSCard")).findings.length === 0, JSON.stringify(made(skeleton({ planned: true })).findings));
   const deep = made(fence("dg", JSON.stringify({ kind: "skeleton", views: [{ viewport: "DESKTOP", frame: { rows: [{ items: [{ frame: { unit: "DSLayout", rows: [{ items: [{ text: "x" }] }] } }] }] } }] })));
-  ok("[MKT.SCRIPTS.629] a unit named in a view, a nested frame or a section is found too", deep.findings.some((f) => f.stops === true && f.message.includes("`DSLayout`")), JSON.stringify(deep.findings));
-  setBuiltUnits(null);
-  ok("[MKT.SCRIPTS.629] where no list of built units can be read, no skeleton is held against it", !made(skeleton({})).findings.some((f) => f.message.includes("builds")));
-  setBuiltUnits();
-  const fileList = made(skeleton({}));
-  ok("[MKT.SCRIPTS.629] the list of built units is read from design-system-units.json in the styles folder by default, and DSFeature is built",
-    fileList.findings.some((f) => f.stops === true && f.message.includes("`DSFeature`")), JSON.stringify(fileList.findings));
+  ok("[MKT.SCRIPTS.629] a unit named in a view or a nested frame is drawn without a stop", !deep.findings.some((f) => f.stops === true), JSON.stringify(deep.findings));
+  const fenced = made(fence("unit", JSON.stringify({ unit: "DSFeature", props: {} })));
+  ok("[MKT.SCRIPTS.629] a `unit` fence on a docs page stops the write: a render belongs on a surface sample page, and the page draws the unit's structure as a skeleton and names its showcase page",
+    fenced.findings.length === 1 && fenced.findings[0].stops === true && fenced.findings[0].message.includes("surface sample page") && fenced.findings[0].message.includes("`dg` skeleton") && fenced.findings[0].message.includes("showcase page") && !fenced.html.includes("sds-unit"), JSON.stringify(fenced.findings));
 
   const rows = (n) => Array.from({ length: n }, (_, k) => [`Thing ${k + 1}`, `what thing ${k + 1} is`]);
   const catalog = made(table(["Name", "Description"], ...rows(5)));

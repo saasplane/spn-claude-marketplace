@@ -195,50 +195,13 @@ function unitFrame(body: string[], findings: Finding[]): string {
 }
 
 /**
- * The units the design system builds, which `scripts/build-unit-styles.mjs` writes beside `design-system-units.css` as `design-system-units.json` from the
- * design system's surface snapshot. Null where the list cannot be read, and then no skeleton is held against it.
+ * A docs page draws a built unit as a skeleton of its structure, naming its showcase page (N017, 2026-11-24), so a `dg` skeleton that
+ * names a built unit no longer stops the write. A `unit` fence draws a render, which belongs on a surface sample page (a design
+ * language's samples or a surface page preview), so on a docs page it stops the write. `"planned": true` still marks a shape not built yet.
  */
-export type BuiltUnits = ReadonlySet<string> | null;
-function readBuiltUnits(): BuiltUnits {
-  const styles = stylesDir(import.meta.dirname);
-  if (!styles || !existsSync(join(styles, "design-system-units.json"))) return null;
-  try {
-    const list = JSON.parse(readFileSync(join(styles, "design-system-units.json"), "utf8"))?.units;
-    return Array.isArray(list) ? new Set(list.filter((name: unknown): name is string => typeof name === "string")) : null;
-  } catch { return null; }
-}
-let builtUnits: BuiltUnits | undefined;
-/** Replace the list of built units, or give back the file's with no argument. A test names its own. */
-export function setBuiltUnits(units?: Iterable<string> | null): void { builtUnits = units === undefined ? undefined : units === null ? null : new Set(units); }
-
-/** Each unit a skeleton spec names: the `unit` of any frame or section in it, however deep. */
-function skeletonUnits(spec: unknown, found: Set<string> = new Set()): Set<string> {
-  if (Array.isArray(spec)) spec.forEach((one) => skeletonUnits(one, found));
-  else if (spec && typeof spec === "object") {
-    for (const [key, value] of Object.entries(spec)) {
-      if (key === "unit" && typeof value === "string") found.add(value);
-      else skeletonUnits(value, found);
-    }
-  }
-  return found;
-}
-
-/**
- * A SKELETON OF A UNIT THE DESIGN SYSTEM BUILDS stops the write, because the page then shows a sketch of what a `unit` fence draws for
- * real. A skeleton of a shape that is not built yet carries `"planned": true`; once the design system builds it, this finding is the
- * page's cue to change it to a `unit`.
- */
-function builtSkeleton(spec: Spec, findings: Finding[]): void {
-  if (spec.kind !== "skeleton" || spec.planned === true) return;
-  const built = (builtUnits === undefined ? (builtUnits = readBuiltUnits()) : builtUnits);
-  if (!built) return;
-  const named = [...skeletonUnits(spec)].filter((name) => built.has(name));
-  if (!named.length) return;
-  findings.push({
-    message: `a \`dg\` skeleton names ${named.map((name) => `\`${name}\``).join(", ")}, which the design system builds: draw it with a \`unit\` fence, or set \`"planned": true\` on the skeleton where it shows a shape that is not built yet`,
-    stops: true,
-  });
-}
+let unitFenceAllowed = false;
+/** Let a `unit` fence be drawn (a test of the drawing itself); a docs page never does. */
+export function setUnitFence(allowed = false): void { unitFenceAllowed = allowed; }
 
 const LENS_LABEL: Record<string, string> = {
   LEAD: "Engineering leader", BUSINESS: "Business manager", PRODUCT: "Product manager",
@@ -883,12 +846,12 @@ function renderBody(lines: string[], findings: Finding[], nested = false): strin
       } else if (lang === "cards" || lang === "next") {
         out.push(spelled(lang, body, findings));
       } else if (lang === "unit") {
-        out.push(unitFrame(body, findings));
+        if (unitFenceAllowed) out.push(unitFrame(body, findings));
+        else findings.push({ message: "a `unit` fence draws a render, and a render belongs on a surface sample page (a design language's samples or a surface page preview): on a docs page draw the unit's structure as a `dg` skeleton and name its showcase page", stops: true });
       } else if (lang === "dg") {
         let spec: Spec | null = null;
         try { spec = JSON.parse(body.join("\n")); } catch (e) { findings.push({ message: `a \`dg\` figure is not strict JSON — ${(e as Error).message}` }); }
         if (spec) {
-          builtSkeleton(spec, findings);
           const { svg, findings: df } = draw(spec);
           for (const m of df) findings.push({ message: m });
           if (svg) {
