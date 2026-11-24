@@ -672,16 +672,20 @@ console.log("\n=== the page renderer — the page's name and its title are two t
   // A fact whose value is JSON opens in a popover (rule 580).
   const catalog = (value) => produced("```catalog layout=LIST\nRoom | the room\n  Value: " + value + "\n```\n");
   const obj = catalog('`{"roomAndLayouts": {"kind": "SPLIT", "sizes": [1, 2]}, "tone": "WARM", "tags": ["A", "B"]}`');
-  ok("[MKT.SCRIPTS.660] a JSON object fact draws a chip with a tree icon, its first keys in words and its count, bound to a dialog",
-    /<button type="button" class="sds-json-chip" data-json-open="(sds-json-\d+)" aria-haspopup="dialog" aria-expanded="false"[^>]*><svg class="sds-json-mark"[^>]*aria-hidden="true"[\s\S]*?<\/svg><span class="sds-json-label">Room and layouts, Tone<\/span><span class="sds-json-n">3 keys<\/span><\/button><dialog id="\1" class="sds-json-dialog"/.test(obj), obj.slice(-1200));
-  ok("[MKT.SCRIPTS.660] the dialog's head names the fact, with a count, Copy JSON and a close button",
-    obj.includes('<h2 id=') && obj.includes('>Value</h2><div class="sds-json-count">3 keys</div>') && obj.includes('class="sds-json-copy" data-json="{\n  &quot;roomAndLayouts&quot;') && obj.includes('class="sds-json-close" aria-label="Close"'), obj.slice(-2400));
+  ok("[MKT.SCRIPTS.660] a JSON object fact draws a chip with a tree icon and its first keys in words (no count), bound to a dialog",
+    /<button type="button" class="sds-json-chip" data-json-open="(sds-json-\d+)" aria-haspopup="dialog" aria-expanded="false"[^>]*><svg class="sds-json-mark"[^>]*aria-hidden="true"[\s\S]*?<\/svg><span class="sds-json-label">Room and layouts, Tone<\/span><\/button><dialog id="\1" class="sds-json-dialog"/.test(obj), obj.slice(-1200));
+  const head = obj.slice(obj.indexOf('<div class="sds-json-head">'), obj.indexOf('<div class="sds-json-body">'));
+  ok("[MKT.SCRIPTS.660] the dialog's head is one slim line: the fact's name and the close button, no count and no Copy button",
+    head.includes('<h2 id=') && head.includes('>Value</h2></div><button type="button" class="sds-json-close" aria-label="Close"') && !/\d+ (keys?|items?)/.test(head) && !head.includes("sds-json-copy") && !head.includes("sds-json-count") && !obj.includes("sds-json-count"), head);
+  ok("[MKT.SCRIPTS.660] Copy JSON is a copy icon button at the JSON panel's top right, labelled and with a tooltip, holding the JSON, with a check icon and a polite live region",
+    /<div class="sds-json-caprow"><div class="sds-json-cap">JSON<\/div><button type="button" class="sds-json-copy" aria-label="Copy JSON" data-tip="Copy JSON" data-json="\{\n  &quot;roomAndLayouts&quot;[^>]*><svg class="sds-json-ico-copy"[\s\S]*?<svg class="sds-json-ico-check"/.test(obj)
+      && obj.includes('<span class="sds-json-live" role="status" aria-live="polite"></span>') && /<div class="sds-json-scroll" role="region" tabindex="0" aria-label="JSON">/.test(obj));
   ok("[MKT.SCRIPTS.660] the words panel lists each key in words, an enum code in code, a list as tags, a nested object indented",
     obj.includes('<section class="sds-json-words"') && obj.includes("<dt>Room and layouts</dt><dd><dl class=\"sds-json-nest\">") && obj.includes("<dt>Kind</dt><dd><code>SPLIT</code></dd>") && obj.includes('<ul class="sds-json-tags"><li><code>A</code></li><li><code>B</code></li></ul>'), obj.slice(-2400));
   ok("[MKT.SCRIPTS.660] the JSON panel holds the indented JSON with its keys, strings and numbers marked, and the fact no longer draws one line of code",
     obj.includes('<span class="sds-jk">"roomAndLayouts"</span>:') && obj.includes('<span class="sds-js">"SPLIT"</span>') && obj.includes('<span class="sds-jn">1</span>') && !/<dd><code>\{/.test(obj));
   const arr = catalog('`["ONE", "TWO", "THREE"]`');
-  ok("[MKT.SCRIPTS.660] a JSON list draws a chip counting its items", arr.includes('<span class="sds-json-n">3 items</span>') && arr.includes("<li><code>ONE</code></li>"), arr.slice(-900));
+  ok("[MKT.SCRIPTS.660] a JSON list draws a chip with its first items in words, and no count", arr.includes('<span class="sds-json-label">One, Two</span>') && arr.includes('aria-label="One, Two, JSON value, opens a dialog"') && !/\d+ items/.test(arr) && arr.includes("<li><code>ONE</code></li>"), arr.slice(-900));
   ok("[MKT.SCRIPTS.660] a value that is not JSON draws as before, and no dialog stands for it",
     !catalog("`PLAIN`").includes("<dialog") && catalog("`PLAIN`").includes("<code>PLAIN</code>") && !catalog("`{not json}`").includes("<dialog") && catalog("a sentence").includes("a sentence"));
   ok("[MKT.SCRIPTS.660] a short value takes the design system's XL extent, and each panel is focusable and labelled",
@@ -694,7 +698,9 @@ console.log("\n=== the page renderer — the page's name and its title are two t
   const css = (await import("node:fs")).readFileSync(resolve(HERE, "src", "styles", "docs-language.src.css"), "utf8");
   ok("[MKT.SCRIPTS.660] the stylesheet gives the dialog the XL width capped at 95vw, FIT capped at 85vw, 80vh at most, panels that scroll alone, and panels stacking under 48rem",
     /\.sds-json-chip\s*\{/.test(css) && /\.sds-json-dialog\s*\{[^}]*width:\s*min\(720px, 95vw\)[^}]*max-height:\s*80vh/.test(css) && /data-extent="FIT"\][^}]*max-width:\s*85vw/.test(css)
-    && /\.sds-json-body > section\s*\{[^}]*overflow:\s*auto/.test(css) && /max-width:\s*47\.99rem/.test(css));
+    && /\.sds-json-body > section:not\(\.sds-json-code\), \.sds-json-scroll\s*\{[^}]*overflow:\s*auto/.test(css) && /max-width:\s*47\.99rem/.test(css));
+  ok("[MKT.SCRIPTS.660] the stylesheet gives the head the SM step, a 32px close button with a 40px hit area, and pins Copy beside the JSON caption",
+    /\.sds-json-head\s*\{[^}]*padding:\s*1rem 1rem 1rem 1\.25rem/.test(css) && /\.sds-json-close\s*\{[^}]*width:\s*2rem/.test(css) && /\.sds-json-close::after\s*\{[^}]*inset:\s*-4px/.test(css) && /\.sds-json-caprow\s*\{/.test(css) && !css.includes(".sds-json-count"));
   const js = (await import("node:fs")).readFileSync(resolve(HERE, "src", "styles", "docs-page.js"), "utf8");
   ok("[MKT.SCRIPTS.660] the page script opens with showModal, closes on the button and outside, returns focus to the chip and copies the JSON",
     js.includes("showModal") && js.includes(".sds-json-close") && js.includes("chip.focus()") && js.includes("navigator.clipboard.writeText"));

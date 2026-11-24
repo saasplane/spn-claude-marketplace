@@ -665,10 +665,8 @@ function jsonColoured(pretty: string): string {
 function jsonFact(json: unknown, name: string): string {
   const id = `sds-json-${++jsonPopovers}`;
   const keys = Array.isArray(json) ? [] : Object.keys(json as object);
-  const count = Array.isArray(json) ? json.length : keys.length;
-  const size = `${count} ${Array.isArray(json) ? (count === 1 ? "item" : "items") : (count === 1 ? "key" : "keys")}`;
   const title = name.replace(/<[^>]*>/g, "").trim() || (Array.isArray(json) ? "List" : "Values");
-  const label = Array.isArray(json) ? title : keys.slice(0, 2).map(keyInWords).join(", ");
+  const label = Array.isArray(json) ? (json.every((one) => one === null || typeof one !== "object") ? json.slice(0, 2).map((one) => keyInWords(String(one))).join(", ") : title) : keys.slice(0, 2).map(keyInWords).join(", ");
   const body = Array.isArray(json) ? jsonValue(json) : jsonList(json as Record<string, unknown>, false);
   const pretty = JSON.stringify(json, null, 2);
   const attr = pretty.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
@@ -676,14 +674,19 @@ function jsonFact(json: unknown, name: string): string {
   const lines = pretty.split("\n");
   const extent = lines.length <= 24 && Math.max(...lines.map((l) => l.length)) <= 56 ? "XL" : "FIT";
   const close = `<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><path d="M3.5 3.5l9 9m0-9l-9 9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+  const icon = (cls: string, paths: string) => `<svg class="${cls}" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
+  const copyIcon = icon("sds-json-ico-copy", `<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>`);
+  const checkIcon = icon("sds-json-ico-check", `<path d="M20 6 9 17l-5-5"/>`);
   const tree = `<svg class="sds-json-mark" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12h-8"/><path d="M21 6H8"/><path d="M21 18h-8"/><path d="M3 6v4c0 1.1.9 2 2 2h3"/><path d="M3 10v6c0 1.1.9 2 2 2h3"/></svg>`;
-  return `<button type="button" class="sds-json-chip" data-json-open="${id}" aria-haspopup="dialog" aria-expanded="false" aria-label="Open ${esc(title)} (${esc(size)}) as words and JSON">${tree}<span class="sds-json-label">${esc(label)}</span><span class="sds-json-n">${size}</span></button>`
+  return `<button type="button" class="sds-json-chip" data-json-open="${id}" aria-haspopup="dialog" aria-expanded="false" aria-label="${esc(label)}, JSON value, opens a dialog">${tree}<span class="sds-json-label">${esc(label)}</span></button>`
     + `<dialog id="${id}" class="sds-json-dialog" data-extent="${extent}" aria-labelledby="${id}-t">`
-    + `<div class="sds-json-head"><div class="sds-json-titles"><h2 id="${id}-t">${esc(title)}</h2><div class="sds-json-count">${size}</div></div>`
-    + `<button type="button" class="sds-json-copy" data-json="${attr}">Copy JSON</button>`
+    + `<div class="sds-json-head"><div class="sds-json-titles"><h2 id="${id}-t">${esc(title)}</h2></div>`
     + `<button type="button" class="sds-json-close" aria-label="Close" autofocus>${close}</button></div>`
     + `<div class="sds-json-body"><section class="sds-json-words" role="region" tabindex="0" aria-label="In words"><div class="sds-json-cap">In words</div>${body}</section>`
-    + `<section class="sds-json-code" role="region" tabindex="0" aria-label="JSON"><div class="sds-json-cap">JSON</div><pre><code>${jsonColoured(pretty)}</code></pre></section></div></dialog>`;
+    + `<section class="sds-json-code"><div class="sds-json-caprow"><div class="sds-json-cap">JSON</div>`
+    + `<button type="button" class="sds-json-copy" aria-label="Copy JSON" data-tip="Copy JSON" data-json="${attr}">${copyIcon}${checkIcon}</button></div>`
+    + `<div class="sds-json-scroll" role="region" tabindex="0" aria-label="JSON"><pre><code>${jsonColoured(pretty)}</code></pre></div>`
+    + `<span class="sds-json-live" role="status" aria-live="polite"></span></section></div></dialog>`;
 }
 
 /** A fact's value drawn inline: a JSON object or list as a chip with its dialog (named by the fact's key), anything else as words (`inline`). */

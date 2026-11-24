@@ -1652,9 +1652,9 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   letter-spacing: normal;
 }
 .sds-facts .sds-fact-key { margin-right: .3em; }
-/* A FACT WHOSE VALUE IS JSON (rule 580): a chip (a tree icon, the first keys in words, a muted count) that opens a native dialog of two panels:
+/* A FACT WHOSE VALUE IS JSON (rule 580): a chip (a tree icon and the first keys in words) that opens a native dialog of two panels:
    the value in words, and the formatted JSON. Every value is a token the sheet already has, so both modes follow the page. The icon is Lucide's
-   list-tree (ISC licence, (c) Lucide Contributors; THIRD-PARTY-NOTICES.md), drawn inline by the writer. */
+   list-tree, copy and check (ISC licence, (c) Lucide Contributors; THIRD-PARTY-NOTICES.md), drawn inline by the writer. */
 .sds-json-chip {
   --chip-ink: var(--surface-brand-fg, var(--sds-accent));
   --chip-text: color-mix(in oklch, var(--chip-ink) 75%, var(--sds-ink));
@@ -1682,7 +1682,6 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 .sds-json-copy:focus-visible,
 .sds-json-close:focus-visible { outline: 2px solid var(--sds-accent); outline-offset: 2px; }
 .sds-json-chip .sds-json-mark { flex: none; width: 14px; height: 14px; }
-.sds-json-chip .sds-json-n { padding-left: .55em; border-left: 1px solid color-mix(in oklch, var(--chip-ink) 45%, transparent); color: color-mix(in oklch, var(--sds-slate) 85%, var(--sds-ink)); }
 .sds-json-dialog {
   box-sizing: border-box;
   width: min(720px, 95vw);
@@ -1713,25 +1712,31 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 @keyframes sds-json-rise { from { opacity: 0; scale: .96; } to { opacity: 1; scale: 1; } }
 @keyframes sds-json-fade { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .sds-json-dialog[open], .sds-json-dialog[open]::backdrop { animation: none; } .sds-json-chip { transition: none; } }
-.sds-json-head { display: flex; align-items: center; gap: .5rem; flex: none; padding: 1.25rem; border-bottom: 1px solid var(--sds-rule); }
+.sds-json-head { display: flex; align-items: center; gap: .5rem; flex: none; padding: 1rem 1rem 1rem 1.25rem; border-bottom: 1px solid var(--sds-rule); }
 .sds-json-titles { flex: 1 1 auto; min-width: 0; }
-.sds-json-dialog h2 { margin: 0; padding: 0; border: 0; font-family: inherit; font-size: var(--sds-part-title); line-height: var(--sds-part-title-lh); font-weight: var(--font-weight-semibold); color: var(--sds-ink); letter-spacing: normal; text-transform: none; }
-.sds-json-count { margin-top: .1rem; font-size: var(--sds-xs); line-height: var(--sds-caption-lh); color: var(--sds-faint); }
+.sds-json-dialog h2 { margin: 0; padding: 0; border: 0; font-family: inherit; font-size: var(--sds-part-title); line-height: var(--sds-part-title-lh); font-weight: var(--font-weight-semibold); color: var(--sds-ink); letter-spacing: normal; text-transform: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sds-json-copy, .sds-json-close {
-  flex: none; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; min-height: 2.5rem; margin: 0;
-  font: inherit; font-size: var(--sds-small); line-height: 1; color: var(--sds-slate); background: transparent; border: 1px solid transparent; border-radius: var(--radius-md); cursor: pointer;
+  position: relative; flex: none; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; width: 2rem; height: 2rem; margin: 0; padding: 0;
+  font: inherit; line-height: 1; color: var(--sds-slate); background: transparent; border: 1px solid transparent; border-radius: var(--radius-md); cursor: pointer;
 }
-.sds-json-copy { padding: 0 .9rem; border-color: var(--sds-rule); }
-.sds-json-close { width: 2.5rem; padding: 0; }
+.sds-json-close::after { content: ""; position: absolute; inset: -4px; }
 .sds-json-copy:hover, .sds-json-close:hover { color: var(--sds-ink); background: var(--surface-hover, var(--sds-card)); }
+.sds-json-copy .sds-json-ico-check { display: none; }
 .sds-json-copy.sds-is-copied { color: var(--sds-ink); border-color: var(--sds-accent); }
+.sds-json-copy.sds-is-copied .sds-json-ico-copy { display: none; }
+.sds-json-copy.sds-is-copied .sds-json-ico-check { display: block; }
+.sds-json-copy[data-tip]:hover::after, .sds-json-copy[data-tip]:focus-visible::after {
+  content: attr(data-tip); position: absolute; z-index: 2; top: calc(100% + 6px); right: 0; padding: .25rem .5rem; white-space: nowrap; pointer-events: none;
+  font-size: var(--sds-xs); line-height: var(--sds-caption-lh); color: var(--sds-paper); background: var(--sds-ink); border-radius: var(--radius-sm);
+}
+.sds-json-live { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .sds-json-body { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); }
 /* Each panel scrolls on its own, down and across, with a thin scrollbar and a soft shadow at an edge where more lies beyond (the cover gradients
    scroll with the content, the shadow gradients stay: a shadow shows only where the cover has moved off). The dialog itself never scrolls. */
-.sds-json-body > section {
+.sds-json-body > section:not(.sds-json-code), .sds-json-scroll {
   --pane: var(--sds-paper);
   --edge: color-mix(in srgb, var(--sds-ink) 11%, transparent);
-  min-width: 0; padding: 1.25rem; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--surface-border-strong) transparent;
+  min-width: 0; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--surface-border-strong) transparent;
   background:
     linear-gradient(var(--pane) 30%, transparent) top / 100% 2rem no-repeat local,
     linear-gradient(transparent, var(--pane) 70%) bottom / 100% 2rem no-repeat local,
@@ -1743,8 +1748,12 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
     radial-gradient(farthest-side at 100% 50%, var(--edge), transparent) right / .6rem 100% no-repeat scroll,
     var(--pane);
 }
-.sds-json-body > section:focus-visible { outline: 2px solid var(--sds-accent); outline-offset: -2px; }
-.sds-json-code { --pane: var(--sds-card); border-left: 1px solid var(--sds-rule); }
+.sds-json-body > section:not(.sds-json-code) { padding: 1.25rem; }
+.sds-json-body > section:focus-visible, .sds-json-scroll:focus-visible { outline: 2px solid var(--sds-accent); outline-offset: -2px; }
+.sds-json-code { --pane: var(--sds-card); position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; background: var(--sds-card); border-left: 1px solid var(--sds-rule); }
+.sds-json-caprow { flex: none; display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .625rem .75rem .25rem 1.25rem; }
+.sds-json-caprow .sds-json-cap { margin: 0; }
+.sds-json-scroll { flex: 1 1 auto; min-height: 0; padding: .5rem 1.25rem 1.25rem; }
 .sds-json-cap { margin: 0 0 .8rem; font-size: var(--sds-xs); line-height: var(--sds-caption-lh); font-weight: var(--font-weight-medium); letter-spacing: .06em; text-transform: uppercase; color: var(--sds-faint); }
 .sds-json-dialog dl { margin: 0; }
 .sds-json-dialog dl > div { padding: .45rem 0; }

@@ -671,7 +671,8 @@ document.addEventListener('click', function (e) {
   if (t.classList && t.classList.contains('sds-json-dialog')) { t.close(); return; }
   var b = t.closest('.sds-json-copy');
   if (!b) return;
-  var done = function () { b.textContent = 'Copied'; b.classList.add('sds-is-copied'); setTimeout(function () { b.textContent = 'Copy JSON'; b.classList.remove('sds-is-copied'); }, 1400); };
+  var live = b.closest('.sds-json-code') && b.closest('.sds-json-code').querySelector('.sds-json-live');
+  var done = function () { b.classList.add('sds-is-copied'); if (live) live.textContent = 'Copied'; setTimeout(function () { b.classList.remove('sds-is-copied'); if (live) live.textContent = ''; }, 1500); };
   var text = b.getAttribute('data-json') || '';
   if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, done); else done();
 });

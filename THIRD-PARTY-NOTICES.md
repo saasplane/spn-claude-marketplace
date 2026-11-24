@@ -33,10 +33,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## Lucide (the `list-tree` icon)
+## Lucide (the `list-tree`, `copy` and `check` icons)
 
 - Licence: ISC
-- Where it ships: drawn inline as SVG by the page writer (`packages/plugin-spn-devex/src/scripts/lib/render.ts`, the chip of a JSON fact) into every docs page that holds one.
+- Where it ships: drawn inline as SVG by the page writer (`packages/plugin-spn-devex/src/scripts/lib/render.ts`, the chip and the copy button of a JSON fact) into every docs page that holds one.
 
 ```
 ISC License
