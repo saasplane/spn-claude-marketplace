@@ -1433,7 +1433,7 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
-  padding: .8rem var(--sds-frame-head-px);
+  padding: .5rem var(--sds-frame-head-px);
   border-bottom: 1px solid var(--sds-rule);
   border-radius: calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0 0;
   background: var(--muted);
@@ -1450,11 +1450,10 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   min-width: 0;
 }
 .sds-group-line {
-  margin: .2rem 0 0;
+  margin: .1rem 0 0;
   font-size: var(--sds-sm);
   color: var(--sds-text-fact);
 }
-.sds-group-body > .sds-tabset > .sds-tabset-bar { margin-top: -.2rem; }
 .sds-group-body .sds-scroll { margin: 0; }
 .sds-group-count {
   font-size: var(--sds-xs);
@@ -1463,6 +1462,42 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 }
 .sds-group-body {
   padding: 1rem 1.1rem;
+}
+/* A GROUP PANEL HOLDING TABS OR A CATALOG IS ONE PANEL (the developer, 2026-11-24: "match tabs edge to edge in panel", "such can be merged no
+   need extra padding"): the body has no inset and no band under the head, the tab row and its underline run from the panel's left edge to its
+   right edge with the first tab's text at the head title's inset, and the rows of a list run edge to edge with a divider between rows and no
+   box of their own. Outside a group panel nothing changes. */
+.sds-group-body:has(> .sds-tabset, > .sds-scroll) {
+  padding: 0;
+}
+.sds-group-body > .sds-tabset {
+  margin: 0;
+}
+.sds-group-body > .sds-tabset > .sds-tabset-scroll > .sds-tabset-bar,
+.sds-group-body > .sds-tabset > .sds-tabset-bar {
+  margin-top: 0;
+  padding-left: calc(var(--sds-frame-head-px) - .8rem);
+}
+.sds-group-body .sds-tabset-panel > :first-child {
+  margin-top: 0;
+}
+.sds-group-body .sds-scroll,
+.sds-group-body .sds-tabset-panel > .sds-scroll {
+  border: 0;
+  border-radius: 0;
+  background: none;
+  margin: 0;
+}
+.sds-group-body .sds-scroll tr:last-child > td {
+  border-bottom: 0;
+}
+/* Tags at a row's end: the badge keeps its own padding, an even gap between tags and between wrapped lines, the first tag level with the row's first line. */
+.sds-group-body td > .sds-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  justify-content: flex-end;
+  padding-top: .05rem;
 }
 .sds-group-body > .sds-tiles {
   margin: 0;
