@@ -19,6 +19,7 @@ import { tmpdir } from "node:os";
 import { draw, figureOf, type Spec } from "./draw.ts";
 import { readsAsCondition } from "./block-fit.ts";
 import { sentenceColumn } from "./item-cells.ts";
+import { colours, linesOf } from "./code-colour.ts";
 import { isSeatFile, producedPageOf, visibilityOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { stylesDir } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { RULE_ID_SRC, chipOf, parseFields } from "../../../../plugin-support-lib/src/lib/rule-mark.ts";
@@ -866,6 +867,44 @@ function spelled(kind: string, body: string[], findings: Finding[]): string {
   return `  <div class="sds-nextnav">\n${doors.join("\n")}\n  </div>`;
 }
 
+/** A code frame folds past this many lines, and shows this many of them while shut (RULE.DEVEX.WORKSPACE.573). */
+const FOLD_PAST = 20, PEEK = 10;
+
+/** A `mark=` value, `3-5,9`, as the set of line numbers it names; null where it is not that. */
+function markedLines(value: string): Set<number> | null {
+  const set = new Set<number>();
+  for (const part of value.split(",")) {
+    const m = /^(\d+)(?:-(\d+))?$/.exec(part);
+    if (!m) return null;
+    const from = Number(m[1]), to = m[2] ? Number(m[2]) : from;
+    if (to < from) return null;
+    for (let n = from; n <= to; n++) set.add(n);
+  }
+  return set;
+}
+
+/**
+ * The code frame of a file excerpt, a marked line or code past twenty lines (RULE.DEVEX.WORKSPACE.573): the path (linking the whole file
+ * where its repository has a github.com remote) and the lines as the title, the language as a badge, every line its own element so a
+ * marked line can be shaded and the gutter can number it, the colours written in, and a fold that shows the first lines while shut.
+ */
+function codeFrame(o: { path: string | null; range: string | null; href: string | null; lang: string; lines: string[]; first: number; marks: Set<number>; numbered: boolean; folded: boolean }): string {
+  const runs = colours(o.lang) ? linesOf(o.lines.join("\n"), o.lang) : o.lines.map((text) => [{ cls: null as string | null, text }]);
+  const drawn = o.lines.map((_, k) => {
+    const n = o.first + k;
+    const text = (runs[k] ?? []).map((r) => r.cls ? `<span class="sds-tk-${r.cls}">${escapedCode(r.text)}</span>` : escapedCode(r.text)).join("");
+    return `<span class="sds-ln${o.marks.has(n) ? " sds-mark" : ""}" data-n="${n}">${text}</span>`;
+  });
+  const attr = o.lang ? ` data-lang="${o.lang}"` : "";
+  const long = drawn.length > FOLD_PAST;
+  const shown = long ? drawn.slice(0, PEEK) : drawn;
+  const rest = long ? drawn.slice(PEEK) : [];
+  const where = o.path ? (o.href ? `<a class="sds-file-path" href="${esc(o.href)}">${esc(o.path)}${o.range ? `<span class="sds-file-lines">:${o.range}</span>` : ""}</a>` : `<span class="sds-file-path">${esc(o.path)}${o.range ? `<span class="sds-file-lines">:${o.range}</span>` : ""}</span>`) : `<span class="sds-file-path"></span>`;
+  const more = rest.length ? `\n    <details class="sds-more"><summary>Show ${rest.length} more lines</summary><pre${attr}>${rest.join("\n")}</pre></details>` : "";
+  const frame = `  <figure class="sds-file sds-code${o.numbered ? " sds-code-numbered" : ""}">\n    <figcaption>${where}${o.lang ? `<span class="sds-file-lang">${esc(o.lang)}</span>` : ""}</figcaption>\n    <pre${attr}>${shown.join("\n")}</pre>${more}\n  </figure>`;
+  return o.folded && o.path ? `  <details class="sds-fold">\n    <summary>${esc(o.path)}${o.range ? `:${o.range}` : ""}</summary>\n${frame}\n  </details>` : frame;
+}
+
 /** One section's body: paragraphs, tables, lists, fenced blocks and figures. */
 function renderBody(lines: string[], findings: Finding[], nested = false): string {
   const out: string[] = [];
@@ -932,22 +971,52 @@ function renderBody(lines: string[], findings: Finding[], nested = false): strin
       // A fence tag is a language, and may carry `file=<path>`: the block then stands in a FILE frame titled by that path,
       // and the word `fold` draws that frame inside a `details` whose summary is the path.
       const fileAt = /\bfile=(\S+)/.exec(tag);
+      const linesAt = /\blines=(\S+)/.exec(tag);
+      const markAt = /\bmark=(\S+)/.exec(tag);
       const folded = /(?:^|\s)fold(?=\s|$)/.test(tag);
-      const lang = tag.replace(/\bfile=\S+/, "").replace(/(?:^|\s)fold(?=\s|$)/, " ").trim();
+      const lang = tag.replace(/\b(?:file|lines|mark)=\S+/g, "").replace(/(?:^|\s)fold(?=\s|$)/, " ").trim();
       const kind = lang.split(/\s+/)[0];
       const body: string[] = [];
       i++;
       while (i < lines.length && !/^```/.test(lines[i])) body.push(lines[i++]);
       i++;
+      // A FILE EXCERPT: `lines=a-b` with an empty body reads those lines of the file (RULE.DEVEX.WORKSPACE.573). A path that is not there,
+      // a range outside the file, or a body beside `lines=` stops the write.
+      let first = 1, range: string | null = null, href: string | null = null;
+      if (linesAt) {
+        const stop = (message: string) => { findings.push({ message, stops: true }); };
+        const span = /^(\d+)-(\d+)$/.exec(linesAt[1]);
+        const where = fileAt && pageRoot ? resolve(pageRoot, fileAt[1]) : null;
+        if (!fileAt) { stop("`lines=a-b` reads a file: the fence's tag needs `file=<path>` too"); continue; }
+        if (!span || Number(span[1]) < 1 || Number(span[2]) < Number(span[1])) { stop(`\`lines=${linesAt[1]}\` is a range of two line numbers, \`lines=a-b\`, a from 1 and b from a`); continue; }
+        if (body.some((line) => line.trim())) { stop("a fence with `lines=` holds no body: the excerpt is read from the file, never pasted"); continue; }
+        if (!where || !existsSync(where)) { stop(`\`lines=${linesAt[1]}\` reads \`${fileAt[1]}\` from the repository root${pageRoot ? "" : " (the page's folder holding `docs/` is not known)"}, and no file is there`); continue; }
+        const all = readFileSync(where, "utf8").replace(/\n$/, "").split("\n");
+        if (Number(span[2]) > all.length) { stop(`\`lines=${linesAt[1]}\` runs past the end of \`${fileAt[1]}\`, which holds ${all.length} lines`); continue; }
+        first = Number(span[1]);
+        range = `${span[1]}-${span[2]}`;
+        body.length = 0;
+        body.push(...all.slice(first - 1, Number(span[2])));
+        href = githubAddress(where);
+      }
       // A FOLDED FENCE WITH NO BODY READS ITS FILE: the path is relative to the folder holding `docs/`, so a page shows a spec
       // without copying it into the markdown. A path that is not there stops the write.
-      if (folded && fileAt && !body.some((line) => line.trim())) {
+      if (!linesAt && folded && fileAt && !body.some((line) => line.trim())) {
         const where = pageRoot ? resolve(pageRoot, fileAt[1]) : null;
         if (!where || !existsSync(where)) {
-          findings.push({ message: `a folded fence with no body reads \`${fileAt[1]}\` from the repository root${pageRoot ? "" : " (the page's folder holding `docs/` is not known)"}, and no file is there`, stops: true });
+          findings.push({ message: `a folded fence with no body reads \`${fileAt[1]}\` from the repository root${pageRoot ? "" : " (the page's folder holding \`docs/\` is not known)"}, and no file is there`, stops: true });
           continue;
         }
         body.push(...readFileSync(where, "utf8").replace(/\n$/, "").split("\n"));
+      }
+      let marks = new Set<number>();
+      if (markAt) {
+        const read = markedLines(markAt[1]);
+        if (!read) { findings.push({ message: `\`mark=${markAt[1]}\` names lines as \`a-b\` or \`a\`, joined by commas`, stops: true }); continue; }
+        const last = first + body.length - 1;
+        const outside = [...read].filter((n) => n < first || n > last);
+        if (outside.length) { findings.push({ message: `\`mark=${markAt[1]}\` names line ${outside[0]}, outside the lines this fence shows (${first}-${last})`, stops: true }); continue; }
+        marks = read;
       }
       if (kind === "catalog") {
         out.push(catalogBlock(lang, body, findings));
@@ -971,11 +1040,14 @@ function renderBody(lines: string[], findings: Finding[], nested = false): strin
       } else if (lang === "html") {
         out.push(body.join("\n"));
       } else {
-        // The page holds plain code, tagged with its language. The shared script colours the block
-        // when the page opens, so no colour is written here.
+        // Plain code is tagged with its language, and the shared script colours it when the page opens. An excerpt, a marked line
+        // or a long block is drawn by `codeFrame`, which writes its colours.
         const pre = `<pre${lang ? ` data-lang="${lang}"` : ""}>${lang ? escapedCode(body.join("\n")) : esc(body.join("\n"))}</pre>`;
         if (folded && !fileAt) findings.push({ message: "the word `fold` needs a `file=<path>` in the same fence tag: the fold's summary is the path" });
-        if (fileAt) {
+        // A frame of its own: an excerpt, a marked line, or code past twenty lines (never a shell command, which the page script frames, nor a tree).
+        const framed = linesAt || markAt || (body.length > FOLD_PAST && kind !== "sh" && kind !== "bash" && kind !== "tree");
+        if (framed) out.push(codeFrame({ path: fileAt ? fileAt[1] : null, range, href, lang, lines: body, first, marks, numbered: !!linesAt, folded }));
+        else if (fileAt) {
           const frame = `  <figure class="sds-file">\n    <figcaption><span class="sds-file-path">${esc(fileAt[1])}</span>${lang ? `<span class="sds-file-lang">${esc(lang)}</span>` : ""}</figcaption>\n    ${pre}\n  </figure>`;
           out.push(folded ? `  <details class="sds-fold">\n    <summary>${esc(fileAt[1])}</summary>\n${frame}\n  </details>` : frame);
         } else out.push(`  ${pre}`);

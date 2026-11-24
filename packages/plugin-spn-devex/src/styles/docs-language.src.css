@@ -2103,6 +2103,20 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 .sds-fold[open] > summary { border-bottom: 1px solid var(--sds-rule); }
 .sds-fold > .sds-file { margin: 0; border: 0; border-radius: 0 0 var(--radius) var(--radius); }
 
+/* CODE FRAME: an excerpt of a file, a marked line, or code past twenty lines. Every line is its own element: a marked line is shaded edge to edge,
+   an excerpt's lines carry their file line numbers in a gutter (drawn, never copied), and the lines past the tenth sit behind a fold. */
+.sds-code .sds-ln { display: inline-block; box-sizing: border-box; min-width: calc(100% + 2.2rem); margin: 0 -1.1rem; padding: 0 1.1rem; }
+.sds-code .sds-ln:empty::after { content: ' '; }
+.sds-code .sds-ln.sds-mark { background: var(--sds-accent-soft); box-shadow: inset 2px 0 0 var(--sds-accent); }
+.sds-code-numbered .sds-ln::before { content: attr(data-n); display: inline-block; width: 3ch; margin-right: 1.4ch; text-align: right; color: var(--sds-tk-c); user-select: none; }
+.sds-code .sds-file-lines { color: var(--sds-text-description); }
+.sds-code a.sds-file-path { color: inherit; text-decoration: none; }
+.sds-code a.sds-file-path:hover { color: var(--sds-accent); text-decoration: underline; }
+.sds-code > .sds-more { border-top: 1px dashed var(--sds-rule); }
+.sds-code > .sds-more > summary { cursor: pointer; padding: .35rem var(--sds-frame-head-px); font-family: var(--font-code); font-size: var(--font-content-xs-size); color: var(--sds-text-description); }
+.sds-code > .sds-more > summary:hover { color: var(--sds-accent); }
+.sds-code > .sds-more > pre { margin: 0; border: 0; border-radius: 0; padding-top: 0; }
+
 /* GUIDANCE: the fold under a catalog row. A small gap under the row's facts, none after it; the summary and the open lines
    share one inset; the lines are tight, label and value on one line; rules are a run of small ids. */
 .sds-fold.sds-guidance { margin: .35rem 0 0; border: 0; background: none; }

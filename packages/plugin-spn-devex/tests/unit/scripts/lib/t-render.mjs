@@ -527,6 +527,43 @@ console.log("\n=== the page renderer — a folded fence with no body reads its f
   rmSync(root, { recursive: true, force: true });
 }
 
+console.log("\n=== the page renderer — code forms: an excerpt of a file, a marked line, a long block");
+{
+  const root = mkdtempSync(join(tmpdir(), "spn-code-"));
+  mkdirSync(join(root, "src"), { recursive: true });
+  writeFileSync(join(root, "src", "a.ts"), Array.from({ length: 30 }, (_, k) => k % 7 === 0 ? `export const v${k} = ${k}; // n` : `const s${k} = "x";`).join("\n") + "\n");
+  const rooted = (markdown) => renderPage({
+    block: { id: "probe", title: "Probe", status: "DONE", lenses: ["ARCHITECT"], summary: "What a probe is." },
+    markdown: `# Probe\n\nThe lead.\n\n## What it is\n\n${markdown}\n`, workspace: "/workspace", location: "/workspace/docs/02-constructs/probe.md",
+    furniture: { stylesheet: "", script: "", footer: "" }, root,
+  });
+  const excerpt = rooted("```ts file=src/a.ts lines=2-4 mark=3\n```");
+  ok("[MKT.SCRIPTS.643] file= with lines= draws that excerpt, titled with its path and lines, each line its own element numbered from the file",
+    excerpt.findings.length === 0 && excerpt.html.includes('<span class="sds-file-path">src/a.ts<span class="sds-file-lines">:2-4</span></span>')
+      && excerpt.html.includes('data-n="2"') && excerpt.html.includes('data-n="4"') && !excerpt.html.includes('data-n="5"') && !excerpt.html.includes('data-n="1"'), excerpt.html.slice(-900));
+  ok("[MKT.SCRIPTS.643] mark= shades the lines named, by file line number, and no other",
+    excerpt.html.includes('<span class="sds-ln sds-mark" data-n="3">') && !excerpt.html.includes('sds-mark" data-n="2"') && !excerpt.html.includes('sds-mark" data-n="4"'));
+  ok("[MKT.SCRIPTS.643] the excerpt's syntax colours are written into the page, in the docs palette's token classes, and the page's own script leaves it alone",
+    excerpt.html.includes('<span class="sds-tk-k">const</span>') && excerpt.html.includes('<span class="sds-tk-s">"x"</span>'));
+  const whole = rooted("```ts file=src/a.ts lines=1-1\n```");
+  ok("[MKT.SCRIPTS.643] a comment and a number are coloured, and the code's own characters are escaped",
+    whole.html.includes('<span class="sds-tk-c">// n</span>') && whole.html.includes('<span class="sds-tk-n">0</span>'));
+  const long = rooted("```ts file=src/a.ts lines=1-25\n```");
+  ok("[MKT.SCRIPTS.644] an excerpt past 20 lines folds: the first ten stand in the frame and the rest sit behind a fold that counts them",
+    long.html.includes('<details class="sds-more"><summary>Show 15 more lines</summary>') && long.html.indexOf('data-n="10"') < long.html.indexOf("<details class=\"sds-more\"") && long.html.indexOf('data-n="11"') > long.html.indexOf("<details class=\"sds-more\""), long.html.slice(-500));
+  ok("[MKT.SCRIPTS.644] twenty lines stay open, and a pasted fence past twenty lines folds the same way",
+    !rooted("```ts file=src/a.ts lines=1-20\n```").html.includes("sds-more") && rooted(fence("ts", Array.from({ length: 22 }, (_, k) => `const a${k} = 1;`).join("\n"))).html.includes("Show 12 more lines"));
+  ok("[MKT.SCRIPTS.643] a pasted fence with no file=, lines= or mark= still draws as plain code",
+    rooted("```ts\nconst a = 1;\n```").html.includes('<pre data-lang="ts">const a = 1;</pre>'));
+  const bad = [rooted("```ts file=src/a.ts lines=1-99\n```"), rooted("```ts file=src/none.ts lines=1-2\n```"), rooted("```ts lines=1-2\n```"), rooted("```ts file=src/a.ts lines=1-2\nconst x = 1;\n```"), rooted("```ts file=src/a.ts lines=2-4 mark=9\n```"), rooted("```ts file=src/a.ts lines=4-2\n```")];
+  ok("[MKT.SCRIPTS.645] a range past the file, a missing file, lines= with no file=, a body beside lines=, a mark outside the excerpt and a backward range each stop the write",
+    bad.every((one) => one.findings.some((f) => f.stops === true)), JSON.stringify(bad.map((one) => one.findings.map((f) => f.message))));
+  ok("[MKT.SCRIPTS.645] with no root known, an excerpt stops the write", made("```ts file=src/a.ts lines=1-2\n```").findings.some((f) => f.stops));
+  const asTabs = rooted(tilde("tabs", "--- Contract\n```ts file=src/a.ts lines=1-1\n```\n--- Today\n```ts file=src/a.ts lines=2-2\n```"));
+  ok("[MKT.SCRIPTS.646] two forms of one thing are tabs: each panel holds its own excerpt frame", asTabs.findings.length === 0 && (asTabs.html.match(/class="sds-file sds-code/g) ?? []).length === 2 && asTabs.html.includes('class="sds-tabset"'));
+  rmSync(root, { recursive: true, force: true });
+}
+
 {
   const page = pageFromRender(JSON.stringify({ pages: [{ html: '<body><svg width="1em"></svg></body>', findings: [] }] }));
   let refused = "";
