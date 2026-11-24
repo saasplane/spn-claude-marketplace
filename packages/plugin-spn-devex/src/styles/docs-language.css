@@ -7767,8 +7767,8 @@
   margin-right: .4rem;
   font-size: inherit;
   line-height: inherit;
-  font-weight: var(--font-weight-medium);
-  color: var(--sds-text-fact-card);
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--sds-text-title-card);
 }
 .sds-guidance-ids {
   display: inline;

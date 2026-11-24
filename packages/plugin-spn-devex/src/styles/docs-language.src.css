@@ -2115,7 +2115,7 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   color: var(--sds-text-description);
 }
 .sds-fold.sds-guidance[open] > summary { border-bottom: 0; }
-/* The open guidance stands under the word Guidance, past the marker, in the text font: labels in the fact key's quiet colour,
+/* The open guidance stands under the word Guidance, past the marker, in the text font: labels in the card title colour, set heavier,
    values in the description's colour, as the facts line pairs them. */
 .sds-fold.sds-guidance > p {
   margin: .15rem 0 0;
@@ -2130,8 +2130,8 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   margin-right: .4rem;
   font-size: inherit;
   line-height: inherit;
-  font-weight: var(--font-weight-medium);
-  color: var(--sds-text-fact-card);
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--sds-text-title-card);
 }
 .sds-guidance-ids { display: inline; font-family: var(--font-code); font-size: .7rem; color: var(--sds-text-description); }
 .sds-guidance-ids > span { display: inline-block; margin-right: .4rem; white-space: nowrap; }
