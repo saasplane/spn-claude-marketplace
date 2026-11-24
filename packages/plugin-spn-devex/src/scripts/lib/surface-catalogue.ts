@@ -311,15 +311,22 @@ const CATALOG = "```catalog layout=LIST facts=AFTER_DESCRIPTION";
 /** A tab's list of kinds. `resolved` carries a language's states; the catalogue passes none and the rows are the stand-in's. */
 function kindList(part: string, kinds: Array<{ kind: Kind; state?: State; definedIn?: string; change?: string; was?: State }>): string {
   const rows = [CATALOG];
+  // The keys count across the whole list, one column each (RULE.DEVEX.WORKSPACE.576): where any row carries From or Change, every
+  // row's config stands as one Config fact, so the list names three keys at most.
+  const anyOwn = kinds.some(({ state, definedIn, change }) => (state === "INHERITED" && definedIn) || change);
   for (const { kind, state, definedIn, change, was } of kinds) {
     const line = kindLine(kind);
     rows.push(kindName(kind) + (line ? ` | ${line}` : ""));
     const facts = configFacts(part, kind);
     // The first fact that is only tags is the row's badge, so the state stands in it beside the code.
     rows.push(`  ${facts[0][0]}: ${facts[0][1]}${state ? ` [${state}]` : ""}`);
-    if (state === "INHERITED" && definedIn) rows.push(`  From: ${definedIn}${was && was !== "PICKED" ? ` (${was.toLowerCase().replace("_", " ")})` : ""}`);
-    if (change) rows.push(`  Change: ${clean(change)}`);
-    for (const [k, v] of facts.slice(1)) rows.push(`  ${k}: ${v}`);
+    // A LIST HOLDS UP TO THREE FACTS BESIDE ITS BADGE (RULE.DEVEX.WORKSPACE.576): with From or Change on the row, the config stands as one fact.
+    const own: Array<[string, string]> = [];
+    if (state === "INHERITED" && definedIn) own.push(["From", `${definedIn}${was && was !== "PICKED" ? ` (${was.toLowerCase().replace("_", " ")})` : ""}`]);
+    if (change) own.push(["Change", clean(change)]);
+    const config = facts.slice(1);
+    const merged: Array<[string, string]> = anyOwn && config.length ? [["Config", config.map(([k, v]) => `${k} ${v}`).join(" · ")]] : config;
+    for (const [k, v] of [...own, ...merged]) rows.push(`  ${k}: ${v}`);
     for (const [k, v] of guidanceLines(kind)) rows.push(`  ${k}: ${v}`);
   }
   rows.push("```");
@@ -401,8 +408,10 @@ export function renderLanguage(catalogue: Catalogue, resolved: Resolved, opts: {
   const out: string[] = [];
   const parent = spec.extends === null ? "none, this language is a root" : opts.parentPage ? `[${spec.extends}](${opts.parentPage})` : spec.extends;
   const refs = spec.references.map((r) => clean((r.id ?? r.url ?? JSON.stringify(r)) as string));
-  const panel = [CATALOG, `${spec.name} | ${clean(spec.domain.product)}`, `  Version: ${spec.version}`, `  Extends: ${parent}`,
-    `  Records: ${spec.domain.records.map(clean).join(", ") || "none"}`, `  Reads: ${clean(spec.domain.reads)}`, `  References: ${refs.join(", ") || "none"}`, "```"].join("\n");
+  // The panel's title carries the version and its line who reads the product, so the row holds three facts (RULE.DEVEX.WORKSPACE.576).
+  const product = clean(spec.domain.product) + (spec.domain.reads ? `, read by ${clean(spec.domain.reads)}` : "");
+  const panel = [CATALOG, `${spec.name} | ${product}`, `  Extends: ${parent}`,
+    `  Records: ${spec.domain.records.map(clean).join(", ") || "none"}`, `  References: ${refs.join(", ") || "none"}`, "```"].join("\n");
   out.push(`~~~group Language | ${clean(spec.name)} ${clean(spec.version)}\n${panel}\n~~~`, "", languageShared(outline, resolved.shared), "");
   for (const cat of resolved.categories) {
     out.push(`### ${cat.code} — ${clean(cat.description.split(", who")[0])}${cat.fresh ? " (a category of its own)" : ""}`, "");

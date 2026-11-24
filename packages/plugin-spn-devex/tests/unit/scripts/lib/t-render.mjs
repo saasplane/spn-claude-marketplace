@@ -539,6 +539,10 @@ console.log("\n=== the page renderer — a LIST's fact keys, facts=END with no f
   const four = made(fence("catalog layout=LIST", "Item | line\n  A: 1\n  B: 2\n  C: 3\n  D: 4"));
   ok("[MKT.SCRIPTS.652] a LIST with four or more fact keys stops the write and names the keys", four.findings.some((f) => f.stops && f.message.includes("up to three fact keys") && f.message.includes("A, B, C, D")), JSON.stringify(four.findings));
   ok("[MKT.SCRIPTS.652] three keys draw as before", !made(fence("catalog layout=LIST", "Item | line\n  A: 1\n  B: 2\n  C: 3")).findings.some((f) => f.stops));
+  const badged = `~~~group Containers | what a page is made of\n${fence("catalog layout=LIST facts=AFTER_DESCRIPTION", "Hero | the opening\n  Code: [HERO]\n  Unit: DSSectionContainer\n  Size: XL\n  Color: BRAND")}\n~~~`;
+  ok("[MKT.SCRIPTS.658] in a group panel a fact of bracketed codes is the row's badge, so three facts and a badge draw", !made(badged).findings.some((f) => f.stops), JSON.stringify(made(badged).findings));
+  ok("[MKT.SCRIPTS.658] known-bad: the same four keys outside a group still stop the write",
+    made(fence("catalog layout=LIST facts=AFTER_DESCRIPTION", "Hero | the opening\n  Code: [HERO]\n  Unit: DSSectionContainer\n  Size: XL\n  Color: BRAND")).findings.some((f) => f.stops && f.message.includes("Code, Unit, Size, Color")));
   const tags = made(fence("catalog layout=LIST", "Kinds | which rules are shared?\n  [UNIT] [COMPONENT]\nLevels | what does each level own?\n  [WIDGET]\nPages | what a page holds\n  [PAGE]"));
   ok("[MKT.SCRIPTS.653] bare tags never get the advice to write facts=END, which does not draw a keyless fact", !tags.findings.some((f) => f.message.includes("facts=END")), JSON.stringify(tags.findings));
   ok("[MKT.SCRIPTS.653] a list of short keyed facts still gets it", made(fence("catalog layout=LIST", "Kinds | q\n  Owes: one\nLevels | q\n  Owes: two")).findings.some((f) => f.message.includes("facts=END")));

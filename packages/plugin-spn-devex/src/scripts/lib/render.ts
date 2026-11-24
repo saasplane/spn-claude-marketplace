@@ -646,7 +646,9 @@ function catalogHtml(items: CatalogItem[], layout: string | null, media: string 
   const kind = layout ?? "GRID";
   // A LIST HOLDS UP TO THREE FACT KEYS (RULE.DEVEX.WORKSPACE.576): four or more are a table's columns, not a row's facts.
   if (kind === "LIST") {
-    const named = factKeys(items);
+    // In a group panel a fact of bracketed codes is the row's badge, drawn at its end and not on the facts line, so it is not counted.
+    const badge = (key: string): boolean => inGroup && items.every((item) => item.facts.every(([name, value]) => name !== key || /^\s*(\[[^\]\[]+\]\s*)+$/.test(value)));
+    const named = factKeys(items).filter((key) => !badge(key));
     if (named.length >= 4) findings.push({ message: `a \`catalog layout=LIST\` holds up to three fact keys, this list names ${named.length} (${named.join(", ")}): fold a phrase into the item's line, or write a table`, stops: true });
     if (factsAt === "END" && !items.some((item) => item.facts.length)) findings.push({ message: "`facts=END` draws a column for each fact, and no item of this list holds one: write the facts under their items, or leave `facts=END` out (rule 563)" });
   }

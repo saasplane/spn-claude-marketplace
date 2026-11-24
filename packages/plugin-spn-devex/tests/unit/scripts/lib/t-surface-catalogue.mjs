@@ -80,6 +80,17 @@ ok("it opens with the language's panel and links the parent's page", page.starts
 ok("a kind's state stands as a tag beside its code", page.includes("  Code: [HERO] [CUSTOMISED]") && page.includes("  Code: [NUMBERS] [NOT_USED]") && page.includes("  Code: [PLANS] [NEW]"));
 ok("the part's source and its values stand in the tab", page.includes("Filled by: [OWN]") && page.includes("  Source: [OWN]"));
 ok("a wholly inherited category is one line", renderLanguage(catalogue, resolveLanguage(catalogue, [root, spec("quiet", "surface@1")]), { specPath: "s.json" }).includes("Inherited whole from surface@1: this language says nothing here."));
+// A LIST holds up to three facts beside its badge (RULE.DEVEX.WORKSPACE.576), so the writer never stops on a block it generates.
+const factsBesideBadge = (md) => [...md.matchAll(/```catalog[^\n]*\n([\s\S]*?)```/g)].map(([, body]) => {
+  const seen = new Map();
+  for (const [, key, value] of body.matchAll(/^ {2}([A-Z][^:\n]*): (.*)$/gm)) {
+    if (/^(For|Choose when|Not when|Rules)$/.test(key)) continue;
+    seen.set(key, (seen.get(key) ?? true) && /^\s*(\[[^\]\[]+\]\s*)+$/.test(value));
+  }
+  return [...seen.values()].filter((badge) => !badge).length;
+});
+ok("[MKT.SCRIPTS.659] every list the language block writes names three keys or fewer beside its badge, across all its rows, a customised kind's config folded into one",
+  Math.max(...factsBesideBadge(page)) <= 3 && page.includes("  Version") === false, JSON.stringify(factsBesideBadge(page)));
 ok("it ends with the gaps and the spec in a fold", page.includes("~~~group Gaps |") && page.endsWith("```json file=docs/specs/design-languages/demo.spdl.json fold\n```"));
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-surface-catalogue` : `\n  all ${total} passed — t-surface-catalogue`);
