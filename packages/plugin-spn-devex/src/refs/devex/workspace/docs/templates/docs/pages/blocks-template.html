@@ -441,6 +441,72 @@ DSToolbar | a toolbar, with its items, groups and separators
   <div class="sds-group-body"><div class="sds-tiles sds-tiles-compact" data-layout="GRID"><div class="sds-tile"><h4><code>DSLayout</code></h4><p>the frame of a page</p></div><div class="sds-tile"><h4><code>DSSiteLayout</code></h4><p>the wrapper of a site&rsquo;s page</p></div></div></div>
 </section>
 
+  <h4 id="b-groups-forms">A panel with a list, a panel with tabs</h4>
+  <p class="sds-small"><strong>Use when</strong> a named set needs a head and a one-line description: a panel holding a list for a set of items, a panel holding tabs for a set split into two to six sub-sets, each its own list.</p>
+  <p>A panel&rsquo;s head holds its name, its description and its count, and its body is flush: a list stands straight under the head, and tabs stand edge to edge. A list in a panel draws Plan-style rows, the title, its description, one line of facts and the one closed-set fact as a badge at the row&rsquo;s end. An item&rsquo;s <code>For:</code>, <code>Choose when:</code>, <code>Not when:</code> and <code>Rules:</code> lines open as a closed Guidance fold under the row. A fenced group draws no row of links.</p>
+  <pre data-lang="text">~~~group The parts of a category | what a category is made of
+```catalog layout=LIST facts=AFTER_DESCRIPTION
+Shared | what every category holds
+  Parts: 4
+  Code: [OWN]
+  For: a designer
+  Choose when: a value is the same on every page
+  Not when: one page needs its own look → Style
+Structure | how a category's pages are built
+  Parts: 4
+  Code: [PICKED]
+```
+~~~
+
+~~~group Structure | how a category's pages are built
+~~~tabs look=LINE
+--- Layouts
+```catalog layout=LIST facts=AFTER_DESCRIPTION
+Topnav | a bar across the top
+  Code: [PICKED]
+  Unit: DSSiteLayout
+```
+--- Pages
+```catalog layout=LIST facts=AFTER_DESCRIPTION
+Home | the first page
+  Code: [NEW]
+```
+~~~
+~~~</pre>
+<section class="sds-group" id="g-the-parts-of-a-category" aria-labelledby="g-the-parts-of-a-category-title">
+  <div class="sds-group-head"><div class="sds-group-title"><h5 id="g-the-parts-of-a-category-title">The parts of a category</h5><p class="sds-group-line">what a category is made of</p></div><span class="sds-group-count">2 items</span></div>
+  <div class="sds-group-body"><div class="sds-scroll"><table>
+    <tbody>
+      <tr><td><p><strong>Shared</strong></p><p>what every category holds</p><span class="sds-small"><span class="sds-fact-key">Parts</span><span class="sds-fact-value">4</span></span><details class="sds-fold sds-guidance"><summary>Guidance</summary><p class="sds-small"><strong>For</strong> a designer</p><p class="sds-small"><strong>Choose when</strong> a value is the same on every page</p><p class="sds-small"><strong>Not when</strong> one page needs its own look → Style</p></details></td><td><span class="sds-tags"><span class="sds-badge">OWN</span></span></td></tr>
+      <tr><td><p><strong>Structure</strong></p><p>how a category's pages are built</p><span class="sds-small"><span class="sds-fact-key">Parts</span><span class="sds-fact-value">4</span></span></td><td><span class="sds-tags"><span class="sds-badge">PICKED</span></span></td></tr>
+    </tbody>
+  </table></div></div>
+</section>
+<section class="sds-group" id="g-structure" aria-labelledby="g-structure-title">
+  <div class="sds-group-head"><div class="sds-group-title"><h5 id="g-structure-title">Structure</h5><p class="sds-group-line">how a category's pages are built</p></div><span class="sds-group-count">2 tabs</span></div>
+  <div class="sds-group-body"><div class="sds-tabset" data-type="LINE">
+    <div class="sds-tabset-bar" role="tablist" aria-label="Layouts, Pages">
+      <button type="button" role="tab" id="t-1-1" aria-controls="p-1-1" aria-selected="true">Layouts</button>
+      <button type="button" role="tab" id="t-1-2" aria-controls="p-1-2" aria-selected="false">Pages</button>
+    </div>
+    <div class="sds-tabset-panel" role="tabpanel" id="p-1-1" aria-labelledby="t-1-1">
+  <div class="sds-scroll"><table>
+    <tbody>
+      <tr><td><p><strong>Topnav</strong></p><p>a bar across the top</p><span class="sds-small"><span class="sds-fact-key">Unit</span><span class="sds-fact-value">DSSiteLayout</span></span></td><td><span class="sds-tags"><span class="sds-badge">PICKED</span></span></td></tr>
+    </tbody>
+  </table></div>
+    </div>
+    <div class="sds-tabset-panel" role="tabpanel" id="p-1-2" aria-labelledby="t-1-2">
+  <div class="sds-scroll"><table>
+    <tbody>
+      <tr><td><p><strong>Home</strong></p><p>the first page</p></td><td><span class="sds-tags"><span class="sds-badge">NEW</span></span></td></tr>
+    </tbody>
+  </table></div>
+    </div>
+  </div></div>
+</section>
+</section>
+
   <h3 id="b-fold">FOLD &mdash; extra detail</h3>
   <p class="sds-small"><strong>Use when</strong> some readers want detail the rest can skip, or a file the page explains has no need to be shown whole.</p>
   <p>A fold is a <code>details</code> with its summary. It keeps the page short and still shows on a search. What every reader must read never goes in one. A file the page explains is a fold with an empty body, <code>file=&lt;path&gt; fold</code>, and the writer reads the file&rsquo;s own words.</p>

@@ -4,12 +4,17 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "section": "The figures — what sits inside a block, and the closed set of them",
-      "seen": "7a2364d7"
+      "seen": "d4e5dfe1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "section": "A rendered unit is written as a tree",
-      "seen": "4bfe16bc"
+      "seen": "c9dc276f"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
+      "section": "A render belongs on a surface sample page",
+      "seen": "851bcff8"
     }
   ]
 }
@@ -20,7 +25,9 @@
 
 **You write a spec, never a drawing.** A figure is a fence the page writer draws, so it has the look of every other figure in both themes. Every box is a thing the passage names, in its words.
 
-## A rendered unit is a tree
+**A render (`unit`) belongs only on a surface sample page** (`RULE.DEVEX.WORKSPACE.571` · GUIDE): a design language's samples or a surface page preview. The page writer stops a `unit` fence on a docs page. There a built unit's structure is a skeleton, drawn only for a unit made of parts a reader places, each part in its design-system name, with a line naming its showcase page; a single component has no figure.
+
+## A rendered unit is a tree (surface sample pages only)
 
 **A unit of the design system is shown as a fenced tree, and `docs page write` renders it into a unit in its own frame on every write** (rule RULE.DEVEX.WORKSPACE.538 · GUIDE). The fence is tagged `unit` and holds one tree in the render's form: either one unit as `"unit"` with its `"props"`, or `"sections"`, a list of units each with its props, a placement or a slot, with `"caption"` beside them; the writer adds the render's own `treeVersion` key, so none is written, and no raw element. The writer sends the tree to `spnutils apps surface render` and sets the page it prints in a frame, light and dark side by side, the unit's name as the title and the tree below it as code. A tree the render refuses, or one with a finding, stops the write with the finding's words. On github.com the fence reads as plain code.
 
@@ -41,8 +48,10 @@
 | You need to show | Use |
 | --- | --- |
 | how ideas connect | a `dg` diagram |
-| a unit the design system builds | `unit`: inline when small, framed when window-sized (a layout, a whole page) |
-| a unit, variant or page shape not built yet | a skeleton, marked planned; once the design system builds it, the page writer flags it and it becomes a `unit` |
+| a unit the design system builds, on a surface sample page or a surface page preview | `unit`: inline when small, framed when window-sized (a layout, a whole page) |
+| a built unit made of parts a reader places (a composite, a widget, a container, a layout, a page), on a docs page | a skeleton of its parts, each in its design-system name, and a line naming its showcase page (`RULE.DEVEX.WORKSPACE.571` · GUIDE) |
+| a single built component, on a docs page | no figure: its words, its props and a line naming its showcase page |
+| a unit, variant or page shape not built yet | a skeleton, marked planned |
 | one whole page of a product, for review | the surface preview |
 | several such pages | a samples index: the index template, each entry a surface preview |
 | a running page as it is | `spn-surface page copy`, in a surface preview |
@@ -80,7 +89,7 @@ Where the passage is unsure, these lines decide:
 - **Draw every relation the passage states between the boxes it names, and no relation it only implies.** At most six boxes; where the passage names more, the figure shows the part the caption points at.
 - **A caption states only what the passage states.** A cardinality or an exception the passage does not say is not written in the caption.
 
-**A skeleton is marked `"planned": true` at the top of its spec.** One that names a unit the design system builds, without the mark, stops the write: draw it with a `unit` fence instead.
+**A skeleton is marked `"planned": true` at the top of its spec when its unit is not built yet.** A skeleton of a built unit is drawn without the mark, each part in its design-system name.
 
 ## A figure is a ```dg``` fence of strict JSON
 
