@@ -18,6 +18,9 @@ change. Do not re-derive a hint, and do not go looking for more files.
 
 - **A table becomes a catalog** where each row is a name and a sentence a reader scans, and a catalog becomes a table where the
   reader compares columns.
+- **Every `catalog layout=LIST` you write or touch names `facts=`** (rule 563): `facts=END` when every fact is short (a word, a
+  number, a status, a version or up to three tags; up to three columns), else `facts=AFTER_DESCRIPTION`. A list without facts
+  needs none. An item whose one fact is a few codes may write them as a line of tags with no key (rule 564).
 - **A list becomes tabs** where its items are alternatives a reader picks one of, or a table of item cells where the items run long.
 - **Detail folds away** where a unit's second half is reference a reader opens on demand.
 - **A matching figure is added beside a passage** that walks through three or more steps, relations, states or layers. The passage
