@@ -601,8 +601,8 @@ const exitIn = (cwd, args) => {
   try { execFileSync(process.execPath, [TOOL, "docs", ...args], { encoding: "utf8", cwd, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: cwd } }); return 0; }
   catch (error) { return error.status; }
 };
-const USAGE = "usage: spn-devex docs face check [<path>] [--block glossary|constructs|contents|tags]\n" +
-              "       spn-devex docs face write <path> [--block glossary|constructs|contents|tags]\n";
+const USAGE = "usage: spn-devex docs face check [<path>] [--block glossary|constructs|contents|tags|surface-catalogue|surface-design-language]\n" +
+              "       spn-devex docs face write <path> [--block glossary|constructs|contents|tags|surface-catalogue|surface-design-language]\n";
 
 console.log("\n=== `docs face` needs its action as a word, and a `write` needs a path");
 {
@@ -622,7 +622,7 @@ console.log("\n=== `docs face` needs its action as a word, and a `write` needs a
 
   one("[MKT.SCRIPTS.87] [MKT.SCRIPTS.112] `write` with no path prints its usage line and says a path is owed",
     run(root, ["face", "write"]),
-    "usage: spn-devex docs face write <path> [--block glossary|constructs|contents|tags]\n`docs face write` needs a path.\n");
+    "usage: spn-devex docs face write <path> [--block glossary|constructs|contents|tags|surface-catalogue|surface-design-language]\n`docs face write` needs a path.\n");
   one("[MKT.SCRIPTS.87] [MKT.SCRIPTS.112] and exits 2", exitIn(root, ["face", "write"]), 2);
   one("[MKT.SCRIPTS.87] [MKT.SCRIPTS.112] and it wrote nothing under the folder it was run from", readAt(root, at), stale);
 
@@ -632,12 +632,12 @@ console.log("\n=== `docs face` needs its action as a word, and a `write` needs a
   one("[MKT.SCRIPTS.113] `check` writes nothing", readAt(root, at), stale);
   one("[MKT.SCRIPTS.113] where the caller is in no repository, `check` with no path says to name one",
     run(BASE, ["face", "check"]),
-    "usage: spn-devex docs face check [<path>] [--block glossary|constructs|contents|tags]\n" +
+    "usage: spn-devex docs face check [<path>] [--block glossary|constructs|contents|tags|surface-catalogue|surface-design-language]\n" +
     "`docs face check` needs a path here, because the folder it is run from is in no repository. Name a repository.\n");
   one("[MKT.SCRIPTS.113] with exit 2", exitIn(BASE, ["face", "check"]), 2);
 
   one("[MKT.SCRIPTS.115] a block outside the set is refused with the set",
-    run(root, ["face", "write", "docs", "--block", "maps"]), has("takes `--block` from glossary · constructs · contents · tags, and `maps` is none of them."));
+    run(root, ["face", "write", "docs", "--block", "maps"]), has("takes `--block` from glossary · constructs · contents · tags · surface-catalogue · surface-design-language, and `maps` is none of them."));
   one("[MKT.SCRIPTS.115] with exit 2", exitIn(root, ["face", "write", "docs", "--block", "maps"]), 2);
   one("an option the command does not take is refused with exit 2", exitIn(root, ["face", "check", "docs", "--json"]), 2);
   one("a second path is refused with exit 2", exitIn(root, ["face", "write", "docs", "docs"]), 2);

@@ -7,7 +7,7 @@
 
 
 
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.1/docs-language.css" integrity="sha384-FSy6NEydzbJ7AjYW6VWuuBQAaLJgvNLMgLOuNB3LymgigG6f0vSMHnhDjOIFV/Nv" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.17.0/docs-language.css" integrity="sha384-iKzty+7ilkXUlI6/BeAWzMb6prxxEjEE3a3TqWxHlSa2n92QRsxIBNP4USCjaadn" crossorigin="anonymous">
 <div class="sds-page">
 <nav class="sds-rail" id="rail">
   <div class="sds-rail-title">Blocks</div>
@@ -441,6 +441,71 @@ DSToolbar | a toolbar, with its items, groups and separators
   <div class="sds-group-body"><div class="sds-tiles sds-tiles-compact" data-layout="GRID"><div class="sds-tile"><h4><code>DSLayout</code></h4><p>the frame of a page</p></div><div class="sds-tile"><h4><code>DSSiteLayout</code></h4><p>the wrapper of a site&rsquo;s page</p></div></div></div>
 </section>
 
+  <h4 id="b-groups-forms">A panel with a list, a panel with tabs</h4>
+  <p class="sds-small"><strong>Use when</strong> a named set needs a head and a one-line description: a panel holding a list for a set of items, a panel holding tabs for a set split into two to six sub-sets, each its own list.</p>
+  <p>A panel&rsquo;s head holds its name, its description and its count, and its body is flush: a list stands straight under the head, and tabs stand edge to edge. A list in a panel draws Plan-style rows, the title, its description, one line of facts and the one closed-set fact as a badge at the row&rsquo;s end. An item&rsquo;s <code>For:</code>, <code>Choose when:</code>, <code>Not when:</code> and <code>Rules:</code> lines open as a closed Guidance fold under the row. A fenced group draws no row of links.</p>
+  <pre data-lang="text">~~~group The parts of a category | what a category is made of
+```catalog layout=LIST facts=AFTER_DESCRIPTION
+Shared | what every category holds
+  Parts: 4
+  Code: [OWN]
+  For: a designer
+  Choose when: a value is the same on every page
+  Not when: one page needs its own look → Style
+Structure | how a category's pages are built
+  Parts: 4
+  Code: [PICKED]
+```
+~~~
+
+~~~group Structure | how a category's pages are built
+~~~tabs look=LINE
+--- Layouts
+```catalog layout=LIST facts=AFTER_DESCRIPTION
+Topnav | a bar across the top
+  Code: [PICKED]
+  Unit: DSSiteLayout
+```
+--- Pages
+```catalog layout=LIST facts=AFTER_DESCRIPTION
+Home | the first page
+  Code: [NEW]
+```
+~~~
+~~~</pre>
+<section class="sds-group" id="g-the-parts-of-a-category" aria-labelledby="g-the-parts-of-a-category-title">
+  <div class="sds-group-head"><div class="sds-group-title"><h5 id="g-the-parts-of-a-category-title">The parts of a category</h5><p class="sds-group-line">what a category is made of</p></div><span class="sds-group-count">2 items</span></div>
+  <div class="sds-group-body"><div class="sds-scroll"><table>
+    <tbody>
+      <tr><td><p><strong>Shared</strong></p><p>what every category holds</p><span class="sds-small sds-facts"><span class="sds-fact-key">Parts</span><span class="sds-fact-value">4</span></span><details class="sds-fold sds-guidance"><summary>Guidance</summary><p class="sds-small"><strong>For</strong> a designer</p><p class="sds-small"><strong>Choose when</strong> a value is the same on every page</p><p class="sds-small"><strong>Not when</strong> one page needs its own look → Style</p></details></td><td><span class="sds-tags"><span class="sds-badge">OWN</span></span></td></tr>
+      <tr><td><p><strong>Structure</strong></p><p>how a category's pages are built</p><span class="sds-small sds-facts"><span class="sds-fact-key">Parts</span><span class="sds-fact-value">4</span></span></td><td><span class="sds-tags"><span class="sds-badge">PICKED</span></span></td></tr>
+    </tbody>
+  </table></div></div>
+</section>
+<section class="sds-group" id="g-structure" aria-labelledby="g-structure-title">
+  <div class="sds-group-head"><div class="sds-group-title"><h5 id="g-structure-title">Structure</h5><p class="sds-group-line">how a category's pages are built</p></div><span class="sds-group-count">2 tabs</span></div>
+  <div class="sds-group-body"><div class="sds-tabset" data-type="LINE">
+    <div class="sds-tabset-bar" role="tablist" aria-label="Layouts, Pages">
+      <button type="button" role="tab" id="t-1-1" aria-controls="p-1-1" aria-selected="true">Layouts</button>
+      <button type="button" role="tab" id="t-1-2" aria-controls="p-1-2" aria-selected="false">Pages</button>
+    </div>
+    <div class="sds-tabset-panel" role="tabpanel" id="p-1-1" aria-labelledby="t-1-1">
+  <div class="sds-scroll"><table>
+    <tbody>
+      <tr><td><p><strong>Topnav</strong></p><p>a bar across the top</p><span class="sds-small sds-facts"><span class="sds-fact-key">Unit</span><span class="sds-fact-value">DSSiteLayout</span></span></td><td><span class="sds-tags"><span class="sds-badge">PICKED</span></span></td></tr>
+    </tbody>
+  </table></div>
+    </div>
+    <div class="sds-tabset-panel" role="tabpanel" id="p-1-2" aria-labelledby="t-1-2">
+  <div class="sds-scroll"><table>
+    <tbody>
+      <tr><td><p><strong>Home</strong></p><p>the first page</p></td><td><span class="sds-tags"><span class="sds-badge">NEW</span></span></td></tr>
+    </tbody>
+  </table></div>
+    </div>
+  </div></div>
+</section>
+
   <h3 id="b-fold">FOLD &mdash; extra detail</h3>
   <p class="sds-small"><strong>Use when</strong> some readers want detail the rest can skip, or a file the page explains has no need to be shown whole.</p>
   <p>A fold is a <code>details</code> with its summary. It keeps the page short and still shows on a search. What every reader must read never goes in one. A file the page explains is a fold with an empty body, <code>file=&lt;path&gt; fold</code>, and the writer reads the file&rsquo;s own words.</p>
@@ -456,6 +521,57 @@ DSToolbar | a toolbar, with its items, groups and separators
     <thead><tr><th></th><th>{{A reader's question}}</th><th>{{A reader's question}}</th></tr></thead>
     <tbody><tr><td><strong>{{Thing}}</strong></td><td>{{&hellip;}}</td><td>{{&hellip;}}</td></tr><tr><td><strong>{{Thing}}</strong></td><td>{{&hellip;}}</td><td>{{&hellip;}}</td></tr></tbody>
   </table></div>
+  <h3 id="b-terms-table">TERMS TABLE</h3>
+  <p class="sds-small"><strong>Use when</strong> a construct names the words its page gives a meaning to.</p>
+  <p>The seat file keeps three columns, <code>Term</code>, <code>Contract term</code> and <code>What it means</code>. When every contract term is empty or a dash, the page draws two columns and no column of dashes. One contract term in any row brings the third column back.</p>
+  <pre data-lang="text">| Term | Contract term | What it means |
+| --- | --- | --- |
+| Block | — | any unit a surface is built from |
+| Kind of surface | — | where a surface runs and how a person reaches it |
+| Task state | — | where a task stands |</pre>
+  <div class="sds-scroll"><table class="sds-terms sds-terms-two">
+    <thead><tr><th>Term</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Block</strong></td><td>any unit a surface is built from</td></tr>
+      <tr><td><strong>Kind of surface</strong></td><td>where a surface runs and how a person reaches it</td></tr>
+      <tr><td><strong>Task state</strong></td><td>where a task stands</td></tr>
+    </tbody>
+  </table></div>
+  <h3 id="b-numbered-table">NUMBERED TABLE</h3>
+  <p class="sds-small"><strong>Use when</strong> numbered things each have a title and a sentence.</p>
+  <p>A table whose first column is only a number draws the number and the title on one line, with the sentence under the title.</p>
+  <pre data-lang="text">| No | Step | What happens |
+| --- | --- | --- |
+| 1 | Pick | Choose the template by the page's kind. |
+| 2 | Fill | Write each section in the block its content takes. |
+| 3 | Check | Run the page check until it reports no finding. |</pre>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Step</th></tr></thead>
+    <tbody>
+      <tr><td><p><span class="sds-num">1</span> <strong>Pick</strong></p><p>Choose the template by the page's kind.</p></td></tr>
+      <tr><td><p><span class="sds-num">2</span> <strong>Fill</strong></p><p>Write each section in the block its content takes.</p></td></tr>
+      <tr><td><p><span class="sds-num">3</span> <strong>Check</strong></p><p>Run the page check until it reports no finding.</p></td></tr>
+    </tbody>
+  </table></div>
+  <h3 id="b-long-table">LONG TABLE &mdash; a fold</h3>
+  <p class="sds-small"><strong>Use when</strong> a table runs past about 20 rows and a reader looks one row up.</p>
+  <p>A fence of tildes tagged <code>fold</code> and its summary holds the table, and the page draws it shut.</p>
+  <pre data-lang="text">~~~fold The rules this chapter binds
+| Rule | What it decides | Weight |
+| --- | --- | --- |
+| `RULE.DEVEX.WORKSPACE.530` | what rule 530 decides | GUIDE |
+| `RULE.DEVEX.WORKSPACE.531` | what rule 531 decides | GUIDE |
+~~~</pre>
+  <details class="sds-fold sds-fold-block">
+    <summary>The rules this chapter binds</summary>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Rule</th><th>Weight</th></tr></thead>
+    <tbody>
+      <tr><td><p><code>RULE.DEVEX.WORKSPACE.530</code></p><p>what rule 530 decides</p></td><td>GUIDE</td></tr>
+      <tr><td><p><code>RULE.DEVEX.WORKSPACE.531</code></p><p>what rule 531 decides</p></td><td>GUIDE</td></tr>
+    </tbody>
+  </table></div>
+  </details>
 </section>
 
 <section id="literals" data-block="example">
@@ -536,6 +652,84 @@ deploy:
 }</pre>
   </figure>
   <p class="sds-small">the markup: a <code>figure.sds-file</code> holding a <code>figcaption</code> (its <code>.sds-file-path</code> and its <code>.sds-file-lang</code>) and the <code>pre</code></p>
+  <h3 id="b-code-forms">CODE EXCERPT</h3>
+  <p class="sds-small"><strong>Use when</strong> a page shows code. The code is read from its file, and the page shows the part that matters.</p>
+  <p>A fence whose tag reads <code>file=&lt;path&gt; lines=a-b</code> and whose body is empty draws that excerpt of the file. The frame is titled with the path and the lines, links the whole file, and numbers each line as the file does. <code>mark=a-b</code> shades the lines you want the reader to see. Every frame takes syntax colours in light and in dark, and a copy button.</p>
+  <p class="sds-small">an excerpt with one marked line: the fence is</p>
+  <pre data-lang="text">```json file=docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/app-patterns/a-value-from-an-enum.dg.json lines=1-8 mark=3
+```</pre>
+  <figure class="sds-file sds-code sds-code-numbered">
+    <figcaption><a class="sds-file-path" href="https://github.com/saasplane/spn-foundation/blob/HEAD/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/app-patterns/a-value-from-an-enum.dg.json">docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/app-patterns/a-value-from-an-enum.dg.json<span class="sds-file-lines">:1-8</span></a><span class="sds-file-lang">json</span></figcaption>
+    <pre data-lang="json"><span class="sds-ln" data-n="1">{</span>
+<span class="sds-ln" data-n="2"> <span class="sds-tk-s">"kind"</span>: <span class="sds-tk-s">"skeleton"</span>,</span>
+<span class="sds-ln sds-mark" data-n="3"> <span class="sds-tk-s">"title"</span>: <span class="sds-tk-s">"A value from an enum"</span>,</span>
+<span class="sds-ln" data-n="4"> <span class="sds-tk-s">"caption"</span>: <span class="sds-tk-s">"How a value is shown follows from what it is on the page. An icon in a skeleton is the default icon, whichever icon the enum or the value takes."</span>,</span>
+<span class="sds-ln" data-n="5"> <span class="sds-tk-s">"frame"</span>: {</span>
+<span class="sds-ln" data-n="6">  <span class="sds-tk-s">"label"</span>: <span class="sds-tk-s">"How a value is shown"</span>,</span>
+<span class="sds-ln" data-n="7">  <span class="sds-tk-s">"rows"</span>: [</span>
+<span class="sds-ln" data-n="8">   {</span></pre>
+  </figure>
+  <p class="sds-small">code past 20 lines folds, with its first 10 lines showing: the fence is</p>
+  <pre data-lang="text">```json file=docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/app-patterns/a-value-from-an-enum.dg.json lines=1-22
+```</pre>
+  <figure class="sds-file sds-code sds-code-numbered">
+    <figcaption><a class="sds-file-path" href="https://github.com/saasplane/spn-foundation/blob/HEAD/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/app-patterns/a-value-from-an-enum.dg.json">docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/app-patterns/a-value-from-an-enum.dg.json<span class="sds-file-lines">:1-22</span></a><span class="sds-file-lang">json</span></figcaption>
+    <pre data-lang="json"><span class="sds-ln" data-n="1">{</span>
+<span class="sds-ln" data-n="2"> <span class="sds-tk-s">"kind"</span>: <span class="sds-tk-s">"skeleton"</span>,</span>
+<span class="sds-ln" data-n="3"> <span class="sds-tk-s">"title"</span>: <span class="sds-tk-s">"A value from an enum"</span>,</span>
+<span class="sds-ln" data-n="4"> <span class="sds-tk-s">"caption"</span>: <span class="sds-tk-s">"How a value is shown follows from what it is on the page. An icon in a skeleton is the default icon, whichever icon the enum or the value takes."</span>,</span>
+<span class="sds-ln" data-n="5"> <span class="sds-tk-s">"frame"</span>: {</span>
+<span class="sds-ln" data-n="6">  <span class="sds-tk-s">"label"</span>: <span class="sds-tk-s">"How a value is shown"</span>,</span>
+<span class="sds-ln" data-n="7">  <span class="sds-tk-s">"rows"</span>: [</span>
+<span class="sds-ln" data-n="8">   {</span>
+<span class="sds-ln" data-n="9">    <span class="sds-tk-s">"items"</span>: [</span>
+<span class="sds-ln" data-n="10">     {</span></pre>
+    <details class="sds-more"><summary>Show 12 more lines</summary><pre data-lang="json"><span class="sds-ln" data-n="11">      <span class="sds-tk-s">"icon"</span>: <span class="sds-tk-s">"default"</span>,</span>
+<span class="sds-ln" data-n="12">      <span class="sds-tk-s">"text"</span>: <span class="sds-tk-s">"Enterprise"</span></span>
+<span class="sds-ln" data-n="13">     },</span>
+<span class="sds-ln" data-n="14">     {</span>
+<span class="sds-ln" data-n="15">      <span class="sds-tk-s">"note"</span>: <span class="sds-tk-s">"one icon for the whole enum"</span></span>
+<span class="sds-ln" data-n="16">     }</span>
+<span class="sds-ln" data-n="17">    ],</span>
+<span class="sds-ln" data-n="18">    <span class="sds-tk-s">"label"</span>: <span class="sds-tk-s">"a kind, beside other facts"</span></span>
+<span class="sds-ln" data-n="19">   },</span>
+<span class="sds-ln" data-n="20">   {</span>
+<span class="sds-ln" data-n="21">    <span class="sds-tk-s">"items"</span>: [</span>
+<span class="sds-ln" data-n="22">     {</span></pre></details>
+  </figure>
+  <p class="sds-small">two forms of one thing are tabs, one excerpt in each panel: the fence is</p>
+  <pre data-lang="text">~~~tabs look=LINE
+--- The head
+```json file=docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/app-patterns/a-value-from-an-enum.dg.json lines=1-4
+```
+--- The first row
+```json file=docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/app-patterns/a-value-from-an-enum.dg.json lines=6-9
+```
+~~~</pre>
+  <div class="sds-tabset" data-type="LINE">
+    <div class="sds-tabset-bar" role="tablist" aria-label="The head, The first row">
+      <button type="button" role="tab" id="t-cf-1" aria-controls="p-cf-1" aria-selected="true">The head</button>
+      <button type="button" role="tab" id="t-cf-2" aria-controls="p-cf-2" aria-selected="false">The first row</button>
+    </div>
+    <div class="sds-tabset-panel" role="tabpanel" id="p-cf-1" aria-labelledby="t-cf-1">
+  <figure class="sds-file sds-code sds-code-numbered">
+    <figcaption><a class="sds-file-path" href="https://github.com/saasplane/spn-foundation/blob/HEAD/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/app-patterns/a-value-from-an-enum.dg.json">docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/app-patterns/a-value-from-an-enum.dg.json<span class="sds-file-lines">:1-4</span></a><span class="sds-file-lang">json</span></figcaption>
+    <pre data-lang="json"><span class="sds-ln" data-n="1">{</span>
+<span class="sds-ln" data-n="2"> <span class="sds-tk-s">"kind"</span>: <span class="sds-tk-s">"skeleton"</span>,</span>
+<span class="sds-ln" data-n="3"> <span class="sds-tk-s">"title"</span>: <span class="sds-tk-s">"A value from an enum"</span>,</span>
+<span class="sds-ln" data-n="4"> <span class="sds-tk-s">"caption"</span>: <span class="sds-tk-s">"How a value is shown follows from what it is on the page. An icon in a skeleton is the default icon, whichever icon the enum or the value takes."</span>,</span></pre>
+  </figure>
+    </div>
+    <div class="sds-tabset-panel" role="tabpanel" id="p-cf-2" aria-labelledby="t-cf-2">
+  <figure class="sds-file sds-code sds-code-numbered">
+    <figcaption><a class="sds-file-path" href="https://github.com/saasplane/spn-foundation/blob/HEAD/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/app-patterns/a-value-from-an-enum.dg.json">docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/app-patterns/a-value-from-an-enum.dg.json<span class="sds-file-lines">:6-9</span></a><span class="sds-file-lang">json</span></figcaption>
+    <pre data-lang="json"><span class="sds-ln" data-n="6">  <span class="sds-tk-s">"label"</span>: <span class="sds-tk-s">"How a value is shown"</span>,</span>
+<span class="sds-ln" data-n="7">  <span class="sds-tk-s">"rows"</span>: [</span>
+<span class="sds-ln" data-n="8">   {</span>
+<span class="sds-ln" data-n="9">    <span class="sds-tk-s">"items"</span>: [</span></pre>
+  </figure>
+    </div>
+  </div>
   <h3 id="b-command">COMMAND &mdash; a run</h3>
   <p class="sds-small"><strong>Use when</strong> the reader runs a command in a terminal or asks the agent for a step.</p>
   <p>{{What running it does, in a sentence. One command a line; a note after two spaces and a hash stays quiet and is never copied; a script stays a CODE block.}}</p>
@@ -1048,7 +1242,7 @@ deploy:
     </tbody>
   </table></div>
   <h4 id="b-unit">UNIT &mdash; a rendered unit</h4>
-  <p class="sds-small"><strong>Use when</strong> the reader should see a unit of the design system as it draws, light and dark.</p>
+  <p class="sds-small"><strong>Use when</strong> you want the reader to see a unit of the design system as it draws, light and dark.</p>
   <p>The page holds the tree, in a fence tagged <code>unit</code>. <code>docs page write</code> sends it to the render and sets the result in a frame, the unit&rsquo;s name as its title, light and dark side by side, the tree below it as code. A tree the render refuses stops the write. The frame is the writer&rsquo;s output, so a template shows the fence:</p>
   <pre data-lang="text">```unit
 { "specVersion": 1,
@@ -1181,7 +1375,7 @@ deploy:
 </div>
 <figcaption>The navigation is a sidebar that a person opens and shuts to its icons. Its head, navigation, actions and foot are four places in one column, and children fills the content beside it. Each place carries the name of its prop, and takes any node.</figcaption>
 </figure>
-  <p><strong>A container</strong> &mdash; a container as it stands today: its header unframed above, then one rounded box holding the content parts and the footer.</p>
+  <p><strong>A container</strong> &mdash; a container as it is today: its header unframed above, then one rounded box holding the content parts and the footer.</p>
 <figure class="dl-figure">
 <div class="dl-frame">
 <svg class="dl-svg dl-skeleton" viewBox="0 0 928 524" role="img" aria-label="DSPanelContainer: a header, content and a footer">
@@ -1410,7 +1604,7 @@ deploy:
   <path class="dl-glyph" d="M848.83 521.92 L852.92 526 L848.83 530.08"/>
 </svg>
 </div>
-<figcaption>One widget placed whole, as it stands on a page: in the content of a container. Its bar holds the control that ticks every record, the node the page gives it, the sort and the layout switch; its records are one table; its footer holds the count and the pagination.</figcaption>
+<figcaption>One widget placed whole, as it sits on a page: in the content of a container. Its bar holds the control that ticks every record, the node the page gives it, the sort and the layout switch; its records are one table; its footer holds the count and the pagination.</figcaption>
 </figure>
   <p><strong>A component</strong> &mdash; a dialog, one of the few components that frame others, over its scrim.</p>
 <figure class="dl-figure">
@@ -2766,7 +2960,7 @@ deploy:
       <tr><td><code>sds-error</code></td><td><span class="sds-badge sds-error">error</span></td><td>a thing failed, was refused or was removed</td></tr>
     </tbody>
   </table></div>
-  <div class="sds-pull sds-info"><span class="sds-label">Info</span><p>A pull that carries <code>sds-info</code>: something the reader should know.</p></div>
+  <div class="sds-pull sds-info"><span class="sds-label">Info</span><p>A pull that carries <code>sds-info</code>: something you want the reader to know.</p></div>
   <div class="sds-pull sds-success"><span class="sds-label">Success</span><p>A pull that carries <code>sds-success</code>: the step ran, and the check passed.</p></div>
   <div class="sds-pull sds-warning"><span class="sds-label">Warning</span><p>A pull that carries <code>sds-warning</code>: this works, and one part of it is still done by hand.</p></div>
   <div class="sds-pull sds-error"><span class="sds-label">Error</span><p>A pull that carries <code>sds-error</code>: the command stopped, and nothing was written.</p></div>
@@ -2811,4 +3005,4 @@ deploy:
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.1/docs-page.js" integrity="sha384-Yh+Ztg5bVhxgDDtxHr+EPMzSUK9lZBPyEbf6lX6l64JeEy5SMSsRzxFEZUjVw6ui" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.17.0/docs-page.js" integrity="sha384-Vb4RyU01owBrMnb6+lymdbrxDT/UU49uVT1B/1yV/jRmQWs4B3AiDiszEmlJs7L+" crossorigin="anonymous"></script>

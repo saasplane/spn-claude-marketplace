@@ -7,7 +7,7 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const HERE = resolve(import.meta.dirname, "..", "..", "..", "..");
-const { renderPage, setUnitRender, setBuiltUnits, designSystemVersion, pageFromRender, pagesFromRender, DEFAULT_RENDER_APP } = await import(pathToFileURL(resolve(HERE, "src", "scripts", "lib", "render.ts")).href);
+const { renderPage, setUnitRender, setUnitFence, designSystemVersion, pageFromRender, pagesFromRender, DEFAULT_RENDER_APP } = await import(pathToFileURL(resolve(HERE, "src", "scripts", "lib", "render.ts")).href);
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -77,30 +77,59 @@ ok("the Terms table carries the class `sds-terms`, which gives the three columns
 ok("a table that is not the Terms table carries no such class",
   !produced(table(["Rule", "What it decides", "Weight"], ["`RD.X.1`", "what every provider delivers", "MUST"])).includes("sds-terms")
   && !produced(table(["Term", "Meaning"], ["Estate", "everything a product runs on"])).includes("sds-terms"));
+{
+  const empty = rowsOf(produced(table(["Term", "Contract term", "What it means"], ["Estate", "—", "everything a product runs on"], ["Ring", "", "a set of estates"])), "<thead>");
+  ok("[MKT.SCRIPTS.647] a Terms table whose Contract term cells are all empty or a dash draws no Contract term column, in its head or its rows",
+    empty.startsWith("<thead><tr><th>Term</th><th>Description</th></tr></thead>") && empty.includes("<tr><td><strong>Estate</strong></td><td>everything a product runs on</td></tr>") && !empty.includes("Contract term"), empty);
+  ok("[MKT.SCRIPTS.647] it takes the class `sds-terms sds-terms-two`, so the stylesheet gives its two columns their own shares",
+    produced(table(["Term", "Contract term", "What it means"], ["Estate", "—", "x"])).includes('<table class="sds-terms sds-terms-two">'));
+  ok("[MKT.SCRIPTS.647] one contract term in any row keeps the column",
+    rowsOf(produced(table(["Term", "Contract term", "What it means"], ["Estate", "—", "x"], ["Ring", "`SPRing`", "y"])), "<thead>").includes("<th>Contract term</th>"));
+}
+{
+  const css = (await import("node:fs")).readFileSync(resolve(HERE, "src", "styles", "docs-language.src.css"), "utf8");
+  const piece = produced(table(["Piece", "The question it answers", "Its terms"], ["A provider", "What must it build?", "Provider"]));
+  ok("[MKT.SCRIPTS.648] an item cell's facts are a key and a value, each its own element, in the one inline-fact look: no `Key: value` text",
+    piece.includes('<span class="sds-small sds-facts"><span class="sds-fact-key">Terms</span><span class="sds-fact-value">Provider</span></span>') && !piece.includes("Terms: Provider"), piece.slice(-400));
+  ok("[MKT.SCRIPTS.648] the stylesheet draws every inline fact from one set of rules: the key in the fact colour at medium weight, the value in the card title colour, in the text font",
+    /\.sds-tile-facts dt,\s*\.sds-fact-key\s*\{[^}]*font-family:\s*inherit[^}]*font-weight:\s*var\(--font-weight-medium\)[^}]*color:\s*var\(--sds-text-fact-card\)/.test(css)
+      && /\.sds-tile-facts dd,\s*\.sds-fact-value\s*\{[^}]*color:\s*var\(--sds-text-title-card\)/.test(css));
+  ok("[MKT.SCRIPTS.648] and no block keeps a copy: a group row, a GRID card, a LIST row and a one-line fact set no colour or weight of their own for their key and value",
+    !/\.sds-group-body \.sds-fact-(?:key|value)/.test(css) && !/data-layout='(?:GRID|LIST)'\] \.sds-tile-facts(?:-one)? d[td] \{[^}]*(?:color|font-weight|font-style)/.test(css));
+}
+{
+  const numbered = produced(table(["No", "Step", "What happens"], ["1", "Pick", "Choose the template by the page's kind, and start it from the seat"], ["2", "Fill", "Write each section in the block its content takes, in order"], ["3", "Check", "Run the page check until it reports no finding"]));
+  ok("[MKT.SCRIPTS.649] a table whose first column is only a number draws the number and the item's title on one line, its sentence under the title",
+    numbered.includes('<tr><td><p><span class="sds-num">1</span> <strong>Pick</strong></p><p>Choose the template by the page\'s kind, and start it from the seat</p></td></tr>'), numbered);
+  ok("[MKT.SCRIPTS.649] the number column is gone, and the head is the title column's name",
+    numbered.includes("<thead><tr><th>Step</th></tr></thead>") && !numbered.includes("<th>No</th>"), numbered);
+  ok("[MKT.SCRIPTS.649] a table whose first column holds words is not read this way, and a number beside other columns keeps those columns",
+    !produced(table(["Name", "Count"], ["a", "1"])).includes("sds-num") && produced(table(["No", "Step", "Owner"], ["1", "Pick", "lead"], ["2", "Fill", "agent"])).includes("<th>Owner</th>"));
+}
 const { cutVersions, integrityTable, newestVersion, linesFor } = await import(pathToFileURL(resolve(HERE, "..", "plugin-support-lib", "src", "lib", "page-styles.ts")).href);
 const { readFileSync } = await import("node:fs");
 const STYLES_HOME = resolve(HERE, "src", "styles");
-ok("the newest version of the shared styles is 1.16.1, which serves design-system-units.css and design-system.css, so every page writer links it",
-  newestVersion(Object.keys(cutVersions(STYLES_HOME))) === "1.16.1");
+ok("the newest version of the shared styles is 1.17.0, which serves design-system-units.css and design-system.css, so every page writer links it",
+  newestVersion(Object.keys(cutVersions(STYLES_HOME))) === "1.17.0");
 ok("and 1.10.0 serves the Terms shares: a fixed layout, and the stacked rows under 40rem",
   /table\.sds-terms\{table-layout:fixed\}|table\.sds-terms\s*\{[^}]*table-layout:\s*fixed/.test(readFileSync(resolve(HERE, "..", "..", "public", "assets", "docs", "1.10.0", "sds-docs.css"), "utf8"))
   && readFileSync(resolve(HERE, "..", "..", "public", "assets", "docs", "1.10.0", "sds-docs.css"), "utf8").includes("max-width:40rem"));
 for (const name of ["construct", "overview", "blocks"]) {
   const template = readFileSync(resolve(HERE, "src", "refs", "devex", "workspace", "docs", "templates", "docs", "pages", `${name}-template.html`), "utf8");
-  ok(`the ${name} template links 1.16.1, the version every page writer links, with its hash`,
-    template.includes(linesFor("1.16.1", undefined, integrityTable(STYLES_HOME)["1.16.1"]).stylesheet) && !template.includes("/1.15.0/"));
+  ok(`the ${name} template links 1.17.0, the version every page writer links, with its hash`,
+    template.includes(linesFor("1.17.0", undefined, integrityTable(STYLES_HOME)["1.17.0"]).stylesheet) && !template.includes("/1.15.0/"));
 }
 const binds = rowsOf(produced(table(["Rule", "What it decides", "Weight"], ["`RD.X.1`", "what every provider delivers", "MUST"])), "<thead>");
 ok("Binds keeps the Weight a reader compares down, and folds what a rule decides into the rule's cell",
   binds.includes("<thead><tr><th>Rule</th><th>Weight</th></tr></thead>") && binds.includes("<tr><td><p><code>RD.X.1</code></p><p>what every provider delivers</p></td><td>MUST</td></tr>"), binds);
 const pieces = rowsOf(produced(table(["Piece", "The question it answers", "Its terms"], ["**A provider**", "What must it build?", "Provider"], ["**Figma**", "Why elsewhere?", "—"])), "<thead>");
 ok("a Model's pieces are one column: the piece, its question, and its terms as a fact",
-  pieces.includes("<tr><td><p><strong>A provider</strong></p><p>What must it build?</p><span class=\"sds-small\">Terms: Provider</span></td></tr>") &&
+  pieces.includes("<tr><td><p><strong>A provider</strong></p><p>What must it build?</p><span class=\"sds-small sds-facts\"><span class=\"sds-fact-key\">Terms</span><span class=\"sds-fact-value\">Provider</span></span></td></tr>") &&
   pieces.includes("<tr><td><p><strong>Figma</strong></p><p>Why elsewhere?</p></td></tr>"), pieces);
 const edges = rowsOf(produced(table(["Owns", "Refuses", "Who owns that instead"], ["the build", "what a kind is", "[Targets](targets.md)"])), "<thead>");
 ok("a Boundary keeps Owns beside Refuses, and who owns the refused part is a fact",
   edges.includes("<thead><tr><th>Owns</th><th>Refuses</th></tr></thead>") &&
-  edges.includes("<tr><td>the build</td><td>what a kind is<span class=\"sds-small\">Owned by: <a href=\"targets.md\">Targets</a></span></td></tr>"), edges);
+  edges.includes("<tr><td>the build</td><td>what a kind is<span class=\"sds-small sds-facts\"><span class=\"sds-fact-key\">Owned by</span><span class=\"sds-fact-value\"><a href=\"targets.md\">Targets</a></span></span></td></tr>"), edges);
 const other = rowsOf(produced(table(["Key", "Example", "Why"], ["`a`", "`b`", "c"])), "<thead>");
 ok("any other table of short values keeps its columns, as written",
   other.includes("<thead><tr><th>Key</th><th>Example</th><th>Why</th></tr></thead>") && other.includes("<tr><td><code>a</code></td><td><code>b</code></td><td>c</td></tr>"), other);
@@ -166,6 +195,7 @@ ok("red: several columns of sentences are a paragraph each, led by the column's 
 
 console.log("\n=== the page renderer — a unit fence is drawn by the render and set in a frame");
 {
+  setUnitFence(true);
   const tree = { unit: "DSFeature", props: { pageLevel: "PAGE", type: "BACKDROP", title: "A title" } };
   const seen = [];
   setUnitRender((file) => { seen.push(JSON.parse(readFileSync(file, "utf8"))); return "<html><head></head><body><p class=\"x\">drawn & ready</p></body></html>"; });
@@ -273,6 +303,7 @@ console.log("\n=== the page renderer — a unit fence is drawn by the render and
   try { pagesFromRender(JSON.stringify({ renders: { LIGHT: { DESKTOP: { findings: [] } } } })); } catch (e) { refusedNew = e.message; }
   ok("[MKT.SCRIPTS.632] a mode with no html is refused by its name", refusedNew.includes("LIGHT") && refusedNew.includes("`html`"), refusedNew);
   setUnitRender();
+  setUnitFence();
 }
 
 const made = (markdown) => renderPage({
@@ -288,20 +319,16 @@ console.log("\n=== the page renderer — a skeleton of a built unit, and a table
     kind: "skeleton", caption: "A sketch", ...extra,
     frame: { label: "A frame", unit, rows: [{ label: "Row", items: [{ text: "One" }] }] },
   }));
-  setBuiltUnits(["DSFeature", "DSLayout"]);
   const built = made(skeleton({}));
-  ok("[MKT.SCRIPTS.629] a `dg` skeleton whose frame names a unit the design system builds stops the write, naming the unit and the `unit` fence",
-    built.findings.some((f) => f.stops === true && f.message.includes("`DSFeature`") && f.message.includes("`unit` fence") && f.message.includes('"planned": true')), JSON.stringify(built.findings));
-  ok("[MKT.SCRIPTS.629] a skeleton marked `\"planned\": true` is let through, and so is one whose unit the design system does not build",
-    !made(skeleton({ planned: true })).findings.some((f) => f.stops) && made(skeleton({}, "DSCard")).findings.length === 0, JSON.stringify(made(skeleton({ planned: true })).findings));
+  ok("[MKT.SCRIPTS.629] a `dg` skeleton whose frame names a unit the design system builds is drawn on a docs page, with no finding",
+    built.findings.length === 0 && built.html.includes("<svg"), JSON.stringify(built.findings));
+  ok("[MKT.SCRIPTS.629] a skeleton marked `\"planned\": true` and one whose unit is not built are drawn too",
+    made(skeleton({ planned: true })).findings.length === 0 && made(skeleton({}, "DSCard")).findings.length === 0, JSON.stringify(made(skeleton({ planned: true })).findings));
   const deep = made(fence("dg", JSON.stringify({ kind: "skeleton", views: [{ viewport: "DESKTOP", frame: { rows: [{ items: [{ frame: { unit: "DSLayout", rows: [{ items: [{ text: "x" }] }] } }] }] } }] })));
-  ok("[MKT.SCRIPTS.629] a unit named in a view, a nested frame or a section is found too", deep.findings.some((f) => f.stops === true && f.message.includes("`DSLayout`")), JSON.stringify(deep.findings));
-  setBuiltUnits(null);
-  ok("[MKT.SCRIPTS.629] where no list of built units can be read, no skeleton is held against it", !made(skeleton({})).findings.some((f) => f.message.includes("builds")));
-  setBuiltUnits();
-  const fileList = made(skeleton({}));
-  ok("[MKT.SCRIPTS.629] the list of built units is read from design-system-units.json in the styles folder by default, and DSFeature is built",
-    fileList.findings.some((f) => f.stops === true && f.message.includes("`DSFeature`")), JSON.stringify(fileList.findings));
+  ok("[MKT.SCRIPTS.629] a unit named in a view or a nested frame is drawn without a stop", !deep.findings.some((f) => f.stops === true), JSON.stringify(deep.findings));
+  const fenced = made(fence("unit", JSON.stringify({ unit: "DSFeature", props: {} })));
+  ok("[MKT.SCRIPTS.629] a `unit` fence on a docs page stops the write: a render belongs on a surface sample page, and the page draws the unit's structure as a skeleton and names its showcase page",
+    fenced.findings.length === 1 && fenced.findings[0].stops === true && fenced.findings[0].message.includes("surface sample page") && fenced.findings[0].message.includes("`dg` skeleton") && fenced.findings[0].message.includes("showcase page") && !fenced.html.includes("sds-unit"), JSON.stringify(fenced.findings));
 
   const rows = (n) => Array.from({ length: n }, (_, k) => [`Thing ${k + 1}`, `what thing ${k + 1} is`]);
   const catalog = made(table(["Name", "Description"], ...rows(5)));
@@ -414,7 +441,7 @@ console.log("\n=== the page renderer — a catalog in three layouts, with media 
     cells.html.includes('<dl class="sds-tile-facts" data-columns="2"><div><dt>Example</dt>') && cells.html.includes('<div class="sds-tile-fact-none"></div></dl>') && !cells.html.includes("sds-tile-fact-wide"), cells.html);
   const bareTags = made(fence("catalog layout=GRID", "MARKETING | a site\n  [UNIT] [PAGE]"));
   ok("[RULE.DEVEX.WORKSPACE.564] a line of tags with no key is the item's one fact, drawn as its badges alone",
-    bareTags.html.includes('<div class="sds-tile-fact-bare"><dd><span class="sds-tags"><span class="sds-badge">UNIT</span> <span class="sds-badge">PAGE</span></span></dd></div>') && !bareTags.html.includes("<dt>") && bareTags.findings.length === 0, bareTags.html);
+    bareTags.html.includes('<div class="sds-tile-fact-bare"><dt hidden>Tags</dt><dd><span class="sds-tags"><span class="sds-badge">UNIT</span> <span class="sds-badge">PAGE</span></span></dd></div>') && !bareTags.html.includes("<dt>") && bareTags.findings.length === 0, bareTags.html);
   ok("[RULE.DEVEX.WORKSPACE.564] tags with no key beside another fact are a finding, and facts= on a GRID is a finding",
     made(fence("catalog layout=GRID", "MARKETING | a site\n  [UNIT]\n  Person: Visitor")).findings.some((f) => f.message.includes("tags stand bare only"))
       && made(fence("catalog layout=GRID facts=END", "A | a\n  K: v")).findings.some((f) => f.message.includes("in LIST only"))
@@ -440,6 +467,37 @@ console.log("\n=== the page renderer — groups in a catalog are panels");
       && made(fence("catalog", "stray | item\n## A\nx | y\n## B\nz | w")).findings.some((f) => f.message.includes("above its first")));
 }
 
+console.log("\n=== the page renderer — group fences are panels");
+{
+  const inTabs = tilde("group Structure | how a category's pages are built", tilde("tabs", "--- Layouts\n" + fence("catalog layout=LIST facts=AFTER_DESCRIPTION", "Topnav | a bar\n  Unit: DSTopnav") + "--- Pages\nNone yet."));
+  const g = made(inTabs);
+  ok("[MKT.SCRIPTS.638] a group with a description holding tabs is one panel: its name and tab count in the head, the description a line under the name, the tabs in the body",
+    g.html.includes('<section class="sds-group" id="g-structure" aria-labelledby="g-structure-title">') && g.html.includes(`<h5 id="g-structure-title">Structure</h5><p class="sds-group-line">how a category's pages are built</p>`)
+      && g.html.includes('<span class="sds-group-count">2 tabs</span>') && /<div class="sds-group-body">\s*<div class="sds-tabset"/.test(g.html) && g.findings.length === 0 && !g.html.includes("~~~"), g.html + JSON.stringify(g.findings));
+  ok("[MKT.SCRIPTS.638] a LIST in a tab is the Plan table's rows: the name in bold, the description under it, the other facts on one small line joined with a dot, and the bracketed code a badge at the row's end",
+    g.html.includes('<tr><td><p><strong>Topnav</strong></p><p>a bar</p><span class="sds-small sds-facts"><span class="sds-fact-key">Unit</span><span class="sds-fact-value">DSTopnav</span></span></td>') && !g.html.includes("sds-tile"), g.html);
+  const b = made(tilde("group Structure", tilde("tabs", "--- Layouts\n" + fence("catalog layout=LIST facts=AFTER_DESCRIPTION", "Topnav | a bar\n  Code: [TOPNAV]\n  Unit: DSSiteLayout\n  Level: site") + "--- Pages\nNone yet.")));
+  ok("[MKT.SCRIPTS.638] the one fact of bracketed codes is a badge in a second cell, and the facts left are one small line joined with a dot",
+    b.html.includes('<span class="sds-small sds-facts"><span class="sds-fact-key">Unit</span><span class="sds-fact-value">DSSiteLayout</span> &middot; <span class="sds-fact-key">Level</span><span class="sds-fact-value">site</span></span></td><td><span class="sds-tags"><span class="sds-badge">TOPNAV</span></span></td>'), b.html);
+  const c = made(tilde("group Data entry", fence("catalog", "DSInput | one line of text\nDSSelect | a choice")));
+  ok("[MKT.SCRIPTS.639] a group holding a catalog is one panel with the item count, and one group has no jump row",
+    c.html.includes('<h5 id="g-data-entry-title">Data entry</h5><span class="sds-group-count">2 items</span>') && c.html.includes('<div class="sds-tiles">') && !c.html.includes("sds-group-jumps") && !c.html.includes("sds-group-line") && c.findings.length === 0, c.html);
+  const two = made(inTabs + "\n" + tilde("group Style | how pages look", tilde("tabs", "--- Theme\nColours.\n--- Media\nPictures.\n--- Words\nText.")) + "\n\nAfter prose.");
+  ok("[MKT.SCRIPTS.640] consecutive fenced groups stand as panels with no row of jump links, and the prose after them is a paragraph",
+    !two.html.includes("sds-group-jumps") && two.html.includes("<p>After prose.</p>") && (two.html.match(/<section class="sds-group"/g) ?? []).length === 2 && two.findings.length === 0, two.html + JSON.stringify(two.findings));
+  const guided = "Topnav | a bar\n  Code: [TOPNAV]\n  For: VISITOR\n  Choose when: a site with few pages\n  Not when: the pages are many → RAIL\n  Not when: the page is an app → DOCK\n  Rules: RULE.SUPPORT.SURFACE.206";
+  const gp = made(tilde("group Structure | how pages are built", tilde("tabs", "--- Layouts\n" + fence("catalog layout=LIST facts=AFTER_DESCRIPTION", guided) + "--- Pages\nNone yet.")));
+  const gl = made(fence("catalog layout=LIST facts=AFTER_DESCRIPTION", guided));
+  const fold = (h) => (h.match(/<details class="sds-fold sds-guidance"><summary>Guidance<\/summary>/g) ?? []).length === 1 && !/<details[^>]* open/.test(h)
+    && h.includes("<strong>For</strong> VISITOR") && h.includes("<strong>Choose when</strong> a site with few pages") && (h.match(/<strong>Not when<\/strong>/g) ?? []).length === 2
+    && h.includes("<strong>Not when</strong> the pages are many → RAIL") && h.includes('<strong>Rules</strong> <span class="sds-guidance-ids"><span>RULE.SUPPORT.SURFACE.206</span></span>');
+  ok("[MKT.SCRIPTS.642] an item's For, Choose when, Not when (one a case) and Rules lines are one closed fold titled Guidance under its row, in a group's Plan-style list and in a plain LIST, and are no facts of the row",
+    fold(gp.html) && fold(gl.html) && gp.findings.length === 0 && gl.findings.length === 0, gp.html + gl.html + JSON.stringify([gp.findings, gl.findings]));
+  const open = made("~~~group Never closed\n" + fence("catalog", "A | a"));
+  ok("[MKT.SCRIPTS.641] a group never closed stops the write, and so does one holding neither tabs nor a catalog",
+    open.findings.some((f) => f.stops && f.message.includes("never closed")) && made(tilde("group Empty", "Just words.")).findings.some((f) => f.stops && f.message.includes("neither")));
+}
+
 console.log("\n=== the page renderer — tabs");
 {
   const body = "--- MARKETING\nSome *prose* here.\n\n```json\n{ \"a\": 1 }\n```\n--- RESOURCES\n- one\n- two";
@@ -462,6 +520,46 @@ console.log("\n=== the page renderer — tabs");
     made(tilde("tabs", "stray\n--- A\nx\n--- B\ny")).findings.some((f) => f.stops && f.message.includes("before the first"))
       && made("~~~tabs\n--- A\nx\n--- B\ny\n").findings.some((f) => f.stops && f.message.includes("never closed")));
   ok("[MKT.SCRIPTS.615] a --- line inside a code fence of a panel is code, not a label", made(tilde("tabs", "--- A\n```text\n--- not a tab\n```\n--- B\ny")).findings.length === 0);
+}
+
+{
+  const rows = Array.from({ length: 26 }, (_, k) => `| \`R${k}\` | what rule ${k} decides | MUST |`).join("\n");
+  const longTable = `| Rule | What it decides | Weight |\n| --- | --- | --- |\n${rows}`;
+  const folded = produced(`~~~fold The 26 rules\n${longTable}\n~~~\n\nAfter it.\n`);
+  ok("[MKT.SCRIPTS.650] a `~~~fold <summary>` fence draws its table inside a shut details whose summary is the fence's words",
+    folded.includes('<details class="sds-fold sds-fold-block">\n    <summary>The 26 rules</summary>') && folded.includes("<table") && !folded.includes("<details open") && folded.indexOf("<summary>") < folded.indexOf("<table"), folded.slice(-600));
+  ok("[MKT.SCRIPTS.650] the prose after the fence is a paragraph of the page, not of the fold", /<\/details>\s*<p>After it\.<\/p>/.test(folded), folded.slice(-300));
+  ok("[MKT.SCRIPTS.650] a fold with no summary, or never closed, stops the write",
+    made("~~~fold\nx\n~~~\n").findings.some((f) => f.stops && f.message.includes("summary")) && made("~~~fold Long\nx\n").findings.some((f) => f.stops && f.message.includes("never closed")));
+  ok("[MKT.SCRIPTS.650] a fold stands inside a tab, and the tab's fence still closes on its own line",
+    made(tilde("tabs", `--- A\n~~~fold More\ntext\n~~~\n--- B\ny`)).findings.length === 0 && made(tilde("tabs", `--- A\n~~~fold More\ntext\n~~~\n--- B\ny`)).html.includes("<summary>More</summary>"));
+}
+console.log("\n=== the page renderer — a LIST's fact keys, facts=END with no fact, and bare tags");
+{
+  const four = made(fence("catalog layout=LIST", "Item | line\n  A: 1\n  B: 2\n  C: 3\n  D: 4"));
+  ok("[MKT.SCRIPTS.652] a LIST with four or more fact keys stops the write and names the keys", four.findings.some((f) => f.stops && f.message.includes("up to three fact keys") && f.message.includes("A, B, C, D")), JSON.stringify(four.findings));
+  ok("[MKT.SCRIPTS.652] three keys draw as before", !made(fence("catalog layout=LIST", "Item | line\n  A: 1\n  B: 2\n  C: 3")).findings.some((f) => f.stops));
+  const badged = `~~~group Containers | what a page is made of\n${fence("catalog layout=LIST facts=AFTER_DESCRIPTION", "Hero | the opening\n  Code: [HERO]\n  Unit: DSSectionContainer\n  Size: XL\n  Color: BRAND")}\n~~~`;
+  ok("[MKT.SCRIPTS.658] in a group panel a fact of bracketed codes is the row's badge, so three facts and a badge draw", !made(badged).findings.some((f) => f.stops), JSON.stringify(made(badged).findings));
+  ok("[MKT.SCRIPTS.658] known-bad: the same four keys outside a group still stop the write",
+    made(fence("catalog layout=LIST facts=AFTER_DESCRIPTION", "Hero | the opening\n  Code: [HERO]\n  Unit: DSSectionContainer\n  Size: XL\n  Color: BRAND")).findings.some((f) => f.stops && f.message.includes("Code, Unit, Size, Color")));
+  const tags = made(fence("catalog layout=LIST", "Kinds | which rules are shared?\n  [UNIT] [COMPONENT]\nLevels | what does each level own?\n  [WIDGET]\nPages | what a page holds\n  [PAGE]"));
+  ok("[MKT.SCRIPTS.653] bare tags never get the advice to write facts=END, which does not draw a keyless fact", !tags.findings.some((f) => f.message.includes("facts=END")), JSON.stringify(tags.findings));
+  ok("[MKT.SCRIPTS.653] a list of short keyed facts still gets it", made(fence("catalog layout=LIST", "Kinds | q\n  Owes: one\nLevels | q\n  Owes: two")).findings.some((f) => f.message.includes("facts=END")));
+  const none = made(fence("catalog layout=LIST facts=END", "Kinds | which rules are shared?\nLevels | what does each level own?"));
+  ok("[MKT.SCRIPTS.654] facts=END with no fact on any item raises a finding", none.findings.some((f) => f.message.includes("no item of this list holds one")), JSON.stringify(none.findings));
+  ok("[MKT.SCRIPTS.655] a line of bare tags is a fact whose definition term is hidden, so the definition list is whole", tags.html.includes('<div class="sds-tile-fact-bare"><dt hidden>Tags</dt><dd>'), tags.html.slice(-500));
+  ok("[MKT.SCRIPTS.655] and the stylesheet carries no display rule for the bare tags' row",
+    !/\.sds-tile-facts > \.sds-tile-fact-bare\s*\{\s*display/.test(readFileSync(resolve(HERE, "src", "styles", "docs-language.src.css"), "utf8")));
+}
+
+console.log("\n=== the page renderer — the catalog check leaves Terms, glossary and Binds tables as tables");
+{
+  const many = (head, first) => table(head, ...Array.from({ length: 8 }, (_, k) => [`${first}${k}`, `what ${first}${k} means in this domain`, ...head.slice(2).map(() => "x")]));
+  const reads = (md) => made(md).findings.some((f) => f.message.includes("reads as a catalog"));
+  ok("[MKT.SCRIPTS.656] a glossary of eight terms with a Term and a Description column is not read as a catalog", !reads(many(["Term", "Description"], "T")));
+  ok("[MKT.SCRIPTS.656] a Terms table with a What it means column, and a Binds table with a What it decides column, are not read as one either", !reads(many(["Term", "What it means"], "T")) && !reads(many(["Rule", "What it decides"], "R")));
+  ok("[MKT.SCRIPTS.656] a table of names and descriptions that is neither still is", reads(many(["Name", "Description"], "N")) && reads(many(["Command", "What it does"], "C")));
 }
 
 console.log("\n=== the page renderer — a file frame that folds");
@@ -495,6 +593,43 @@ console.log("\n=== the page renderer — a folded fence with no body reads its f
     missing.findings.length === 1 && missing.findings[0].stops === true && missing.findings[0].message.includes("docs/specs/none.json") && !missing.html.includes("sds-fold"), JSON.stringify(missing.findings));
   ok("[MKT.SCRIPTS.616] with no root known, an empty folded fence stops the write; an empty fence that does not fold is not read",
     made("```json file=docs/specs/x.json fold\n```").findings.some((f) => f.stops) && made("```json file=docs/specs/x.json\n```").findings.length === 0);
+  rmSync(root, { recursive: true, force: true });
+}
+
+console.log("\n=== the page renderer — code forms: an excerpt of a file, a marked line, a long block");
+{
+  const root = mkdtempSync(join(tmpdir(), "spn-code-"));
+  mkdirSync(join(root, "src"), { recursive: true });
+  writeFileSync(join(root, "src", "a.ts"), Array.from({ length: 30 }, (_, k) => k % 7 === 0 ? `export const v${k} = ${k}; // n` : `const s${k} = "x";`).join("\n") + "\n");
+  const rooted = (markdown) => renderPage({
+    block: { id: "probe", title: "Probe", status: "DONE", lenses: ["ARCHITECT"], summary: "What a probe is." },
+    markdown: `# Probe\n\nThe lead.\n\n## What it is\n\n${markdown}\n`, workspace: "/workspace", location: "/workspace/docs/02-constructs/probe.md",
+    furniture: { stylesheet: "", script: "", footer: "" }, root,
+  });
+  const excerpt = rooted("```ts file=src/a.ts lines=2-4 mark=3\n```");
+  ok("[MKT.SCRIPTS.643] file= with lines= draws that excerpt, titled with its path and lines, each line its own element numbered from the file",
+    excerpt.findings.length === 0 && excerpt.html.includes('<span class="sds-file-path">src/a.ts<span class="sds-file-lines">:2-4</span></span>')
+      && excerpt.html.includes('data-n="2"') && excerpt.html.includes('data-n="4"') && !excerpt.html.includes('data-n="5"') && !excerpt.html.includes('data-n="1"'), excerpt.html.slice(-900));
+  ok("[MKT.SCRIPTS.643] mark= shades the lines named, by file line number, and no other",
+    excerpt.html.includes('<span class="sds-ln sds-mark" data-n="3">') && !excerpt.html.includes('sds-mark" data-n="2"') && !excerpt.html.includes('sds-mark" data-n="4"'));
+  ok("[MKT.SCRIPTS.643] the excerpt's syntax colours are written into the page, in the docs palette's token classes, and the page's own script leaves it alone",
+    excerpt.html.includes('<span class="sds-tk-k">const</span>') && excerpt.html.includes('<span class="sds-tk-s">"x"</span>'));
+  const whole = rooted("```ts file=src/a.ts lines=1-1\n```");
+  ok("[MKT.SCRIPTS.643] a comment and a number are coloured, and the code's own characters are escaped",
+    whole.html.includes('<span class="sds-tk-c">// n</span>') && whole.html.includes('<span class="sds-tk-n">0</span>'));
+  const long = rooted("```ts file=src/a.ts lines=1-25\n```");
+  ok("[MKT.SCRIPTS.644] an excerpt past 20 lines folds: the first ten stand in the frame and the rest sit behind a fold that counts them",
+    long.html.includes('<details class="sds-more"><summary>Show 15 more lines</summary>') && long.html.indexOf('data-n="10"') < long.html.indexOf("<details class=\"sds-more\"") && long.html.indexOf('data-n="11"') > long.html.indexOf("<details class=\"sds-more\""), long.html.slice(-500));
+  ok("[MKT.SCRIPTS.644] twenty lines stay open, and a pasted fence past twenty lines folds the same way",
+    !rooted("```ts file=src/a.ts lines=1-20\n```").html.includes("sds-more") && rooted(fence("ts", Array.from({ length: 22 }, (_, k) => `const a${k} = 1;`).join("\n"))).html.includes("Show 12 more lines"));
+  ok("[MKT.SCRIPTS.643] a pasted fence with no file=, lines= or mark= still draws as plain code",
+    rooted("```ts\nconst a = 1;\n```").html.includes('<pre data-lang="ts">const a = 1;</pre>'));
+  const bad = [rooted("```ts file=src/a.ts lines=1-99\n```"), rooted("```ts file=src/none.ts lines=1-2\n```"), rooted("```ts lines=1-2\n```"), rooted("```ts file=src/a.ts lines=1-2\nconst x = 1;\n```"), rooted("```ts file=src/a.ts lines=2-4 mark=9\n```"), rooted("```ts file=src/a.ts lines=4-2\n```")];
+  ok("[MKT.SCRIPTS.645] a range past the file, a missing file, lines= with no file=, a body beside lines=, a mark outside the excerpt and a backward range each stop the write",
+    bad.every((one) => one.findings.some((f) => f.stops === true)), JSON.stringify(bad.map((one) => one.findings.map((f) => f.message))));
+  ok("[MKT.SCRIPTS.645] with no root known, an excerpt stops the write", made("```ts file=src/a.ts lines=1-2\n```").findings.some((f) => f.stops));
+  const asTabs = rooted(tilde("tabs", "--- Contract\n```ts file=src/a.ts lines=1-1\n```\n--- Today\n```ts file=src/a.ts lines=2-2\n```"));
+  ok("[MKT.SCRIPTS.646] two forms of one thing are tabs: each panel holds its own excerpt frame", asTabs.findings.length === 0 && (asTabs.html.match(/class="sds-file sds-code/g) ?? []).length === 2 && asTabs.html.includes('class="sds-tabset"'));
   rmSync(root, { recursive: true, force: true });
 }
 

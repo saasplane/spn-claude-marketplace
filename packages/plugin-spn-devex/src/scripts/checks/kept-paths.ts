@@ -22,7 +22,7 @@ import { DEVEX, WORKSTREAMS } from "../../../../plugin-support-lib/src/lib/docs-
 import { emit, readPayload, runAlone, type Payload, type Verdict } from "../lib/payload.ts";
 
 /** The kinds of `spn:generated` block the book names; a kind outside this list needs the developer's yes. */
-export const KNOWN_KINDS = ["constructs", "glossary", "glossary-html", "progress", "open", "contents", "dictionary", "commands"];
+export const KNOWN_KINDS = ["constructs", "glossary", "glossary-html", "progress", "open", "contents", "dictionary", "commands", "surface-catalogue", "surface-design-language"];
 
 const CLOSED = `/${DEVEX}/${WORKSTREAMS}/closed/`;
 const WORKSPACE_CACHE = /\/\.spndevex\/(?:\.?cache|\.?state-cache)\//;

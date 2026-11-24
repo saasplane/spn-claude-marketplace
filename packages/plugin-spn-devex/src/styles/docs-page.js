@@ -479,9 +479,10 @@ try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(
   }
   // A file frame (a file, a unit) gains the button at the end of its head: it copies the frame's code.
   Array.prototype.slice.call(document.querySelectorAll('figure.sds-file > figcaption')).forEach(function (cap) {
-    var code = cap.parentNode.querySelector('pre');
+    var figure = cap.parentNode, code = figure.querySelector('pre');
     if (!code || cap.querySelector('.sds-cmd-copy')) return;
-    cap.appendChild(copyButton(function () { return code.textContent; }, 'Copy the code'));
+    // A code frame that folds holds a second block behind its fold; the button copies every block, whole.
+    cap.appendChild(copyButton(function () { return Array.prototype.map.call(figure.querySelectorAll('pre'), function (pre) { return pre.textContent; }).join('\n'); }, 'Copy the code'));
   });
   // A block tagged sh or bash is framed too when it holds commands; a script (a line that opens or closes a branch or a loop) stays
   // a plain code block, since a prompt on each line of a script would be wrong. The colouring before this ran on its text, so the

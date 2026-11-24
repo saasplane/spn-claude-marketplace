@@ -52,9 +52,9 @@ spn-devex docs cycles show <workstream> [--json] — print the Cycles table of a
 
 spn-devex docs cycles write <workstream> — write the parts of a workstream's page that its arcs decide
 
-spn-devex docs face check [<path>] [--block glossary|constructs|contents|tags] — report the generated regions a write would change, and write nothing
+spn-devex docs face check [<path>] [--block glossary|constructs|contents|tags|surface-catalogue|surface-design-language] — report the generated regions a write would change, and write nothing
 
-spn-devex docs face write <path> [--block glossary|constructs|contents|tags] — write the generated regions the path feeds
+spn-devex docs face write <path> [--block glossary|constructs|contents|tags|surface-catalogue|surface-design-language] — write the generated regions the path feeds
 
 spn-devex docs figure check <path…> [--variant <name>] — labels fit and connectors join, and every spec draws: the findings of each page's own drawings
 

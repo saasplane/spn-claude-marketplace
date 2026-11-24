@@ -92,5 +92,12 @@
     "docs-index.js": "a4a30436cf1cb7f03f11b854cad0fb15ccc9a228f8c203ce2da5aa8fda6b0137",
     "design-system-units.css": "8e15d06a7ce7ab1131c17e0f982feb8f2926ed1ded4b6e6d5bb579ba0ff56250",
     "design-system.css": "1783656b11e093050443b19c1f4d2020aa2e327fcd2f0dc04bfbc2feea067503"
+  },
+  "1.17.0": {
+    "docs-language.css": "eb31fdd21ff3bc30a0b5b706f58d6a677560f08bb984fdee94818ce5585bd464",
+    "docs-page.js": "5e577380d8ecbc611d0719a68ac51cd632901a783fc34bcde0ddd896f748d34c",
+    "docs-index.js": "a4a30436cf1cb7f03f11b854cad0fb15ccc9a228f8c203ce2da5aa8fda6b0137",
+    "design-system-units.css": "8e15d06a7ce7ab1131c17e0f982feb8f2926ed1ded4b6e6d5bb579ba0ff56250",
+    "design-system.css": "1783656b11e093050443b19c1f4d2020aa2e327fcd2f0dc04bfbc2feea067503"
   }
 }
