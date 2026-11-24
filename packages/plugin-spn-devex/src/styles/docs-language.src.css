@@ -1446,6 +1446,16 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   text-transform: none;
   letter-spacing: normal;
 }
+.sds-group-title {
+  min-width: 0;
+}
+.sds-group-line {
+  margin: .2rem 0 0;
+  font-size: var(--sds-sm);
+  color: var(--sds-text-fact);
+}
+.sds-group-body > .sds-tabset > .sds-tabset-bar { margin-top: -.2rem; }
+.sds-group-body .sds-scroll { margin: 0; }
 .sds-group-count {
   font-size: var(--sds-xs);
   color: var(--sds-text-fact);

@@ -438,6 +438,30 @@ console.log("\n=== the page renderer — groups in a catalog are panels");
       && made(fence("catalog", "stray | item\n## A\nx | y\n## B\nz | w")).findings.some((f) => f.message.includes("above its first")));
 }
 
+console.log("\n=== the page renderer — group fences are panels");
+{
+  const inTabs = tilde("group Structure | how a category's pages are built", tilde("tabs", "--- Layouts\n" + fence("catalog layout=LIST facts=AFTER_DESCRIPTION", "Topnav | a bar\n  Unit: DSTopnav") + "--- Pages\nNone yet."));
+  const g = made(inTabs);
+  ok("[MKT.SCRIPTS.638] a group with a description holding tabs is one panel: its name and tab count in the head, the description a line under the name, the tabs in the body",
+    g.html.includes('<section class="sds-group" id="g-structure" aria-labelledby="g-structure-title">') && g.html.includes(`<h5 id="g-structure-title">Structure</h5><p class="sds-group-line">how a category's pages are built</p>`)
+      && g.html.includes('<span class="sds-group-count">2 tabs</span>') && /<div class="sds-group-body">\s*<div class="sds-tabset"/.test(g.html) && g.findings.length === 0 && !g.html.includes("~~~"), g.html + JSON.stringify(g.findings));
+  ok("[MKT.SCRIPTS.638] a LIST in a tab is the Plan table's rows: the name in bold, the description under it, the other facts on one small line joined with a dot, and the bracketed code a badge at the row's end",
+    g.html.includes('<tr><td><p><strong>Topnav</strong></p><p>a bar</p><span class="sds-small">Unit DSTopnav</span></td>') && !g.html.includes("sds-tile"), g.html);
+  const b = made(tilde("group Structure", tilde("tabs", "--- Layouts\n" + fence("catalog layout=LIST facts=AFTER_DESCRIPTION", "Topnav | a bar\n  Code: [TOPNAV]\n  Unit: DSSiteLayout\n  Level: site") + "--- Pages\nNone yet.")));
+  ok("[MKT.SCRIPTS.638] the one fact of bracketed codes is a badge in a second cell, and the facts left are one small line joined with a dot",
+    b.html.includes('<span class="sds-small">Unit DSSiteLayout &middot; Level site</span></td><td><span class="sds-tags"><span class="sds-badge">TOPNAV</span></span></td>'), b.html);
+  const c = made(tilde("group Data entry", fence("catalog", "DSInput | one line of text\nDSSelect | a choice")));
+  ok("[MKT.SCRIPTS.639] a group holding a catalog is one panel with the item count, and one group has no jump row",
+    c.html.includes('<h5 id="g-data-entry-title">Data entry</h5><span class="sds-group-count">2 items</span>') && c.html.includes('<div class="sds-tiles">') && !c.html.includes("sds-group-jumps") && !c.html.includes("sds-group-line") && c.findings.length === 0, c.html);
+  const two = made(inTabs + "\n" + tilde("group Style | how pages look", tilde("tabs", "--- Theme\nColours.\n--- Media\nPictures.\n--- Words\nText.")) + "\n\nAfter prose.");
+  ok("[MKT.SCRIPTS.640] consecutive groups share one row of jump links above the panels, and the prose after them is a paragraph",
+    two.html.includes('<nav class="sds-group-jumps" aria-label="Groups"><a class="sds-group-jump" href="#g-structure">Structure <span>2</span></a> <a class="sds-group-jump" href="#g-style">Style <span>3</span></a></nav>')
+      && two.html.indexOf("sds-group-jumps") < two.html.indexOf('<section class="sds-group"') && two.html.includes("<p>After prose.</p>") && (two.html.match(/<section class="sds-group"/g) ?? []).length === 2 && two.findings.length === 0, two.html + JSON.stringify(two.findings));
+  const open = made("~~~group Never closed\n" + fence("catalog", "A | a"));
+  ok("[MKT.SCRIPTS.641] a group never closed stops the write, and so does one holding neither tabs nor a catalog",
+    open.findings.some((f) => f.stops && f.message.includes("never closed")) && made(tilde("group Empty", "Just words.")).findings.some((f) => f.stops && f.message.includes("neither")));
+}
+
 console.log("\n=== the page renderer — tabs");
 {
   const body = "--- MARKETING\nSome *prose* here.\n\n```json\n{ \"a\": 1 }\n```\n--- RESOURCES\n- one\n- two";

@@ -598,6 +598,17 @@ function catalogHtml(items: CatalogItem[], layout: string | null, media: string 
     return `  <div class="sds-tiles">\n${tiles.join("\n")}\n  </div>`;
   }
   const kind = layout ?? "GRID";
+  // IN A GROUP PANEL A LIST IS THE PLAN TABLE'S ROWS (the approach page's Plan): a line between rows, the name in bold, the description under it,
+  // the facts on one small line under that joined with ` · `, and a fact that is only bracketed codes as a badge at the row's end.
+  if (inGroup && kind === "LIST" && !media) {
+    const rows = items.map((item) => {
+      const tags = item.facts.find(([, value]) => /^\s*(\[[^\]\[]+\]\s*)+$/.test(value));
+      const small = item.facts.filter((fact) => fact !== tags).map(([key, value]) => `${key ? `${inline(key)} ` : ""}${inline(value)}`);
+      const badge = tags ? factValue(tags[1]) : "";
+      return `      <tr><td><p><strong>${inline(item.name)}</strong></p>${item.line ? `<p>${inline(item.line)}</p>` : ""}${small.length ? `<span class="sds-small">${small.join(" &middot; ")}</span>` : ""}</td>${items.some((one) => one.facts.some(([, value]) => /^\s*(\[[^\]\[]+\]\s*)+$/.test(value))) ? `<td>${badge}</td>` : ""}</tr>`;
+    });
+    return `  <div class="sds-scroll"><table>\n    <tbody>\n${rows.join("\n")}\n    </tbody>\n  </table></div>`;
+  }
   if (kind === "TABLE") {
     if (media) findings.push({ message: `a \`catalog\` in TABLE has no media; \`media=${media}\` is not drawn` });
     const keys: string[] = [];
@@ -661,6 +672,8 @@ function catalogHtml(items: CatalogItem[], layout: string | null, media: string 
 
 /** Group ids already used on the page, so a second catalog's group of the same name gets its own anchor. */
 let groupIds = new Set<string>();
+/** True while a group panel's body is drawn: a catalog LIST there is the Plan table's rows. */
+let inGroup = false;
 
 /**
  * A `catalog` fence: ```catalog layout=GRID|LIST|TABLE media=ICON|MARK|AVATAR|AVATAR_GROUP|MEDIA_TOP facts=END|AFTER_DESCRIPTION (LIST only). The item line is
@@ -711,6 +724,70 @@ function catalogBlock(tag: string, body: string[], findings: Finding[]): string 
   out.push(`  <nav class="sds-group-jumps" aria-label="Groups">${panels.map((p) => `<a class="sds-group-jump" href="#${p.id}">${inline(p.group.name as string)} <span>${p.group.items.length}</span></a>`).join(" ")}</nav>`);
   out.push(...panels.map((p) => p.html));
   return out.join("\n");
+}
+
+// ---------------------------------------------------------------------------- the GROUP panel
+
+/** The line after a tilde fence's opening line where it closes: a `~~~tabs` or `~~~group` line opens one level and a line of three tildes alone closes the innermost, so a group holding tabs closes on its own line. -1 where it is never closed. */
+function tildeFenceEnd(lines: string[], open: number): number {
+  let depth = 1;
+  for (let k = open + 1; k < lines.length; k++) {
+    if (/^~~~(?:tabs|group)\b/.test(lines[k])) depth++;
+    else if (/^~~~\s*$/.test(lines[k]) && --depth === 0) return k;
+  }
+  return -1;
+}
+
+/** What a group panel counts: the tabs of the `tabs` fence it holds, or the items of its `catalog`; null where it holds neither. */
+function groupCount(body: string[]): { n: number; noun: string } | null {
+  const at = body.findIndex((line) => line.trim());
+  if (at < 0) return null;
+  if (/^~~~tabs\b/.test(body[at])) {
+    let fenced = false, n = 0;
+    for (const line of body.slice(at + 1)) { if (/^```/.test(line)) fenced = !fenced; else if (!fenced && /^---\s+\S/.test(line)) n++; }
+    return { n, noun: n === 1 ? "tab" : "tabs" };
+  }
+  if (/^```catalog\b/.test(body[at])) {
+    const inner: string[] = [];
+    for (let k = at + 1; k < body.length && !/^```/.test(body[k]); k++) inner.push(body[k]);
+    const n = catalogLines(inner, []).reduce((sum, group) => sum + group.items.length, 0);
+    return { n, noun: n === 1 ? "item" : "items" };
+  }
+  return null;
+}
+
+/**
+ * A fence of tildes tagged `group <name>` or `group <name> | <description>`, holding one `tabs` or `catalog` fence, is one panel: the name and the
+ * count of its members in its head, the description a line under the name, the block in its body. It closes on the line of three tildes that
+ * matches its opening, counting the `~~~tabs` it holds, so no fence takes a different closing line when it holds tabs. Consecutive groups
+ * (only blank lines between) share one row of links above the panels.
+ */
+function drawnInGroup(body: string[], findings: Finding[]): string {
+  const before = inGroup;
+  inGroup = true;
+  try { return renderBody(body, findings).trim(); } finally { inGroup = before; }
+}
+
+function groupPanels(heads: { name: string; description: string; body: string[] }[], findings: Finding[]): string {
+  const panels = heads.map((group) => {
+    let id = `g-${anchorOf(group.name)}`;
+    for (let n = 2; groupIds.has(id); n++) id = `g-${anchorOf(group.name)}-${n}`;
+    groupIds.add(id);
+    if (group.body.some((line) => /^~~~group\b/.test(line))) findings.push({ message: `a \`group\` fence holds one \`tabs\` or \`catalog\` fence, and groups never nest: "${group.name}"`, stops: true });
+    const counted = groupCount(group.body);
+    if (!counted) findings.push({ message: `a \`group\` fence holds a \`tabs\` or a \`catalog\` fence, "${group.name}" holds neither`, stops: true });
+    const count = counted ? `${counted.n} ${counted.noun}` : "";
+    const title = `<h5 id="${id}-title">${inline(group.name)}</h5>`;
+    const head = group.description
+      ? `<div class="sds-group-head"><div class="sds-group-title">${title}<p class="sds-group-line">${inline(group.description)}</p></div>${count ? `<span class="sds-group-count">${count}</span>` : ""}</div>`
+      : `<div class="sds-group-head">${title}${count ? `<span class="sds-group-count">${count}</span>` : ""}</div>`;
+    const html = `<section class="sds-group" id="${id}" aria-labelledby="${id}-title">\n  ${head}\n  <div class="sds-group-body">${drawnInGroup(group.body, findings)}</div>\n</section>`;
+    return { id, group, n: counted?.n ?? 0, html };
+  });
+  const jumps = panels.length > 1
+    ? [`  <nav class="sds-group-jumps" aria-label="Groups">${panels.map((p) => `<a class="sds-group-jump" href="#${p.id}">${inline(p.group.name)} <span>${p.n}</span></a>`).join(" ")}</nav>`]
+    : [];
+  return [...jumps, ...panels.map((p) => p.html)].join("\n");
 }
 
 // ---------------------------------------------------------------------------- the TABS block
@@ -805,6 +882,25 @@ function renderBody(lines: string[], findings: Finding[], nested = false): strin
       const t = l.replace(/^#+\s*/, "");
       out.push(`  <h${level} id="${anchorOf(t)}">${inline(t)}</h${level}>`);
       i++; continue;
+    }
+    // A fence of tildes tagged `group` is a panel; groups in a row share one row of jump links.
+    if (/^~~~group\b/.test(l)) {
+      flush();
+      const heads: { name: string; description: string; body: string[] }[] = [];
+      while (i < lines.length && /^~~~group\b/.test(lines[i])) {
+        const tag = lines[i].replace(/^~~~group\s*/, "").trim();
+        const [name, ...rest] = tag.split(/\s+\|\s+/);
+        const end = tildeFenceEnd(lines, i);
+        if (!name.trim()) findings.push({ message: "a `group` fence is tagged with its name: `~~~group <name>` or `~~~group <name> | <description>`", stops: true });
+        if (end < 0) { findings.push({ message: `a \`group\` fence is never closed with \`~~~\`: "${name.trim()}"`, stops: true }); heads.push({ name: name.trim() || "Group", description: rest.join(" | ").trim(), body: lines.slice(i + 1) }); i = lines.length; break; }
+        heads.push({ name: name.trim(), description: rest.join(" | ").trim(), body: lines.slice(i + 1, end) });
+        i = end + 1;
+        let peek = i;
+        while (peek < lines.length && !lines[peek].trim()) peek++;
+        if (peek < lines.length && /^~~~group\b/.test(lines[peek])) i = peek;
+      }
+      out.push(groupPanels(heads, findings));
+      continue;
     }
     // A fence of tildes is the TABS block, closed by a line of three tildes alone.
     if (/^~~~tabs\b/.test(l)) {
@@ -954,15 +1050,16 @@ function renderPageBody(opts: Parameters<typeof renderPage>[0]): { html: string;
   const findings: Finding[] = [];
   const { block } = opts;
   const lines = opts.markdown.split("\n");
-  tabsDrawn = 0; groupIds = new Set(); unitUsed = false; unitStylesheet = opts.furniture.stylesheet;
+  tabsDrawn = 0; groupIds = new Set(); inGroup = false; unitUsed = false; unitStylesheet = opts.furniture.stylesheet;
 
   // Everything above the first `##` is the lead: the h1 and the tag line are the masthead's,
   // so they are dropped here rather than rendered twice.
   // A `## ` line inside a fence is not a section: a catalog fence uses it for its groups.
   const sectionAt = new Set<number>();
-  for (let k = 0, fence = ""; k < lines.length; k++) {
-    if (fence) { if (fence === "```" ? /^```/.test(lines[k]) : /^~~~\s*$/.test(lines[k])) fence = ""; continue; }
-    if (/^```/.test(lines[k])) fence = "```"; else if (/^~~~tabs\b/.test(lines[k])) fence = "~~~"; else if (/^##\s/.test(lines[k])) sectionAt.add(k);
+  for (let k = 0; k < lines.length; k++) {
+    if (/^```/.test(lines[k])) { k++; while (k < lines.length && !/^```/.test(lines[k])) k++; continue; }
+    if (/^~~~(?:tabs|group)\b/.test(lines[k])) { const end = tildeFenceEnd(lines, k); k = end < 0 ? lines.length : end; continue; }
+    if (/^##\s/.test(lines[k])) sectionAt.add(k);
   }
   const firstSection = lines.findIndex((_, k) => sectionAt.has(k));
   const leadLines = lines.slice(0, firstSection < 0 ? lines.length : firstSection)
