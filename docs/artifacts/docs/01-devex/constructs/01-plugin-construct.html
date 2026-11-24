@@ -4,18 +4,16 @@
 {"id":"plugin-set","variant":"construct","title":"The Plugin","subtitle":"One folder holds everything a rule needs to reach a running session.","lenses":["ARCHITECT","LEAD"],"status":"PLANNING","dependsOn":[],"summary":"A plugin carries one of this repository's standards into a running session, in one folder: its manifest, its entry in the marketplace list, the installed copy a session actually reads, and the version field that names which bytes those are.","keywords":["plugin","marketplace","manifest","version","install","plugin root"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-z6T3Ju/mWAnv24wb8AFXMHYMyXMd5U/g7N2hA3X1uCys4Ty2Yy7TcMXWe+SMPck0" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../devex-overview.html">&larr; spn-devex</a>
   <div class="sds-rail-title">The Plugin</div>
 </nav>
 <div class="sds-wrap">
-
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; The Plugin</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">Engineering leader</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <div class="sds-eyebrow"><span class="sds-line1"><a href="../../concept-overview.html">SaaS Plane</a> &middot; <a href="../devex-overview.html">Claude Marketplace</a> &middot; The Plugin</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">Engineering leader</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>The Plugin</h1>
   <p class="sds-subtitle">One folder holds everything a rule needs to reach a running session.</p>
   <p class="sds-standfirst">A plugin carries one of this repository's standards into a running session, in one folder: its manifest, its entry in the marketplace list, the installed copy a session actually reads, and the version field that names which bytes those are. Read this page before you edit a manifest, or when a change does not seem to take effect. It names the three files involved, then walks through what each one holds and how they connect.</p>
@@ -47,7 +45,7 @@
 <!-- 02 -->
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
-  <p>Three files carry a plugin from an author's edit to the session that reads it, and confusing any two of them is where the afternoon goes. Read them left to right: what names a plugin, what a plugin claims about itself, where its bytes end up, and who reads them there.</p>
+  <p>Three files carry a plugin from an author's edit to the session that reads it, and confusing any two of them is where the afternoon goes. Read them left to right: <code>marketplace.json</code> names a plugin, <code>plugin.json</code> is what a plugin claims about itself, the plugin root is where its bytes end up, and a session is who reads them there.</p>
 <figure class="dl-figure">
 <div class="dl-frame">
 <svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="No arrow reaches a session from this checkout; only the installed copy is ever read.">
@@ -115,13 +113,12 @@
   <p>Installing reads an entry, copies that plugin's folder, and stores it where a session can read it. Everything a plugin wires names that folder through <code>CLAUDE_PLUGIN_ROOT</code> rather than through a path in this checkout, so a plugin works wherever it was installed. A command of the plugin is typed by the plugin's own name, because the plugin ships a launcher under that name in <code>bin/</code>, and no one types a path to the entry file. A plugin with a command line declares the tier of each command group in <code>tiers.json</code>.</p>
   <h3 id="contents-what-a-plugin-may-hold-and-what">Contents — What a plugin may hold, and what it owes</h3>
   <p>A plugin folder holds any mix of the constructs this domain names, and owes none of them. Each construct is named by its own page, and none of them is described here. The folders to open are these:</p>
-  <div class="sds-scroll"><table>
-    <thead><tr><th>Plugin</th></tr></thead>
-    <tbody>
-      <tr><td><p><code>spn-devex</code></p><p>every construct except <code>providers/</code>, which is why it is the folder to open to see what a full plugin looks like</p></td></tr>
-      <tr><td><p><strong><code>spn-apps</code> and <code>spn-infra</code></strong></p><p>a <code>providers/</code> folder each, and no <code>agents/</code></p></td></tr>
-    </tbody>
-  </table></div>
+  <div class="sds-tiles" data-layout="LIST">
+    <div class="sds-tile"><div class="sds-tile-body"><h4><code>spn-devex</code></h4><p>every construct except <code>providers/</code>, which is why it is the folder to open to see what a full plugin looks like</p>
+      </div></div>
+    <div class="sds-tile"><div class="sds-tile-body"><h4><code>spn-apps</code> and <code>spn-infra</code></h4><p>a <code>providers/</code> folder each, and no <code>agents/</code></p>
+      </div></div>
+  </div>
 </section>
 
 <!-- 04 -->
@@ -159,4 +156,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-yDkvlVaxZfr5SBqgjOk8GZPsDngeCYQxHHaY1aPfty/M6hFe1DXJz++VjJ+i+082" crossorigin="anonymous"></script>

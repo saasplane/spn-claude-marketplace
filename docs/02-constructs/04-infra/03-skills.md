@@ -37,7 +37,7 @@ This construct realizes the book's `01-devex/02-agent/02-skills`.
 
 ## Model
 
-Each skill is a different point on one walk, and the last box is the same for all of them.
+Each skill is a different point on one walk, and the last step is the same for all of them. The ask is to change what the estate is, or to publish what it runs. It is matched to a skill, the skill's manifest edit is reviewed as one line per choice, and it is handed to the tool's command, the only door a cloud is changed through.
 
 ```dg
 { "kind": "map",
@@ -59,27 +59,41 @@ None of these folders divides into steps: each walk is short enough that one fil
 
 ## Parts
 
-### Declaring — Declaring is a manifest edit, reviewed line by line
+### Declaring — declaring is a manifest edit, reviewed line by line
 
 A change to what the estate is should read as one line per choice. A diff mixing rendered output with declared intent hides the decision inside the consequence. So the declaring skill changes the manifest, validates it, and shows the difference in that shape. Authoring a new package and publishing one are explicitly not this skill, and its description names both neighbours so a wrong ask lands in the right folder.
 
-### Rendering — A rendering is read before anything is approved
+### Rendering — a rendering is read before anything is approved
 
 Approval is the last moment a wrong rendering is cheap. After it, the estate has changed. So one skill states what a rendering must name and what it must never contain, and it also answers the narrower question of whether a declaration change produced exactly what was intended and nothing more. It is convened before any approval, never after.
 
-### Module authoring — Authoring a module names what is not a module
+### Module authoring — authoring a module names what is not a module
 
 A vendor reached over the network is application configuration behind a seam, and the estate never sees it. Treating one as a module builds infrastructure for something that does not exist. So the authoring skill covers a piece the platform actually runs, and rules the networked case out in the sentence a session matches against. It walks the whole path in one file, from the first scaffold to the pin flip.
 
-### Version edit — The version is a reviewed edit, and the tool's command does the rest
+### Version edit — the version is a reviewed edit, and the tool's command does the rest
 
 A version typed into a build script is a second place the number lives. The package manifest is the one place. So the publishing skill edits that field as a reviewed change and then runs the release command, which stages and publishes. The same skill covers repointing a bespoke script at the release command, so the second place stops existing.
 
-### Standing up — Standing a node up and running a layer are doors, not journeys
+```dg
+{ "kind": "chain",
+  "title": "Publishing a version",
+  "caption": "The number is edited once, in the package manifest, and the release command does everything after it.",
+  "boxes": [{ "id": "a", "label": "Edit the version", "note": "a reviewed change to the package manifest" },
+            { "id": "b", "label": "Run the release command", "em": true },
+            { "id": "c", "label": "Stage and publish" }] }
+```
 
-Two of these folders open a command that already ships and had nothing fronting it. **`new` scaffolds an estate node** — which type, where it goes, what its manifest must carry. **`run` brings a layer up or down and reports what is standing.** Neither carries a walk of its own, because the command is the walk; what the skill adds is knowing which target to name and what the flags mean before you type one.
+### Standing up — standing a node up and running a layer are doors, not journeys
 
-### Skill and card — A skill names the card, and the card holds the words
+Two of these folders open a command that already ships and had nothing fronting it:
+
+- **`new` scaffolds an estate node** — which type, where it goes, what its manifest must carry.
+- **`run` brings a layer up or down and reports what is standing.**
+
+Neither carries a walk of its own, because the command is the walk; what the skill adds is knowing which target to name and what the flags mean before you type one.
+
+### Skill and card — a skill names the card, and the card holds the words
 
 None of these files defines the estate's vocabulary. Each names the card that does — which file declares what, which layer owns which act, how a name is composed — so a skill sequences the work and the card holds the words.
 

@@ -7,11 +7,11 @@ description: Write one of the five reports on a repository — coverage (how muc
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "f9709d35"
+      "seen": "19f9504b"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/05-docs-pages.md",
-      "seen": "422c982c"
+      "seen": "510f8877"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",

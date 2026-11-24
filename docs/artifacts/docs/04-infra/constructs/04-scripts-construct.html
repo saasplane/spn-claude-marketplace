@@ -4,18 +4,16 @@
 {"id":"estate-guard","variant":"construct","title":"Scripts","subtitle":"The gate that catches what should never be written into an infrastructure declaration.","lenses":["INFRA","TRUST"],"status":"PLANNING","dependsOn":["checks","estate-hooks"],"summary":"Scripts holds the gate that catches what must never appear in an estate declaration — a credential, an identifier a tool should discover for itself, a cloud provider's own string outside the one entry allowed to hold it — before it is written.","keywords":["scripts","dispatcher","subject","rule","secret","allow"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-z6T3Ju/mWAnv24wb8AFXMHYMyXMd5U/g7N2hA3X1uCys4Ty2Yy7TcMXWe+SMPck0" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../infra-overview.html">&larr; spn-infra</a>
   <div class="sds-rail-title">Scripts</div>
 </nav>
 <div class="sds-wrap">
-
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Scripts</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">DevOps / SRE</span><span class="sds-badge sds-lens">DevSecOps / Security</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <div class="sds-eyebrow"><span class="sds-line1"><a href="../../concept-overview.html">SaaS Plane</a> &middot; <a href="../infra-overview.html">Claude Marketplace</a> &middot; Scripts</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">DevOps / SRE</span><span class="sds-badge sds-lens">DevSecOps / Security</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>Scripts</h1>
   <p class="sds-subtitle">The gate that catches what should never be written into an infrastructure declaration.</p>
   <p class="sds-standfirst">Scripts holds the gate that catches what must never appear in an estate declaration — a credential, an identifier a tool should discover for itself, a cloud provider's own string outside the one entry allowed to hold it — before it is written. Read this page before you add a new rule here, or when you want to know which file actually runs at write time. It explains the dispatcher the wiring calls, the gate that decides which rules have an opinion about a file, and the named rule bodies that check the text directly.</p>
@@ -50,10 +48,11 @@
 <!-- 02 -->
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
-  <p>Three folders, three jobs, and the order they run in is the order a person meets them. 1. The dispatcher is called.</p>
+  <p>Three folders, three jobs, and the order they run in is the order a person meets them:</p>
   <ol>
-    <li>It asks the gate which subjects apply.</li>
-    <li>Each subject runs the rule bodies that have an opinion about this path.</li>
+    <li>The dispatcher in <code>events/</code> is called.</li>
+    <li>It asks the gate in <code>checks/</code> which subjects apply.</li>
+    <li>Each subject runs the rule bodies in <code>lib/</code> that have an opinion about this path.</li>
   </ol>
 <figure class="dl-figure">
 <div class="dl-frame">
@@ -101,47 +100,48 @@
   -->
   <p><strong>The path is read before any text</strong>, because one refusal needs nothing else: built output is refused whatever it would contain. Then the text this call would add is taken, and each remaining subject is asked about it in turn, the first denial ending the run.</p>
   <p>A rule that fails is skipped rather than fatal: a gate that crashes the chain removes every other gate with it, which is worse than any single miss. The helpers the dispatcher reads its event and records its timings through are <strong>this plugin's own copies</strong>. A plugin is installed on its own and a partner may hold one without the others, so a sibling's file cannot be a dependency — reaching for one means resolving it at runtime, and a resolve that misses has to return the pass-through, which is silence wearing the shape of success.</p>
-  <p>The figure below follows one call through the dispatcher, from the moment it arrives to the answer it gets. Every road out of it ends in an exit code of zero.</p>
+  <p>The figure below follows one call through the dispatcher, from the moment it arrives to the answer it gets. A write or an edit arrives. If the call names no file, it is allowed in silence, and so is any input the gate cannot read. Where the call names a file, the path alone may refuse it, because built output is refused whatever it holds. Otherwise the dispatcher takes the text the call adds. Then it asks each subject in turn.</p>
+  <p>A rule that throws is skipped. When a subject refuses, the dispatcher prints the refusal, exit zero, and the first refusal ends the run; when none refuses, the call is allowed. Every road out of it ends in an exit code of zero.</p>
 <figure class="dl-figure">
 <div class="dl-frame">
 <svg class="dl-svg" viewBox="0 0 928 888" role="img" aria-label="The only way out with a refusal is a rule that read the path or the new text and objected. Anything the gate cannot read, and any rule that throws, falls back to allowing.">
   <rect class="dl-tile" x="344" y="16" width="188" height="48" rx="24"/>
   <text class="dl-name" x="438" y="37" text-anchor="middle">A write or an edit</text>
   <text class="dl-detail" x="438" y="52" text-anchor="middle">arrives at the dispatcher</text>
-  <path class="dl-tile" d="M428.3 122.4 L428.3 122.4 Q438 120 447.7 122.4 L584.3 155.6 Q594 158 584.3 160.4 L447.7 193.6 Q438 196 428.3 193.6 L291.7 160.4 Q282 158 291.7 155.6 Z"/>
-  <text class="dl-name" x="438" y="162" text-anchor="middle">Does the call name a file?</text>
-  <rect class="dl-tile" x="120" y="280" width="224" height="48" rx="24"/>
-  <text class="dl-name" x="232" y="301" text-anchor="middle">Allow, in silence</text>
-  <text class="dl-detail" x="232" y="316" text-anchor="middle">unreadable input lands here too</text>
-  <path class="dl-tile" d="M566.5 283.2 L566.5 283.2 Q576 280 585.5 283.2 L742.5 336.8 Q752 340 742.5 343.2 L585.5 396.8 Q576 400 566.5 396.8 L409.5 343.2 Q400 340 409.5 336.8 Z"/>
-  <text class="dl-name" x="576" y="336.5" text-anchor="middle">Does the path alone refuse it?</text>
-  <text class="dl-detail" x="576" y="351.5" text-anchor="middle">built output, whatever it holds</text>
-  <rect class="dl-tile" x="472" y="456" width="208" height="48" rx="10"/>
-  <text class="dl-name" x="484" y="477">Take the text the call adds</text>
-  <text class="dl-detail" x="484" y="492">content, or the replacement</text>
-  <rect class="dl-tile" x="476" y="560" width="200" height="48" rx="10"/>
-  <text class="dl-name" x="488" y="581">Ask each subject in turn</text>
-  <text class="dl-detail" x="488" y="596">a rule that throws is skipped</text>
-  <path class="dl-tile" d="M566.4 666.8 L566.4 666.8 Q576 664 585.6 666.8 L696.4 699.2 Q706 702 696.4 704.8 L585.6 737.2 Q576 740 566.4 737.2 L455.6 704.8 Q446 702 455.6 699.2 Z"/>
-  <text class="dl-name" x="576" y="706" text-anchor="middle">Did a subject refuse?</text>
+  <path class="dl-tile" d="M428.4 122.8 L428.4 122.8 Q438 120 447.6 122.8 L558.4 155.2 Q568 158 558.4 160.8 L447.6 193.2 Q438 196 428.4 193.2 L317.6 160.8 Q308 158 317.6 155.2 Z"/>
+  <text class="dl-name" x="438" y="162" text-anchor="middle">The call names a file</text>
+  <rect class="dl-tile" x="136" y="280" width="224" height="48" rx="24"/>
+  <text class="dl-name" x="248" y="301" text-anchor="middle">Allow, in silence</text>
+  <text class="dl-detail" x="248" y="316" text-anchor="middle">unreadable input lands here too</text>
+  <path class="dl-tile" d="M568.6 283.5 L568.6 283.5 Q578 280 587.4 283.5 L730.6 336.5 Q740 340 730.6 343.5 L587.4 396.5 Q578 400 568.6 396.5 L425.4 343.5 Q416 340 425.4 336.5 Z"/>
+  <text class="dl-name" x="578" y="336.5" text-anchor="middle">The path alone refuses it</text>
+  <text class="dl-detail" x="578" y="351.5" text-anchor="middle">built output, whatever it holds</text>
+  <rect class="dl-tile" x="474" y="456" width="208" height="48" rx="10"/>
+  <text class="dl-name" x="486" y="477">Take the text the call adds</text>
+  <text class="dl-detail" x="486" y="492">content, or the replacement</text>
+  <rect class="dl-tile" x="478" y="560" width="200" height="48" rx="10"/>
+  <text class="dl-name" x="490" y="581">Each subject in turn</text>
+  <text class="dl-detail" x="490" y="596">a rule that throws is skipped</text>
+  <path class="dl-tile" d="M568.6 667.3 L568.6 667.3 Q578 664 587.4 667.3 L676.6 698.7 Q686 702 676.6 705.3 L587.4 736.7 Q578 740 568.6 736.7 L479.4 705.3 Q470 702 479.4 698.7 Z"/>
+  <text class="dl-name" x="578" y="706" text-anchor="middle">A subject refuses</text>
   <rect class="dl-tile" x="248" y="824" width="72" height="36" rx="18"/>
   <text class="dl-name" x="284" y="846" text-anchor="middle">Allow</text>
   <path class="dl-tile" d="M389.2 832.5 L389.2 832.5 Q392 824 401 824 L615 824 Q624 824 621.2 832.5 L610.8 863.5 Q608 872 599 872 L385 872 Q376 872 378.8 863.5 Z"/>
   <text class="dl-name" x="500" y="845" text-anchor="middle">Print the refusal, exit zero</text>
   <text class="dl-detail" x="500" y="860" text-anchor="middle">it names the laws card</text>
   <path class="dl-wire" d="M438 64 L438 120"/>
-  <path class="dl-wire" d="M438 196 L438 212 Q438 220 430 220 L240 220 Q232 220 232 228 L232 280"/>
-  <path class="dl-wire" d="M438 196 L438 212 Q438 220 446 220 L568 220 Q576 220 576 228 L576 280"/>
-  <path class="dl-wire" d="M752 340 L800 340 Q808 340 808 348 L808 840 Q808 848 800 848 L616 848"/>
-  <path class="dl-wire" d="M576 400 L576 456"/>
-  <path class="dl-wire" d="M576 504 L576 560"/>
-  <path class="dl-wire" d="M576 608 L576 664"/>
-  <path class="dl-wire" d="M576 740 L576 756 Q576 764 568 764 L508 764 Q500 764 500 772 L500 824"/>
-  <path class="dl-wire" d="M576 740 L576 756 Q576 764 568 764 L292 764 Q284 764 284 772 L284 824"/>
-  <text class="dl-wlabel" x="240" y="256">no</text>
-  <text class="dl-wlabel" x="584" y="256">yes</text>
-  <text class="dl-wlabel" x="771" y="332">yes</text>
-  <text class="dl-wlabel" x="584" y="436">no</text>
+  <path class="dl-wire" d="M438 196 L438 212 Q438 220 430 220 L256 220 Q248 220 248 228 L248 280"/>
+  <path class="dl-wire" d="M438 196 L438 212 Q438 220 446 220 L570 220 Q578 220 578 228 L578 280"/>
+  <path class="dl-wire" d="M740 340 L788 340 Q796 340 796 348 L796 840 Q796 848 788 848 L616 848"/>
+  <path class="dl-wire" d="M578 400 L578 456"/>
+  <path class="dl-wire" d="M578 504 L578 560"/>
+  <path class="dl-wire" d="M578 608 L578 664"/>
+  <path class="dl-wire" d="M578 740 L578 756 Q578 764 570 764 L508 764 Q500 764 500 772 L500 824"/>
+  <path class="dl-wire" d="M578 740 L578 756 Q578 764 570 764 L292 764 Q284 764 284 772 L284 824"/>
+  <text class="dl-wlabel" x="256" y="256">no</text>
+  <text class="dl-wlabel" x="586" y="256">yes</text>
+  <text class="dl-wlabel" x="759" y="332">yes</text>
+  <text class="dl-wlabel" x="586" y="436">no</text>
   <text class="dl-wlabel" x="508" y="800">yes, the first one ends the run</text>
   <text class="dl-wlabel" x="292" y="800">no</text>
 </svg>
@@ -153,12 +153,12 @@
   "caption": "The only way out with a refusal is a rule that read the path or the new text and objected. Anything the gate cannot read, and any rule that throws, falls back to allowing.",
   "boxes": [
     { "id": "call", "label": "A write or an edit", "note": "arrives at the dispatcher", "shape": "terminator" },
-    { "id": "file", "label": "Does the call name a file?", "shape": "decision" },
+    { "id": "file", "label": "The call names a file", "shape": "decision" },
     { "id": "silent", "label": "Allow, in silence", "note": "unreadable input lands here too", "shape": "terminator" },
-    { "id": "path", "label": "Does the path alone refuse it?", "note": "built output, whatever it holds", "shape": "decision" },
+    { "id": "path", "label": "The path alone refuses it", "note": "built output, whatever it holds", "shape": "decision" },
     { "id": "text", "label": "Take the text the call adds", "note": "content, or the replacement" },
-    { "id": "subjects", "label": "Ask each subject in turn", "note": "a rule that throws is skipped" },
-    { "id": "verdict", "label": "Did a subject refuse?", "shape": "decision" },
+    { "id": "subjects", "label": "Each subject in turn", "note": "a rule that throws is skipped" },
+    { "id": "verdict", "label": "A subject refuses", "shape": "decision" },
     { "id": "refuse", "label": "Print the refusal, exit zero", "note": "it names the laws card", "shape": "io" },
     { "id": "allow", "label": "Allow", "shape": "terminator" }
   ],
@@ -179,26 +179,29 @@
 <!-- 03 -->
 <section id="s3">
   <div class="sds-section-head"><h2>Parts</h2></div>
-  <h3 id="three-folders-three-folders-and-what-dec">Three folders — Three folders, and what decides which one a file goes in</h3>
-  <ul>
-    <li><code>events/</code> holds what the wiring calls, and there is one such file because there is one wired moment.</li>
-    <li><code>checks/</code> holds the gate, which knows which subjects exist and how to reach a provider's parse of each.</li>
-    <li><code>lib/</code> holds everything more than one of them needs: the rule bodies, the event shape, the timing recorder.</li>
-  </ul>
+  <h3 id="three-folders-three-folders-and-what-dec">Three folders — three folders, and what decides which one a file goes in</h3>
+  <div class="sds-tiles" data-layout="LIST">
+    <div class="sds-tile"><div class="sds-tile-body"><h4><code>events/</code></h4><p>what the wiring calls, and there is one such file because there is one wired moment</p>
+      </div></div>
+    <div class="sds-tile"><div class="sds-tile-body"><h4><code>checks/</code></h4><p>the gate, which knows which subjects exist and how to reach a provider's parse of each</p>
+      </div></div>
+    <div class="sds-tile"><div class="sds-tile-body"><h4><code>lib/</code></h4><p>everything more than one of them needs: the rule bodies, the event shape, the timing recorder</p>
+      </div></div>
+  </div>
   <p><strong>The axis is what the file is for, not what it is about</strong>, which is why a rule about secrets and a rule about built output sit side by side.</p>
-  <h3 id="unsure-allows-unsure-means-allow-and-eve">Unsure allows — Unsure means allow, and every exit is zero</h3>
+  <h3 id="unsure-allows-unsure-means-allow-and-eve">Unsure allows — unsure means allow, and every exit is zero</h3>
   <p>Unreadable input, or a call naming no file, ends the run in silence with the call allowed. A refusal prints the documented decision and still exits zero, because a hook that fails loudly takes every other gate down with it. The dispatcher returns as soon as it finds no file path, and the whole run is wrapped so nothing reaches the harness as a failure.</p>
-  <h3 id="added-text-it-reads-the-text-the-call-wo">Added text — It reads the text the call would add, not the file</h3>
+  <h3 id="added-text-it-reads-the-text-the-call-wo">Added text — it reads the text the call would add, not the file</h3>
   <p>A refusal must be about what is being written. Judging the file on disk would refuse an edit to a file that already carries the fault and miss the fault arriving now. So a write's content or an edit's replacement is taken, whichever is present, and where there is no new text only the subject that reads the path alone can run.</p>
-  <h3 id="cloud-discovery-the-gate-discovers-the-c">Cloud discovery — The gate discovers the clouds and deliberately runs every one</h3>
+  <h3 id="cloud-discovery-the-gate-discovers-the-c">Cloud discovery — the gate discovers the clouds and deliberately runs every one</h3>
   <p>The gate names no cloud. It reads which folders the providers tree holds and imports each one's validator for each subject, so a third cloud joins by adding a folder rather than by editing an import list. <strong>And it runs all of them, not the declared one.</strong> A write-time gate cannot read a resolved estate — there may not be one yet — and running only the declared cloud's patterns would let an AWS region into a declaration whose cloud entry says Google, which is the mistake somebody makes while moving an estate between clouds and the moment the gate is most worth having. The cost is a handful of regular expressions against text already in memory.</p>
-  <h3 id="flat-rule-bodies-the-rule-bodies-sit-fla">Flat rule bodies — The rule bodies sit flat, because every one of them is cloud-free</h3>
+  <h3 id="flat-rule-bodies-the-rule-bodies-sit-fla">Flat rule bodies — the rule bodies sit flat, because every one of them is cloud-free</h3>
   <p><em>An account id is never pinned</em> is true on every cloud, and so is <em>no secrets at any path</em>, and so is <em>built output is not source</em>. Those rule bodies name no cloud anywhere in them. The provider-string rule is the exception, and it varies in its <strong>patterns</strong> rather than in its judgement — <em>a provider string lives only inside a cloud entry</em> holds everywhere, while what a region looks like is that cloud's business — so it is written as a factory each cloud feeds its own spellings to. <strong>There is no rules folder</strong>, because the moment one exists, rules drift into it that only one cloud ever needed.</p>
-  <h3 id="identifier-refusal-an-identifier-is-refu">Identifier refusal — An identifier is refused where a key names it</h3>
+  <h3 id="identifier-refusal-an-identifier-is-refu">Identifier refusal — an identifier is refused where a key names it</h3>
   <p>A bare run of digits is not evidence of anything, and refusing every one of them would block timestamps, sizes and identifiers with nothing to do with an account. So the rule fires where a key spelled as an account identifier is assigned a value of the right shape, and leaves a loose number alone. The credential rule is shaped the same way: it needs a credential-named key assigned a quoted literal of real length, and ignores a reference to a variable. Both sides of the length boundary are stated as test cases, so nobody re-derives the threshold from a regular expression.</p>
-  <h3 id="estate-manifest-one-rule-reads-only-the-">Estate manifest — One rule reads only the estate manifest</h3>
+  <h3 id="estate-manifest-one-rule-reads-only-the-">Estate manifest — one rule reads only the estate manifest</h3>
   <p>A provider's own region string is legitimate in a small number of places — the region mapping on a cloud entry, and a profile's capacity keys. Searching for such strings everywhere would refuse documentation and test fixtures. So the rule fires only on a file named as an estate manifest, removes the sanctioned homes from the text first, and searches what is left.</p>
-  <h3 id="refusal-cards-every-refusal-names-the-ca">Refusal cards — Every refusal names the card that explains it</h3>
+  <h3 id="refusal-cards-every-refusal-names-the-ca">Refusal cards — every refusal names the card that explains it</h3>
   <p>A denial and its reasoning are one hop apart: the sentence every refusal carries points at the laws card this plugin ships, so a reader who has just been refused can reach the rule without searching for it. The sentence is written once and quoted by every rule, because copies of a law drift and a person then meets a different account of it depending on which file they happened to touch.</p>
 </section>
 
@@ -239,4 +242,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-yDkvlVaxZfr5SBqgjOk8GZPsDngeCYQxHHaY1aPfty/M6hFe1DXJz++VjJ+i+082" crossorigin="anonymous"></script>

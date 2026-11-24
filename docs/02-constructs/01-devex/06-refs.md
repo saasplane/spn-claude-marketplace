@@ -39,7 +39,7 @@ This construct realizes the book's `01-devex/02-agent/04-plugins`.
 
 ## Model
 
-The hash is taken once, when the copy is made. Everything afterwards is a comparison.
+The hash is taken once, when the copy is made: a chapter is copied into the restatement, the restatement carries a stamp, and the drift run reads the stamp. Everything afterwards is a comparison.
 
 ```dg
 { "kind": "map",
@@ -87,9 +87,13 @@ A check that walks only the block can validate only what the file declared, so a
 
 ### Restatement failures — Three ways a restatement fails, and they are not the same finding
 
-**Undeclared** is prose naming a source the block leaves out, which no run can see. **Unstamped** is a file saying what it restates and carrying no block at all, so nothing machine-readable exists to compare. **Unread** is a name no check can resolve to a file, which is an under-report rather than a hidden fault.
+```catalog layout=LIST name=Finding
+Undeclared | prose naming a source the block leaves out, which no run can see
+Unstamped | a file saying what it restates and carrying no block at all, so nothing machine-readable exists to compare
+Unread | a name no check can resolve to a file, which is an under-report rather than a hidden fault
+```
 
-Follow one file through the checks and each finding falls out at its own question, which is why they are three findings and not one.
+Follow one file through the checks. A file that says what it restates is asked its questions in turn. Does it carry a block? If not, it is Unstamped. Does its prose name a source the block omits? If so, it is Undeclared. Does every name resolve to a file? If not, it is Unread. Only then do the checks compare the stamps. Each finding falls out at its own question, which is why they are separate findings and not one.
 
 ```dg
 { "kind": "flowchart",

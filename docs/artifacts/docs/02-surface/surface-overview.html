@@ -23,7 +23,7 @@
 }
 -->
 
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-z6T3Ju/mWAnv24wb8AFXMHYMyXMd5U/g7N2hA3X1uCys4Ty2Yy7TcMXWe+SMPck0" crossorigin="anonymous">
 <div class="sds-page">
 <nav class="sds-rail" id="rail">
   <a class="sds-home" href="../concept-overview.html">&larr; the hub</a>
@@ -37,7 +37,7 @@
   <p class="sds-standfirst">spn-surface is the plugin a repository that builds a page loads beside spn-apps, and this page reads it one folder at a time. Read it before you add a rule about how a page looks or behaves, or when you want to know why the design skill is not in the apps plugin. It says only what is in this domain, and sends you to the page that states each part in full.</p>
 </header>
 
-<section id="s0">
+<section id="s0" data-block="reasons">
   <div class="sds-section-head"><h2>Overview</h2></div>
   <p>A page is chosen and drawn before it is built, and the rules for choosing it are true of every stack: what a label says, which container holds a panel, which pattern a task follows. <code>spn-surface</code> carries those rules. Each folder here is the same kind of instrument <code>spn-devex</code> defines.</p>
   <p>This page is for a UX designer or a web developer working on a page, and for anyone about to add a Surface rule. It assumes you know what a plugin is; if you do not, the <a href="../01-devex/devex-overview.html">spn-devex overview</a> comes first. After it you know which folder a change belongs in, and why this plugin names no stack.</p>
@@ -45,23 +45,23 @@
   <p><strong>What you can decide after this page.</strong> Whether a rule is about what a person sees or about how a stack builds it, and which plugin it then belongs in.</p>
 </section>
 
-<section id="s1">
-  <div class="sds-section-head"><h2>The Plugin &mdash; what spn-surface is, and when a session loads it</h2></div>
+<section id="s1" data-block="reasons">
+  <div class="sds-section-head"><h2>The Plugin &mdash; the one folder this domain ships from, and why a session loads it</h2></div>
   <p>Everything this domain ships sits in one folder, and that folder is what an install copies. Its identity is its own: the name and the description in its manifest say what it carries, and the description is what a session matches against when it decides whether to load the plugin at all. Its version reads <code>0.1.0</code>, the number its first release publishes.</p>
   <p><em>Decide here:</em> whether the description says enough for a session that is designing a page to load this plugin.</p>
   <p><a class="sds-more" href="constructs/01-plugin-construct.html">Read The Plugin &rarr;</a></p>
 </section>
 
-<section id="s2">
-  <div class="sds-section-head"><h2>Hooks &mdash; one moment, for the connector's script</h2></div>
+<section id="s2" data-block="reasons">
+  <div class="sds-section-head"><h2>Hooks &mdash; the one moment where a script is read before the Figma connector runs it</h2></div>
   <p>This plugin wires one moment: the call about to hand a script to the Figma connector. The connector refuses some of what it is given and throws on the rest, and either answer arrives after the call, so the one rule here reads the script before it. Every other call a session makes never reaches this plugin.</p>
   <p><em>Decide here:</em> whether a new rule is about a script's text before the connector runs it, and so belongs on this moment.</p>
   <p><a class="sds-more" href="constructs/02-hooks-construct.html">Read Hooks &rarr;</a></p>
 </section>
 
-<section id="s3">
-  <div class="sds-section-head"><h2>Skills &mdash; the command a Surface question answers to</h2></div>
-  <p>The design skill states a page, a screen or a flow as a tree of named blocks. It decides them in six steps, in the order the Surface standards decide things.</p>
+<section id="s3" data-block="reasons">
+  <div class="sds-section-head"><h2>Skills &mdash; the design skill, which turns a request for a page into a tree of named blocks</h2></div>
+  <p>The design skill states a page, a screen or a flow as a tree of named blocks. It decides them step by step, in the order the Surface standards decide things.</p>
   <figure class="dl-figure">
   <div class="dl-frame">
   <svg class="dl-svg" viewBox="0 0 928 68" role="img" aria-label="The order the design skill decides a page in">
@@ -86,27 +86,40 @@
   </div>
   <figcaption>The blocks come last. Each step is decided before the one after it, in the order the Surface standards decide things.</figcaption>
   </figure>
+  <!-- dg:source
+{ "kind": "chain",
+  "title": "The order the design skill decides a page in",
+  "caption": "The blocks come last. Each step is decided before the one after it, in the order the Surface standards decide things.",
+  "boxes": [
+    { "id": "a", "label": "The person" },
+    { "id": "b", "label": "The flow" },
+    { "id": "c", "label": "The pattern" },
+    { "id": "d", "label": "The panels" },
+    { "id": "e", "label": "The tasks" },
+    { "id": "f", "label": "The blocks", "em": true }
+  ] }
+  -->
   <p>It writes no code. Where the window holds the Figma connector it can draw the tree, and where it holds none the tree is still complete.</p>
   <p><em>Decide here:</em> whether a new request is a design question, and which step of the skill it reaches.</p>
   <p><a class="sds-more" href="constructs/03-skills-construct.html">Read Skills &rarr;</a></p>
 </section>
 
-<section id="s4">
-  <div class="sds-section-head"><h2>Scripts &mdash; the code this plugin runs</h2></div>
-  <p>The folder divides by what calls each file. The wiring starts one process, which asks the connector check and returns one verdict. The command line ships no command today. The helpers a check needs, the masker, the text a write would leave and the stack read, have one copy in the shared support folder, so no plugin reads a neighbour's file.</p>
+<section id="s4" data-block="reasons">
+  <div class="sds-section-head"><h2>Scripts &mdash; the code this plugin runs, sorted by what calls each file</h2></div>
+  <p>The folder divides by what calls each file. The wiring starts one process, which asks the connector check and the other checks and returns one verdict. The command line ships <code>check scan</code>, <code>unit find</code> and <code>unit show</code>, which read Surface code whole and look units up. The helpers a check needs, the masker, the text a write would leave and the stack read, have one copy in the shared support folder, so no plugin reads a neighbour's file.</p>
   <p><em>Decide here:</em> whether a new piece of code is a check the dispatcher asks, or a helper another plugin also needs.</p>
   <p><a class="sds-more" href="constructs/04-scripts-construct.html">Read Scripts &rarr;</a></p>
 </section>
 
-<section id="s5">
-  <div class="sds-section-head"><h2>Refs &mdash; the Surface book, restated inside the plugin</h2></div>
-  <p>A partner holding this plugin has no copy of the foundation book beside it, so the Surface rules are written out inside it: the standards, the patterns, the architecture of the design system, its library and its delivery. Two folders of skeleton specs are copies the book owns. A ref states and never executes, and each one says which version of the book it was read at.</p>
+<section id="s5" data-block="reasons">
+  <div class="sds-section-head"><h2>Refs &mdash; the Surface rules, written out inside the plugin so a partner needs no copy of the book</h2></div>
+  <p>A partner holding this plugin has no copy of the foundation book beside it, so the Surface rules are written out inside it: the standards, the patterns, the architecture of the design system, its library and its delivery. The folders of skeleton specs are copies the book owns. A ref states and never executes, and each one says which version of the book it was read at.</p>
   <p><em>Decide here:</em> whether a fact the design skill needs is a restatement of the book, and where in the mirror it goes.</p>
   <p><a class="sds-more" href="constructs/05-refs-construct.html">Read Refs &rarr;</a></p>
 </section>
 
-<section id="s6">
-  <div class="sds-section-head"><h2>Tests &mdash; the plugin's own folders, without a framework</h2></div>
+<section id="s6" data-block="reasons">
+  <div class="sds-section-head"><h2>Tests &mdash; how the plugin proves its own rule, with no framework to install</h2></div>
   <p>This plugin runs a rule on a person's design file, so it owes proof of its own. Its suites sit at the plugin root under one tier, mirror the source, and are found by walking. The bundle a hook runs is held to its source twice: it must answer what the source answers, and it must not be older than the source.</p>
   <p><em>Decide here:</em> where the proof for a new check goes, and why a bundle needs its own two cases.</p>
   <p><a class="sds-more" href="constructs/06-tests-construct.html">Read Tests &rarr;</a></p>
@@ -168,15 +181,15 @@
 </section>
 
 <section id="s8" data-block="next">
-  <div class="sds-section-head"><h2>Next — Where to go next</h2></div>
-  <ul>
-    <li>What each instrument is, before this domain adds to it &rarr; <a href="../01-devex/devex-overview.html">spn-devex</a></li>
-    <li>The apps plugin, which holds how a block is built in a stack &rarr; <a href="../03-apps/apps-overview.html">spn-apps</a></li>
-    <li>What each chapter here is held to in this plugin's own source &rarr; <a href="../../../04-capabilities/02-surface/plugin-spn-surface/README.md">capabilities: spn-surface</a></li>
-    <li>What a developer building a page is promised &rarr; <a href="../../../03-behaviors/02-surface/README.md">behaviours: surface</a></li>
-    <li>Every construct of this domain, in reading order &rarr; <a href="../../../02-constructs/02-surface/README.md">constructs: surface</a></li>
-    <li>Back to the whole model &rarr; <a href="../concept-overview.html">the hub</a></li>
-  </ul>
+  <div class="sds-section-head"><h2>Next &mdash; where to go next</h2></div>
+  <div class="sds-tiles">
+    <a class="sds-tile sds-door" href="../01-devex/devex-overview.html"><span class="sds-door-kicker">What each instrument is, before this domain adds to it</span><span class="sds-door-title">spn-devex<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span></a>
+    <a class="sds-tile sds-door" href="../03-apps/apps-overview.html"><span class="sds-door-kicker">The apps plugin, which holds how a block is built in a stack</span><span class="sds-door-title">spn-apps<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span></a>
+    <a class="sds-tile sds-door" href="../../../04-capabilities/02-surface/plugin-spn-surface/README.md"><span class="sds-door-kicker">What each chapter here is held to in this plugin's own source</span><span class="sds-door-title">Capabilities: spn-surface<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span></a>
+    <a class="sds-tile sds-door" href="../../../03-behaviors/02-surface/README.md"><span class="sds-door-kicker">What a developer building a page is promised</span><span class="sds-door-title">Behaviours: surface<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span></a>
+    <a class="sds-tile sds-door" href="../../../02-constructs/02-surface/README.md"><span class="sds-door-kicker">Every construct of this domain, in reading order</span><span class="sds-door-title">Constructs: surface<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span></a>
+    <a class="sds-tile sds-door" href="../concept-overview.html"><span class="sds-door-kicker">Back to the whole model</span><span class="sds-door-title">The hub<span class="sds-door-arrow" aria-hidden="true">&rarr;</span></span></a>
+  </div>
 </section>
 
 </div>
@@ -186,4 +199,4 @@
   Sources: <a href="../../../../CONCEPT.md">CONCEPT.md</a> &sect; surface; the constructs it links.
 </footer>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-yDkvlVaxZfr5SBqgjOk8GZPsDngeCYQxHHaY1aPfty/M6hFe1DXJz++VjJ+i+082" crossorigin="anonymous"></script>

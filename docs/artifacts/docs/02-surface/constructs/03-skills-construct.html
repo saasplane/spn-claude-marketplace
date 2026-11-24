@@ -4,18 +4,16 @@
 {"id":"surface-skills","variant":"construct","title":"Skills","subtitle":"The command a page, a flow or a mock is asked for, in one folder.","lenses":["UX","WEB_DEV"],"status":"PLANNING","dependsOn":["skill-set"],"summary":"A skill belongs to this domain when it describes work on what a person sees and touches before any code is written, which today is one skill: design.","keywords":["skill","design","steps","tree","figma","stage"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-z6T3Ju/mWAnv24wb8AFXMHYMyXMd5U/g7N2hA3X1uCys4Ty2Yy7TcMXWe+SMPck0" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../surface-overview.html">&larr; spn-surface</a>
   <div class="sds-rail-title">Skills</div>
 </nav>
 <div class="sds-wrap">
-
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Skills</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">UX designer</span><span class="sds-badge sds-lens">Web developer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <div class="sds-eyebrow"><span class="sds-line1"><a href="../../concept-overview.html">SaaS Plane</a> &middot; <a href="../surface-overview.html">Claude Marketplace</a> &middot; Skills</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">UX designer</span><span class="sds-badge sds-lens">Web developer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>Skills</h1>
   <p class="sds-subtitle">The command a page, a flow or a mock is asked for, in one folder.</p>
   <p class="sds-standfirst">A skill belongs to this domain when it describes work on what a person sees and touches before any code is written, which today is one skill: <code>design</code>. Read this page to see what the skill produces, which steps it reads only when the work reaches them, and why it serves the ideate stage. It explains the skill's shape and leaves its rules to the refs.</p>
@@ -33,6 +31,43 @@
     <li>the tasks;</li>
     <li>only then the blocks.</li>
   </ol>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 68" role="img" aria-label="The order the design skill decides a page in">
+  <rect class="dl-tile" x="24" y="16" width="100" height="36" rx="10"/>
+  <text class="dl-name" x="36" y="37">the person</text>
+  <path class="dl-wire" d="M124 34 L180 34"/>
+  <rect class="dl-tile" x="180" y="16" width="100" height="36" rx="10"/>
+  <text class="dl-name" x="192" y="37">the flow</text>
+  <path class="dl-wire" d="M280 34 L336 34"/>
+  <rect class="dl-tile" x="336" y="16" width="100" height="36" rx="10"/>
+  <text class="dl-name" x="348" y="37">the pattern</text>
+  <path class="dl-wire" d="M436 34 L492 34"/>
+  <rect class="dl-tile" x="492" y="16" width="100" height="36" rx="10"/>
+  <text class="dl-name" x="504" y="37">the panels</text>
+  <path class="dl-wire" d="M592 34 L648 34"/>
+  <rect class="dl-tile" x="648" y="16" width="100" height="36" rx="10"/>
+  <text class="dl-name" x="660" y="37">the tasks</text>
+  <path class="dl-wire" d="M748 34 L804 34"/>
+  <rect class="dl-tile-on" x="804" y="16" width="100" height="36" rx="10"/>
+  <text class="dl-name" x="816" y="37">the blocks</text>
+</svg>
+</div>
+<figcaption>The blocks come last: each step is decided before the one after it.</figcaption>
+</figure>
+  <!-- dg:source
+{ "kind": "chain",
+  "title": "The order the design skill decides a page in",
+  "caption": "The blocks come last: each step is decided before the one after it.",
+  "boxes": [
+    { "id": "a", "label": "the person" },
+    { "id": "b", "label": "the flow" },
+    { "id": "c", "label": "the pattern" },
+    { "id": "d", "label": "the panels" },
+    { "id": "e", "label": "the tasks" },
+    { "id": "f", "label": "the blocks", "em": true }
+  ] }
+  -->
   <p>This construct realizes the book's <code>01-devex/02-agent/02-skills</code>.</p>
 </section>
 
@@ -104,15 +139,15 @@
 <!-- 03 -->
 <section id="s3">
   <div class="sds-section-head"><h2>Parts</h2></div>
-  <h3 id="page-first-the-skill-states-a-page-befor">Page first — The skill states a page before its code is written</h3>
+  <h3 id="page-first-the-skill-states-a-page-befor">Page first — the skill states a page before its code is written</h3>
   <p>You ask it to design, lay out or draw a page, a screen or a flow of pages. It picks the layout, decides the containers, chooses the pattern for each task, and then names the blocks. Its result is one tree for each page: every block by the name the book gives it, with its props. Deciding what a feature is stays with the core plugin's <code>ideate</code>, and writing the screen stays with the build skill of the apps plugin.</p>
-  <h3 id="stackless-steps-a-step-that-names-no-sta">Stackless steps — A step that names no stack stays in the skill's own folder</h3>
-  <p>The skill has two steps, <code>draw</code> and <code>change-library</code>. <code>draw</code> draws the page in Figma from the published libraries, and <code>change-library</code> walks a change of a library file through the connector, with the scripts the skill ships to read a page and to lay out a set. Neither names a language, so no provider holds them. The skill reads them only where the window holds the Figma connector and the work reaches them. A window with no connector never loads them, and the design is complete without them.</p>
-  <h3 id="ideate-stage-the-skill-serves-the-ideate">Ideate stage — The skill serves the ideate stage</h3>
+  <h3 id="stackless-steps-a-step-that-names-no-sta">Stackless steps — a step that names no stack stays in the skill's own folder</h3>
+  <p>The skill has the steps <code>draw</code> and <code>change-library</code>. <code>draw</code> draws the page in Figma from the published libraries, and <code>change-library</code> walks a change of a library file through the connector, with the scripts the skill ships to read a page and to lay out a set. Neither names a language, so no provider holds them. The skill reads them only where the window holds the Figma connector and the work reaches them. A window with no connector never loads them, and the design is complete without them.</p>
+  <h3 id="ideate-stage-the-skill-serves-the-ideate">Ideate stage — the skill serves the ideate stage</h3>
   <p>A skill and a stage are separate closed sets mapped many to one, and the mapping is what makes <em>which standards apply to this request</em> derivable from the skill that was invoked. A page is designed before its code is written, so this skill answers to the ideate stage.</p>
-  <h3 id="builder-and-partner-one-skill-serves-the">Builder and partner — One skill serves the builder and a partner alike</h3>
+  <h3 id="builder-and-partner-one-skill-serves-the">Builder and partner — one skill serves the builder and a partner alike</h3>
   <p>Both design from the refs and the specs this plugin carries, and neither needs the book open. The skill is the same for both.</p>
-  <h3 id="skill-stamp-a-skill-carries-a-stamp-so-a">Skill stamp — A skill carries a stamp, so a chapter it fell behind can say so</h3>
+  <h3 id="skill-stamp-a-skill-carries-a-stamp-so-a">Skill stamp — a skill carries a stamp, so a chapter it fell behind can say so</h3>
   <p>A skill is prose the agent loads, and prose drifts from the book silently because nothing compares it. The skill opens with a block naming the chapters it restates and the hash last read from each, so a drift run reads it exactly as it reads a ref.</p>
 </section>
 
@@ -152,4 +187,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-yDkvlVaxZfr5SBqgjOk8GZPsDngeCYQxHHaY1aPfty/M6hFe1DXJz++VjJ+i+082" crossorigin="anonymous"></script>

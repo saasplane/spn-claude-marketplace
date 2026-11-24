@@ -7,11 +7,11 @@ description: How infrastructure appears for development - the layer order, what 
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "f9709d35"
+      "seen": "19f9504b"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/06-provision.md",
-      "seen": "758dfc98"
+      "seen": "74ddc6ca"
     }
   ]
 }

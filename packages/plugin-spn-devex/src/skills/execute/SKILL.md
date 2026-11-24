@@ -7,7 +7,7 @@ description: Carry out a go. Use the moment the developer gives the go on one ar
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "f9709d35"
+      "seen": "19f9504b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",

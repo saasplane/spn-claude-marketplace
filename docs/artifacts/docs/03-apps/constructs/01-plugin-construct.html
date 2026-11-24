@@ -4,18 +4,16 @@
 {"id":"apps-plugin","variant":"construct","title":"The Plugin","subtitle":"The one folder that makes spn-apps its own plugin, separate from every other.","lenses":["ARCHITECT","LEAD"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"This plugin is the one folder everything in the apps domain ships from, and the folder an install copies whole.","keywords":["plugin","manifest","identity","description","version","lockstep"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-z6T3Ju/mWAnv24wb8AFXMHYMyXMd5U/g7N2hA3X1uCys4Ty2Yy7TcMXWe+SMPck0" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../apps-overview.html">&larr; spn-apps</a>
   <div class="sds-rail-title">The Plugin</div>
 </nav>
 <div class="sds-wrap">
-
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; The Plugin</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">Engineering leader</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <div class="sds-eyebrow"><span class="sds-line1"><a href="../../concept-overview.html">SaaS Plane</a> &middot; <a href="../apps-overview.html">Claude Marketplace</a> &middot; The Plugin</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">Engineering leader</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>The Plugin</h1>
   <p class="sds-subtitle">The one folder that makes spn-apps its own plugin, separate from every other.</p>
   <p class="sds-standfirst">This plugin is the one folder everything in the apps domain ships from, and the folder an install copies whole. Read this page to see what it claims about itself, who is entitled to load it, and what its version number means. It covers the manifest, the world that earns it, and the version rule it shares with the marketplace's other three plugins.</p>
@@ -46,11 +44,11 @@
 <!-- 02 -->
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
-  <p>A repository declares a world, and then:</p>
+  <p>A repository's claim is the world it declares, and then:</p>
   <ol>
-    <li>the set of plugins it gets is derived from that declaration;</li>
-    <li>an install copies each one;</li>
-    <li>a session reads the installed copy rather than this checkout.</li>
+    <li>the derived set, the plugins it gets, follows from that declaration;</li>
+    <li>an install copies each one, and the installed copy is found by its name and its version;</li>
+    <li>a session reads the installed copy rather than this checkout, matching the description against the work at hand.</li>
   </ol>
 <figure class="dl-figure">
 <div class="dl-frame">
@@ -148,4 +146,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-yDkvlVaxZfr5SBqgjOk8GZPsDngeCYQxHHaY1aPfty/M6hFe1DXJz++VjJ+i+082" crossorigin="anonymous"></script>

@@ -4,18 +4,16 @@
 {"id":"tests","variant":"construct","title":"Tests","subtitle":"A suite sits at the same path as the file it proves, so nothing has to be searched for.","lenses":["QA","SERVER_DEV"],"status":"PLANNING","dependsOn":["plugin-set","checks"],"summary":"Tests is the folder a plugin proves itself from, arranged so a reader can find the suite that covers a script just by following that script's own path.","keywords":["test","suite","tier","mirror","runner","harness"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-z6T3Ju/mWAnv24wb8AFXMHYMyXMd5U/g7N2hA3X1uCys4Ty2Yy7TcMXWe+SMPck0" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../devex-overview.html">&larr; spn-devex</a>
   <div class="sds-rail-title">Tests</div>
 </nav>
 <div class="sds-wrap">
-
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Tests</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Quality engineer</span><span class="sds-badge sds-lens">Backend developer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <div class="sds-eyebrow"><span class="sds-line1"><a href="../../concept-overview.html">SaaS Plane</a> &middot; <a href="../devex-overview.html">Claude Marketplace</a> &middot; Tests</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Quality engineer</span><span class="sds-badge sds-lens">Backend developer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>Tests</h1>
   <p class="sds-subtitle">A suite sits at the same path as the file it proves, so nothing has to be searched for.</p>
   <p class="sds-standfirst">Tests is the folder a plugin proves itself from, arranged so a reader can find the suite that covers a script just by following that script's own path. Read this page before you add a new suite, or when a test does not show up where you expected it. It explains the tier a suite belongs to — the level of proof it offers — and the mirror that says what it is proof of. It also says why two tiers are deliberately absent.</p>
@@ -25,7 +23,7 @@
 <section id="s0">
   <div class="sds-section-head"><h2>Overview</h2></div>
   <p>A plugin is code, so it owes proof, and what makes that proof its own construct rather than an implementation detail is where the files sit.</p>
-  <p>The tree answers two questions in a fixed order. <strong>The tier comes first and the mirror second</strong>, because the tier answers <em>what kind of proof is this</em> and the mirror answers <em>of what</em>. Put the mirror first and a second tier for the same file has nowhere to go; put the tier first and an integration suite for a file that already has a unit suite lands at the same path under a different tier, without colliding.</p>
+  <p>The tree answers its questions in a fixed order. <strong>The tier comes first and the mirror second</strong>, because the tier answers <em>what kind of proof is this</em> and the mirror answers <em>of what</em>. Put the mirror first and a second tier for the same file has nowhere to go; put the tier first and an integration suite for a file that already has a unit suite lands at the same path under a different tier, without colliding.</p>
   <p>The second promise is about what happens the next time the tree moves. <strong>Nothing here counts a <code>..</code> hop.</strong> Moving these suites once broke every one of them at the same moment, because each computed its own depth from where it happened to sit.</p>
 </section>
 
@@ -48,7 +46,7 @@
 <!-- 02 -->
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
-  <p>A suite's address is derived, never chosen. Read it outward from the folder every plugin's proof sits in.</p>
+  <p>A suite's address is derived, never chosen. Read it outward from the folder every plugin's proof sits in: first the tier, then the mirror, and the mirror ends at the suite.</p>
 <figure class="dl-figure">
 <div class="dl-frame">
 <svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="The tier comes first and the mirror second, so a second tier for one file lands beside its suite rather than on it.">
@@ -215,4 +213,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-yDkvlVaxZfr5SBqgjOk8GZPsDngeCYQxHHaY1aPfty/M6hFe1DXJz++VjJ+i+082" crossorigin="anonymous"></script>

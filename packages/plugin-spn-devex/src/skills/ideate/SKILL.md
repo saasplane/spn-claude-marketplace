@@ -7,11 +7,11 @@ description: Decide what a node IS, and design a requirement inside that shape -
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "f9709d35"
+      "seen": "19f9504b"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
-      "seen": "da4650d4"
+      "seen": "096f07d3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",

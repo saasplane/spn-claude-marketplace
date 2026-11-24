@@ -1,4 +1,4 @@
-/* RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The index of artifacts — one page that opens every other
+/* RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § The index of artifacts — one page that opens every other
    The index of a repository's artifacts: a tree of its pages on the left, read as the app rail is, and one page at
    a time on the right, in one frame under a bar. The tree is read from the page's data block, which
    `docs index` writes from the pages on disk. A click on an entry replaces the page in the frame and pushes the

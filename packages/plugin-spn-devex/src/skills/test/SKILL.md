@@ -7,11 +7,11 @@ description: What proves a behaviour, at which tier, and what a passing suite do
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "f9709d35"
+      "seen": "19f9504b"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
-      "seen": "53cfb13a"
+      "seen": "e5e8f5af"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",

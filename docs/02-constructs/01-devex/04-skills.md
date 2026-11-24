@@ -39,7 +39,7 @@ This construct realizes the book's `01-devex/02-agent/02-skills`.
 
 ## Model
 
-The listing is cheap to hold because it is one line per skill. Everything expensive is read only after a match.
+The listing is cheap to hold because it is one line per skill. Everything expensive is read only after a match: the work at hand is matched against the listing, a match loads `SKILL.md`, and that file sequences a step file only when it needs one.
 
 ```dg
 { "kind": "map",

@@ -12,7 +12,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/04-data-and-trust.md",
-      "seen": "768d17aa"
+      "seen": "de2e0e68"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/03-control-map.md",

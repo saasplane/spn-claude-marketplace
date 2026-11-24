@@ -4,18 +4,16 @@
 {"id":"stack-checks","variant":"construct","title":"Scripts","subtitle":"Every file this plugin runs, sorted by what calls it and what stack it serves.","lenses":["SERVER_DEV","WEB_DEV"],"status":"PLANNING","dependsOn":["apps-hooks","checks"],"summary":"Scripts holds everything this plugin executes, divided by what calls each file — the wiring, the gate the wiring asks, the tools a person or agent runs by typing their path, and the libraries the others read.","keywords":["gate","subject","dispatcher","register","action","coverage"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-z6T3Ju/mWAnv24wb8AFXMHYMyXMd5U/g7N2hA3X1uCys4Ty2Yy7TcMXWe+SMPck0" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../apps-overview.html">&larr; spn-apps</a>
   <div class="sds-rail-title">Scripts</div>
 </nav>
 <div class="sds-wrap">
-
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Scripts</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Backend developer</span><span class="sds-badge sds-lens">Web developer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <div class="sds-eyebrow"><span class="sds-line1"><a href="../../concept-overview.html">SaaS Plane</a> &middot; <a href="../apps-overview.html">Claude Marketplace</a> &middot; Scripts</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Backend developer</span><span class="sds-badge sds-lens">Web developer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>Scripts</h1>
   <p class="sds-subtitle">Every file this plugin runs, sorted by what calls it and what stack it serves.</p>
   <p class="sds-standfirst">Scripts holds everything this plugin executes, divided by what calls each file — the wiring, the gate the wiring asks, the tools a person or agent runs by typing their path, and the libraries the others read. Read this page before you add a script here, or when you want to know which file runs a given command. It explains how the gate resolves a write to the declared stack without naming one, and what the commands over this domain's own registers do.</p>
@@ -24,7 +22,7 @@
 <!-- 00 -->
 <section id="s0">
   <div class="sds-section-head"><h2>Overview</h2></div>
-  <p>Two decisions shape the whole folder. <strong>Nothing here names a stack</strong> — the gate reads the declaration and resolves into a provider, so the code that knows a language sits outside this folder entirely. And <strong>a tool writes only what a run found</strong> — part of a behaviour row is somebody's decision, and a tool writing over that would turn a declaration into a guess.</p>
+  <p>The decisions below shape the whole folder. <strong>Nothing here names a stack</strong> — the gate reads the declaration and resolves into a provider, so the code that knows a language sits outside this folder entirely. And <strong>a tool writes only what a run found</strong> — part of a behaviour row is somebody's decision, and a tool writing over that would turn a declaration into a guess.</p>
   <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
 </section>
 
@@ -52,7 +50,7 @@
 <!-- 02 -->
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
-  <p>The folder has two halves that never meet. One is reached by the wiring and answers about a single write. The other is reached by its own path and answers about a whole repository.</p>
+  <p>The folder has two halves that never meet. One is reached by the wiring and answers about a single write. The other is reached by its own path and answers about a whole repository. The wired half asks the gate, which reads the declaration and resolves into the provider for it. The commanded half stands apart from both, and each reads the shared half, which holds what the two have in common.</p>
 <figure class="dl-figure">
 <div class="dl-frame">
 <svg class="dl-svg" viewBox="0 0 928 272" role="img" aria-label="The wired half answers about one write; the commanded half answers about a repository, and neither reads the other.">
@@ -124,7 +122,7 @@
   <p>A partial run that reset a whole register would make every status swing on every run, and nobody could read a red as new. So a run updates the rows declaring a tier it covered and leaves the rest exactly as it found them. That is why the tier is a person's cell to declare: it is what a run matches itself against, and a hand-checked row is never written over.</p>
   <h3 id="run-artifact-it-reads-the-run-s-own-arti">Run artifact — It reads the run's own artifact, never a specification</h3>
   <p>A status derived from a specification reports a case that exists as a case that ran. Crossing a route with a surface, or scanning a source tree for case titles, cannot see a case that was skipped or filtered out. So the writer reads the file the runner produced, and a row whose case never reached the runner says so.</p>
-  <p>The figure follows one row of a register through the three sections above, from the run's start to what the writer leaves on it.</p>
+  <p>The figure follows one row of a register through the three sections above, from the run's start to what the writer leaves on it. The writer asks its questions in turn. <em>Is it hand-checked?</em> If so, the row is left as it was. <em>Did the run cover its tier?</em> If not, the row is left as it was. <em>Did a case reach the runner with its id?</em> If not, the row says so; if so, the writer writes the two run cells, the status and the moment it was found.</p>
 <figure class="dl-figure">
 <div class="dl-frame">
 <svg class="dl-svg" viewBox="0 0 928 696" role="img" aria-label="The writer changes a row only at the last step. At every earlier question the run cannot speak for the row, so the row is left exactly as it was.">
@@ -228,4 +226,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-yDkvlVaxZfr5SBqgjOk8GZPsDngeCYQxHHaY1aPfty/M6hFe1DXJz++VjJ+i+082" crossorigin="anonymous"></script>

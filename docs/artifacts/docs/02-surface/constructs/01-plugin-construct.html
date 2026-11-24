@@ -4,18 +4,16 @@
 {"id":"surface-plugin","variant":"construct","title":"The Plugin","subtitle":"The one folder that makes spn-surface its own plugin, separate from every other.","lenses":["ARCHITECT","UX"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"This plugin is the one folder everything in the Surface domain ships from, and the folder an install copies whole.","keywords":["plugin","manifest","identity","description","version","surface"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-z6T3Ju/mWAnv24wb8AFXMHYMyXMd5U/g7N2hA3X1uCys4Ty2Yy7TcMXWe+SMPck0" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../surface-overview.html">&larr; spn-surface</a>
   <div class="sds-rail-title">The Plugin</div>
 </nav>
 <div class="sds-wrap">
-
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; The Plugin</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">UX designer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <div class="sds-eyebrow"><span class="sds-line1"><a href="../../concept-overview.html">SaaS Plane</a> &middot; <a href="../surface-overview.html">Claude Marketplace</a> &middot; The Plugin</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">UX designer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>The Plugin</h1>
   <p class="sds-subtitle">The one folder that makes spn-surface its own plugin, separate from every other.</p>
   <p class="sds-standfirst">This plugin is the one folder everything in the Surface domain ships from, and the folder an install copies whole. Read this page to see what it claims about itself, who is entitled to load it, and what its version number means. It covers the manifest, the world that earns it, and the version rule it shares with the marketplace's other plugins.</p>
@@ -46,33 +44,30 @@
 <!-- 02 -->
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
-  <p>A repository declares a world, and then:</p>
+  <p>A repository's claim declares a world, and then:</p>
   <ol>
-    <li>the set of plugins it gets is derived from that declaration;</li>
-    <li>an install copies each one;</li>
+    <li>the derived set of plugins it gets follows from that declaration;</li>
+    <li>an install copies each one, and the installed copy is found by its name and its version;</li>
     <li>a session reads the installed copy rather than this checkout.</li>
   </ol>
 <figure class="dl-figure">
 <div class="dl-frame">
-<svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="Nobody types a plugin name into a workspace: the declaration is read and the set follows from it.">
+<svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="From a repository's claim to a session">
   <rect class="dl-tile" x="332" y="16" width="264" height="64" rx="10"/>
   <text class="dl-name" x="344" y="37">a repository's claim</text>
-  <text class="dl-detail" x="344" y="52">sprepo.json — the world it answers to</text>
+  <text class="dl-detail" x="344" y="52">sprepo.json, the world it answers to</text>
   <path class="dl-wire" d="M464 80 L464 120"/>
-  <text class="dl-wlabel" x="476" y="104">derives</text>
   <rect class="dl-tile" x="332" y="120" width="264" height="64" rx="10"/>
   <text class="dl-name" x="344" y="141">the derived set</text>
   <text class="dl-detail" x="344" y="156">which plugins this repository is</text>
   <text class="dl-detail" x="344" y="171">entitled to load</text>
   <path class="dl-wire" d="M464 184 L464 224"/>
-  <text class="dl-wlabel" x="476" y="208">installed as</text>
   <rect class="dl-tile" x="332" y="224" width="264" height="64" rx="10"/>
   <text class="dl-name" x="344" y="245">the installed copy</text>
   <text class="dl-detail" x="344" y="260">found by name and by the version the</text>
   <text class="dl-detail" x="344" y="275">manifest carries</text>
   <path class="dl-wire" d="M464 288 L464 328"/>
-  <text class="dl-wlabel" x="476" y="312">read by</text>
-  <rect class="dl-tile" x="332" y="328" width="264" height="64" rx="10"/>
+  <rect class="dl-tile-on" x="332" y="328" width="264" height="64" rx="10"/>
   <text class="dl-name" x="344" y="349">a session</text>
   <text class="dl-detail" x="344" y="364">matches the description against the work</text>
   <text class="dl-detail" x="344" y="379">at hand</text>
@@ -81,18 +76,14 @@
 <figcaption>Nobody types a plugin name into a workspace: the declaration is read and the set follows from it.</figcaption>
 </figure>
   <!-- dg:source
-{ "kind": "map",
+{ "kind": "chain",
+  "title": "From a repository's claim to a session",
   "caption": "Nobody types a plugin name into a workspace: the declaration is read and the set follows from it.",
   "boxes": [
-    { "id": "a", "label": "a repository's claim", "note": "sprepo.json — the world it answers to" },
+    { "id": "a", "label": "a repository's claim", "note": "sprepo.json, the world it answers to" },
     { "id": "b", "label": "the derived set", "note": "which plugins this repository is entitled to load" },
     { "id": "c", "label": "the installed copy", "note": "found by name and by the version the manifest carries" },
-    { "id": "d", "label": "a session", "note": "matches the description against the work at hand" }
-  ],
-  "links": [
-    { "from": "a", "to": "b", "label": "derives" },
-    { "from": "b", "to": "c", "label": "installed as" },
-    { "from": "c", "to": "d", "label": "read by" }
+    { "id": "d", "label": "a session", "note": "matches the description against the work at hand", "em": true }
   ] }
   -->
 </section>
@@ -100,13 +91,13 @@
 <!-- 03 -->
 <section id="s3">
   <div class="sds-section-head"><h2>Parts</h2></div>
-  <h3 id="plugin-identity-the-identity-is-this-plu">Plugin identity — The identity is this plugin's own</h3>
+  <h3 id="plugin-identity-the-identity-is-this-plu">Plugin identity — the identity is this plugin's own</h3>
   <p>The manifest names this folder <code>spn-surface</code> and describes the Surface domain before any stack is chosen: the standards of content, interaction, patterns and names, the architecture of the design system, and the one skill, <code>design</code>, that states a page as a tree of named blocks. The description is long deliberately, because it is matched against the work at hand rather than browsed by a person, and material nothing matches is material nothing reaches.</p>
-  <h3 id="who-gets-it-the-world-decides-who-gets-i">Who gets it — The world decides who gets it</h3>
+  <h3 id="who-gets-it-the-world-decides-who-gets-i">Who gets it — the world decides who gets it</h3>
   <p>A workspace never types a plugin name. Each repository declares its world in its own manifest, and the set of plugins it is entitled to load is derived from that declaration. The derivation is the foundation's, and this page only says which side of it this plugin sits on: a repository that builds a page loads this plugin beside the apps plugin.</p>
-  <h3 id="version-number-the-version-is-the-number">Version number — The version is the number of what is published</h3>
+  <h3 id="version-number-the-version-is-the-number">Version number — the version is the number of what is published</h3>
   <p>The manifest reads <code>0.1.0</code>, the version this plugin's first release publishes. The field names what is published rather than what somebody is working on, and a cache directory is keyed by version, so a plugin edited without an increment installs over its own published bytes and nothing tells a reader which of the two is running.</p>
-  <h3 id="plugin-contents-what-this-plugin-holds-a">Plugin contents — What this plugin holds, and what it does not</h3>
+  <h3 id="plugin-contents-what-this-plugin-holds-a">Plugin contents — what this plugin holds, and what it does not</h3>
   <p>This folder ships wiring, a skill, scripts, refs and tests. It ships no agents, because a persona and a reviewing viewpoint answer to no stack and live once in the core plugin, where the UX and UI lenses are. It ships no providers folder, because it holds no file that names a stack. Each folder it does ship has its own page, and none of them is described here.</p>
 </section>
 
@@ -145,4 +136,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-yDkvlVaxZfr5SBqgjOk8GZPsDngeCYQxHHaY1aPfty/M6hFe1DXJz++VjJ+i+082" crossorigin="anonymous"></script>

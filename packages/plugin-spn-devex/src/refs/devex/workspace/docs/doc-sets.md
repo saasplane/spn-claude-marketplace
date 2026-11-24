@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
-      "seen": "2e5f7bbe"
+      "seen": "21b3b3bf"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
@@ -29,7 +29,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md",
-      "seen": "13acca92"
+      "seen": "c6635913"
     },
     {
       "path": "spn-foundation/CONCEPT.md",

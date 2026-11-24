@@ -4,18 +4,16 @@
 {"id":"apps-hooks","variant":"construct","title":"Hooks","subtitle":"One moment wired, because every rule here is about a file about to change.","lenses":["ARCHITECT","SERVER_DEV"],"status":"PLANNING","dependsOn":["apps-plugin","hook-set"],"summary":"This plugin wires exactly one moment of a session — the point where a file is about to change — because every rule it holds is about what a file contains.","keywords":["hook","hooks.json","PreToolUse","matcher","entry","dispatch"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-z6T3Ju/mWAnv24wb8AFXMHYMyXMd5U/g7N2hA3X1uCys4Ty2Yy7TcMXWe+SMPck0" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../apps-overview.html">&larr; spn-apps</a>
   <div class="sds-rail-title">Hooks</div>
 </nav>
 <div class="sds-wrap">
-
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Hooks</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">Backend developer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <div class="sds-eyebrow"><span class="sds-line1"><a href="../../concept-overview.html">SaaS Plane</a> &middot; <a href="../apps-overview.html">Claude Marketplace</a> &middot; Hooks</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">Backend developer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>Hooks</h1>
   <p class="sds-subtitle">One moment wired, because every rule here is about a file about to change.</p>
   <p class="sds-standfirst">This plugin wires exactly one moment of a session — the point where a file is about to change — because every rule it holds is about what a file contains. Read this page to see why one moment is enough here, and which calls that one moment covers. It explains the single wired entry and how its dispatcher decides what to run.</p>
@@ -47,7 +45,7 @@
 <!-- 02 -->
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
-  <p>One moment, narrowed to two tool names, behind one command — and what that command runs is decided per call from the repository's own declaration.</p>
+  <p>One moment, narrowed to two tool names, behind one command — and what that command runs is decided per call from the repository's own declaration. A write about to run is matched by the one entry, the entry runs the dispatcher, and the dispatcher returns a verdict: a refusal, advice, or silence.</p>
 <figure class="dl-figure">
 <div class="dl-frame">
 <svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="The declaration is read per write, so one installed plugin serves whatever stack the node claims.">
@@ -142,4 +140,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-yDkvlVaxZfr5SBqgjOk8GZPsDngeCYQxHHaY1aPfty/M6hFe1DXJz++VjJ+i+082" crossorigin="anonymous"></script>

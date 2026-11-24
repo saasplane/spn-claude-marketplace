@@ -39,7 +39,7 @@ This construct realizes the book's `01-devex/02-agent/04-plugins`.
 
 ## Model
 
-A session never reads this checkout. It reads an installed copy, found by the plugin's name together with the version its manifest carries, and it loads that copy only where the repository it is standing in declares the world this plugin serves.
+A session never reads this checkout. The marketplace entry names this plugin and the folder holding it, and points at `plugin.json`, the plugin's own claim of its name, version and description. An install copies that folder, and the session reads the installed copy, found by the plugin's name together with the version its manifest carries. It loads that copy only into an INFRA repository, because the repository's own `sprepo.json` declares the world this plugin serves.
 
 ```dg
 { "kind": "map",
@@ -59,23 +59,23 @@ A session never reads this checkout. It reads an installed copy, found by the pl
 
 ## Parts
 
-### Shared number — The four plugins carry one number, and every release moves all four
+### Shared number — the four plugins carry one number, and every release moves all four
 
 **A reader cannot tell four version numbers apart.** The plugins install as one set, by one command, and a session loads whichever of them its repository declares. Faced with four different numbers there is no way to tell from the outside whether that is four deliberate versions or one release that half-landed. So the four move together, and a plugin with nothing changed in it is released anyway at the new number. The cost is releasing an unchanged plugin, which costs nothing.
 
-### Published number — The number names what is published, not what somebody is working on
+### Published number — the number names what is published, not what somebody is working on
 
 **The release happens at the version the plugins already carry, and the count moves afterwards.** A published version ships, and the first edit after it increments the patch — for all four, not for the one that was touched. That is what makes a stale cache findable: a cache directory is keyed by version, so a plugin edited without an increment installs over its own published bytes and nothing tells a reader which of the two is running.
 
-### Description — The description is this plugin's own, and it decides the load
+### Description — the description is this plugin's own, and it decides the load
 
 **A description is matched, not browsed.** It states in full what the plugin carries — the estate skills, the cards that hold the estate's vocabulary, the per-cloud material, and the refusal a write meets — because a session compares it against the work at hand rather than reading it for pleasure. The marketplace entry carries a second description for a listing to show, and the manifest is the current one wherever the two disagree.
 
-### INFRA loading — It loads where a repository declares INFRA
+### INFRA loading — it loads where a repository declares INFRA
 
 **The world is read from the repository, never typed by a workspace.** A repository declaring `INFRA` gets this plugin, and that covers both the estate repository and the blueprint repository beside it, because both are edited under the estate's laws. A repository declaring another world never loads it, which is why the guard can be narrow: it only ever meets files that belong to an estate.
 
-### Plugin contents — What this plugin holds, and what it leaves out
+### Plugin contents — what this plugin holds, and what it leaves out
 
 `spn-infra` ships six folders:
 

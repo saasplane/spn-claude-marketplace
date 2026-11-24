@@ -2331,10 +2331,10 @@ console.log("\n=== stop — send-backs are written as they are said, the welcome
     const bare = "The band has two buttons.\n\nI recommend the shorter heading, so the band reads in one line.";
     const viewed = "UX and VOICE read the band.\n\nI recommend the shorter heading, so the band reads in one line.";
     const red = stopModule.checkAreaViews(bare, site);
-    check("[MKT.HOOKS.508] red: a reply that proposes a shape for the area the prompt touched and names none of its views is sent back, naming the views, the skill and the rule",
+    check("[RULE.DEVEX.AGENT.177] [MKT.HOOKS.508] red: a reply that proposes a shape for the area the prompt touched and names none of its views is sent back, naming the views, the skill and the rule",
       red.length === 1 && red[0].check === "reply-shape" && red[0].message.includes("UX, UI, VOICE, MARKETING") && red[0].message.includes("spn-surface:design") && red[0].message.includes("RULE.DEVEX.AGENT.177"), JSON.stringify(red));
-    check("[MKT.HOOKS.508] green: the same proposal naming the views passes", stopModule.checkAreaViews(viewed, site).length === 0);
-    check("[MKT.HOOKS.508] green: a reply that proposes nothing, or a window whose prompt touched no area, owes no view",
+    check("[RULE.DEVEX.AGENT.177] [MKT.HOOKS.508] green: the same proposal naming the views passes", stopModule.checkAreaViews(viewed, site).length === 0);
+    check("[RULE.DEVEX.AGENT.177] [MKT.HOOKS.508] green: a reply that proposes nothing, or a window whose prompt touched no area, owes no view",
       stopModule.checkAreaViews("The band is drawn and the checks are green.", site).length === 0 && stopModule.checkAreaViews(bare, []).length === 0);
   }
 

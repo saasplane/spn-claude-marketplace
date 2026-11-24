@@ -38,7 +38,7 @@ This construct realizes the book's `01-devex/02-agent/04-plugins`.
 
 ## Model
 
-The book is the source. A ref is the copy that travels with the plugin, arranged so its shape tells a reader where to look before they have read anything.
+The book is the source. A ref is the copy that travels with the plugin, arranged so its shape tells a reader where to look before they have read anything. Each ref carries the stamp, which names every chapter it restates and the hash last read there, and a drift run compares that hash and reports a copy that fell behind.
 
 ```dg
 { "kind": "map",

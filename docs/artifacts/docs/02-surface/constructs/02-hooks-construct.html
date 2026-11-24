@@ -4,18 +4,16 @@
 {"id":"surface-hooks","variant":"construct","title":"Hooks","subtitle":"One moment wired, because the one rule here is about a script about to run.","lenses":["ARCHITECT","UX"],"status":"PLANNING","dependsOn":["surface-plugin","hook-set"],"summary":"This plugin wires exactly one moment of a session, the point where the Figma connector is about to run a script, and one tool, because its one rule is about what that script says.","keywords":["hook","hooks.json","PreToolUse","matcher","entry","connector"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-z6T3Ju/mWAnv24wb8AFXMHYMyXMd5U/g7N2hA3X1uCys4Ty2Yy7TcMXWe+SMPck0" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../surface-overview.html">&larr; spn-surface</a>
   <div class="sds-rail-title">Hooks</div>
 </nav>
 <div class="sds-wrap">
-
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Hooks</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">UX designer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <div class="sds-eyebrow"><span class="sds-line1"><a href="../../concept-overview.html">SaaS Plane</a> &middot; <a href="../surface-overview.html">Claude Marketplace</a> &middot; Hooks</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">UX designer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>Hooks</h1>
   <p class="sds-subtitle">One moment wired, because the one rule here is about a script about to run.</p>
   <p class="sds-standfirst">This plugin wires exactly one moment of a session, the point where the Figma connector is about to run a script, and one tool, because its one rule is about what that script says. Read this page to see why one moment and one tool are enough here, and what the entry does with a call. It explains the single wired entry and its dispatcher.</p>
@@ -47,26 +45,23 @@
 <!-- 02 -->
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
-  <p>One moment, narrowed to one tool name, behind one command.</p>
+  <p>One moment, narrowed to one tool name, behind one command. A connector call about to run is matched by the one entry, the entry runs the dispatcher, and the dispatcher hands the call to the connector check and returns a verdict.</p>
 <figure class="dl-figure">
 <div class="dl-frame">
-<svg class="dl-svg" viewBox="0 0 928 344" role="img" aria-label="The matcher is applied by the harness first, so a session that never draws in Figma never starts this plugin's process.">
+<svg class="dl-svg" viewBox="0 0 928 344" role="img" aria-label="A connector call, from the matcher to a verdict">
   <rect class="dl-tile" x="332" y="16" width="264" height="48" rx="10"/>
   <text class="dl-name" x="344" y="37">a connector call about to run</text>
   <text class="dl-detail" x="344" y="52">mcp__figma__use_figma, and no other tool</text>
   <path class="dl-wire" d="M464 64 L464 104"/>
-  <text class="dl-wlabel" x="476" y="88">matched by</text>
   <rect class="dl-tile" x="332" y="104" width="264" height="48" rx="10"/>
   <text class="dl-name" x="344" y="125">the one entry</text>
-  <text class="dl-detail" x="344" y="140">hooks.json — one command, one timeout</text>
+  <text class="dl-detail" x="344" y="140">hooks.json, one command and one timeout</text>
   <path class="dl-wire" d="M464 152 L464 192"/>
-  <text class="dl-wlabel" x="476" y="176">runs</text>
   <rect class="dl-tile" x="332" y="192" width="264" height="48" rx="10"/>
   <text class="dl-name" x="344" y="213">the dispatcher</text>
   <text class="dl-detail" x="344" y="228">hands the call to the connector check</text>
   <path class="dl-wire" d="M464 240 L464 280"/>
-  <text class="dl-wlabel" x="476" y="264">returns</text>
-  <rect class="dl-tile" x="332" y="280" width="264" height="48" rx="10"/>
+  <rect class="dl-tile-on" x="332" y="280" width="264" height="48" rx="10"/>
   <text class="dl-name" x="344" y="301">a verdict</text>
   <text class="dl-detail" x="344" y="316">a refusal, advice, or silence</text>
 </svg>
@@ -74,18 +69,14 @@
 <figcaption>The matcher is applied by the harness first, so a session that never draws in Figma never starts this plugin's process.</figcaption>
 </figure>
   <!-- dg:source
-{ "kind": "map",
+{ "kind": "chain",
+  "title": "A connector call, from the matcher to a verdict",
   "caption": "The matcher is applied by the harness first, so a session that never draws in Figma never starts this plugin's process.",
   "boxes": [
     { "id": "a", "label": "a connector call about to run", "note": "mcp__figma__use_figma, and no other tool" },
-    { "id": "b", "label": "the one entry", "note": "hooks.json — one command, one timeout" },
+    { "id": "b", "label": "the one entry", "note": "hooks.json, one command and one timeout" },
     { "id": "c", "label": "the dispatcher", "note": "hands the call to the connector check" },
-    { "id": "d", "label": "a verdict", "note": "a refusal, advice, or silence" }
-  ],
-  "links": [
-    { "from": "a", "to": "b", "label": "matched by" },
-    { "from": "b", "to": "c", "label": "runs" },
-    { "from": "c", "to": "d", "label": "returns" }
+    { "id": "d", "label": "a verdict", "note": "a refusal, advice, or silence", "em": true }
   ] }
   -->
 </section>
@@ -93,15 +84,15 @@
 <!-- 03 -->
 <section id="s3">
   <div class="sds-section-head"><h2>Parts</h2></div>
-  <h3 id="one-moment-one-moment-and-why-the-others">One moment — One moment, and why the others are not claimed</h3>
+  <h3 id="one-moment-one-moment-and-why-the-others">One moment — one moment, and why the others are not claimed</h3>
   <p>The moment a call is about to run is the only one that can still stop it, and a rule about a script's text has nothing to say at any other. A moment claimed for the sake of symmetry is an interpreter start-up on every call in a session, paid for an answer nobody asked for.</p>
-  <h3 id="matcher-the-matcher-is-the-first-and-che">Matcher — The matcher is the first and cheapest filter</h3>
+  <h3 id="matcher-the-matcher-is-the-first-and-che">Matcher — the matcher is the first and cheapest filter</h3>
   <p>The entry narrows to the connector's script runner. Every other call a session makes never reaches this plugin at all, which is a filter the harness applies before any process of this plugin's starts.</p>
-  <h3 id="text-refusal-the-check-refuses-only-what">Text refusal — The check refuses only what the text shows</h3>
+  <h3 id="text-refusal-the-check-refuses-only-what">Text refusal — the check refuses only what the text shows</h3>
   <p>The connector check blanks comment and string bodies, then refuses a script that calls an API the connector does not support or one that throws there. It notes, and lets the call go, what the text cannot settle: a second page switch, and a call that passes no <code>skillNames</code>. It reads no file, calls no network and runs no command.</p>
-  <h3 id="throwing-checks-a-check-that-throws-is-s">Throwing checks — A check that throws is skipped, never fatal</h3>
+  <h3 id="throwing-checks-a-check-that-throws-is-s">Throwing checks — a check that throws is skipped, never fatal</h3>
   <p>A gate that crashes the chain removes every other gate with it, which is worse than any single miss. The dispatcher treats a check that throws as silence.</p>
-  <h3 id="plugin-root-the-wiring-names-the-plugin-">Plugin root — The wiring names the plugin root, never a checkout</h3>
+  <h3 id="plugin-root-the-wiring-names-the-plugin-">Plugin root — the wiring names the plugin root, never a checkout</h3>
   <p>The command is written against the installed folder rather than against a path in this repository, so the entry works wherever the plugin was installed.</p>
 </section>
 
@@ -138,4 +129,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-yDkvlVaxZfr5SBqgjOk8GZPsDngeCYQxHHaY1aPfty/M6hFe1DXJz++VjJ+i+082" crossorigin="anonymous"></script>

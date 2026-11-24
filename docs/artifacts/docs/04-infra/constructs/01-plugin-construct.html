@@ -4,18 +4,16 @@
 {"id":"estate-plugin","variant":"construct","title":"Plugin","subtitle":"The one folder that carries this repository's infrastructure rules into a working session.","lenses":["INFRA","ARCHITECT"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"This plugin carries this repository's estate standard — the rules for the infrastructure a product runs on — into a session that is working on one, in one folder.","keywords":["plugin","manifest","version","lockstep","description","INFRA"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-z6T3Ju/mWAnv24wb8AFXMHYMyXMd5U/g7N2hA3X1uCys4Ty2Yy7TcMXWe+SMPck0" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../infra-overview.html">&larr; spn-infra</a>
   <div class="sds-rail-title">Plugin</div>
 </nav>
 <div class="sds-wrap">
-
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Plugin</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">DevOps / SRE</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <div class="sds-eyebrow"><span class="sds-line1"><a href="../../concept-overview.html">SaaS Plane</a> &middot; <a href="../infra-overview.html">Claude Marketplace</a> &middot; Plugin</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">DevOps / SRE</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>Plugin</h1>
   <p class="sds-subtitle">The one folder that carries this repository's infrastructure rules into a working session.</p>
   <p class="sds-standfirst">This plugin carries this repository's estate standard — the rules for the infrastructure a product runs on — into a session that is working on one, in one folder. Read this page to see what this plugin claims about itself and when a session loads it. It explains the manifest, the marketplace entry, and the version rule it shares with its two sibling plugins.</p>
@@ -48,7 +46,7 @@
 <!-- 02 -->
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
-  <p>A session never reads this checkout. It reads an installed copy, found by the plugin's name together with the version its manifest carries, and it loads that copy only where the repository it is standing in declares the world this plugin serves.</p>
+  <p>A session never reads this checkout. The marketplace entry names this plugin and the folder holding it, and points at <code>plugin.json</code>, the plugin's own claim of its name, version and description. An install copies that folder, and the session reads the installed copy, found by the plugin's name together with the version its manifest carries. It loads that copy only into an INFRA repository, because the repository's own <code>sprepo.json</code> declares the world this plugin serves.</p>
 <figure class="dl-figure">
 <div class="dl-frame">
 <svg class="dl-svg" viewBox="0 0 928 408" role="img" aria-label="The declared world decides the load; the version decides which bytes are loaded.">
@@ -97,15 +95,15 @@
 <!-- 03 -->
 <section id="s3">
   <div class="sds-section-head"><h2>Parts</h2></div>
-  <h3 id="shared-number-the-four-plugins-carry-one">Shared number — The four plugins carry one number, and every release moves all four</h3>
+  <h3 id="shared-number-the-four-plugins-carry-one">Shared number — the four plugins carry one number, and every release moves all four</h3>
   <p><strong>A reader cannot tell four version numbers apart.</strong> The plugins install as one set, by one command, and a session loads whichever of them its repository declares. Faced with four different numbers there is no way to tell from the outside whether that is four deliberate versions or one release that half-landed. So the four move together, and a plugin with nothing changed in it is released anyway at the new number. The cost is releasing an unchanged plugin, which costs nothing.</p>
-  <h3 id="published-number-the-number-names-what-i">Published number — The number names what is published, not what somebody is working on</h3>
+  <h3 id="published-number-the-number-names-what-i">Published number — the number names what is published, not what somebody is working on</h3>
   <p><strong>The release happens at the version the plugins already carry, and the count moves afterwards.</strong> A published version ships, and the first edit after it increments the patch — for all four, not for the one that was touched. That is what makes a stale cache findable: a cache directory is keyed by version, so a plugin edited without an increment installs over its own published bytes and nothing tells a reader which of the two is running.</p>
-  <h3 id="description-the-description-is-this-plug">Description — The description is this plugin's own, and it decides the load</h3>
+  <h3 id="description-the-description-is-this-plug">Description — the description is this plugin's own, and it decides the load</h3>
   <p><strong>A description is matched, not browsed.</strong> It states in full what the plugin carries — the estate skills, the cards that hold the estate's vocabulary, the per-cloud material, and the refusal a write meets — because a session compares it against the work at hand rather than reading it for pleasure. The marketplace entry carries a second description for a listing to show, and the manifest is the current one wherever the two disagree.</p>
-  <h3 id="infra-loading-it-loads-where-a-repositor">INFRA loading — It loads where a repository declares INFRA</h3>
+  <h3 id="infra-loading-it-loads-where-a-repositor">INFRA loading — it loads where a repository declares INFRA</h3>
   <p><strong>The world is read from the repository, never typed by a workspace.</strong> A repository declaring <code>INFRA</code> gets this plugin, and that covers both the estate repository and the blueprint repository beside it, because both are edited under the estate's laws. A repository declaring another world never loads it, which is why the guard can be narrow: it only ever meets files that belong to an estate.</p>
-  <h3 id="plugin-contents-what-this-plugin-holds-a">Plugin contents — What this plugin holds, and what it leaves out</h3>
+  <h3 id="plugin-contents-what-this-plugin-holds-a">Plugin contents — what this plugin holds, and what it leaves out</h3>
   <p><code>spn-infra</code> ships six folders:</p>
   <pre data-lang="tree">hooks/
 skills/
@@ -151,4 +149,4 @@ tests/</pre>
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-yDkvlVaxZfr5SBqgjOk8GZPsDngeCYQxHHaY1aPfty/M6hFe1DXJz++VjJ+i+082" crossorigin="anonymous"></script>

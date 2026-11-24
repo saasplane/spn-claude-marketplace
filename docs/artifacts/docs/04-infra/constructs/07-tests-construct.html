@@ -4,18 +4,16 @@
 {"id":"estate-tests","variant":"construct","title":"Tests","subtitle":"How this plugin proves the rules it refuses a bad file on.","lenses":["INFRA","QA"],"status":"PLANNING","dependsOn":["tests","estate-guard","estate-providers"],"summary":"This plugin proves its own gate — the rules that refuse a file — in a Tests folder arranged so moving a source file moves its test with it.","keywords":["test","tier","mirror","runner","harness","suite"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.css" integrity="sha384-R47poopLRnz65naDQiMbuRZgxiTZtsgOLsiaP10qjWo62gNyH4ezyJy2v/TyMG5J" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-language.css" integrity="sha384-z6T3Ju/mWAnv24wb8AFXMHYMyXMd5U/g7N2hA3X1uCys4Ty2Yy7TcMXWe+SMPck0" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
-  <a class="sds-home" href="../infra-overview.html">&larr; spn-infra</a>
   <div class="sds-rail-title">Tests</div>
 </nav>
 <div class="sds-wrap">
-
 <header class="sds-masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Tests</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">DevOps / SRE</span><span class="sds-badge sds-lens">Quality engineer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <div class="sds-eyebrow"><span class="sds-line1"><a href="../../concept-overview.html">SaaS Plane</a> &middot; <a href="../infra-overview.html">Claude Marketplace</a> &middot; Tests</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">DevOps / SRE</span><span class="sds-badge sds-lens">Quality engineer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>Tests</h1>
   <p class="sds-subtitle">How this plugin proves the rules it refuses a bad file on.</p>
   <p class="sds-standfirst">This plugin proves its own gate — the rules that refuse a file — in a Tests folder arranged so moving a source file moves its test with it. Read this page before you add a new rule, or when you want to know what a rule must be proven against. It explains why each rule is checked both against what it must refuse <strong>and</strong> against what it must let through, and how the folder finds the plugin root instead of counting hops to it.</p>
@@ -26,6 +24,33 @@
   <div class="sds-section-head"><h2>Overview</h2></div>
   <p>A gate nobody proves is a gate nobody can trust to be narrow. This plugin's refusals are regular expressions over text somebody is about to write, and a rule that is one character too greedy refuses correct files until somebody turns the whole gate off.</p>
   <p><strong>The tier comes first and the mirror second.</strong> <code>unit/</code> answers <em>what kind of proof is this</em>, and the path under it answers <em>of what</em> by repeating the source file's own path. That order is what lets a second tier be added later without a collision: an integration suite for a file that already has a unit suite lands at the same path under a different tier.</p>
+<figure class="dl-figure">
+<div class="dl-frame">
+<svg class="dl-svg" viewBox="0 0 928 96" role="img" aria-label="How a suite's path is read">
+  <rect class="dl-tile" x="20" y="16" width="260" height="64" rx="10"/>
+  <text class="dl-name" x="32" y="37">The tier</text>
+  <text class="dl-detail" x="32" y="52">what kind of proof this is</text>
+  <path class="dl-wire" d="M280 48 L336 48"/>
+  <rect class="dl-tile-on" x="336" y="16" width="260" height="64" rx="10"/>
+  <text class="dl-name" x="348" y="37">The mirror</text>
+  <text class="dl-detail" x="348" y="52">of what, by repeating the source file's</text>
+  <text class="dl-detail" x="348" y="67">own path</text>
+  <path class="dl-wire" d="M596 48 L652 48"/>
+  <rect class="dl-tile" x="652" y="16" width="260" height="64" rx="10"/>
+  <text class="dl-name" x="664" y="37">The suite</text>
+  <text class="dl-detail" x="664" y="52">a second tier lands at the same path</text>
+</svg>
+</div>
+<figcaption>Look at the order: the tier is read first and the mirror second, so a second tier lands beside the first.</figcaption>
+</figure>
+  <!-- dg:source
+{ "kind": "chain",
+  "title": "How a suite's path is read",
+  "caption": "Look at the order: the tier is read first and the mirror second, so a second tier lands beside the first.",
+  "boxes": [{ "id": "a", "label": "The tier", "note": "what kind of proof this is" },
+            { "id": "b", "label": "The mirror", "note": "of what, by repeating the source file's own path", "em": true },
+            { "id": "c", "label": "The suite", "note": "a second tier lands at the same path" }] }
+  -->
   <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
 </section>
 
@@ -49,7 +74,7 @@
 <!-- 02 -->
 <section id="s2">
   <div class="sds-section-head"><h2>Model</h2></div>
-  <p>Two fixed folders and one file, and the shape of the path carries the meaning.</p>
+  <p>Two fixed folders and one file, and the shape of the path carries the meaning. <code>run.mjs</code> walks the whole tree and runs every suite it finds. <code>helpers/</code> holds the harness, which every suite loads. <code>unit/</code> is the tier, the first thing the path says, and <code>unit/&lt;source path&gt;</code> is the mirror, where the suite sits at its source's own path.</p>
 <figure class="dl-figure">
 <div class="dl-frame">
 <svg class="dl-svg" viewBox="0 0 928 364" role="img" aria-label="The runner walks, so a suite is discovered by where a source file sits rather than by a list.">
@@ -100,13 +125,13 @@
 <!-- 03 -->
 <section id="s3">
   <div class="sds-section-head"><h2>Parts</h2></div>
-  <h3 id="what-is-proven-what-is-proven-and-both-s">What is proven — What is proven, and both sides of every rule</h3>
+  <h3 id="what-is-proven-what-is-proven-and-both-s">What is proven — what is proven, and both sides of every rule</h3>
   <p>One suite proves the estate laws — what each rule refuses, what it allows, and where the credential length boundary sits, stated as cases so nobody re-derives it from a regular expression. Another proves the subject resolution: each cloud's own spellings refused, each cloud's sanctioned homes still allowed, and the case that matters most — a region belonging to the <strong>other</strong> cloud caught as well, because a write-time gate cannot know which cloud the estate will resolve to.</p>
-  <h3 id="load-bearing-suite-the-suite-is-proven-l">Load-bearing suite — The suite is proven load-bearing, not merely green</h3>
+  <h3 id="load-bearing-suite-the-suite-is-proven-l">Load-bearing suite — the suite is proven load-bearing, not merely green</h3>
   <p>A passing suite proves the code does what the suite says; it does not prove the suite would notice if the code stopped. So the discovery was tested by moving the Google provider folder aside: exactly the two Google cases went red and every other case stayed green, and restoring the folder returned the whole run. That is the difference between a suite that reads the tree and a suite that agrees with it.</p>
-  <h3 id="runner-the-runner-walks-and-it-judges-on">Runner — The runner walks, and it judges on the exit code</h3>
+  <h3 id="runner-the-runner-walks-and-it-judges-on">Runner — the runner walks, and it judges on the exit code</h3>
   <p><code>run.mjs</code> finds every suite by walking the tree and taking each file whose name marks it as one, so a suite is discovered by where its source sits rather than by being added to a list. It reads each suite's own exit code as the verdict and uses the printed summary only for the count, because a suite that exits non-zero while printing a cheerful last line would otherwise read as green. Standard error is discarded rather than inherited, so a fixture's warnings do not appear in the run as this run's findings.</p>
-  <h3 id="folder-counting-nothing-counts-folders-t">Folder counting — Nothing counts folders to find the code</h3>
+  <h3 id="folder-counting-nothing-counts-folders-t">Folder counting — nothing counts folders to find the code</h3>
   <p>Moving the suites once broke every one of them at the same moment, because each computed its own depth back to the plugin. So each part does one thing:</p>
   <ul>
     <li>the harness exports the plugin root, found once;</li>
@@ -114,21 +139,20 @@
     <li>a suite states only what it proves.</li>
   </ul>
   <p><strong>A suite that types a depth is a suite the next move breaks</strong>, and nothing here types one.</p>
-  <h3 id="real-verdict-a-case-runs-the-real-proces">Real verdict — A case runs the real process and reads the real verdict</h3>
+  <h3 id="real-verdict-a-case-runs-the-real-proces">Real verdict — a case runs the real process and reads the real verdict</h3>
   <p>The harness writes a hook event to a fresh process on standard input and parses the decision back out, so what a case proves is what the harness would see rather than what a function returns. A case states the decision it expects and, for a refusal, a fragment the message must carry — which is how a rule that fires for the wrong reason is caught rather than counted as a pass.</p>
-  <h3 id="absences-what-is-absent-and-the-absence-">Absences — What is absent, and the absence is the statement</h3>
+  <h3 id="absences-what-is-absent-and-the-absence-">Absences — what is absent, and the absence is the statement</h3>
   <p>There is no <code>integration/</code> folder and no <code>setup/</code> folder. Nothing runs at that tier in this plugin, and the runner needs no fixture stood up before it starts. <strong>An empty folder would teach a reader that the tier works</strong>, so neither exists, which is the same rule a cloud with no validator follows.</p>
-  <h3 id="replayed-payloads-the-payload-a-case-rep">Replayed payloads — The payload a case replays sits beside the suites, once per event</h3>
+  <h3 id="replayed-payloads-the-payload-a-case-rep">Replayed payloads — the payload a case replays sits beside the suites, once per event</h3>
   <p><code>tests/fixtures/payloads/pretooluse/</code> holds one recorded call for the one event this plugin wires, and a suite reads it rather than constructing its own. A payload is an input, never a generated answer, so a stale one is a fixture problem and never a passing case that stopped proving anything.</p>
-  <h3 id="bundle-cases-two-more-cases-prove-the-bu">Bundle cases — Two more cases prove the bundle, not one file</h3>
+  <h3 id="bundle-cases-two-more-cases-prove-the-bu">Bundle cases — two more cases prove the bundle, not one file</h3>
   <p><code>unit/t-dist-current.mjs</code> and <code>unit/t-bundle-parity.mjs</code> sit at the tree's root rather than under any one mirror, because each proves a property of the whole plugin:</p>
-  <div class="sds-scroll"><table>
-    <thead><tr><th>Case</th></tr></thead>
-    <tbody>
-      <tr><td><p><code>unit/t-dist-current.mjs</code></p><p>recomputes a bundle's declared sources against the banner esbuild wrote into it</p></td></tr>
-      <tr><td><p><code>unit/t-bundle-parity.mjs</code></p><p>runs a recorded payload through the source and through the committed bundle and asserts the two agree</p></td></tr>
-    </tbody>
-  </table></div>
+  <div class="sds-tiles" data-layout="LIST">
+    <div class="sds-tile"><div class="sds-tile-body"><h4><code>unit/t-dist-current.mjs</code></h4><p>recomputes a bundle's declared sources against the banner esbuild wrote into it</p>
+      </div></div>
+    <div class="sds-tile"><div class="sds-tile-body"><h4><code>unit/t-bundle-parity.mjs</code></h4><p>runs a recorded payload through the source and through the committed bundle and asserts the two agree</p>
+      </div></div>
+  </div>
   <p>Both call the one shared harness the foundation's plugins realization states, <code>packages/plugin-support-lib/tests/helpers/</code>, so the build and the check can never quietly disagree. This plugin ships no <code>commands/</code>, but <code>hooks.json</code> still runs a built <code>dist/events/pretooluse.mjs</code>, so it owes both cases exactly as its two siblings do.</p>
 </section>
 
@@ -167,4 +191,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.15.0/sds-docs.js" integrity="sha384-XYna7dQ9hUAzsp8poWNLetdO4Oyfh/cIKwuuh6sduxMcNDmnLGJ3zcw6DaG1IN9+" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.16.0/docs-page.js" integrity="sha384-yDkvlVaxZfr5SBqgjOk8GZPsDngeCYQxHHaY1aPfty/M6hFe1DXJz++VjJ+i+082" crossorigin="anonymous"></script>
