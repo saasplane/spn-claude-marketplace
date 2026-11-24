@@ -700,7 +700,7 @@ console.log("\n=== the page renderer — the page's name and its title are two t
     /\.sds-json-chip\s*\{/.test(css) && /\.sds-json-dialog\s*\{[^}]*width:\s*min\(720px, 95vw\)[^}]*max-height:\s*80vh/.test(css) && /data-extent="FIT"\][^}]*max-width:\s*85vw/.test(css)
     && /\.sds-json-body > section:not\(\.sds-json-code\), \.sds-json-scroll\s*\{[^}]*overflow:\s*auto/.test(css) && /max-width:\s*47\.99rem/.test(css));
   ok("[MKT.SCRIPTS.660] the stylesheet gives the head the SM step, a 32px close button with a 40px hit area, and pins Copy beside the JSON caption",
-    /\.sds-json-head\s*\{[^}]*padding:\s*1rem 1rem 1rem 1\.25rem/.test(css) && /\.sds-json-close\s*\{[^}]*width:\s*2rem/.test(css) && /\.sds-json-close::after\s*\{[^}]*inset:\s*-4px/.test(css) && /\.sds-json-caprow\s*\{/.test(css) && !css.includes(".sds-json-count"));
+    /\.sds-json-head\s*\{[^}]*padding:\s*1rem \.75rem 1rem 1\.25rem/.test(css) && /\.sds-json-close\s*\{[^}]*width:\s*2rem/.test(css) && /\.sds-json-close::after\s*\{[^}]*inset:\s*-4px/.test(css) && /\.sds-json-caprow\s*\{/.test(css) && !css.includes(".sds-json-count"));
   const js = (await import("node:fs")).readFileSync(resolve(HERE, "src", "styles", "docs-page.js"), "utf8");
   ok("[MKT.SCRIPTS.660] the page script opens with showModal, closes on the button and outside, returns focus to the chip and copies the JSON",
     js.includes("showModal") && js.includes(".sds-json-close") && js.includes("chip.focus()") && js.includes("navigator.clipboard.writeText"));
