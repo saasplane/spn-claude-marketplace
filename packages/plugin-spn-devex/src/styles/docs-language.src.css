@@ -1630,6 +1630,7 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 .sds-group-body .sds-fact-key {
   color: var(--sds-text-fact-card);
   font-weight: var(--font-weight-medium);
+  margin-right: .3em;
 }
 .sds-group-body .sds-fact-value {
   color: var(--sds-text-title-card);

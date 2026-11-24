@@ -616,7 +616,7 @@ function catalogHtml(items: CatalogItem[], layout: string | null, media: string 
   if (inGroup && kind === "LIST" && !media) {
     const rows = items.map((item) => {
       const tags = item.facts.find(([, value]) => /^\s*(\[[^\]\[]+\]\s*)+$/.test(value));
-      const small = item.facts.filter((fact) => fact !== tags).map(([key, value]) => `${key ? `<span class="sds-fact-key">${inline(key)}</span> ` : ""}<span class="sds-fact-value">${inline(value)}</span>`);
+      const small = item.facts.filter((fact) => fact !== tags).map(([key, value]) => `${key ? `<span class="sds-fact-key">${inline(key)}</span>` : ""}<span class="sds-fact-value">${inline(value)}</span>`);
       const badge = tags ? factValue(tags[1]) : "";
       return `      <tr><td><p><strong>${inline(item.name)}</strong></p>${item.line ? `<p>${inline(item.line)}</p>` : ""}${small.length ? `<span class="sds-small">${small.join(" &middot; ")}</span>` : ""}${guidanceHtml(item)}</td>${items.some((one) => one.facts.some(([, value]) => /^\s*(\[[^\]\[]+\]\s*)+$/.test(value))) ? `<td>${badge}</td>` : ""}</tr>`;
     });
