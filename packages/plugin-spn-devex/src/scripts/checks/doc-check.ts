@@ -219,7 +219,7 @@ function pocketKind(parts: string[]): { place: string; suffix: string } | null {
   if (inside !== null)
     return inside.slice(0, -1).includes(CONSTRUCT_PAGES)
       ? { place: `in ${CONSTRUCT_PAGES}/`, suffix: CONSTRUCT_PAGE_SUFFIX }
-      : { place: `under ${POCKET.artifacts}/${ARTIFACT.docs}/, in no ${CONSTRUCT_PAGES}/ folder,`, suffix: OVERVIEW_PAGE_SUFFIX };
+      : { place: `under ${POCKET.artifacts}/${VISIBILITY.public}/${ARTIFACT.docs}/, in no ${CONSTRUCT_PAGES}/ folder,`, suffix: OVERVIEW_PAGE_SUFFIX };
   return parts.includes(POCKET.artifacts) && parts.at(-2) === ARTIFACT.guides
     ? { place: `in ${ARTIFACT.guides}/`, suffix: GUIDE_PAGE_SUFFIX } : null;
 }
@@ -574,7 +574,7 @@ export function approachShape(text: string, exempt = false, closed = false): Fin
   const missing = ["why", "what", "how"].filter((s) => !heads.includes(s));
   if (missing.length)
     return [["RULE", "carries no " + missing.join(" + ") + " — this explains rather than argues, so " +
-      `it is an overview: ${POCKET.artifacts}/${ARTIFACT.docs}/<domain>/<name>${OVERVIEW_PAGE_SUFFIX} (RULE.DEVEX.WORKSPACE.102 / 040). An approach ` +
+      `it is an overview: ${POCKET.artifacts}/${VISIBILITY.public}/${ARTIFACT.docs}/<domain>/<name>${OVERVIEW_PAGE_SUFFIX} (RULE.DEVEX.WORKSPACE.102 / 040). An approach ` +
       "is an opening, then Why > What > Plan > How > Open > Deferred"]];
   if (exempt) return [];
 

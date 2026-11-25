@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/01-shape/README.md",
-      "seen": "0d7f4273"
+      "seen": "32b7bd43"
     },
     {
       "path": "spn-foundation/docs/02-constructs/README.md",

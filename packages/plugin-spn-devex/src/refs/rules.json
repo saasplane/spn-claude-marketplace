@@ -7669,7 +7669,17 @@
         {
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/decision-cards.md",
+          "heading": "It governs conversation, not just documents"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/decision-cards.md",
           "heading": "While a card is open"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "The commands"
         },
         {
           "plugin": "spn-devex",
@@ -30220,9 +30230,9 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "`DSSiteLayout` wraps one site's page, and it is the only thing that marks a page as a site's",
+      "sentence": "`DSSitePage` wraps one site's page, and it is the only thing that marks a page as a site's",
       "chapter": "04-capabilities/02-support/01-surface/10-architecture-layouts/01-common/01-layout.md",
-      "heading": "DSSiteLayout",
+      "heading": "DSSitePage",
       "decision": null,
       "restated": [
         {
@@ -31296,7 +31306,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "A suffix names where a unit is placed: `App`, `Layout`, `Container` or `Widget`",
+      "sentence": "A suffix names where a unit is placed: `App`, `Layout`, `Page`, `Container` or `Widget`",
       "chapter": "04-capabilities/02-support/01-surface/05-standards-names/01-common/01-names.md",
       "heading": "A name says its layer",
       "decision": null,

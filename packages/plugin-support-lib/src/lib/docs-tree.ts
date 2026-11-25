@@ -12,17 +12,19 @@
 //     01-purpose/ … 05-guides/                       the five seats, numbered in reading order
 //     registers/decisions.md                         the pocket holding the repository's own rules
 //     artifacts/                                     the pocket holding what a node produced
-//       index.html                                   the index of artifacts
-//       docs/concept-overview.html                   the hub, and each overview that belongs to no one domain
-//       docs/<domain>/<name>-overview.html           a domain's overviews, in the folder named as its seat folder
-//       docs/<domain>/constructs/<x>-construct.html  the domain's construct pages
-//       guides/ · reports/                           the guide pages, and the reports somebody asked for
+//       public/index.html · private/index.html       the two index pages, one over each half
+//       public/docs/concept-overview.html            the hub, and each overview that belongs to no one domain
+//       public/docs/<domain>/<name>-overview.html    a domain's overviews, in the folder named as its seat folder
+//       public/docs/<domain>/constructs/<x>-construct.html  the domain's construct pages
+//       public/guides/ · public/surface/             the guide pages, and each design language's samples home
+//       private/reports/                             the reports somebody asked for
+//     A pocket not moved yet keeps docs/, guides/ and reports/ directly in it beside one index.html (`artifactsLayout`).
 //   <workspace>/.spndevex/workstreams/<state>/<NNN-subject>/
 //                                                    a workstream, its approach page and its arcs
 //
 // Paths are compared with forward slashes.
 
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { join, sep } from "node:path";
 
 /** The workspace's working-state folder, at the workspace root. */
@@ -115,20 +117,27 @@ export function registersDir(docs: string): string { return pocketDir(docs, "reg
 /** The decision log, `<docs>/registers/decisions.md`. */
 export function decisionsRegister(docs: string): string { return join(registersDir(docs), DECISIONS); }
 export function artifactsDir(docs: string): string { return pocketDir(docs, "artifacts"); }
+/** What the earlier layout keeps directly in the pocket: `docs/`, `guides/` and `reports/`, beside one index (05-pages.md § What the pocket holds). */
+export const EARLIER_FOLDERS: readonly string[] = [ARTIFACT.docs, ARTIFACT.guides, ARTIFACT.reports];
 /**
- * Which layout a docs tree's pocket has. It is the earlier one (`today`) only where the pocket holds `docs/`, `guides/`, `reports/` or an
- * index directly in it and neither `public/` nor `private/`; a pocket that does not exist yet, or holds one of the two, is `split`.
+ * Which layout a docs tree's pocket has, decided once here for every writer, check and hook. A pocket that holds `public/docs/` is
+ * `split`. One that holds `docs/`, `guides/`, `reports/` or an index directly in it, and no `public/docs/`, keeps the earlier layout
+ * (`today`), even where `public/surface/` already stands beside them: a half-moved pocket is read where its pages still are. A pocket
+ * that does not exist yet, or holds neither, is `split`, so a first page is written in the book's layout.
  */
 export function artifactsLayout(docs: string): "split" | "today" {
   const pocket = artifactsDir(docs);
   if (!existsSync(pocket)) return "split";
-  if (existsSync(join(pocket, VISIBILITY.public)) || existsSync(join(pocket, VISIBILITY.private))) return "split";
-  return readdirSync(pocket).some((name) => name !== FACE && !name.startsWith(".")) ? "today" : "split";
+  if (existsSync(join(pocket, VISIBILITY.public, ARTIFACT.docs))) return "split";
+  return [...EARLIER_FOLDERS, ARTIFACT_INDEX].some((name) => existsSync(join(pocket, name))) ? "today" : "split";
 }
-/** The folder one artifact folder sits in: `<pocket>/public/docs` in the split layout, `<pocket>/docs` in the earlier one. */
+/**
+ * The folder one artifact folder sits in: `<pocket>/public/docs` in the split layout, `<pocket>/docs` in the earlier one. `surface/`
+ * was never part of the earlier layout, so it sits in `public/` in either.
+ */
 export function artifactFolderDir(docs: string, folder: string): string {
-  const inside = artifactsLayout(docs) === "split" ? [VISIBILITY_OF[folder] ?? VISIBILITY.public, folder] : [folder];
-  return join(artifactsDir(docs), ...inside);
+  const earlier = artifactsLayout(docs) === "today" && EARLIER_FOLDERS.includes(folder);
+  return join(artifactsDir(docs), ...(earlier ? [folder] : [VISIBILITY_OF[folder] ?? VISIBILITY.public, folder]));
 }
 /** The pocket's `docs` folder: the hub, and one folder for each domain or subdomain. */
 export function artifactDocsDir(docs: string): string { return artifactFolderDir(docs, ARTIFACT.docs); }
@@ -149,7 +158,7 @@ export function privateIndex(docs: string): string { return join(artifactsDir(do
 export function hubPage(docs: string): string { return join(artifactDocsDir(docs), HUB); }
 /**
  * The folder a file sits in directly under a docs tree's artifacts pocket — `reports` for
- * `<repo>/docs/artifacts/reports/2026/a.html` — or `null` where the file is not inside a folder of
+ * `<repo>/docs/artifacts/private/reports/2026/a.html` — or `null` where the file is not inside a folder of
  * that pocket. A check compares it with `ARTIFACT_FOLDERS`, because the pocket's folder set is fixed.
  */
 export function artifactFolderOf(path: string): string | null {
@@ -224,7 +233,7 @@ export function isSeatFile(path: string): boolean {
 
 /**
  * The folder of a domain in the pocket, from its seat folder: `<docs>/02-constructs/01-x/02-y` gives
- * `<docs>/artifacts/docs/01-x/02-y`. The constructs seat itself gives the pocket's `docs` folder.
+ * `<docs>/artifacts/public/docs/01-x/02-y`. The constructs seat itself gives the pocket's `docs` folder.
  * Null where the folder is not in the constructs seat.
  */
 export function domainDirOf(seatFolder: string): string | null {
@@ -235,7 +244,7 @@ export function domainDirOf(seatFolder: string): string | null {
 
 /**
  * The construct page a seat file is produced as (05-pages.md § What the pocket holds):
- * `<docs>/02-constructs/01-x/a.md` gives `<docs>/artifacts/docs/01-x/constructs/a-construct.html`.
+ * `<docs>/02-constructs/01-x/a.md` gives `<docs>/artifacts/public/docs/01-x/constructs/a-construct.html`.
  */
 export function producedPageOf(seatFile: string): string {
   const norm = slashes(seatFile);

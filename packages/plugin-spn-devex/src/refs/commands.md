@@ -204,6 +204,8 @@ spn-devex workstream open --file <block.json> --note "<the developer's words>" [
 
 spn-devex workstream progress write <workstream> — regenerate the progress block in the approach page's Plan
 
+spn-devex workstream question list [<workstream>] [--state open|answered|withdrawn|all] [--every] — list the cards of this window's own workstreams, or of the one named, in one state; --every reads every open and backlog workstream
+
 spn-devex workstream question raise <workstream>/<arc> --file card.json (the card holds why, what, viewsLead, views, options, recommended, nearest, signs, others, about, preview and settled) — raise a card: the next number, the record, the card in the approach page's Open
 
 spn-devex workstream question brief <workstream>/Q<n> — print a fresh view's brief from the card: the problem and the constraints first, no options, the proposals to follow

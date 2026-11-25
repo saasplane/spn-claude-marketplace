@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/14-delivery-library/",
-      "seen": "9604845a"
+      "seen": "09e1e2e8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/16-delivery-providers/01-figma/",

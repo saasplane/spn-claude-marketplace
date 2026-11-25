@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/02-naming.md",
-      "seen": "e3bffbb2"
+      "seen": "4e05def3"
     }
   ]
 }
@@ -122,7 +122,7 @@
 
 **A form's own state is `I<what it edits>FormState`** (`RULE.SUPPORT.APPS.220` · MUST · skill:spn-apps/implement): `IRoleFormState`, `IOrgAuthPolicyFormState`. It is the shape a form holds while a person fills it in, and its fields take the command's own types. The name says which unit holds it, the form, as `IRoleFormProps` does, and keeps the word *state* apart from a contract state, which is a record the server returns. `EntryState` and `Draft` are not used.
 
-**A suffix names where a unit is placed: `App`, `Layout`, `Container`, `Widget`.** A widget stands beside others or in a sidebar, inside a container or not. A block built for one task and placed nowhere in particular is a component and carries none, as the design system's `DSDataTable` does. **The list of pattern words is not closed.** A module that follows a pattern the stack already names uses that name. A plain component is raw: it has no layer to say. The props interface follows the unit's name, as `IRoleListContainerProps`.
+**A suffix names where a unit is placed: `App`, `Layout`, `Page`, `Container`, `Widget`.** A widget stands beside others or in a sidebar, inside a container or not. A block built for one task and placed nowhere in particular is a component and carries none, as the design system's `DSDataTable` does. **The list of pattern words is not closed.** A module that follows a pattern the stack already names uses that name. A plain component is raw: it has no layer to say. The props interface follows the unit's name, as `IRoleListContainerProps`.
 
 **A module's route keys are one enum, and its routes are one constant. Proposed** (`RULE.SUPPORT.APPS.203` · MUST · skill:spn-apps/implement). The enum is `<MOD>RouteType`. Each key is in capitals and matches its value, and each value begins with the module's code: `IAMRouteType.ROLE_DETAIL = 'IAM_ROLE_DETAIL'`. The list is the constant `<MOD>_ROUTES`, typed `ISPRoute[]`. The developer has not seen this choice.
 

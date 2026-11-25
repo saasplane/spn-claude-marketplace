@@ -52,6 +52,8 @@ outstanding is this question.** None is a lighter version of another, and none e
 answer. Each gets the full shape, every part, for every item, exactly as a document's `Open`
 section does.
 
+**Read the cards with `spn-devex workstream question list`, never by opening `questions.jsonl`.** With no workstream named it lists only the workstreams this window owns, because a window speaks of its own workstreams and no other (`RULE.DEVEX.WORKSPACE.236` · MUST · short). Another workstream's cards are read only when the developer names it, and every workstream's only with `--every`.
+
 The phrasing does not choose the shape; **what the person must do** chooses it:
 
 | They must… | Answer with |

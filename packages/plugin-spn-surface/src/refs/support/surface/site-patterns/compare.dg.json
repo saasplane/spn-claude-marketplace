@@ -1,7 +1,7 @@
 {
   "kind": "skeleton",
   "title": "Compare",
-  "caption": "A DSFeatureGridSectionContainer of cells side by side, one for each plan or alternative, each holding the same facts so a row reads across. The page that holds this section is wrapped once in DSSiteLayout.",
+  "caption": "A DSFeatureGridSectionContainer of cells side by side, one for each plan or alternative, each holding the same facts so a row reads across. The page that holds this section is wrapped once in DSSitePage.",
   "layout": {
     "type": "TOPNAV",
     "body": {

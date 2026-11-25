@@ -1,7 +1,7 @@
 {
   "kind": "skeleton",
   "title": "Plans",
-  "caption": "A DSFeatureGridSectionContainer of three cells, one for each plan: its name, what it costs and holds, and one action. The page that holds this section is wrapped once in DSSiteLayout.",
+  "caption": "A DSFeatureGridSectionContainer of three cells, one for each plan: its name, what it costs and holds, and one action. The page that holds this section is wrapped once in DSSitePage.",
   "layout": {
     "type": "TOPNAV",
     "body": {

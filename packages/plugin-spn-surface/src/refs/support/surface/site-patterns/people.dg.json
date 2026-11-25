@@ -1,7 +1,7 @@
 {
   "kind": "skeleton",
   "title": "People",
-  "caption": "A DSFeatureGridSectionContainer of cells, one for each person: a mark, a name and a line on what they do. The page that holds this section is wrapped once in DSSiteLayout.",
+  "caption": "A DSFeatureGridSectionContainer of cells, one for each person: a mark, a name and a line on what they do. The page that holds this section is wrapped once in DSSitePage.",
   "layout": {
     "type": "TOPNAV",
     "body": {

@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/01-surface-types.md",
-      "seen": "39e7b1f6"
+      "seen": "e4a4dd1a"
     }
   ]
 }
@@ -176,7 +176,7 @@ The book's rules hold for every person as they stand. A person changes only a se
 
 ## An application and a site — 🔮
 
-An application and a site are built from the same units, and one theme gives both their look. A site is a surface a person reads more than they work on, such as a marketing site. A page of a site is a run of sections: each is a `DSSectionContainer`, set apart by its fill and its room, and holds one `DSFeature` or a grid of features, `DSFeatureGridSectionContainer`. A feature's page level sets its display size, 64, 40, 22 or 18 px from `PAGE` to `GROUP`. Three rules hold on every page of a site: its words keep a length budget by level, each part takes its depth from what it holds, and anything set one under another is a `DSList`. None of this changes a unit an application uses, and a unit a site uses reads the same tokens as every other, so one theme tints a partner's site and their app together. A site's page is wrapped once in `DSSiteLayout`, a unit of the Layouts layer that renders `data-ds-page="SITE"` around the run of sections; a marketing page and a page of docs in a web app built from the design system, such as a docs section of a platform's website, are site pages, and a page a person works on, sign-in and onboarding included, never is. Inside it the display steps draw in the theme's display family. The generated pages of `docs/artifacts/`, the construct pages and the approach pages are written by the docs tooling with their own styles, not by the design system, and are not wrapped.
+An application and a site are built from the same units, and one theme gives both their look. A site is a surface a person reads more than they work on, such as a marketing site. A page of a site is a run of sections: each is a `DSSectionContainer`, set apart by its fill and its room, and holds one `DSFeature` or a grid of features, `DSFeatureGridSectionContainer`. A feature's page level sets its display size, 64, 40, 22 or 18 px from `PAGE` to `GROUP`. Three rules hold on every page of a site: its words keep a length budget by level, each part takes its depth from what it holds, and anything set one under another is a `DSList`. None of this changes a unit an application uses, and a unit a site uses reads the same tokens as every other, so one theme tints a partner's site and their app together. A site's page is wrapped once in `DSSitePage`, a unit of the Layouts layer that renders `data-ds-page="SITE"` around the run of sections; a marketing page and a page of docs in a web app built from the design system, such as a docs section of a platform's website, are site pages, and a page a person works on, sign-in and onboarding included, never is. Inside it the display steps draw in the theme's display family. The generated pages of `docs/artifacts/`, the construct pages and the approach pages are written by the docs tooling with their own styles, not by the design system, and are not wrapped.
 
 ## The words of a page, by what it is for — 🔮
 

@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "Statement",
- "caption": "A DSSectionContainer at size MD, color BASE, holds one DSFeature at CONTAINER with textAlign CENTER: a title, a description and at most three text facts, read whole, with no items and no media. Where it states the problem the page ends, the section takes color DEFAULT with inset, because the kind of reading changes from its neighbours. On a phone it stands as it is. The page that holds this section is wrapped once in DSSiteLayout.",
+ "caption": "A DSSectionContainer at size MD, color BASE, holds one DSFeature at CONTAINER with textAlign CENTER: a title, a description and at most three text facts, read whole, with no items and no media. Where it states the problem the page ends, the section takes color DEFAULT with inset, because the kind of reading changes from its neighbours. On a phone it stands as it is. The page that holds this section is wrapped once in DSSitePage.",
  "layout": {
   "type": "TOPNAV",
   "body": {

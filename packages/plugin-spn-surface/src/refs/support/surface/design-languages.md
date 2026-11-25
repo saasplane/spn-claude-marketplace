@@ -258,7 +258,7 @@ Each suits its own reader: Stone a reader who wants a calm, dark page, Daylight 
 
 ## Boundary
 
-This ref states what a design language is, its parts by surface category, how a page is built from one, how one is made and where the platform's look and each app's theme live. It stops at the choices. Where a section's emphasis goes, and the tests and the case line, are `site-patterns.md`. What `DSSiteLayout`, `DSSectionContainer` and `DSFeature` take, prop by prop, is `architecture-layouts.md`, `architecture-containers.md` and `architecture-components.md`. The theme, and that Support ships both, is `architecture-app.md`.
+This ref states what a design language is, its parts by surface category, how a page is built from one, how one is made and where the platform's look and each app's theme live. It stops at the choices. Where a section's emphasis goes, and the tests and the case line, are `site-patterns.md`. What `DSSitePage`, `DSSectionContainer` and `DSFeature` take, prop by prop, is `architecture-layouts.md`, `architecture-containers.md` and `architecture-components.md`. The theme, and that Support ships both, is `architecture-app.md`.
 
 ## Binds
 

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/05-standards-names.md",
-      "seen": "76d5379c"
+      "seen": "fd8c98c7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/05-standards-names/",
-      "seen": "b4634429"
+      "seen": "73337c39"
     }
   ]
 }
@@ -211,7 +211,7 @@ A format prop that is not set takes the person's preference from the app context
 | Components | the smallest blocks, and the composites: blocks built from components for one task | core |
 | Widgets | units placed beside others or in a sidebar | components and core |
 | Containers | the containers | components and core |
-| Layouts | the layout, and `DSSiteLayout`, the wrapper of a site's page | every layer before it |
+| Layouts | the layout, and `DSSitePage`, the wrapper of a site's page | every layer before it |
 | App | the root block `DSApp`, the app's contract and the theme | every layer before it |
 
 A layer uses only the layers named before it, so the direction between two blocks is never an argument: the block in the later layer is the one that depends. The vocabulary is `CORE` · `COMPONENTS` · `WIDGETS` · `CONTAINERS` · `LAYOUTS` · `APP`.
@@ -220,17 +220,18 @@ A layer uses only the layers named before it, so the direction between two block
 
 ## A name says its layer — ✅
 
-A suffix names where a unit is placed: `App`, `Layout`, `Container` and `Widget`. A component carries none, and a composite is a component.
+A suffix names where a unit is placed: `App`, `Layout`, `Page`, `Container` and `Widget`. A component carries none, and a composite is a component.
 
 | Where the unit is placed | Its name ends in | Example |
 | --- | --- | --- |
 | Nowhere in particular: a component, a composite included | no word | `DSButton` · `DSTable` · `DSDataTable` · `DSFilterBar` · `DSFeature` |
 | Beside others, or in a sidebar, inside a container or not | `Widget` | `DSCardWidget` |
 | Around a part of a page | `Container`, with the box it draws before it when it draws one | `DSPanelContainer` · `DSDataTablePanelContainer` · `DSSectionContainer` · `DSFeatureGridSectionContainer` |
-| Around a page | `Layout` | `DSLayout` · `DSSiteLayout` |
+| Around a page, with its navigation | `Layout` | `DSLayout` |
+| Around a whole page, framing it and nothing else | `Page` | `DSSitePage` |
 | Around an app | `App` | `DSApp` |
 
-- **A suffix MUST name where a unit is placed: `App`, `Layout`, `Container` or `Widget`** (`RULE.SUPPORT.SURFACE.229` · MUST · skill:spn-surface/design). A reader then tells where a block stands from its name alone, in the book, in the design library and in every stack.
+- **A suffix MUST name where a unit is placed: `App`, `Layout`, `Page`, `Container` or `Widget`** (`RULE.SUPPORT.SURFACE.229` · MUST · skill:spn-surface/design). A reader then tells where a block stands from its name alone, in the book, in the design library and in every stack. `Page` is for a unit that frames a whole page and draws no layout of its own: `DSSitePage`, which marks a site's page, with `DSSiteLayout` kept as a deprecated alias.
 - **The word before `Container` MUST name the box the unit draws, and the unit MUST be written in place of that box** (`RULE.SUPPORT.SURFACE.267` · MUST · skill:spn-surface/design). A `…PanelContainer` stands where a panel may, and a `…SectionContainer` where a section may. There is no `DSCardContainer`, `DSFeatureContainer` or `DSFeatureSectionContainer`. `architecture-containers.md` states the rule and the props it carries.
 - **A component MUST take no such word.** A composite is placed nowhere in particular, so it is a component and takes none: a data table is `DSDataTable`, never a widget by name.
 - **No block MAY carry a letter for its layer before its name.** A letter before the name was the only mark of its kind in the design system, and a reader had to be told what it stood for.
@@ -267,7 +268,7 @@ The surface domain sets ten names of its own, and each is built under the same r
 | `SPSurfacePersonType` | who a category is for | `VISITOR` · `LEARNER` · `SEEKER` · `TEAM` · `INDIVIDUAL` |
 | `SPSurfaceGroupType` | the three groups the parts of a category stand in | `SHARED` · `STRUCTURE` · `STYLE` |
 | `SPSurfacePartType` | one of the twelve parts, read as its group and its code, because `MOTION` stands in two groups | Shared: `BRAND` · `DRAWING` · `MOTION` · `VOICE`. Structure: `LAYOUTS` · `PAGES` · `CONTAINERS` · `WIDGETS`. Style: `THEME` · `MEDIA` · `MOTION` · `WORDS` |
-| `SPSurfaceSourceType` | who fills a part in a design language | `OWN` · `INHERITED` · `NONE` |
+| `SPDesignLanguageSourceType` | who fills a part in a design language. It takes the language's own prefix, as `SPDesignLanguageSpec` does, because `SPSurfaceSourceType` already names a snapshot's source in the contract | `OWN` · `INHERITED` · `NONE` |
 | `SPSurfaceItemStateType` | where a kind stands in a design language | `CORE` · `PICKED` · `INHERITED` · `CUSTOMISED` · `NEW` · `NOT_USED` |
 | `SPSurfacePlatformType` | where a surface runs | `WEB` · `NATIVE` |
 | `SPSurfaceCatalogue` | the kinds the foundation defines and a language can extend: a version, and for each category and each part its kinds | no vocabulary: a structure, drawn in the Surface Catalogue |
@@ -293,7 +294,7 @@ This ref states which three props mean one thing everywhere, which of the two si
 | --- | --- |
 | `RULE.SUPPORT.APPS.140` | the book names every block, prop and token of the design system, and every stack uses that name |
 | `RULE.SUPPORT.APPS.143` | `variant` names the surface treatment, `color` the hue and `size` the density step, on every block and every platform |
-| `RULE.SUPPORT.SURFACE.229` | a suffix names where a unit is placed (`App`, `Layout`, `Container`, `Widget`); a component, a composite included, takes none, and no block carries a letter for its layer before its name |
+| `RULE.SUPPORT.SURFACE.229` | a suffix names where a unit is placed (`App`, `Layout`, `Page`, `Container`, `Widget`); a component, a composite included, takes none, and no block carries a letter for its layer before its name |
 | `RULE.SUPPORT.SURFACE.100` | `size` says how dense a control is and `scaleSize` how large a thing that is shown is drawn; the icon, the mark, the avatar and the avatar group take `scaleSize` |
 | `RULE.SUPPORT.SURFACE.267` | the word before `Container` names the box a unit draws and is written in place of, so a `…PanelContainer` stands where a panel may and a `…SectionContainer` where a section may |
 | `RULE.SUPPORT.SURFACE.113` | the item line and the tabs take `pageLevel`, with the one vocabulary `DSPageLevelType`, and the item line has no size |

@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "Choose to see, beside",
- "caption": "A DSSectionContainer, color BASE, holds one DSFeature that splits as SPLIT_END. The options are a LIST, boxed and raised on the door fill: items.surface color DEFAULT, raised, elevation MD. The chosen one is selected, and each option's line says what it changes. Beside them stands a small picture, whole at half width, such as a loop, a tree or a diagram, in the frame of its kind. On a phone each option says its result in words, and the picture stays at rest below, never pinned. The page that holds this section is wrapped once in DSSiteLayout.",
+ "caption": "A DSSectionContainer, color BASE, holds one DSFeature that splits as SPLIT_END. The options are a LIST, boxed and raised on the door fill: items.surface color DEFAULT, raised, elevation MD. The chosen one is selected, and each option's line says what it changes. Beside them stands a small picture, whole at half width, such as a loop, a tree or a diagram, in the frame of its kind. On a phone each option says its result in words, and the picture stays at rest below, never pinned. The page that holds this section is wrapped once in DSSitePage.",
  "layout": {
   "type": "TOPNAV",
   "body": {

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/04-site-container-kinds.md",
-      "seen": "cf88a9c6"
+      "seen": "a3fec5b2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/02-web/02-site-container-kinds.md",
@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/02-site-page-kinds.md",
-      "seen": "b4eb74d7"
+      "seen": "03263017"
     }
   ]
 }
@@ -41,7 +41,7 @@ Read this before you design or review a page of a site. A site's page is a run o
 **A container kind says: for this kind of content, show the section this way** (`RULE.SUPPORT.SURFACE.340` · MUST · skill:spn-surface/design). It is an arrangement of units the design system already has, and the design system builds nothing for one.
 
 - **A section of a site's page follows one of the site container kinds below, and is built from `DSSectionContainer`, `DSFeature` and `DSFeatureGridSectionContainer` and their props** (`RULE.SUPPORT.SURFACE.340` · MUST · skill:spn-surface/design). A container kind names no component of one site's own. A partner's agent has the design system and this plugin, and never another site's code, so a look stated in a site's own component is a look it cannot build.
-- **A page whose sections follow site container kinds MUST be wrapped once in `DSSiteLayout`** (`RULE.SUPPORT.SURFACE.196` · MUST · skill:spn-surface/design). The wrapper marks the page as a site's, a marketing page or a page of docs in a web app, so its display steps draw in the theme's display family; a page that follows an app page kind or a task pattern is never wrapped, a public sign-in page included.
+- **A page whose sections follow site container kinds MUST be wrapped once in `DSSitePage`** (`RULE.SUPPORT.SURFACE.196` · MUST · skill:spn-surface/design). The wrapper marks the page as a site's, a marketing page or a page of docs in a web app, so its display steps draw in the theme's display family; a page that follows an app page kind or a task pattern is never wrapped, a public sign-in page included.
 - **A section's container kind and its look follow from what the section holds, and not from where it stands on the page** (`RULE.SUPPORT.SURFACE.343` · MUST · skill:spn-surface/design). Every partner builds around their own content, so a rule by position, such as *every second section is filled*, fits nobody's page.
 - **Every container kind names the persons it serves in its For line** (`RULE.SUPPORT.SURFACE.332` · MUST · skill:spn-surface/design). A site's page is read by a Visitor, who is deciding, a Learner, who came to learn or to get a thing working, or a Seeker, who came to find one record among many and choose it (`standards-core.md`, *Who an app is for*).
 
@@ -103,21 +103,45 @@ The breadcrumb only shows where a kind stands; a site need not draw one. A group
 
 ## The kinds of page of a marketplace — 🔮
 
-A marketplace is a public site of records: a shop, a site of cars, a job board, a matrimony site. Its reader is a Seeker, who came to find one record among many and choose it. Its pages argue no case. They help the Seeker look, narrow and compare, and every page ends where the Seeker can go on looking. In one visit a Seeker goes down the levels and back up many times: from a search or a category, through the records, to one record, and back again.
+A marketplace is a public site of records: a shop, a site of cars, a job board, a matrimony site. Its reader is a Seeker, who came to find one record among many and choose it. Its pages argue no case. They help the Seeker look, narrow and compare, and every page ends where the Seeker can go on looking.
 
-| Level | Kind | Contract name | Sample breadcrumb | Its sections, in the order of its reader's questions (the usual container kind in brackets) |
-| --- | --- | --- | --- | --- |
-| 1 | **Home** | `HOME` | Home | What is here, and can I find mine (Find, a search first) → where does each kind of record live (Doors, the categories as cards) → the few worth a look first (Records, by shelf) → what will I ask (Questions) → where is everything else (Footer). |
-| 2 | **Listing** | `LISTING` | Home › Jobs | Every record of one kind. What is listed here, and for whom (Hero, its words alone) → the few worth a look first (Records, by shelf) → every record, narrowed the way a reader looks for one (Records, filtered) → what will I ask before I choose (Questions) → where do I go if none fits (Doors). Where the records fall into categories a reader picks first, each category is a page of its own. |
-| 2 or deeper | **Category** | `CATEGORY` | Home › Phones › Android phones | One category of records, the page an entry of the menu opens. What is in this category (Hero, its words alone) → its smaller categories (Doors, as cards) → the few worth a look first (Records, by shelf) → every record in it, narrowed (Records, filtered) → what will I ask (Questions). A category with no smaller ones skips its doors. |
-| 2 | **Results**, beside a listing | `RESULTS` | Home › Phones › Under 300 | The list a Seeker browses and narrows with filters, reached from a category, a brand or a shared link, because the filters chosen are the page's address. What did I choose (Hero, its words alone, the filters as tags) → the records that match, narrowed further (Records, filtered) → where do I go if none fits (Doors). |
-| 2 | **Search**, beside a listing | `SEARCH` | Home › Search | What a typed query returns, across every category. What was asked (Find, the words kept in the field with the count of what answers them) → which categories hold it (Doors, as rows, each with its count) → the records that answer it, narrowed (Records, filtered). A search that finds nothing says so and offers to widen it. |
-| 2 | **Saved** | `SAVED` | Home › Saved | The records a reader kept to come back to, on this device or in their account. What have I kept (Hero, its words alone) → the records kept, newest first (Records, saved) → where do I go to find more (Doors). A record no longer offered stays on the list, marked as gone, until the reader takes it off. |
-| last | **Brand** | `BRAND` | Home › Brands › One maker | The page of one maker, seller or employer. Who makes these, and can I trust them (Hero, the brand's head: its mark, its name, its rating and how many records it has) → what they are known for (Points) → every record of theirs, narrowed (Records, filtered) → who vouches for them (Testimonials, reviews) → where else to look (Doors). |
-| last | **Compare** | `COMPARE` | Home › Phones › Compare | Two to four records a reader chose, side by side. Which ones am I comparing (Hero, its words alone) → how do they differ, row by row (Compare, the records: their pictures first, then their facts in groups, each record's own action under its column). The Seeker picks the records from their cards, and the chosen ones wait in a tray at the foot of the page until Compare opens. |
-| last | **Detail**, under a listing or a category | `DETAIL` | Home › Jobs › One job | One record, the page a card opens. Is this the one, what does it cost, how do I get it (Hero, the record's head: its pictures beside its name, maker, rating, key facts, price and one main action) → what do I get (Points) → what exactly is in it (Feature grid, its contents) → who vouches for it (Testimonials, reviews) → what will I ask (Questions) → what else is like it (Records, by shelf) → what do I do now (Closing call, with the record's one action). |
+The pages fall into three groups, and a Seeker goes back and forth between them many times in one visit. They **find** the records, from a search, a category or a brand; they **choose** one, on its own page, beside others, or from what they kept; then they **act**: buy, book, enrol, apply, connect or ask for the price. Only a site that sells takes a cart and a checkout; a job board, a matrimony site or a site of cars ends on the Detail page with the record's own action.
 
-A marketplace also holds Text and Not found, the standard pages of every site. The sections each kind names are the container kinds below, and the catalogue gives each section's case. **A Seeker keeps a record with one press, from its card or from its page**: on this device, or in their account where they are signed in, and the Saved page shows what was kept.
+| Group | Level | Kind | Contract name | Sample breadcrumb | Its sections, in the order of its reader's questions (the usual container kind in brackets) |
+| --- | --- | --- | --- | --- | --- |
+| Find | 1 | **Home** | `HOME` | Home | What is here, and can I find mine (Find: one field, or the fields a domain searches by) → where does each kind live (Doors, the categories as tiles) → what is on offer (Highlight, the deals banner) → the few worth a look first (Records, by shelf: popular, new, deals, brands) → can I trust this place (Numbers, the trust stats) → who it worked for (Testimonials, success stories) → what will I ask (Questions) → where else can I browse (Doors, link groups) → where is everything else (Footer). |
+| Find | 2 or deeper | **Category** | `CATEGORY` | Home › Phones › Android phones | One category of records, the page an entry of the menu opens. What is in this category (Hero, its words alone) → its smaller categories (Doors, as cards) → the few worth a look first (Records, by shelf) → every record in it, narrowed (Records, filtered) → what will I ask (Questions). A category with no smaller ones skips its doors. The same page serves as a city or community landing, such as stays in Goa or a community's profiles: a filtered result and a page a search engine finds. |
+| Find | last | **Brand** | `BRAND` | Home › Brands › One maker | The owner's page: a seller, host, teacher, employer, dealer or agent. Who makes these, and can I trust them (Hero, the brand's head: its mark, its name, its rating and how many records it has) → what they are known for (Points) → every record of theirs, narrowed (Records, filtered) → who vouches for them (Testimonials, reviews) → where else to look (Doors). |
+| Find | 2 | **Listing** | `LISTING` | Home › Jobs | Every record of one kind. What is listed here, and for whom (Hero, its words alone) → the few worth a look first (Records, by shelf) → every record, narrowed the way a reader looks for one (Records, filtered) → what will I ask before I choose (Questions) → where do I go if none fits (Doors). Where the records fall into categories a reader picks first, each category is a page of its own. |
+| Find | 2 | **Results**, beside a listing | `RESULTS` | Home › Phones › Under 300 | The list a Seeker browses and narrows with filters, reached from a category, a brand or a shared link, because the filters chosen are the page's address. What did I choose (Hero, its words alone, the filters as tags) → the records that match, narrowed further (Records, filtered) → where do I go if none fits (Doors, link groups of similar searches). |
+| Find | 2 | **Search**, beside a listing | `SEARCH` | Home › Search | What a typed query returns, across every category. What was asked (Find, the words kept in the field with the count of what answers them) → which categories hold it (Doors, as rows, each with its count) → the records that answer it, narrowed (Records, filtered) → where else to look (Doors, link groups). A search that finds nothing says so and offers to widen it. |
+| Choose | last | **Detail**, under a listing or a category | `DETAIL` | Home › Jobs › One job | One record, the page a card opens, in one of six cases below. Its head is the record's pictures beside its facts and an action panel: the one action with its price, a check that the record can be had, its variants and its offers. The panel is a sticky column beside the pictures on a desktop, stands under the words on a tablet, and is a bar fixed at the foot on a phone, where the pictures become a swipe row with the next one peeking. A long page carries a row of pills for its sections that stays at the top. |
+| Choose | last | **Compare** | `COMPARE` | Home › Phones › Compare | Two to four records a reader chose, side by side. Which ones am I comparing (Hero, its words alone) → how do they differ, row by row (Compare, the records: their pictures first, then their facts in groups, each record's own action under its column). The Seeker picks the records from their cards, and the chosen ones wait in a tray at the foot of the page until Compare opens. |
+| Choose | 2 | **Saved** | `SAVED` | Home › Saved | The records a reader kept to come back to, on this device or in their account. What have I kept (Hero, its words alone) → the records kept, newest first (Records, saved) → where do I go to find more (Doors). A record no longer offered stays on the list, marked as gone, until the reader takes it off. |
+| Act | 2 | **Cart**, on a site that sells | `CART` | Home › Cart | The records a Seeker chose to buy. What have I chosen (Hero, its words alone) → how many of each, what each costs and the total, then one way to checkout (Order, the cart). An empty cart says so and leads back to the records. |
+| Act | last | **Checkout** | `CHECKOUT` | Home › Cart › Checkout | The steps from a cart to an order, one at a time (Checkout steps). Who you are: sign in, or go on as a guest with an email, never forced to sign in → where it goes: the address and how it comes → how you pay: the payment provider's own fields → is it all right: the order read back, and one action, Place order. Each step keeps what was entered when the Seeker goes back, and on a desktop the order stands beside the steps. |
+| Act | last | **Order placed** | `ORDER_PLACED` | Home › Cart › Order placed | The page after an order is placed. Did it work, and what did I order (Hero, its words alone, then Order, read back) → what happens next (Steps, in a row) → where do I follow it (Closing call, whose one action opens the order in PORTAL after sign-in). A guest is offered an account there, and never made to take one. |
+| Act | 2 | **Plans**, on a site that sells memberships | `PLANS` | Home › Plans | The memberships a site sells, such as a matrimony site's paid plans. What does a membership open (Hero, its words alone) → which one is mine (Plans) → how do they differ, free against paid (Compare, the plans) → what will I ask (Questions) → how do I start (Closing call). |
+
+**A Detail page takes one case, by what the Seeker does with the record.**
+
+| Case | The record | Its sections after the head | Its action |
+| --- | --- | --- | --- |
+| **Buy** | a product | its highlights (Points) → its specifications → reviews → its questions and answers → its owner → its policies → shelves of similar records and of what is bought together | Add to cart |
+| **Book** | a stay, a trip or a table | its highlights → its options by date, such as rooms → reviews → where it is (Locations, a map) → its host → its rules → questions → similar records | Reserve; a price is real only once the dates are chosen |
+| **Enrol** | a course | what you will learn (Points) → its syllabus → its batches (Options) → its teacher → reviews → questions → similar courses → Enrol again at the end (Closing call) | Enrol |
+| **Apply** | a job, with a head of words and no gallery | its criteria (Specifications) → its description (Reading column) → its employer → similar jobs → link groups | Apply |
+| **Connect** | a person's profile | their facts → about them → similar profiles. Its pictures and contact show only as its person allows, and contact opens after both agree | Send interest |
+| **Facts** | a car or a home chosen by its facts | its specifications → its variants (Options) → a calculator → reviews → where it is → its dealer or agent → questions → a shelf to compare with rivals | a lead, such as Get the price or Request details, through an enquiry |
+
+The owner stands on every Detail page with the trust facts of their trade: their rating, how long they have been here and how fast they reply. Wherever stars show, they are `DSRatingView`.
+
+A marketplace also holds Text and Not found, the standard pages of every site. The sections each kind names are the container kinds below, and the catalogue gives each section's case.
+
+- **What needs a person's account opens in a PORTAL, after sign-in.** Their orders and an order's tracking steps, returns, addresses, payment methods, the saved list kept in the account, and a seeker's applications or enquiries are pages of a PORTAL. The marketplace adds no page kind for them; the app page kinds carry them (`standards-patterns.md`).
+- **The records open on the view they are chosen by.** Products are chosen by their pictures, so they open on the grid: four to a row on a desktop, two on a tablet and two on a phone, or one where a card carries a photo row or long facts. Jobs and cars are chosen by their facts, so they open on the list. The view switch stays either way. Where place decides, such as stays and homes, the list stands beside a map; where records are scanned fast, such as jobs, the chosen record opens in a pane beside the list from 1024 up.
+- **Four filters or fewer stand in a bar above the records; more stand as facets** (`DSFacetGroup`, `architecture-components.md`): on a desktop a rail at the start, about 16rem wide, each facet a group that opens with a count beside each choice; on a tablet and a phone a Filters button opens the same facets in a sheet, with a button that shows the results, and the sort is a button of its own.
+- **A Seeker keeps a record with one press, from its card or from its page**: on this device, or in their account where they are signed in, and the Saved page shows what was kept.
 
 ## The sections, by name — 🔮
 
@@ -152,7 +176,8 @@ Each section gives the question it answers, its **For** line, what calls for it,
 - **Calls for it.** The section that says what the page is: its one claim, and what shows it at a glance.
 - **Look.** `DSSectionContainer` `size` `LG`, or `XL` where the hero is the page's emphasis, `color` `BASE`. Inside it, a `DSFeature` at `pageLevel` `PAGE`. The media keeps the frame of its kind: a product is `frames` `MEDIA` with `surface` raised, `elevation` `LG`; a diagram is flat; a mood picture is `type` `BACKDROP`. Use `type` `SPLIT_END` for one picture the title names, and `MEDIA_BOTTOM` for two panes or a wide picture. Centre the words, `textAlign` `CENTER`, only when nothing stands beside or under them. A state such as Alpha is a `BADGE` `eyebrow` in `PRIMARY`, at the level's `variant`. The stack names kinds, so it goes in up to four `BADGE` `facts`, each `OUTLINE` in `DEFAULT` (`RULE.SUPPORT.SURFACE.371` · GUIDE). The actions are the page's one `SOLID` primary, then one `OUTLINE`. With items, use `actionsPlacement` `BEFORE_ITEMS`. A hero takes no `reveal`.
 - **On a phone.** The words, the facts and the buttons, then the picture: the facts are the head's own, and the actions stand after the head.
-- **Not when.** The section is a slideshow of several claims: give each claim its own section. A hero takes no fill.
+- **A hero with slides turns its ground and keeps its words still.** The slideshow is the section's own ground, as a scene is: a `DSCarousel` in the `DSSectionContainer`'s `mediaNode`, edge to edge, its arrows and dots over the slides, and the `DSFeature` over it at the start with its words and no media of its own. Only the slides turn; the claim, its facts and its one main action stay still. The section's `mediaScrim` keeps the words readable on every slide, and from the tablet up the words keep to three fifths of the width. On a phone the slides stand under the words, as a scene does.
+- **Not when.** The section is a slideshow of several claims: give each claim its own section. A hero's slides turn the media only, and never the words. A hero takes no fill.
 - **Specs.** `hero.dg.json`, the picture beside the words; `hero-under.dg.json`, two panes or a wide picture under them.
 
 ### Statement
@@ -254,7 +279,7 @@ The data decides the unit. A set of things of their own is a grid section, and t
 
 - **For** Visitor · Learner · Seeker.
 - **Calls for it.** Questions, from three up to eight, each with a short answer.
-- **Look.** A `DSFeature` at `CONTAINER`, `BASE`, whose title and description stand centred over the accordion, `textAlign` `CENTER`, and whose `contentNode` is a `bordered` `DSAccordionGroup` with its first question open. The section and the feature take their full width; the page writer sets the accordion in a wrapper of its own at the reading measure, centred, and the words of each question start at the start. The accordion runs by the task pattern Disclose (`standards-patterns.md`).
+- **Look.** A `DSFeature` at `CONTAINER`, `BASE`, whose title and description stand centred over the accordion, `textAlign` `CENTER`, and whose `contentNode` is a `bordered` `DSAccordionGroup` with its first question open. The section takes `width` `NARROW`, centred, which draws the reading measure while its ground still reaches edge to edge; the `DSFeature` draws the head and the accordion at that width, and the words of each question start at the start. The accordion runs by the task pattern Disclose (`standards-patterns.md`).
 - **On a phone.** As it is.
 - **Not when.** The answers are long reading: write a doc page.
 - **Spec.** `questions.dg.json`.
@@ -279,7 +304,7 @@ One call is enough. A second button that opens a door the reader has just passed
 ### Reading column
 
 - **Calls for it.** A long text read whole: an article, a reference page, a changelog, a text page.
-- **Look.** `DSSectionContainer` holding one `DSFeature` at the start, at a reading width. The case it draws by default is the kind's own, and the other cases are in the Surface Catalogue.
+- **Look.** `DSSectionContainer` at `width` `NARROW`, which draws the reading measure, holding one `DSFeature` at the start; the section's ground and media still reach edge to edge. The case it draws by default is the kind's own, and the other cases are in the Surface Catalogue.
 - **Spec.** `reading-column.dg.json`.
 
 ### Records

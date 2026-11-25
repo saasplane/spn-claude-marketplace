@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/08-architecture-widgets.md",
-      "seen": "88c7bee2"
+      "seen": "e02545db"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-widgets/",
@@ -110,7 +110,7 @@ This ref states what makes a unit a widget, and what `DSCardWidget` is built fro
 | `RULE.SUPPORT.SURFACE.181` | the small head of a card widget's part takes actions drawn as the head of a group |
 | `RULE.SUPPORT.SURFACE.192` | a partner paints the card widget with a class of their own, and the class sets the card's paint tokens and nothing else |
 | `RULE.SUPPORT.SURFACE.098` | a widget's name has no letter for the layer before it |
-| `RULE.SUPPORT.SURFACE.229` | a suffix names where a unit is placed (`App`, `Layout`, `Container`, `Widget`), and a component carries none |
+| `RULE.SUPPORT.SURFACE.229` | a suffix names where a unit is placed (`App`, `Layout`, `Page`, `Container`, `Widget`), and a component carries none |
 
 ## Proof
 

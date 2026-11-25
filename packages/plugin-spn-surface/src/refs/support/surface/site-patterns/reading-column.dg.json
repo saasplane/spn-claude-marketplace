@@ -1,7 +1,7 @@
 {
   "kind": "skeleton",
   "title": "Reading column",
-  "caption": "A DSSectionContainer holding one DSFeature, its words at the start and read whole at a reading width: the title, then the reading in paragraphs. It is the body of an article, a reference page, a changelog or a text page. The page that holds this section is wrapped once in DSSiteLayout.",
+  "caption": "A DSSectionContainer holding one DSFeature, its words at the start and read whole at a reading width: the title, then the reading in paragraphs. It is the body of an article, a reference page, a changelog or a text page. The page that holds this section is wrapped once in DSSitePage.",
   "layout": {
     "type": "TOPNAV",
     "body": {

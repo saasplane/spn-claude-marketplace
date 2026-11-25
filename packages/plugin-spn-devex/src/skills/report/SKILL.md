@@ -1,6 +1,6 @@
 ---
 name: report
-description: Write one of the five reports on a repository — coverage (how much is written, built and proved), tests (what the tests have proved), audit (is it set up the way the standard says), code (where the source departs from the stack's standards) or docs (where the documents depart from the docs standards) — into its docs/artifacts/reports/ folder. Use when the user asks where a repository stands, how finished it is, what is proved or unproved, whether it is set up right, or what breaks the standards. Never run unasked, and never publish the page unless asked. Stack-agnostic; the domain plugin supplies the commands a code or audit report runs.
+description: Write one of the five reports on a repository — coverage (how much is written, built and proved), tests (what the tests have proved), audit (is it set up the way the standard says), code (where the source departs from the stack's standards) or docs (where the documents depart from the docs standards) — into its docs/artifacts/private/reports/ folder. Use when the user asks where a repository stands, how finished it is, what is proved or unproved, whether it is set up right, or what breaks the standards. Never run unasked, and never publish the page unless asked. Stack-agnostic; the domain plugin supplies the commands a code or audit report runs.
 ---
 <!-- spn:restates
 {

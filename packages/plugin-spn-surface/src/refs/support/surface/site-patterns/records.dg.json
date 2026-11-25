@@ -1,7 +1,7 @@
 {
   "kind": "skeleton",
   "title": "Records",
-  "caption": "A DSFeatureGridSectionContainer of cells, one for each record of a kind, each a title, a line and one fact, and each a door to its own page. The first cell may lead. The page that holds this section is wrapped once in DSSiteLayout.",
+  "caption": "A DSFeatureGridSectionContainer of cells, one for each record of a kind, each a title, a line and one fact, and each a door to its own page. The first cell may lead. The page that holds this section is wrapped once in DSSitePage.",
   "layout": {
     "type": "TOPNAV",
     "body": {

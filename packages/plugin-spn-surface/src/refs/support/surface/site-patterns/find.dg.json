@@ -1,7 +1,7 @@
 {
   "kind": "skeleton",
   "title": "Find",
-  "caption": "A DSSectionContainer holding one DSFeature: the question the reader came with, and one action that opens the search. It stands at the head of a help centre's home and of its search page. The page that holds this section is wrapped once in DSSiteLayout.",
+  "caption": "A DSSectionContainer holding one DSFeature: the question the reader came with, and one action that opens the search. It stands at the head of a help centre's home and of its search page. The page that holds this section is wrapped once in DSSitePage.",
   "layout": {
     "type": "TOPNAV",
     "body": {

@@ -1,7 +1,7 @@
 {
   "kind": "skeleton",
   "title": "Highlight",
-  "caption": "One thing the page wants remembered, shown whole in a lit frame: a DSSectionContainer holding one DSFeature, framed raised and full. It stands once on a page and never first. The page that holds this section is wrapped once in DSSiteLayout.",
+  "caption": "One thing the page wants remembered, shown whole in a lit frame: a DSSectionContainer holding one DSFeature, framed raised and full. It stands once on a page and never first. The page that holds this section is wrapped once in DSSitePage.",
   "layout": {
     "type": "TOPNAV",
     "body": {
