@@ -24,7 +24,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/04-site-container-kinds.md",
       "section": "What holds across",
-      "seen": "bdd977b2"
+      "seen": "593bcad9"
     },
     {
       "path": "spn-foundation/docs/01-purpose/02-what.md",

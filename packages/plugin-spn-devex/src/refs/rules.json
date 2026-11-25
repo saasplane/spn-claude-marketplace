@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "631ad06c"
+    "commit": "670c6ed1"
   },
   "rules": [
     {
@@ -36905,6 +36905,35 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-layouts.md",
           "heading": "The places — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/site-patterns.md",
+          "heading": "What holds across — 🔮"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.444",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A backdrop may move, and stands still for a visitor who asked for reduced motion and for the app's own motion setting",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/04-site-container-kinds.md",
+      "heading": "What holds across",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/verify/SKILL.md",
+          "heading": "Mode: app — health checks on what is running"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The parts — 🔮"
         },
         {
           "plugin": "spn-surface",

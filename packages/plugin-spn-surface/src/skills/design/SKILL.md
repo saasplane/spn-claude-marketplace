@@ -15,7 +15,7 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "6681a576"
+      "seen": "9f16ad2b"
     }
   ]
 }
@@ -669,6 +669,7 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **The notice stands flush in its place.** (`RULE.SUPPORT.SURFACE.419` · MUST · skill:spn-surface/design)
 - **The library's text styles bind to the theme's typefaces and never name a stand-in font** (`RULE.SUPPORT.SURFACE.423` · MUST · skill:spn-surface/design)
 - **A page's title is one step larger only on the page that leads.** (`RULE.SUPPORT.SURFACE.424` · MUST · skill:spn-surface/design)
+- **A backdrop may move, and stands still for a visitor who asked for reduced motion and for the app's own motion setting** (`RULE.SUPPORT.SURFACE.444` · MUST · skill:spn-surface/design)
 - **A cell that the library plans for a unit and the unit's Main page does not draw is a gap of the showcase, and it is fixed on the unit's page before its library page is read** (`RULE.SUPPORT.SURFACE.446` · MUST · skill:spn-surface/design)
 - **The showcase hands its units to the reader** (`RULE.SUPPORT.SURFACE.449` · MUST · skill:spn-surface/design)
 - **Whatever stands boxed in a grid stands as tall as the tallest of its row, and a grid's cell hands its height to what it holds** (`RULE.SUPPORT.SURFACE.530` · MUST · skill:spn-surface/design)

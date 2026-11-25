@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/04-site-container-kinds.md",
-      "seen": "6b0b5ba2"
+      "seen": "c76bfde0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/02-web/02-site-container-kinds.md",
@@ -131,7 +131,7 @@ Every container kind answers the same questions about its look, in this order (`
 
 - **A site's page MUST be a sequence of sections, and each MUST own its room and its fill** (`RULE.SUPPORT.SURFACE.414` · MUST · skill:spn-surface/design). The layout's box gives the side room, so the words of every section and the bar's items share one edge at every width; what a section holds adds no room unless it is framed, and a frame insets its own words. A footer's list of links keeps its words on the column's edge, with rows that are not pressed whole, each holding a link that marks itself under the pointer. A menu's panel is as wide as what it holds: a few short entries stand as a compact list, and a wide panel is for entries that carry content of their own.
 - **The brand at the start of a bar and in a footer links to the home of what it names** (`RULE.SUPPORT.SURFACE.443` · GUIDE). A sign-in step draws it without the link, so the one place a person is meant to finish is not left by a click on the logo.
-- **A backdrop may move, and stands still for a visitor who asked for reduced motion and for the app's own motion setting** (`RULE.SUPPORT.SURFACE.444` · MUST). A section's scene is part of its look, so it is the section that holds still.
+- **A backdrop may move, and stands still for a visitor who asked for reduced motion and for the app's own motion setting** (`RULE.SUPPORT.SURFACE.444` · MUST · skill:spn-surface/design). A section's scene is part of its look, so it is the section that holds still.
 - **A section takes one emphasis and never two** (`RULE.SUPPORT.SURFACE.438` · GUIDE): the page's ground, its own fill where the kind of reading changes, the emphasis band of the hero or the closing call, or the one highlight.
 - **The container kinds decide where emphasis goes, and the site's design language decides how it looks** (`design-languages.md`). A site that sets none keeps the look this ref states.
 - **For each section the agent writes one line, its case** (`RULE.SUPPORT.SURFACE.439` · GUIDE): each answer, the test that decided it, and what the other answer would cost. A reviewer then corrects a test's answer, and the section follows from it.
