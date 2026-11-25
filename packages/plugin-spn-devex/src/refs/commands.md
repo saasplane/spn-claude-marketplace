@@ -80,6 +80,8 @@ spn-devex docs page check <seat…> — report each page that differs from what 
 
 spn-devex docs page write <seat…> — write each construct page from its seat file
 
+spn-devex docs page stamp <overview…> — record in each overview the construct pages it summarises, each with its seat file's seen hash, read from the overview's own doors; run it after the overview is written against them
+
 spn-devex docs page new <kind> <path> [--name <name>] [--workstream <NNN-subject>] [--arc <arc>] — start a hand page from its kind's template: the tool fills what it knows and names the placeholders still to fill
 
 spn-devex docs parity check [<path>…] — the parity findings under the paths, from the seats and the packages of each path's repository
