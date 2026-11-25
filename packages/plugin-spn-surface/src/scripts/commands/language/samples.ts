@@ -11,6 +11,7 @@
 // `docs/artifacts/public/surface/<language>/` of the book unless named. The same spec and catalogue write the same files, so a second run changes nothing.
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
+import { DOCS, surfacePagesDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { type Action, FLAG, UsageFault, VALUE, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { root as catalogueRoot } from "../catalogue/show.ts";
 import { templateBeside } from "../page/copy.ts";
@@ -38,7 +39,7 @@ function write(args: string[]): number {
   if (!specFile || !existsSync(specFile)) throw new UsageFault(`found no spec for \`${language}\`; name it with \`--spec <file>\` or the book with \`--book <folder>\`.`);
   const catalogueFile = words.value("catalogue") ?? join(catalogueRoot(), "catalogue.json");
   if (!existsSync(catalogueFile)) throw new UsageFault(`found no catalogue at ${catalogueFile}; name it with \`--catalogue <file>\`.`);
-  const out = resolve(words.value("out") ?? (book ? join(book, "docs", "artifacts", "public", "surface", language) : ""));
+  const out = resolve(words.value("out") ?? (book ? join(surfacePagesDir(join(book, DOCS)), language) : ""));
   if (!out || out === resolve("/")) throw new UsageFault("needs `--out <dir>`, because no book was found to put the samples in.");
   const templateFile = words.value("template") ?? templateBeside();
   if (!templateFile || !existsSync(templateFile)) throw new UsageFault("found no surface page template; name it with `--template <file>`.");
