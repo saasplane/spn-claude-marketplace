@@ -1,5 +1,6 @@
 {
   "groups": {
+    "catalogue": "allow",
     "check": "allow",
     "language": "allow",
     "page": "allow",
