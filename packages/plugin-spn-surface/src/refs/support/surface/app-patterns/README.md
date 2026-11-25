@@ -3,7 +3,7 @@
   "files": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/app-page-kinds",
-      "seen": "9621dfa7"
+      "seen": "783c2af7"
     }
   ]
 }
@@ -41,6 +41,7 @@ above names the folder and not each file, so a spec the book adds is seen as wel
 | [`record-and-its-setup.dg.json`](record-and-its-setup.dg.json) |
 | [`record-and-its-steps.dg.json`](record-and-its-steps.dg.json) |
 | [`record-and-what-belongs-to-it.dg.json`](record-and-what-belongs-to-it.dg.json) |
+| [`record-and-what-belongs-to-it-invoice.dg.json`](record-and-what-belongs-to-it-invoice.dg.json) |
 | [`set-up-by-kind.dg.json`](set-up-by-kind.dg.json) |
 
 **Never edit a file here.** It is an output. A builder changes the spec in the book, and the export

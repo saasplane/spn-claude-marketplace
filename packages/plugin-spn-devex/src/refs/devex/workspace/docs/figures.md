@@ -4,12 +4,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "section": "The figures — what sits inside a block, and the closed set of them",
-      "seen": "d4e5dfe1"
+      "seen": "4151bde8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "section": "A rendered unit is written as a tree",
-      "seen": "c9dc276f"
+      "seen": "7c9eb21a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
@@ -231,9 +231,9 @@ Each sub-component stands where it stands on the screen: the start or the end of
 | --- | --- | --- | --- |
 | App | `DSApp` | none: the view is its window | the window, at its screen class |
 | Layout | `DSLayout`, of type `RAIL`, `DOCK`, `TOPNAV` or `CANVAS` | `layout` | the body's box, the navigation at its edge, and the content's line |
-| Page level | `DSPageLevel` at `PAGE`, or the header of a container with `fullPage` | `page`, on a view | first in the content, with no boundary: the largest title, its actions at the end |
+| Page level | `DSPageHead`, or the header of a container with `fullPage` | `page`, on a view | first in the content, with no boundary: the largest title, its actions at the end |
 | Container | `DSPanelContainer` | `unit`, on a frame | a dotted outline, its unit's name at its corner, its header under the name with no box round it, and its content and footer in one thin rounded box under the header |
-| Widget or card | `DSFilterBar` · `DSDataTable` · `DSComparison` · `DSListDetail`; `DSCardWidget` · `DSCard` · `DSItemCard` | `unit`, on a frame or a part | a widget: a dotted boundary and its name; a card: its outline, its name and its title |
+| Widget or card | `DSFilterBar` · `DSDataTable` · `DSComparison` · `DSPageFrameListDetail` · `DSPageFrameGroups`; `DSCardWidget` · `DSCard` · `DSItemCard` | `unit`, on a frame or a part | a widget: a dotted boundary and its name; a card: its outline, its name and its title |
 | Content part | `DSPanelContainer.Content`: one or more in a container, all in its one rounded box | a section in `sections` with `part: true` | its title and its actions, a line across the box above it where it is not the first, and no dotted boundary |
 | Group | `DSPageLevel` at `GROUP`: a titled cluster inside a container's, a card's or a content part's content | a section in `sections` with a `label` and no `unit` (and no `part`), or in a part's own `sections` | a dotted boundary, the word *Group* at its corner, and its title and its actions inside it |
 | Component | `DSItem` · `DSButton` · `DSBadge` · `DSIcon` · `DSForm` · the entry controls | the shapes a spec already has | a control, an item line, an icon or a stand-in, with no name |
@@ -242,7 +242,7 @@ Each sub-component stands where it stands on the screen: the start or the end of
 
 - **The level is read from the unit's name** (`RULE.SUPPORT.SURFACE.098` · MUST · skill:spn-surface/design): a widget's ends in `Widget`, a container's in `Container`, and a component's takes no such word. A spec takes no `level` of its own, since the design system's `pageLevel` already names the level of a heading.
 - **A card stands at the level of a widget**: the design system gives a card's title the level `WIDGET`. `DSCard`, `DSItemCard` and `DSCardWidget` are drawn as cards.
-- **The page level is one place, whichever unit carries it**: `DSPageLevel` at `PAGE` above the containers, or the header of the one container that is the page, with `fullPage` (`RULE.SUPPORT.SURFACE.179` · MUST · skill:spn-surface/design). A skeleton draws the two the same way.
+- **The page level is one place, whichever unit carries it**: `DSPageHead` above the containers, or the header of the one container that is the page, with `fullPage` (`RULE.SUPPORT.SURFACE.179` · MUST · skill:spn-surface/design). A skeleton draws the two the same way.
 - **A spec names the book's units**, `DSPanelContainer` and the core widgets, and never a unit one stack builds on top of them.
 - **The drawer refuses a unit that the rule names wrongly** (`RULE.SUPPORT.SURFACE.217` · GUIDE) (`RULE.SUPPORT.SURFACE.221` · GUIDE): a `DSPanelContainer` is a part with a header, a `DSCardWidget` a card with a head (a title with its mark, actions in the head, often titled parts under it), a `DSCard` a card that shows its own info, several side by side included, and a `DSItem` one line about one thing. A `DSCard` with titled parts, a `DSCardWidget` with no head and no titled parts, a loose row of words and an action on the page, a `look` the unit's level does not give, and a row built by hand where an `item` says it are each a finding. A frame names its unit and leaves its look to it.
 - **The chosen entry of the navigation is the page's own** (`RULE.DEVEX.WORKSPACE.268` · MUST · skill:spn-devex/develop): a page that is an entry stands under that entry, and a page below one, a record or a step, keeps the entry it was reached from. `chosen` names the entry by its word, and the check names a view whose page is an entry of `nav` drawn under another.

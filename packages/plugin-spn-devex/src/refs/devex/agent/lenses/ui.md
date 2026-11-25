@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "6cfbce5f"
+      "seen": "6681a576"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/14-delivery-library/01-common/01-library.md",

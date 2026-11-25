@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/15-delivery-showcase.md",
-      "seen": "077076b5"
+      "seen": "8ad2bffc"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/15-delivery-showcase/",
-      "seen": "5e73e041"
+      "seen": "63971c18"
     }
   ]
 }
@@ -261,7 +261,7 @@ A section opens on the tab its unit names. Where the unit names none, Sizes open
 - The look of the frame comes from the theme, as an app's does. The showcase sets no frame part, no border, no fill and no corners of its own on a section, so a change of the container's look in the theme shows on every section. Its default theme names the content as the one framed part.
 - No container stands inside another container. The containers construct refuses a container inside a container, and a section is a container. So an example that is a container, or a whole page of an app, is shown as an embedded screen in the content of its section. The screen is a page of its own, loaded in the section's content, and the frame of the section is the one frame that the reader sees.
 - The opening of a page is the page's own header, and not the header of a container.
-- **The showcase builds its page head and its section heads from the blocks it shows** (`RULE.SUPPORT.SURFACE.186` · MUST · skill:spn-surface/design). The head of a page is a `DSPageLevel` head at `PAGE` that holds a `DSItem`, with its description and its way back. The header of a section's container holds a `DSItem` and the section's actions as plain siblings, and the tabs of a section take their level from the container. It draws no heading with `DSText`, sets no class on a block of the design system and forces no type size, and an example builds nothing by hand that a block does: a mark beside a title is a `DSItem` with the mark as its media.
+- **The showcase builds its page head and its section heads from the blocks it shows** (`RULE.SUPPORT.SURFACE.186` · MUST · skill:spn-surface/design). The head of a page is a `DSPageHead`, whose title line is a `DSItem`, with its description and its way back. The header of a section's container holds a `DSItem` and the section's actions as plain siblings, and the tabs of a section take their level from the container. It draws no heading with `DSText`, sets no class on a block of the design system and forces no type size, and an example builds nothing by hand that a block does: a mark beside a title is a `DSItem` with the mark as its media.
 
 The content of a section's container is one card. The card holds the tabs, the preview and the code as one object. The container's frame is the card's border and its corners, so a section has one border and not two.
 
@@ -402,6 +402,7 @@ This ref states what a showcase shows, in what outline, and how the page of a un
 | `RULE.SUPPORT.SURFACE.212` | the theme is set in one floating bar on every page and in no tool of the toolbar, the toolbar keeps only what a reader uses, and the public site is a static build that writes nothing |
 | `RULE.SUPPORT.SURFACE.280` | the showcase's sidebar opens on one page, Home, then six sections, Core, App, Layout, Container, Widget and Components, and the site's pages and the sample apps stand full page, outside the sidebar |
 | `RULE.SUPPORT.SURFACE.302` | the showcase's toolbar opens on a way back to its site, and the site's bar names the showcase Showcase |
+| `RULE.SUPPORT.SURFACE.186` | the showcase builds its page head from `DSPageHead` and its section heads from `DSItem`, and that its examples build nothing by hand that a block does |
 
 ## Proof
 

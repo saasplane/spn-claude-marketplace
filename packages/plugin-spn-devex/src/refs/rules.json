@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "6655077f"
+    "commit": "631ad06c"
   },
   "rules": [
     {
@@ -27600,7 +27600,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "The back action of a header stands level with the line of the title",
+      "sentence": "The way back of a header is a row of its own above the title line",
       "chapter": "04-capabilities/02-support/01-surface/09-architecture-containers/01-common/01-container.md",
       "heading": "What a page puts in each part",
       "decision": null,
@@ -39008,6 +39008,490 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/providers.md",
           "heading": "The ts provider — ✅ for the two contexts and tokens, 🔮 for the rest"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.605",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "The floor holds Server error and Maintenance, beside Not found and No access, for every surface category",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/03-app-page-kinds.md",
+      "heading": "The pages for a failure that is not the person's",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/site-patterns.md",
+          "heading": "The kinds of page, by level — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/standards-patterns.md",
+          "heading": "The pages for a failure that is not the person's — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/given-design.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.606",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "A table's first cell leads with an avatar only where the record is a person or an organization, with a mark only where the rows are of mixed kinds, and with its text alone for a table of one kind",
+      "chapter": "04-capabilities/02-support/01-surface/07-architecture-components/01-common/01-components.md",
+      "heading": "What a listing leads with",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/standards-patterns.md",
+          "heading": "The listing pages — 🔮"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.607",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "An unread row shows a notch just inside its start edge and a heavier title, and never a tint of the whole row",
+      "chapter": "04-capabilities/02-support/01-surface/07-architecture-components/01-common/01-components.md",
+      "heading": "Media fields by role",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The item line"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.608",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "On a phone, a record with more than four facts a person still needs keeps them as label and value pairs under its lead",
+      "chapter": "04-capabilities/02-support/01-surface/07-architecture-components/01-common/01-components.md",
+      "heading": "Media fields by role",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.609",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "A person's column set is kept with the saved view",
+      "chapter": "04-capabilities/02-support/01-surface/07-architecture-components/01-common/01-components.md",
+      "heading": "Media fields by role",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.610",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "`DSPageFrameGroups` folds its three parts by the screen class, and each part has its way back",
+      "chapter": "04-capabilities/02-support/01-surface/07-architecture-components/01-common/01-components.md",
+      "heading": "DSPageFrameGroups",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The page frames"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.611",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "`DSPageFrameListDetail` is the two-column form, and a chat is that form with `emptyDetail`",
+      "chapter": "04-capabilities/02-support/01-surface/07-architecture-components/01-common/01-components.md",
+      "heading": "DSPageFrameListDetail",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The page frames"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.612",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "A settings page keeps the actions that cannot be undone in a danger zone: its last titled panel, set apart from the others, with each action behind a confirm",
+      "chapter": "04-capabilities/02-support/01-surface/09-architecture-containers/01-common/01-container.md",
+      "heading": "A danger zone",
+      "decision": null,
+      "restated": []
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.613",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "`DSPage*` names the units that work across a page's content, and a `DSPageFrame*` unit places a page's parts in slots and draws no box and no navigation",
+      "chapter": "04-capabilities/02-support/01-surface/05-standards-names/01-common/01-names.md",
+      "heading": "A name says its layer",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "Page — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.614",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "Only the lead cell of a row takes two lines, and every other cell one",
+      "chapter": "04-capabilities/02-support/01-surface/07-architecture-components/01-common/01-components.md",
+      "heading": "The three layouts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/standards-patterns.md",
+          "heading": "The listing pages — 🔮"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.615",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "A listing shows a picture only where it tells one record from another, and in the place its layout gives it",
+      "chapter": "04-capabilities/02-support/01-surface/07-architecture-components/01-common/01-components.md",
+      "heading": "What a listing leads with",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/standards-patterns.md",
+          "heading": "The listing pages — 🔮"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.616",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A media field is named by its role, and a page fills a slot by that role",
+      "chapter": "04-capabilities/02-support/01-surface/07-architecture-components/01-common/01-components.md",
+      "heading": "Media fields by role",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/standards-patterns.md",
+          "heading": "The listing pages — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.617",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "A resources site's Home is a hub only where it holds several sets, and a small product makes its one set the whole site",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/02-site-page-kinds.md",
+      "heading": "Home",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/site-patterns.md",
+          "heading": "The kinds of page, by level — 🔮"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.618",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "A page of measures over time sets one range and one period compared for every part of the page",
+      "chapter": "04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/03-app-page-kinds.md",
+      "heading": "Measures over time",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/growth.md",
+          "heading": "Produces to"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/standards-patterns.md",
+          "heading": "The pages for a failure that is not the person's — 🔮"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.619",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "A quick filter applies the moment it is pressed, and *All* clears its group",
+      "chapter": "04-capabilities/02-support/01-surface/07-architecture-components/01-common/01-components.md",
+      "heading": "DSFilterBar",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The form of the bar"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.620",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "Unread and the accent edge are marks of the record's box, and the item line inside reads the unread mark from it",
+      "chapter": "04-capabilities/02-support/01-surface/07-architecture-components/01-common/01-components.md",
+      "heading": "DSList",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The item line"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-widgets.md",
+          "heading": "Boundary"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.621",
+      "level": "GUIDE",
+      "params": {},
+      "class": "guidance",
+      "sentence": "A record's box takes at most one accent edge, and the unread notch stands inside it",
+      "chapter": "04-capabilities/02-support/01-surface/07-architecture-components/01-common/01-components.md",
+      "heading": "DSList",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The item line"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-widgets.md",
+          "heading": "Boundary"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.622",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A page whose head stands in no box opens with `DSPageHead`, and every way back is one row above the title line",
+      "chapter": "04-capabilities/02-support/01-surface/07-architecture-components/01-common/01-components.md",
+      "heading": "DSPageHead",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/ux.md",
+          "heading": "Produces to"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "Page — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-containers.md",
+          "heading": "What a page puts in each part"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "3. Decide the panels"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.623",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A page frame places its parts and gives them nothing else",
+      "chapter": "04-capabilities/02-support/01-surface/07-architecture-components/01-common/01-components.md",
+      "heading": "What a frame gives",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The page frames"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-containers.md",
+          "heading": "Two containers side by side"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "3. Decide the panels"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.624",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "`DSItem` is an item line and knows nothing of navigation",
+      "chapter": "04-capabilities/02-support/01-surface/07-architecture-components/01-common/01-components.md",
+      "heading": "DSItem",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The item line"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.625",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A page sets at most two containers side by side, one taking the larger share",
+      "chapter": "04-capabilities/02-support/01-surface/09-architecture-containers/01-common/01-container.md",
+      "heading": "Two containers side by side",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/ux.md",
+          "heading": "Produces to"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "The page frames"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-containers.md",
+          "heading": "Two containers side by side"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/standards-patterns.md",
+          "heading": "Groups and their items"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "3. Decide the panels"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.626",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "`DSPageLevel` gives a level, a part and `flush` to what it holds, and lays out nothing",
+      "chapter": "04-capabilities/02-support/01-surface/07-architecture-components/01-common/01-components.md",
+      "heading": "DSPageLevel",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "Page — 🔮"
         },
         {
           "plugin": "spn-surface",

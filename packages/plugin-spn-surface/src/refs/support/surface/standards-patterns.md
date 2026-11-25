@@ -7,11 +7,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-standards-patterns/",
-      "seen": "bd948446"
+      "seen": "80d7bd78"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/03-app-page-kinds.md",
-      "seen": "7f88058b"
+      "seen": "6c0b72d2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/02-web/01-app-page-kinds.md",
@@ -20,7 +20,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "section": "`SKELETON` — a mock of a layout",
-      "seen": "f6e93189"
+      "seen": "5dbe783b"
     }
   ]
 }
@@ -215,7 +215,7 @@ The screen classes are `DESKTOP`, `TABLET` and `MOBILE` (`standards-core.md`). A
 | `DSDataTable`, layout `TABLE` | the same, with fewer columns | the same data table, layout `LIST`, with the filters behind one action |
 | `DSDataTable`, layout `GRID` | the same, with fewer across | layout `LIST` |
 | a table, `DSTable` | the same | a list, one group at a time |
-| two parts side by side: the groups, and the items of the chosen one | the items take the place of the groups, with a back action | the same as a tablet |
+| two parts side by side: the groups, and the items of the chosen one | the items take the place of the groups, with the way back above their title | the same as a tablet |
 | a dialog | the same | a sheet from the bottom of the screen |
 | a sheet at the side | the same | the full screen |
 
@@ -309,7 +309,7 @@ The levels are the layout, the page level, the containers, the widgets and cards
 ### Groups and their items
 
 - **A set of groups that can be added to is a list, and not a row of tabs** (`RULE.SUPPORT.SURFACE.080` · GUIDE). A row of tabs has the width of the page and no more.
-- **Both parts are in view at a desktop only** (`RULE.SUPPORT.SURFACE.079` · MUST · skill:spn-surface/design). On a tablet and on a phone the items of the chosen group take the place of the groups, with a back action. On the web the swap also changes the address: see *On the web: the address of a screen* below.
+- **Both parts are in view at a desktop only** (`RULE.SUPPORT.SURFACE.079` · MUST · skill:spn-surface/design). On a tablet and on a phone the items of the chosen group take the place of the groups, with the way back above their title. Where the items are a list beside a detail, the page is three parts, the groups drawn flat as navigation, and `DSPageFrameGroups` places them, so no more than two containers stand side by side (`RULE.SUPPORT.SURFACE.625` · MUST · skill:spn-surface/design). On the web the swap also changes the address: see *On the web: the address of a screen* below.
 - **Many groups a person searches fit the `LIST` layout of `DSDataTable`, and not its `TABLE` layout** (`RULE.SUPPORT.SURFACE.069` · GUIDE). The part is narrow, and a person picks one group by its name.
 
 ### An overview
@@ -341,18 +341,26 @@ A listing page is a page whose whole content is the records of one kind. It foll
 
 | One record holds | At a desktop | At a tablet | On a phone |
 | --- | --- | --- | --- |
-| several facts a person compares across rows | `TABLE` | `TABLE`, with fewer columns where the record has many | `LIST` |
-| a thing of its own: a kind to set up, an app, a file with a preview | `GRID` | `GRID`, two across | `LIST` |
-| a title and a line under it | `LIST` | `LIST` | `LIST` |
+| three or more facts a person compares across many rows | `TABLE` | `TABLE`, with fewer columns where the record has many | `LIST` |
+| a person or an organization, told apart by a second fact | `TABLE`, its lead cell on two lines | `TABLE`, its lead cell on two lines | `LIST` |
+| more than a line, as a thing a person chooses by looking: a kind to set up, an app, a file with a preview, a project with its progress and its people | `GRID` | `GRID`, two across | `GRID`, one across |
+| a title and one or two facts, opened one at a time | `LIST` | `LIST` | `LIST` |
+
+Which picture each layout leads with, and which field fills it, are stated with the data table in `architecture-components.md` (`RULE.SUPPORT.SURFACE.606` · GUIDE) (`RULE.SUPPORT.SURFACE.614` · GUIDE) (`RULE.SUPPORT.SURFACE.615` · GUIDE) (`RULE.SUPPORT.SURFACE.616` · MUST · skill:spn-surface/design).
 
 - **A listing page whose query takes a page, a text or a filter stays a data table, also where its set is small today** (`RULE.SUPPORT.SURFACE.054` · GUIDE). Its search and its paging are sent to the server. A plain table or a list would do neither.
 - **A list of groups and the list of their items are one page.** The two follow Groups and their items, and neither is a listing page of its own.
+
+## The pages for a failure that is not the person's — 🔮
+
+- **The floor MUST hold Server error and Maintenance, beside Not found and No access, for every surface category** (`RULE.SUPPORT.SURFACE.605` · MUST · skill:spn-surface/design). Each is one `DSEmpty`: Server error (`ServerCrash`, *Something went wrong on our side*, **Try again** and **Go back**) stands in the layout of its surface where it can still be drawn, and Maintenance (`Wrench`, *We'll be back soon*, until a time) stands on `CANVAS`. No language customises them.
+- **A page of measures over time sets one range and one period compared for every part of the page** (`RULE.SUPPORT.SURFACE.618` · GUIDE). A figure and a chart that read two ranges cannot be compared. The kind is planned in the design system until a chart unit is built.
 
 ## The sign-in page — 🔮
 
 **For** Team · Individual · Visitor. For an Individual, the providers and a code by email lead; for a Team, company sign-on stands as an equal; for a Visitor, the sign-up page beside it, with one ask and no account before value.
 
-A sign-in is not one of the fourteen page kinds: it is the page a person passes before any of them, and every app has one, so its shape is stated once (`RULE.SUPPORT.SURFACE.205` · MUST · skill:spn-surface/design).
+A sign-in is not one of the fifteen page kinds: it is the page a person passes before any of them, and every app has one, so its shape is stated once (`RULE.SUPPORT.SURFACE.205` · MUST · skill:spn-surface/design).
 
 | Level | The sign-in |
 | --- | --- |

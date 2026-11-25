@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/02-site-page-kinds.md",
-      "seen": "705ee258"
+      "seen": "3420aa04"
     }
   ]
 }
@@ -74,6 +74,9 @@ The order matters. A grid of things that each open a page is a Feature grid and 
 
 - **A kind of page orders its sections as its reader asks their questions, and does not count them** (`RULE.SUPPORT.SURFACE.340` · MUST · skill:spn-surface/design). A page skips a question its reader does not ask. A count of sections would make a page add a section with nothing to say, or cut one a reader needs.
 
+- **A resources site's Home is a hub only where it holds several sets, and a small product makes its one set the whole site** (`RULE.SUPPORT.SURFACE.617` · GUIDE): `HUB`, one search across every set, a door to each set with its count, what is new, and *Still need help?*; `ONE_SET`, the set's own Group home at the first level. A set's Group home takes the case of its purpose, `HELP`, `DOCS` or `GUIDES`, and a resources site keeps no blog of its own: the Blog is `MARKETING`'s.
+- **A site holds the floor's Server error and Maintenance beside Not found** (`RULE.SUPPORT.SURFACE.605` · MUST · skill:spn-surface/design). Server error stands in the site's layout where it can still be drawn, and Maintenance on `CANVAS`.
+- **A Listing narrowed from a category, a brand or a shared link is the same page, the case `NARROWED`**, because the filters chosen are the page's address; there is no Results kind.
 - **A help centre always draws `DSBreadcrumb` under the bar, one link for each level above the page and the page itself unlinked, and so does any site whose bar does not list its groups or that runs deeper than three levels** (`RULE.SUPPORT.SURFACE.598` · MUST · skill:spn-surface/design). Any other site may draw none.
 
 ## The kinds of page of a marketplace — 🔮

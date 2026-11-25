@@ -15,7 +15,7 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "6cfbce5f"
+      "seen": "6681a576"
     }
   ]
 }
@@ -200,7 +200,7 @@ A page is decided in four steps, in this order (`RULE.SUPPORT.SURFACE.052` · MU
 | `DSDataTable`, layout `TABLE` | the same, with fewer columns | the same data table, layout `LIST`, with the filters behind one action |
 | `DSDataTable`, layout `GRID` | the same, with fewer across | layout `LIST` |
 | a table, `DSTable` | the same | a list, one group at a time |
-| two parts side by side: the groups, and the items of the chosen one | the items take the place of the groups, with a back action; on the web the address changes | the same as a tablet |
+| two parts side by side: the groups, and the items of the chosen one | the items take the place of the groups, with the way back above their title; on the web the address changes | the same as a tablet |
 | a dialog | the same | a sheet from the bottom of the screen |
 | a sheet at the side | the same | the full screen |
 
@@ -243,11 +243,13 @@ A panel is optional. Use one where a part of the page has a header, content and 
 - **Frame a part only when it has a title of its own, and also an action of its own or data it loads by itself** (`RULE.SUPPORT.SURFACE.057` · GUIDE), proposed. The record a page is about is the header of the page, and it takes no frame.
 - **An entry over the page is one panel, placed inside the dialog or the sheet** (`RULE.SUPPORT.SURFACE.077` · GUIDE). Its title and the action that closes it stand in its header, its fields are its content, and its actions stand in its footer.
 - **A large form is one panel.** Its sections are the parts of its content, each under its own title. A section is never a panel of its own, and no list of the sections stands beside the form (`RULE.SUPPORT.SURFACE.078` · GUIDE).
-- **Groups and their items are two panels at a desktop.** On a tablet and on a phone the items take the place of the groups, with a back action (`RULE.SUPPORT.SURFACE.079` · MUST · skill:spn-surface/design), and on the web the swap changes the address. A set of groups that can be added to is a list, and never a row of tabs (`RULE.SUPPORT.SURFACE.080` · GUIDE).
+- **Set at most two containers side by side, one taking the larger share, and decide each part by its job, never its size** (`RULE.SUPPORT.SURFACE.625` · MUST · skill:spn-surface/design). A column a person moves between sets in is navigation, drawn flat, such as a mailbox's folders as a `DSNavList`. A part a person works in, reads or chooses one thing from is a container. Small facts about the one record the page is about are widgets, `DSCardWidget`s one under another in an aside.
+- **Place the parts with a page frame, and give it nothing but the parts** (`RULE.SUPPORT.SURFACE.623` · MUST · skill:spn-surface/design). `DSPageFrameListDetail` places a list beside a detail, `DSPageFrameGroups` the groups, the list and the detail, and `DSPageFrameAside` a main part beside an aside. A frame gives no padding and no size. Write `fullHeight` and `attached` where the parts are panels that each scroll, a chat or a mailbox; a slot of cards is never attached.
+- **Groups and their items are two panels at a desktop, or navigation beside two panels.** On a tablet and on a phone the items take the place of the groups, with the way back above their title (`RULE.SUPPORT.SURFACE.079` · MUST · skill:spn-surface/design), and on the web the swap changes the address. A set of groups that can be added to is a list, and never a row of tabs (`RULE.SUPPORT.SURFACE.080` · GUIDE).
 - **Give one panel to each thing a person reads or saves as a whole** (`RULE.SUPPORT.SURFACE.116` · GUIDE). The sections of that thing are the parts of its content, each under its own title, and never panels of their own. Two things that are read or saved apart are two panels, or cards. An editor with its preview and *Choose many* are each one panel (`RULE.SUPPORT.SURFACE.115` · GUIDE).
 - **Give the page that reads a record and the page that changes it the same parts in the same order** (`RULE.SUPPORT.SURFACE.117` · GUIDE). On the page that changes it, a reading becomes a field, a block of source becomes an editor, and the footer with the actions is added.
 - **Write no prop and no padding to place a title** (`RULE.SUPPORT.SURFACE.109` · MUST · skill:spn-surface/design). An item line at the level `PAGE`, `CONTAINER`, `WIDGET` or `GROUP` starts where what stands under it starts, and in a `flush` part it takes the inset of its place. The part that holds a title gives it its room, and an item line draws no padding of its own (`RULE.SUPPORT.SURFACE.175` · MUST · skill:spn-surface/design). A card hands its size to what it holds, as a panel does (`RULE.SUPPORT.SURFACE.114` · MUST · skill:spn-surface/design). A panel frames a part of a page. A card, `DSCard`, frames one thing: a record, an app, a file, a number. A card is told from a panel by level and purpose, and it takes `surface` and `frames` itself, all three parts where it names none (`RULE.SUPPORT.SURFACE.261` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.262` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.263` · MUST · skill:spn-surface/design).
-- **A page that holds several panels has its head above them, outside any frame, with its way back** (`RULE.SUPPORT.SURFACE.120` · GUIDE). It is an item line at the level `PAGE`. A page with one panel puts its head in the header of that panel. Write the title and the address to go back to, and no row, back button or padding for them.
+- **A page that holds several panels has its head above them, outside any frame, with its way back** (`RULE.SUPPORT.SURFACE.120` · GUIDE). It is `DSPageHead` (`RULE.SUPPORT.SURFACE.622` · MUST · skill:spn-surface/design), its title line an item at the level `PAGE`. A page with one panel puts its head in the header of that panel. Write the title, the address to go back to and its words, `backLabel`, and no row, back button or padding for them: the way back is a row above the title line, in the head and in a panel's header alike.
 - **Write no padding for tabs in a `flush` part, or for their panel** (`RULE.SUPPORT.SURFACE.118` · MUST · skill:spn-surface/design). The first tab starts where the text under it starts, and the line of the tabs still reaches the edge.
 - **A card may hold `DSCard.Header`, `DSCard.Content` and `DSCard.Footer`, and it still frames one thing** (`RULE.SUPPORT.SURFACE.091` · MUST · skill:spn-surface/design). Its parts all sit inside its one frame, in every theme. A part pads itself, and `flush` on a part drops that padding, for a part whose content reaches the edge of the card. `divided` draws a line between each two parts. A part of a page that has a title, actions and data of its own stays a panel.
 - **Write the parts in one order**: `DSPanelContainer.Header`, then `DSPanelContainer.Content`, then `DSPanelContainer.Footer`. A panel holds one or more content parts, and at most one header and one footer.
@@ -497,7 +499,7 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **The initials of an avatar are a title step of about four tenths of the avatar** (`RULE.SUPPORT.SURFACE.105` · MUST · skill:spn-surface/design)
 - **The heading element of a title follows its level, and it changes no style** (`RULE.SUPPORT.SURFACE.106` · MUST · skill:spn-surface/design)
 - **A title in the header of a box takes the level its box gives, where the page names none** (`RULE.SUPPORT.SURFACE.107` · MUST · skill:spn-surface/design)
-- **The back action of a header stands level with the line of the title** (`RULE.SUPPORT.SURFACE.108` · MUST · skill:spn-surface/design)
+- **The way back of a header is a row of its own above the title line** (`RULE.SUPPORT.SURFACE.108` · MUST · skill:spn-surface/design)
 - **An item line that is a title starts where what stands under it starts** (`RULE.SUPPORT.SURFACE.109` · MUST · skill:spn-surface/design)
 - **An action at the end of a row that is a link never follows the link** (`RULE.SUPPORT.SURFACE.110` · MUST · skill:spn-surface/design)
 - **An item line cuts nothing it draws, and the page decides what its words say** (`RULE.SUPPORT.SURFACE.111` · MUST · skill:spn-surface/design)
@@ -693,3 +695,11 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **`DSApp` takes the app's theme setting as `dsContext.themes`, applies the main category's theme at the root, and holds the setting for the pages below** (`RULE.SUPPORT.SURFACE.602` · MUST · skill:spn-surface/design)
 - **`DSPageCategory` gives a surface category to what it holds, and renders nothing** (`RULE.SUPPORT.SURFACE.603` · MUST · skill:spn-surface/design)
 - **`DSSitePage` and `DSLayout` apply the category on the root they already render** (`RULE.SUPPORT.SURFACE.604` · MUST · skill:spn-surface/design)
+- **`DSPage*` names the units that work across a page's content, and a `DSPageFrame*` unit places a page's parts in slots and draws no box and no navigation** (`RULE.SUPPORT.SURFACE.613` · MUST · skill:spn-surface/design)
+- **A media field is named by its role, and a page fills a slot by that role** (`RULE.SUPPORT.SURFACE.616` · MUST · skill:spn-surface/design)
+- **Unread and the accent edge are marks of the record's box, and the item line inside reads the unread mark from it** (`RULE.SUPPORT.SURFACE.620` · MUST · skill:spn-surface/design)
+- **A page whose head stands in no box opens with `DSPageHead`, and every way back is one row above the title line** (`RULE.SUPPORT.SURFACE.622` · MUST · skill:spn-surface/design)
+- **A page frame places its parts and gives them nothing else** (`RULE.SUPPORT.SURFACE.623` · MUST · skill:spn-surface/design)
+- **`DSItem` is an item line and knows nothing of navigation** (`RULE.SUPPORT.SURFACE.624` · MUST · skill:spn-surface/design)
+- **A page sets at most two containers side by side, one taking the larger share** (`RULE.SUPPORT.SURFACE.625` · MUST · skill:spn-surface/design)
+- **`DSPageLevel` gives a level, a part and `flush` to what it holds, and lays out nothing** (`RULE.SUPPORT.SURFACE.626` · MUST · skill:spn-surface/design)

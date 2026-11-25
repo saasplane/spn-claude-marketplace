@@ -3,15 +3,15 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/14-delivery-library/",
-      "seen": "09e1e2e8"
+      "seen": "69d93853"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/05-standards-names/",
-      "seen": "73337c39"
+      "seen": "2e176528"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-containers/",
-      "seen": "fc2a5e84"
+      "seen": "e87bd9db"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-layouts/",
@@ -76,7 +76,7 @@ The design library holds one file for each layer of the design system that is dr
 | The layout | one instance of `DSLayout` in its type, filling the top frame. The `width` of the body, and the `attached` of the navigation and of the content, are set on it as properties of the same names |
 | A part of a layout | the body, the navigation or the content of that instance. The navigation holds `startNode`, the entries of `nav`, `actionsNode` and `endNode`; the content holds the page. `header`, in every layout, is the place directly before the content, under the bar in a dock or a top nav, what it holds standing in the body's box, and the content's box starts under it; `footer` is the place at the page's end; each takes `{ node, sticky? }`, and `DSLayout` takes no `footerNode` prop |
 | The level of a frame | a variable mode of the `Level` collection, set once on the frame, whose six modes are the values of `DSPageLevelType`. It costs no version of any unit |
-| The page level | the head of the page, first in the content: `DSPageLevel` at `PAGE` as its `HEADER`, or the header of a `DSPanelContainer` with `fullPage`. A `DSItem` holds the title and the description, the actions follow it as one group at the end, and `backAnchor` is the way back at the start of the title's line |
+| The page level | the head of the page, first in the content: `DSPageHead`, or the header of a `DSPanelContainer` with `fullPage`. Its title line is a `DSItem` with the title and the description, the actions follow it as one group at the end, and `backAnchor` with `backLabel` is the way back, a row above the title line |
 | A part of a block, or a named place | the part of the instance that carries that name. The blocks of the tree go inside it |
 | `flush` on a part of a container | the frame setting, a variable mode set on that part |
 | Content | the text of the instance, typed as the tree gives it |

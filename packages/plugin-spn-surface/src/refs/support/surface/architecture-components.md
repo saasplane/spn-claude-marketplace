@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/07-architecture-components.md",
-      "seen": "7a96a04a"
+      "seen": "91003ce6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-components/",
-      "seen": "ed29cb97"
+      "seen": "fc3f0156"
     }
   ]
 }
@@ -44,7 +44,7 @@ A **block** is any unit a surface is built from — a layout, a container, a wid
 
 ## The groups — 🔮
 
-Twelve groups, each answering one need of a surface. The list holds the core units: the library draws one page per group, each provider keeps one folder per group, the showcase opens each group of units with an Overview page, and a new core unit joins this list before it is drawn or built anywhere. A stack may provide further units of its own beside them, and this list names none of those.
+Thirteen groups, each answering one need of a surface. The list holds the core units: the library draws one page per group, each provider keeps one folder per group, the showcase opens each group of units with an Overview page, and a new core unit joins this list before it is drawn or built anywhere. A stack may provide further units of its own beside them, and this list names none of those.
 
 | Group | Answers | Blocks |
 | --- | --- | --- |
@@ -55,7 +55,8 @@ Twelve groups, each answering one need of a surface. The list holds the core uni
 | Data entry · Compound fields | the form frame, and inputs built from other inputs | `DSForm` · `DSAddressForm` · `DSAttachment` · `DSAttachmentMulti` · `DSJSONControl` · `DSDataFieldForm` · `DSDataFieldBuilder` · `DSImagePicker` · `DSThemeForm` |
 | Composites | blocks built from components that carry one task end to end and that no other component is built from | `DSDataTable` · `DSFilterBar` · `DSFacetGroup` · `DSComparison` · `DSQuote` · `DSFeature` |
 | Feedback | what a surface says while it works, and when it fails | `DSAlert` · `DSSpinner` · `DSToast` · `DSProgress` · `DSProgressCircle` · `DSSkeleton` · `DSEmpty` |
-| Structure | the small blocks that divide, scroll or fold a part of a page, or stand it on a fill | `DSCollapsible` · `DSHScroll` · `DSScrollArea` · `DSSeparator` · `DSSurface` |
+| Structure | the small blocks that divide, scroll or fold a part of a page, or stand it on a fill | `DSCollapsible` · `DSHScroll` · `DSScrollArea` · `DSSeparator` · `DSSurface` · `DSPageLevel` |
+| Page | the units that work across a page's content: the head of a page that stands in no box, a page setting, and the page frames, which place a page's parts in slots | `DSPageHead` · `DSPageCategory` · `DSPageFrameListDetail` · `DSPageFrameGroups` · `DSPageFrameAside` |
 | Media | images and icons | `DSAspectRatio` · `DSIcon` · `DSMark` · `DSImage` |
 | Navigation | moving between places | `DSBreadcrumb` · `DSMenubar` · `DSNavList` · `DSNavMenu` · `DSNavBarSide` · `DSNavBarTop` · `DSNavEntry` · `DSPagination` · `DSTabs` · `DSStepper` · `DSLink` · `DSAnchor` |
 | Overlays | interruption | `DSDialog` · `DSConfirmDialog` · `DSDrawer` · `DSSheet` · `DSEntryOverlay` · `DSBackdrop` |
@@ -67,7 +68,7 @@ A designer reads a block in the design library, so each table of the book also s
 
 The library draws a sheet for each block of Utility whose behaviour a person feels: a sheet of states for `DSAuthz` (allowed, denied, fallback), `DSSticky` (in flow, stuck) and `DSAnchorContainer`, and one sheet of formats for the formatters. `DSAnchor` of Navigation has a small sheet of states, and `DSAspectRatio` of Media has one sheet of ratios. `DSElementObserver` has an entry with its description and no states. `DSPortal`, a block of the web alone, is the stack's own: the book does not list it and the library does not draw it. The composites are stated under Composites below. The widget, the container and the layout sit one layer up and each have a construct of their own: `architecture-widgets.md`, `architecture-containers.md`, `architecture-layouts.md`.
 
-Six units joined the groups with their own rows in the book:
+Five units joined the groups with their own rows in the book:
 
 | Unit | Group | What it does |
 | --- | --- | --- |
@@ -76,7 +77,6 @@ Six units joined the groups with their own rows in the book:
 | `DSStatusActiveView` | Data display | shows whether a record is active, the same way on every page: a badge in the success colour with the word Active, or in the default colour with the word Inactive. The page may give its own words |
 | `DSThemeForm` | Data entry · Compound fields | the form that edits the theme an app chooses: five layers of choices, each with its own reset, and a reset of every choice. It applies nothing and keeps nothing: the page holds the theme and hands each change back |
 | `DSEntryOverlay` | Overlays | the overlay an entry opens in, over the page it belongs to: a dialog for a small entry and a sheet at the right for a medium one, both 480 px wide. The caller draws the entry with the overlay's parts |
-| `DSListDetail` | the web stack's own composite | places a list beside the detail of its chosen row |
 
 **A prop that takes a vocabulary is marked in the book's rows of props.** Beside the prop, the row names the vocabulary, as `type` (`DSTimePickerType`) of `DSTimePicker` or `format` (`SPDateFormatType`) of `DSDatePicker`. The values, and for the design system's own vocabularies the default, are in the tables of `architecture-names.md`. A shared vocabulary of the platform, one named `SP…Type`, is stated in the second of those tables. `variant`, `color` and `size` name no vocabulary in a row, because they take the three shared names and their vocabularies.
 
@@ -994,6 +994,9 @@ The bar has one form, read from its start to its end. A person who has used one 
 - **At a tablet the bar MUST hold fewer fields in view, and the rest wait behind the action that shows them.** A tablet has less width than a desktop, so fewer boxes fit across it.
 - **On a phone the bar MUST be one button that says how many filters are on, such as *Filters (2)*, with the action that clears them beside it.** A phone has no room for a row of boxes. One button keeps the records in view. Its number tells a person that the records are narrowed before they open anything.
 
+- **A quick filter applies the moment it is pressed, and *All* clears its group** (`RULE.SUPPORT.SURFACE.619` · GUIDE). `groups` takes `IDSFilterBarGroup[]`: each group one dimension of about six values or fewer, such as a status, its counts applying every other filter and not its own, drawn as `groupType` says. `fields` is optional, so a bar may be pills alone. A bar with groups draws no mark; the bar is one row, the groups, then the fields and the actions, wrapping between the groups and the fields, never inside either. On a phone each group stands on its own line and slides sideways, and the fields fold into *Filters (n)*; a bar of groups alone draws no button on a phone either and is as wide as its pills, so a page may place it beside a title or in a toolbar.
+- **A bar of fields fits the width it is given.** Its mark stands inside the controls and is left out under 448 px of the bar's own width, and the controls ask for no more width than the bar has, each field at least 128 px, so a bar in a list column keeps *Clear* in view.
+
 **What the composite does.** `DSFilterBar` draws the fields, the action that shows the hidden ones, the line, and the search and clear actions in this order. Its fields share the width equally. It draws the filter icon in a round shape, as tall as the fields beside it. It keeps in view the fields a page marks `primary`, and beside them a number of the others: up to `moreLimit` at a desktop, three unless the page sets it, and up to `moreLimitTablet` at a tablet, one unless the page sets it. So the bar holds fewer fields at a tablet by itself. On a phone it is the one button: the button opens the fields in a drawer from the bottom of the screen, with the extent `FIT`, so the drawer is as tall as its fields and scrolls only when the window runs out (`RULE.SUPPORT.SURFACE.246` · MUST · skill:spn-surface/design). The size of the bar sets only how dense its controls are, and never how far the drawer reaches. With no filter on, the button reads *Filters* and the clear action is not shown.
 
 
@@ -1106,7 +1109,7 @@ A row states its kind in `mtype`, which takes `DSComparisonRowType`: `FIELD` giv
 
 | Key | Takes | What it decides |
 | --- | --- | --- |
-| `nodes` | `IDSFeatureItem[]`: the props of `DSItem`, whole, but `pageLevel`, `orientation` and `backAnchor`, and a `key`, and `selected` | the items, in the order they are drawn |
+| `nodes` | `IDSFeatureItem[]`: the props of `DSItem`, whole, but `pageLevel` and `orientation`, and a `key`, and `selected` | the items, in the order they are drawn |
 | `type` | `DSFeatureItemsType`: `GRID` · `LIST` · `STATS`. `GRID` when unset | how the items are drawn |
 | `numbered` | yes or no. No by default | whether the numbers 1 to n stand before the titles, as text. `GRID` and `LIST` only |
 | `orientation` | `DSOrientationType`. Unset, `VERTICAL` for `GRID` and `HORIZONTAL` for `LIST` | how every item stands |
@@ -1260,20 +1263,39 @@ A feature is chosen by the level it stands at and by what proves its claim: a pi
 | `factsPlacement` | `AFTER_DESCRIPTION` | every case but a plan's price. It is the unit's own default |
 | `factsPlacement` | `AFTER_TITLE` | facts that say what the feature is before its sentence (`RULE.SUPPORT.SURFACE.242` · GUIDE) |
 
-### DSListDetail
+## Page — 🔮
 
-`DSListDetail` places a list beside the detail of its chosen row. It is the web stack's own composite, and the book states its props and its choice table. A page gives it the list, the detail where a row is chosen, and the address of the list; the unit holds no data and does not know which row is chosen.
+The Page group holds the units that work across a page's content (`RULE.SUPPORT.SURFACE.613` · MUST · skill:spn-surface/design): `DSPageHead`, the head of a page that stands in no box; `DSPageCategory`, a page setting that gives the pages it holds their surface category and draws nothing; and the page frames. `DSPageLevel` gives a box's parts their level and stands in Structure.
 
-| Setting | The page gives | What the composite draws |
+- **`DSPageLevel` MUST give a level, a part and `flush` to what it holds, and lay out nothing** (`RULE.SUPPORT.SURFACE.626` · MUST · skill:spn-surface/design). A head is laid out by `DSPageHead` or by its box's own head. Its `HEADER` layout stays one major version, deprecated.
+- **A page whose head stands in no box MUST open with `DSPageHead`, and every way back MUST be one row above the title line** (`RULE.SUPPORT.SURFACE.622` · MUST · skill:spn-surface/design). The row is a link with an arrow before the words of where it leads, `backLabel`, or Back where none are given, 4 px above the title line and flush with its start. `DSPanelContainer.Header` draws the same row from its `backAnchor` and `backLabel`, and a page frame draws it on a phone. `DSPageHead` takes `header` (the props of `DSItem`, its title the page's `h1`), `headerActions` (the main one `PRIMARY`, `SOLID` one size above the place's, the others `OUTLINE`), `backAnchor` and `backLabel`.
+
+### The page frames
+
+A page frame places a page's parts in slots, folds them by screen class, and draws no box and no navigation. `DSPageFrameListDetail` places a list beside the detail of its chosen row, and `DSListDetail` is its deprecated alias for one major version. `DSPageFrameGroups` places the groups, the list and the detail. `DSPageFrameAside` places a main part beside an aside of small facts about the record. A page gives each frame its parts and the addresses they go back by; the frame holds no data and does not know which row is chosen.
+
+- **A page frame MUST place its parts and give them nothing else** (`RULE.SUPPORT.SURFACE.623` · MUST · skill:spn-surface/design). It gives no padding and no size to what fills a slot. `fullHeight` makes each part as tall as the frame, the layout's content, with a panel in it scrolling its own content and keeping its header and footer in view. `attached` joins panels at a desktop into one surface: they touch, square the corners they touch and draw the line between them once. A slot of cards is never attached, and where one part shows alone `attached` changes nothing.
+- **What fills a slot follows the part's job, never its size** (`RULE.SUPPORT.SURFACE.625` · MUST · skill:spn-surface/design), as `architecture-containers.md` states: navigation drawn flat, a container a person works in, widgets for small facts.
+
+| The parts are | `fullHeight` | `attached` |
 | --- | --- | --- |
-| `list` | any node | the list, in a column at the start at a desktop; on its own where the page gives no `detail`, on every screen |
-| `detail` | any node, where a row is chosen | the detail beside the list at a desktop; alone below a desktop, with `backAnchor` as the way back |
-| `backAnchor` | the address of the list | nothing of its own: the `DSPanelContainer.Header` in the detail draws it as its way back below a desktop |
-| `listWidth` | `DSListDetailListWidthType`, `WIDE` where left out | the width of the list's column at a desktop |
+| panels a person works in side by side, each scrolling its own content: a chat, a mailbox | on | on |
+| panels on a page that scrolls as a whole, such as a record and its parts | off | on where the two read as one view |
+| card widgets, or a list of cards beside a detail | off | off |
 
-- **`DSListDetail` never navigates itself, and it reads the chosen row from nothing.** The page reads the address and passes `detail` or not. Below a desktop it shows the detail alone where there is one, else the list alone.
+| Frame | Its slots | Its other props |
+| --- | --- | --- |
+| `DSPageFrameListDetail` | `list`, `detail`, `emptyDetail` | `backAnchor` (required), `backLabel`, `listWidth`, `fullHeight`, `attached` |
+| `DSPageFrameGroups` | `groups`, `list`, `detail`, `emptyDetail` | `groupsLabel`, `groupsAnchor` (required), `groupsWidth` (`COMPACT` when unset), `backAnchor` (required), `backLabel`, `listWidth`, `fullHeight`, `attached` |
+| `DSPageFrameAside` | `main`, `aside` | `asideWidth`, `fullHeight`, `attached` |
 
-#### The choice table of `DSListDetail`
+Every width takes `DSListDetailListWidthType`: `WIDE`, 320 px and the default but for the groups, `NARROW`, 256 px, and `COMPACT`, 224 px.
+
+- **A frame never navigates itself, and it reads the chosen row from nothing.** The page reads the address and passes `detail` or not. Below a desktop it shows the detail alone where there is one, else the list alone.
+- **`DSPageFrameGroups` folds its three parts by screen class** (`RULE.SUPPORT.SURFACE.610` · GUIDE): groups, list and detail at a desktop; the groups as a menu above the list, named by `groupsLabel`, on a tablet; one part at a time on a phone, the list going back to the groups by `groupsAnchor` and the detail to the list by `backAnchor`. The groups are navigation, a `DSNavList` with counts.
+- **`DSPageFrameListDetail` is the two-column form, and a chat is that form with `emptyDetail`** (`RULE.SUPPORT.SURFACE.611` · GUIDE), with `fullHeight` and `attached`, so the conversations and the thread each scroll in one surface.
+
+#### The choice table of `DSPageFrameListDetail`
 
 A list beside a detail is chosen by what the rows say and by how much room the detail needs.
 
@@ -1395,6 +1417,10 @@ One item line serves every level of a page, and `pageLevel` says which one it st
   | `CONTENT` | 14px | 13px |
   | `INLINE` | 12px | 12px |
 - **A line that says who did a thing and when is an item line at `INLINE`.** Its picture is the `AVATAR` of the person, its title the name, and the time a fact, in the form the date units give it. A stack may keep a unit of its own that draws it.
+- **`DSItem` MUST be an item line that knows nothing of navigation** (`RULE.SUPPORT.SURFACE.624` · MUST · skill:spn-surface/design). The way back is the head's, `DSPageHead` or a panel's header, never the item's.
+- **Unread and the accent edge MUST be marks of the record's box, and the item line inside MUST read the unread mark from it** (`RULE.SUPPORT.SURFACE.620` · MUST · skill:spn-surface/design). `DSList.Item`, `DSCard`, `DSItemCard` (through `card`), `DSCardWidget` and `DSTable.Row` take `unread` and `accentColor`; `DSList` and `DSTable` take `unreadColor`, `PRIMARY` when unset; `DSDataTable` reads `data.getRecordUnread`, `data.getRecordAccent` and `settings.unreadColor` in every layout, and a card in a `GRID` cell takes none of its own. The item inside takes the heavier title on its title text and the word Unread for a screen reader.
+- **An unread row shows a notch just inside its start edge and a heavier title, and never a tint of the whole row** (`RULE.SUPPORT.SURFACE.607` · GUIDE). A tint would collide with the band of the record in view and with the row under the pointer.
+- **A record's box takes at most one accent edge, and the unread notch stands inside it** (`RULE.SUPPORT.SURFACE.621` · GUIDE). The edge is a 3 px line down the start edge in one colour for the record's state or kind, said in words too. The notch stands 6 px in from the start edge, so the two never touch.
 - **A record's item line MUST be its module's `<State>Item`, and a place MUST give it only `IDSItemPlacementProps`** (`RULE.SUPPORT.APPS.218` · MUST · skill:spn-apps/implement). The web module that owns a record makes `DSItem` specific for it once, so the record reads the same in its picker, in its list and on its own page: `RoleItem` draws a role. The Item decides every part once, the title, the description, the picture, the facts and their order, the same at all six levels from `PAGE` to `INLINE`, and the level sets only the sizes. An `INLINE` line has room for little, so there the Item keeps what a person needs to tell its record apart in a line of text, the description, the facts or both, decided once for its record and never by a place: a person's Item may keep the email and drop the facts, a release's may keep its version and state and drop the description. The level comes from where the Item stands, never from the room it has. The record's state shows only when the record is off, first among the facts, and its code shows at every level. The Item fetches nothing and holds no action: an action belongs to the row or the header that holds it. A place says where the line stands and where it leads (`pageLevel`, `orientation`, `anchor`, `showArrow`, `backAnchor`) and gives its own data at the end (`endNode`, `endAlign`), never a badge or a state of the record, which stand in its facts. It may leave out the description with `hideDescription`, or every fact with `hideFacts`, and it never changes a part or adds one. The design system declares `IDSItemPlacementProps` once, so no Item restates it.
 - **A mark in an item line MUST be a rounded square where the page names no shape, and its corner MUST follow its box.** The corner is one of the theme's radius steps: 6px at 24 and 28px, 8px at 32 and 36px, and 10px from 40px up. A page that names a shape still gets it.
 - **An item line that is a title MUST start where what stands under it starts** (`RULE.SUPPORT.SURFACE.109` · MUST · skill:spn-surface/design). A title is an item line at the level `PAGE`, `CONTAINER`, `WIDGET` or `GROUP`. It takes no padding of its own at its two sides. So the title of a group starts where the labels of the fields under it start, in a part that insets, in a card, in a dialog and in a sheet. The head of a page starts where the framed parts under it start. Above and below, a title keeps the padding of its place, which the part that holds it gives.
@@ -3252,6 +3278,22 @@ This ref states which components exist, in which group, and what every one must 
 | `RULE.SUPPORT.SURFACE.389` | a mark is no link and no level rings a mark, so `LINK` and `SUBTLE_OUTLINE` have no case written yet on a mark. It is advice |
 | `RULE.SUPPORT.SURFACE.390` | a header shows at most one main action and one or two secondaries, the rest behind "⋯"; on a record moving through states the main action is the move its state expects next. It is advice |
 | `RULE.SUPPORT.SURFACE.391` | a badge in a table cell is `XS`, because a person scans a table row by row. It is advice |
+| `RULE.SUPPORT.SURFACE.606` | a table's first cell leads with an avatar only for a person or an organization, with a mark only for rows of mixed kinds, and with its text alone for a table of one kind |
+| `RULE.SUPPORT.SURFACE.607` | an unread row shows a notch just inside its start edge and a heavier title, and never a tint of the whole row |
+| `RULE.SUPPORT.SURFACE.608` | on a phone a record with more than four facts a person still needs keeps them as label and value pairs under its lead |
+| `RULE.SUPPORT.SURFACE.609` | a person's column set is kept with the saved view |
+| `RULE.SUPPORT.SURFACE.610` | `DSPageFrameGroups` folds its three parts by screen class: groups, list and detail at a desktop, the groups as a menu above the list on a tablet, one part at a time on a phone |
+| `RULE.SUPPORT.SURFACE.611` | `DSPageFrameListDetail` is the two-column form, and a chat is that form with `emptyDetail` |
+| `RULE.SUPPORT.SURFACE.614` | only the lead cell of a row takes two lines, and every other cell one |
+| `RULE.SUPPORT.SURFACE.615` | a listing shows a picture only where it tells one record from another, an avatar, a logo, a mark or an image, in the place its layout gives it |
+| `RULE.SUPPORT.SURFACE.616` | a media field is named by its role, a person's avatar, a square logo, a wordmark or a cover, and a page fills a slot by that role |
+| `RULE.SUPPORT.SURFACE.619` | a quick pill of `DSFilterBar` applies the moment it is pressed, and *All* clears its group |
+| `RULE.SUPPORT.SURFACE.620` | unread and the accent edge are marks of the record's box, the row, the card or the table row, and the item line inside reads the unread mark from its box and never draws one of its own |
+| `RULE.SUPPORT.SURFACE.621` | a record's box takes at most one accent edge, a 3 px line at its start in one colour that says the record's state or kind, and the unread notch stands 6 px inside the start edge so the two never touch |
+| `RULE.SUPPORT.SURFACE.622` | a page whose head stands in no box opens with `DSPageHead`, and every way back, of a page head, a panel header or a page frame on a phone, is one row above the title line: a link with an arrow and the words of where it leads, Back where none are given |
+| `RULE.SUPPORT.SURFACE.623` | a page frame places its parts and nothing else: it gives no padding and no size to what fills a slot, `fullHeight` makes each part as tall as the frame with a panel scrolling its own content, and `attached` joins panels into one surface and is never given where a slot holds cards |
+| `RULE.SUPPORT.SURFACE.624` | `DSItem` is an item line and knows nothing of navigation: the way back is the head's, never the item's |
+| `RULE.SUPPORT.SURFACE.626` | `DSPageLevel` gives a level, a part and `flush` to what it holds and lays out nothing, as `DSSurface` gives a surface; a head is laid out by `DSPageHead` or by its box's own head, and the `HEADER` layout stays one major version, deprecated |
 
 ## Proof
 

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/05-standards-names.md",
-      "seen": "f411924c"
+      "seen": "20628665"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/05-standards-names/",
-      "seen": "73337c39"
+      "seen": "2e176528"
     }
   ]
 }
@@ -44,7 +44,7 @@ One name is used in the book, in the design library and in every stack. The book
 
 | Name | Means | Values | Vocabulary |
 | --- | --- | --- | --- |
-| `variant` | the surface treatment, by its strength | `SOLID` · `QUIET` · `SUBTLE` · `SUBTLE_OUTLINE` · `OUTLINE` · `GHOST` · `LINK` | `DSVariantType` |
+| `variant` | the surface treatment, by its strength | `SOLID` · `QUIET` · `SUBTLE` · `SUBTLE_OUTLINE` · `OUTLINE` · `OUTLINE_DASHED` · `GHOST` · `LINK` | `DSVariantType` |
 | `color` | the hue | `DEFAULT` · `CUSTOM` · `PRIMARY` · `INFO` · `SUCCESS` · `WARNING` · `ERROR` | `DSColorType` |
 | `size` | the density step, read smallest to largest | `XS` · `SM` · `MD` · `LG` · `XL` | `DSSizeType` |
 
@@ -181,7 +181,7 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSDrawer` | `placement` | `LEFT` · `RIGHT` · `TOP` · `BOTTOM`, `BOTTOM` when unset | `DSDrawerPlacementType` |
 | `DSSheet` | `placement` | `LEFT` · `RIGHT` · `TOP` · `BOTTOM`, `RIGHT` when unset | `DSSheetPlacementType` |
 | `DSEntryOverlay` | `entrySize` (how much room the entry asks for: a dialog at `MD` for `SMALL`, a sheet at the right at `MD` for `MEDIUM`) | `SMALL` · `MEDIUM`. Required | `DSEntrySizeType` |
-| `DSListDetail` | `listWidth` (how wide the list's column is at a desktop) | `COMPACT` · `NARROW` · `WIDE`, `WIDE` when unset | `DSListDetailListWidthType` |
+| `DSPageFrameListDetail` · `DSPageFrameGroups` · `DSPageFrameAside` | `listWidth`, `groupsWidth`, `asideWidth` (how wide a column is at a desktop) | `COMPACT` · `NARROW` · `WIDE`, `WIDE` when unset but `groupsWidth`, `COMPACT` | `DSListDetailListWidthType` |
 | A unit of `units`, on `DSDataUnitGroup` | `span` (how many columns of the group the unit takes. A span wider than the columns of the device is cut to them) | a whole number, 1 to 4. 1 when unset | none |
 | `DSPopover` · `DSHoverCard` · `DSTooltip` · `DSDropdownMenu` · `DSConfirmPopover` | `placement` (`DSPopover` requires it; the others open at `BOTTOM`, `TOP`, `BOTTOM_LEFT` and `BOTTOM_RIGHT` when unset, in that order) | `LEFT` · `RIGHT` · `TOP` · `BOTTOM` · `TOP_LEFT` · `TOP_RIGHT` · `BOTTOM_LEFT` · `BOTTOM_RIGHT` · `RIGHT_TOP` · `RIGHT_BOTTOM` · `LEFT_TOP` · `LEFT_BOTTOM` | `DSPlacementType` |
 | `DSContextMenu` | `placement` | `LEFT` · `RIGHT`, `LEFT` when unset | `DSPlacementHorizontalType` |
@@ -236,7 +236,7 @@ A suffix names where a unit is placed: `App`, `Layout`, `Page`, `Container` and 
 - **A component MUST take no such word.** A composite is placed nowhere in particular, so it is a component and takes none: a data table is `DSDataTable`, never a widget by name.
 - **No block MAY carry a letter for its layer before its name.** A letter before the name was the only mark of its kind in the design system, and a reader had to be told what it stood for.
 - **A name that belongs to a block MUST keep the block's whole name first, and its own word follows.** This holds for a config, a vocabulary, an item and a private part. The table below gives the names that belong to the core composites and the core widget.
-- **A unit that a stack provides on its own MUST follow the same rule**, because it keeps every rule of the book that a core unit keeps (`architecture-components.md`). So the web stack's own composite for a list beside its detail is `DSListDetail`.
+- **A unit that a stack provides on its own MUST follow the same rule**, because it keeps every rule of the book that a core unit keeps (`architecture-components.md`). So the web stack's own units that place a page's parts are page frames, `DSPageFrameListDetail`, `DSPageFrameGroups` and `DSPageFrameAside`, and `DSListDetail` is a deprecated alias for one major version.
 
 | Belongs to | What it is | Its name |
 | --- | --- | --- |
@@ -309,6 +309,7 @@ This ref states which three props mean one thing everywhere, which of the two si
 | `RULE.SUPPORT.SURFACE.043` | a unit or a prop of the design library follows the order construct, Figma, stack, showcase |
 | `RULE.SUPPORT.SURFACE.082` | that order binds the core units, and not a unit that a stack provides on its own |
 | `RULE.SUPPORT.SURFACE.098` | a block's name says its layer by its last word, and no block carries a letter for its layer before its name |
+| `RULE.SUPPORT.SURFACE.613` | `DSPage*` names the units that work across a page's content: the head of a page that stands in no box, `DSPageHead`; page settings, which give one page-wide value; and page frames, `DSPageFrame*`, which place a page's parts in slots, fold them by screen class and draw no box and no navigation; three page frames are built and three more are reserved and unbuilt |
 | `RULE.SUPPORT.APPS.145` | the design system has the layers core, components, widgets, containers, layouts and app, on every stack, and a layer uses only the layers named before it |
 | `RULE.SUPPORT.APPS.154` | a hook of the design system names the context its value comes from |
 | `RULE.SUPPORT.APPS.142` | each shared state of a control has one picture, chosen in the design library on the first component that has it |
