@@ -90,3 +90,6 @@ export function sweep<T>(node: T): T {
 /** A quote: a person's words, who said them and the role they hold, framed as a card where `card` is set. */
 export const quote = (words: string, name: string, role: string, card = false, level = "WIDGET"): Tree =>
   U("DSQuote", { quote: words, speaker: { title: name, description: role, media: { mtype: "AVATAR", title: name } }, pageLevel: level, ...(card ? { surface: { raised: true, elevation: "MD" } } : {}) });
+
+/** A keyboard key combination. */
+export const kbd = (keys: string[]): Tree => U("DSKbd", { keys });

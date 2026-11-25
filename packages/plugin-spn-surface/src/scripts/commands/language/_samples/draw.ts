@@ -4,6 +4,7 @@ import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "
 import { basename, dirname, join } from "node:path";
 import { appPages } from "./draw-app.ts";
 import { type Folders, sitePages, wrapSite } from "./draw-site.ts";
+import { categoryValuePages, sharedPages } from "./values.ts";
 import { type PageOptions, indexHtml, pageHtml, treeOf } from "./files.ts";
 import { plannedPanel, plannedSection } from "./kit.ts";
 import { appLayout } from "./layouts.ts";
@@ -13,12 +14,14 @@ import { BRIEFS } from "./site-words.ts";
 import type { CatKind, Entry, Page, Tree } from "./types.ts";
 import { APP_WORDS } from "./app-words.ts";
 
-export type Catalogue = { version: string; outline: { categories: Record<string, { family: string; person: string; description: string }> }; categories: Record<string, Record<string, CatKind[]>> };
+export type OutlinePart = { code: string; title: string; description: string; values?: { ALL?: string[] } };
+export type Catalogue = { version: string; outline: { groups?: Array<{ code: string; parts: OutlinePart[] }>; categories: Record<string, { family: string; person: string; description: string }> }; categories: Record<string, Record<string, CatKind[]>> };
 export type PartSetting = { source?: string; pick?: string | string[]; notUsed?: unknown[]; add?: unknown[] };
-export type Spec = { name: string; categories: Record<string, Record<string, PartSetting>> };
+export type Spec = { name: string; shared?: Record<string, Record<string, unknown>>; categories: Record<string, Record<string, PartSetting>> };
 export type Options = { indexShell: string; language: string; catalogue: Catalogue; spec: Spec; out: string; template: string; ds: string; app: string; assets: string | null; place: string; only: string | null; log: (line: string) => void };
 
 const PARTS = ["LAYOUTS", "PAGES", "CONTAINERS", "WIDGETS"] as const;
+const ALL_PARTS = [...PARTS, "THEME", "MEDIA", "MOTION", "WORDS", "BRAND", "DRAWING", "VOICE"];
 const TITLES: Record<string, string> = { site: "Site", app: "App", shared: "Shared" };
 const num = (n: number): string => String(n).padStart(2, "0");
 
@@ -47,11 +50,16 @@ export function categoriesOf(catalogue: Catalogue, spec: Spec): Array<{ code: st
 export function pagesOf(options: Options): Array<Page & { family: string }> {
   const { catalogue, spec } = options;
   const out: Array<Page & { family: string }> = [];
+  const outline = (catalogue.outline.groups ?? []).flatMap((group) => group.parts);
+  const sharedParts = (catalogue.outline.groups ?? []).find((group) => group.code === "SHARED")?.parts ?? [];
+  const titles: Record<string, string> = {};
+  for (const part of outline) { titles[part.code] = part.title; titles[`${part.code}-ask`] = part.description; }
+  for (const page of sharedPages(sharedParts, spec.shared)) out.push({ ...page, family: "site" });
   for (const { code, family, folder } of categoriesOf(catalogue, spec)) {
     const folders: Folders = { base: folder, part: (part) => `${folder}/${num(PARTS.indexOf(part as (typeof PARTS)[number]) + 1)}-${part.toLowerCase()}` };
     const picked = (part: string): CatKind[] => pickKinds(catalogue, spec, code, part);
     const pages = family === "site" ? sitePages(code, catalogue.categories[code], BRIEFS[code] ?? BRIEFS.MARKETING, folders, picked) : appPages(code, folders, picked);
-    for (const page of pages) out.push({ ...page, family });
+    for (const page of [...pages, ...categoryValuePages(code, folder, catalogue.categories[code], spec.categories[code] as never, titles)]) out.push({ ...page, family });
   }
   return options.only ? out.filter((page) => page.file.includes(options.only as string)) : out;
 }
@@ -128,7 +136,7 @@ export function run(options: Options): { pages: number; entries: number; planned
     try {
       const old = JSON.parse(readFileSync(dataFile, "utf8")) as { samples?: Array<{ file: string; category?: string | null; part?: string }> };
       const drawn = new Set(categoriesOf(options.catalogue, options.spec).map((c) => c.code));
-      for (const entry of old.samples ?? []) if (entry.category && drawn.has(entry.category) && PARTS.includes(entry.part as (typeof PARTS)[number]) && !written.includes(entry.file) && !options.only) {
+      for (const entry of old.samples ?? []) if (entry.category && (drawn.has(entry.category) || entry.category === "SHARED") && ALL_PARTS.includes(entry.part as string) && !written.includes(entry.file) && !options.only) {
         try { unlinkSync(join(options.out, entry.file)); } catch { /* already gone */ }
       }
     } catch { /* an index that cannot be read is written again */ }

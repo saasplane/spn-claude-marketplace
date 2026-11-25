@@ -37,19 +37,21 @@ chmodSync(fake, 0o755);
 const kind = (code, title, extra = {}) => ({ code, title, description: `${title} is drawn for a reader who asks for it.`, status: "BUILT", ...extra });
 const CATALOGUE = {
   version: "1.0.0",
-  outline: { categories: { MARKETING: { family: "SITE", person: "VISITOR", description: "a site" }, DASHBOARD: { family: "APP", person: "TEAM", description: "an app" } } },
+  outline: { groups: [{ code: "SHARED", parts: [{ code: "BRAND", title: "Brand", description: "the primary, the greys and the typefaces", values: { ALL: ["theBrand"] } }, { code: "VOICE", title: "Voice", description: "how the language speaks", values: { ALL: ["howItSpeaks"] } }] }, { code: "STYLE", parts: [{ code: "THEME", title: "Theme", description: "the colours and corners" }, { code: "MEDIA", title: "Media", description: "the pictures" }, { code: "MOTION", title: "Motion", description: "what moves" }, { code: "WORDS", title: "Words", description: "how long and how big the text runs" }] }], categories: { MARKETING: { family: "SITE", person: "VISITOR", description: "a site" }, DASHBOARD: { family: "APP", person: "TEAM", description: "an app" } } },
   categories: {
     MARKETING: {
       LAYOUTS: [kind("TOPNAV", "Top nav")],
       PAGES: [kind("HOME", "Home", { order: [{ kind: "HERO", case: "BESIDE" }, { kind: "TESTIMONIALS", case: "QUOTE" }, "FOOTER"] })],
       CONTAINERS: [kind("HERO", "Hero", { cases: [{ code: "BESIDE", when: "one picture reads beside the words" }, { code: "SLIDES", when: "the pictures turn", status: "PLANNED", missing: "a slideshow unit" }] }), kind("TESTIMONIALS", "Testimonials", { cases: [{ code: "QUOTE", when: "one quote stands alone" }] }), kind("FOOTER", "Footer", { cases: [{ code: "COLUMNS", when: "the footer holds columns" }] })],
       WIDGETS: [kind("CALLOUT", "Callout"), kind("COUNTDOWN", "Countdown", { status: "PLANNED", missing: "a countdown unit" })],
+      THEME: [kind("ITEM_LOOK", "Item look", { style: { radius: "MEDIUM", door: { raised: true } } })], MEDIA: [], MOTION: [],
+      WORDS: [kind("PARAGRAPH", "Paragraph", { style: { typography: "CONTENT_MD" } }), kind("KEYS", "Keys")],
     },
-    DASHBOARD: { LAYOUTS: [kind("RAIL", "Rail")], PAGES: [kind("FIND_IN_A_LIST", "Find in a list")], CONTAINERS: [kind("PANEL", "Panel")], WIDGETS: [kind("STATE", "State")] },
+    DASHBOARD: { LAYOUTS: [kind("RAIL", "Rail")], PAGES: [kind("FIND_IN_A_LIST", "Find in a list")], CONTAINERS: [kind("PANEL", "Panel")], WIDGETS: [kind("STATE", "State")], THEME: [], MEDIA: [], MOTION: [], WORDS: [] },
   },
 };
 const part = (pick = "ALL") => ({ source: "OWN", pick, notUsed: [], add: [] });
-const SPEC = { name: "Sample", categories: { MARKETING: { LAYOUTS: part(), PAGES: part(), CONTAINERS: part(), WIDGETS: part() }, DASHBOARD: { LAYOUTS: part(), PAGES: part(), CONTAINERS: part(), WIDGETS: part() } } };
+const SPEC = { name: "Sample", shared: { BRAND: { source: "NONE", values: { theBrand: { primary: "THE_DESIGN_SYSTEMS", greys: "THE_DESIGN_SYSTEMS" } }, why: "Sample sets no brand." }, VOICE: { source: "NONE", values: { howItSpeaks: null }, why: "Sample writes no voice yet." } }, categories: { MARKETING: { LAYOUTS: part(), PAGES: part(), CONTAINERS: part(), WIDGETS: part(), THEME: { ...part(), values: { mtype: "THEME", radius: "MEDIUM" }, why: "A site takes its looks from its brand." }, MEDIA: part(), MOTION: part(), WORDS: part() }, DASHBOARD: { LAYOUTS: part(), PAGES: part(), CONTAINERS: part(), WIDGETS: part() } } };
 const book = join(dir, "book");
 mkdirSync(join(book, "docs", "specs", "design-languages"), { recursive: true });
 writeFileSync(join(book, "docs", "specs", "design-languages", "sample.spdl.json"), JSON.stringify(SPEC));
@@ -67,7 +69,7 @@ const common = ["sample", "--book", book, "--catalogue", catalogue, "--out", out
 console.log("=== language samples write — every page of every category the language serves");
 const first = run(...common);
 const written = existsSync(out) ? files(out) : [];
-ok("[MKT.SCRIPTS.700] it prints one OK line with the counts of pages, sections and planned sections, then one line for each category, and exits 0", first.code === 0 && /^OK \S+: 11 pages, \d+ sections, 4 planned$/m.test(first.out) && first.out.includes("MARKETING: layouts 1, pages 1, containers 3, widgets 2") && first.out.includes("DASHBOARD: layouts 1, pages 1, containers 1, widgets 1"), first.out);
+ok("[MKT.SCRIPTS.700] it prints one OK line with the counts of pages, sections and planned sections, then one line for each category, and exits 0", first.code === 0 && /^OK \S+: 21 pages, \d+ sections, 4 planned$/m.test(first.out) && first.out.includes("SHARED: brand 1, voice 1") && first.out.includes("MARKETING: layouts 1, pages 1, containers 3, widgets 2, theme 1, media 1, motion 1, words 1") && first.out.includes("DASHBOARD: layouts 1, pages 1, containers 1, widgets 1"), first.out);
 ok("[MKT.SCRIPTS.701] each layout, page kind, container kind and widget kind is a page in its category's part folder, and the home and the index data stand beside them", written.includes("02-site/01-marketing/01-layouts/01-topnav.html") && written.includes("02-site/01-marketing/02-pages/01-home.html") && written.includes("02-site/01-marketing/03-containers/02-testimonials.html") && written.includes("02-site/01-marketing/04-widgets/01-callout.html") && written.includes("03-app/01-dashboard/02-pages/01-find-in-a-list.html") && written.includes("index.html") && existsSync(join(out, "samples.json")), written.join(" "));
 const home = readFileSync(join(out, "02-site/01-marketing/02-pages/01-home.html"), "utf8");
 const notes = JSON.parse(/<script type="application\/json" id="sample-notes">\n([\s\S]*?)\n<\/script>/.exec(home)[1]);
@@ -80,7 +82,7 @@ ok("[MKT.SCRIPTS.704] a section the render finds a unit missing from is drawn as
 console.log("\n=== language samples write — the index and a second run");
 const data = JSON.parse(readFileSync(join(out, "samples.json"), "utf8"));
 const index = readFileSync(join(out, "index.html"), "utf8");
-ok("[MKT.SCRIPTS.705] samples.json lists every page with its category, part and kinds, and the home's tree names the folders by the catalogue's own words", data.language === "sample" && data.samples.length === 11 && data.samples.every((s) => s.file && s.category && s.part && s.kinds.length) && index.includes('"label": "Containers"') && index.includes('"label": "Marketing"') && !/\{\{[^}]*\}\}/.test(index), index.slice(-800));
+ok("[MKT.SCRIPTS.705] samples.json lists every page with its category, part and kinds, and the home's tree names the folders by the catalogue's own words", data.language === "sample" && data.samples.length === 21 && data.samples.every((s) => s.file && s.category && s.part && Array.isArray(s.kinds)) && index.includes('"label": "Containers"') && index.includes('"label": "Marketing"') && !/\{\{[^}]*\}\}/.test(index), index.slice(-800));
 const snapshot = Object.fromEntries(files(out).map((f) => [f, readFileSync(join(out, f), "utf8")]));
 run(...common);
 ok("[MKT.SCRIPTS.706] a second run writes the same bytes", files(out).every((f) => readFileSync(join(out, f), "utf8") === snapshot[f]) && files(out).length === Object.keys(snapshot).length);
@@ -96,6 +98,15 @@ const second = existsSync(out2) ? files(out2) : [];
 ok("[MKT.SCRIPTS.707] a language serves only the categories its spec names and takes only the kinds it picks, less those it does not use", picked.code === 0 && second.every((f) => !f.startsWith("03-app")) && second.some((f) => f.endsWith("01-hero.html")) && !second.some((f) => f.endsWith("testimonials.html") || f.endsWith("countdown.html")), second.join(" "));
 const linked = readFileSync(join(out2, "02-site/01-marketing/02-pages/01-home.html"), "utf8");
 ok("[MKT.SCRIPTS.708] with --assets a page links the stylesheet and the script from that folder by a path relative to the page, with no integrity attribute", linked.includes('<link rel="stylesheet" href="../../../../assets/docs-language.css">') && linked.includes('<script src="../../../../assets/docs-page.js"></script>') && !/integrity=/.test(linked.replace(/<template[\s\S]*?<\/template>/g, "")), linked.slice(0, 900));
+
+console.log("\n=== language samples write — the values parts");
+const brand = readFileSync(join(out, "01-shared/01-brand.html"), "utf8");
+const brandNotes = JSON.parse(/<script type="application\/json" id="sample-notes">\n([\s\S]*?)\n<\/script>/.exec(brand)[1]);
+ok("[MKT.SCRIPTS.710] the Shared parts are pages in 01-shared, one section for each value the outline lists, noted from the spec's reason", written.includes("01-shared/01-brand.html") && written.includes("01-shared/02-voice.html") && brandNotes.length === 1 && brandNotes[0].kind === "The brand" && brandNotes[0].text === "Sample sets no brand.", JSON.stringify(brandNotes));
+const words = JSON.parse(/<script type="application\/json" id="sample-notes">\n([\s\S]*?)\n<\/script>/.exec(readFileSync(join(out, "02-site/01-marketing/08-words.html"), "utf8"))[1]);
+ok("[MKT.SCRIPTS.711] a category's Theme, Media, Motion and Words are pages 05 to 08 of its folder, each with a head section for what the spec sets and one section for each kind of the part", ["05-theme", "06-media", "07-motion", "08-words"].every((n) => written.includes(`02-site/01-marketing/${n}.html`)) && words.length === 3 && words[0].n === 0 && words[1].kind === "Paragraph", JSON.stringify(words));
+const order = data.samples.map((s) => s.file);
+ok("[MKT.SCRIPTS.712] the index lists Shared first, then each category's parts in the outline's order", order[0] === "01-shared/01-brand.html" && order.indexOf("02-site/01-marketing/01-layouts/01-topnav.html") < order.indexOf("02-site/01-marketing/05-theme.html") && order.indexOf("02-site/01-marketing/08-words.html") < order.indexOf("03-app/01-dashboard/01-layouts/01-rail.html"), order.join(" "));
 
 console.log("\n=== language samples write — what it refuses");
 const none = run("nosuch", "--book", book, "--catalogue", catalogue, "--out", join(dir, "out3"), "--quiet");

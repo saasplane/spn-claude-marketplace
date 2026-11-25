@@ -1,0 +1,144 @@
+// The values parts of a language's samples: Shared (Brand, Drawing, Motion, Voice) and each category's Theme, Media, Motion and Words. A page holds one
+// section for each thing the part sets: a head that says what it is, a sample drawn in the design system's units, and the language's own values
+// for it in a table, read from the spec and the catalogue's kind. A value the design system draws is drawn; a part that holds only words is words.
+import { U, badge, btn, col, eyebrow, feat, grid, item, kbd, muted, plannedSection, row, sec, slot, table, txt } from "./kit.ts";
+import { noteOf, sentence, slugOf, words } from "./notes.ts";
+import type { CatKind, Entry, Page, Tree } from "./types.ts";
+
+type Spec = Record<string, unknown>;
+const human = (key: string): string => {
+  const text = key.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/_/g, " ").toLowerCase();
+  return text.charAt(0).toUpperCase() + text.slice(1);
+};
+const scalar = (value: unknown): string => {
+  if (value === null || value === undefined) return "none";
+  if (Array.isArray(value)) return value.map(scalar).join(", ");
+  if (typeof value === "string") return /^[A-Z0-9_]+$/.test(value) ? words(value) : value;
+  return String(value);
+};
+
+/** A spec value as rows of a name and a value: a nested value gives a row for each of its leaves, named by its path. */
+export function rowsOf(value: unknown, prefix = "", out: string[][] = [], limit = 16): string[][] {
+  if (out.length >= limit) return out;
+  if (value !== null && typeof value === "object" && !Array.isArray(value)) {
+    for (const [key, inner] of Object.entries(value as Spec)) {
+      if (key === "mtype" || key === "lengthSource" || key === "research" || key === "seenOn" || key === "why") continue;
+      rowsOf(inner, prefix ? `${prefix} › ${human(key).toLowerCase()}` : human(key), out, limit);
+    }
+  } else if (Array.isArray(value) && value.some((one) => one !== null && typeof one === "object")) {
+    value.slice(0, 4).forEach((one, at) => rowsOf(one, `${prefix} ${at + 1}`, out, limit));
+  } else if (prefix) out.push([prefix, scalar(value)]);
+  return out.slice(0, limit);
+}
+const valuesTable = (value: unknown): Tree | null => {
+  const rows = rowsOf(value);
+  return rows.length ? table(["Value", "Set to"], rows) : null;
+};
+
+const SENTENCE: Record<string, string> = {
+  PARAGRAPH: "Lumen Labs keeps every site and app of your team in one place, so you change a role once and it holds everywhere.",
+  ROW: "Ravi Shah · Admin", LABEL: "Display name", DESCRIPTION: "Shown to everyone in your organization", NOTE: "Updated 2 minutes ago by Dana Lee",
+  TITLE: "Notification settings", DISPLAY_HEADING: "One foundation for every app", STATE_SENTENCE: "2 of 24 invitations could not be sent", EYEBROW: "Platform", TERM: "SSO",
+};
+
+/** A sample for a kind of a values part, drawn in the design system's units, or null where the table of values is the whole page entry. */
+function sample(part: string, kind: CatKind): Tree[] {
+  const style = (kind.style ?? {}) as Spec;
+  const code = kind.code;
+  if (part === "WORDS") {
+    if (code === "KEYS") return [row([txt("Press", "CONTENT_SM"), kbd(["Ctrl", "K"]), txt("to jump to anything", "CONTENT_SM")], "SM")];
+    const unit = (style.unitValue ?? {}) as Spec;
+    const typography = String(unit.typography ?? style.typography ?? "CONTENT_MD");
+    const extra: Tree = {};
+    if (unit.tone ?? style.tone) extra.tone = String(unit.tone ?? style.tone);
+    if (code === "TERM") extra.underline = "DOTTED";
+    if (code === "STATE_SENTENCE") extra.color = "ERROR";
+    if (code === "EYEBROW") extra.format = "UPPERCASE";
+    return [txt(SENTENCE[code] ?? sentence(kind.description), typography, extra)];
+  }
+  if (part === "THEME") {
+    const card = (title: string, raised: boolean): Tree => U("DSCard", { color: raised ? "BASE" : "DEFAULT" }, [U("DSCard.Content", {}, [txt(title, "TITLE_MD"), muted("Owned by Dana Lee")])]);
+    switch (code) {
+      case "ITEM_LOOK": return [grid([feat({ pageLevel: "WIDGET", title: "A door", description: "Raised, in the quiet tint.", surface: { color: "DEFAULT", raised: true } }), feat({ pageLevel: "WIDGET", title: "A point", description: "Flat, on the page itself." })], 2, 2, 1)];
+      case "DARK_MODE_LOOK": return [grid([card("Raised card", true), card("Quiet card", false)], 2, 2, 1), muted("Press Dark in the bar above to see the same units in dark.")];
+      case "LAYOUT_LOOK": case "APP_LOOK": return [row([btn("Save", "PRIMARY", "SOLID"), btn("Cancel", undefined, "OUTLINE"), badge("Active", "SUCCESS"), badge("Invited", "INFO")], "SM"), U("DSSwitch", { label: "Two-step sign-in", valueLink: { value: true } })];
+      case "PANEL_LOOK": return [U("DSPanelContainer", {}, [U("DSPanelContainer.Header", {}, [item("Billing app", "Owned by Dana Lee", "CONTAINER")]), U("DSPanelContainer.Content", {}, [txt("Region Mumbai · created 3 Mar 2024", "CONTENT_SM")])])];
+      case "CARD_LOOK": return [card("Billing app", true)];
+      case "CARD_WIDGET_LOOK": return [U("DSCardWidget", { header: { title: "Billing app", pageLevel: "WIDGET" }, parts: [{ mtype: "ITEMS", key: "a", items: [{ key: "a", title: "Owner", description: "Dana Lee" }] }] })];
+      case "TABLE_LOOK": return [table(["Name", "Role"], [["Dana Lee", "Owner"], ["Ravi Shah", "Admin"]])];
+      default: return [];
+    }
+  }
+  if (part === "MEDIA") {
+    switch (code) {
+      case "ICONS_AND_MARKS": case "ICONS": return [grid([["KEY", "A mark: a thing of its own"], ["USERS", "A bare icon: a line a person reads"], ["SHIELD", "An icon inside a control"]].map(([icon, text], at) => item(text, null, "CONTENT", undefined, { media: at === 0 ? { mtype: "MARK", icon } : { mtype: "ICON", node: icon } })), 3, 1, 1)];
+      case "AVATARS": return [row([item("Dana Lee", "Owner", "CONTENT", undefined, { media: { mtype: "AVATAR", title: "Dana Lee" } }), item("Mei Tan", "Editor", "CONTENT", undefined, { media: { mtype: "AVATAR", title: "Mei Tan" } })], "XL")];
+      case "CODE_VIEWS": case "CODE_AND_DATA_VIEWS": return [U("DSCodeBlockView", { filename: "role-grant.json", language: "JSON", showLineNumbers: true, bordered: true, code: "{\n  \"member\": \"dana.lee@example.com\",\n  \"role\": \"Editor\"\n}" })];
+      case "PRODUCT_VIEWS": case "FILES_AND_IMAGES": return [feat({ type: "MEDIA_BOTTOM", pageLevel: "CONTAINER", title: "The member list", description: "A product view stands framed and raised.", frames: ["MEDIA"], surface: { raised: true, elevation: "MD" }, mediaNode: slot("The member list in the admin console", "16:8") })];
+      case "PHOTOGRAPHY": return [feat({ type: "MEDIA_BOTTOM", pageLevel: "CONTAINER", title: "A team at work", description: "A photograph stands flush and rounded.", mediaNode: slot("The Pune team at a shared desk", "16:8") })];
+      case "LINE_DRAWINGS": case "ILLUSTRATION": return [slot(`${kind.title}: a drawing of how a role reaches every app`, "16:6")];
+      case "MAPS": case "EMBEDS": return [slot(`${kind.title}: three offices pinned on one map`, "16:6")];
+      default: return [];
+    }
+  }
+  if (part === "MOTION") {
+    switch (code) {
+      case "LOADING": return [grid([col([muted("Start", "TITLE_SM"), U("DSSkeleton", { type: "LIST", count: 3 }), U("DSSpinner", { label: "Loading members" })], "SM"), col([muted("End", "TITLE_SM"), U("DSList", { divided: true }, ["Dana Lee", "Ravi Shah", "Mei Tan"].map((n) => U("DSList.Item", { content: n })))], "SM")], 2, 1, 1)];
+      case "HOVER": return [feat({ pageLevel: "WIDGET", title: "A door", description: "Lit as one target under the pointer; the arrow moves only while hovered.", surface: { color: "DEFAULT", raised: true } })];
+      default: return [];
+    }
+  }
+  return [];
+}
+
+function kindEntry(part: string, kind: CatKind, spec: Spec): Entry {
+  const planned = kind.status !== "BUILT";
+  if (planned) return { kind: kind.title, case: "", note: noteOf(kind), node: plannedSection(kind.title, sentence(kind.description), kind.title), planned: true };
+  const drawn = sample(part, kind);
+  const style = valuesTable({ ...((kind.style ?? {}) as Spec) });
+  const kids: unknown[] = [feat({ title: kind.title, description: sentence(kind.description) }), ...drawn, ...(style ? [style] : [])];
+  void spec;
+  return { kind: kind.title, case: "", note: noteOf(kind), node: sec(kids, "MD"), planned: false };
+}
+
+/** The first section of a category's part: what the language sets for it, from the spec, as the values and the reason. */
+function headEntry(part: string, title: string, setting: Spec | undefined): Entry {
+  const why = typeof setting?.why === "string" ? (setting.why as string) : "";
+  const table = valuesTable(setting?.values);
+  const kids: unknown[] = [feat({ eyebrow: eyebrow(String(setting?.source ?? "OWN").toLowerCase()), title: `What the language sets for ${title.toLowerCase()}`, description: sentence(why) || `The language sets no values for ${title.toLowerCase()} of its own.` }), ...(table ? [table] : [])];
+  return { kind: title, case: "", note: sentence(why) || `The language sets no values for ${title.toLowerCase()} of its own.`, node: sec(kids, "MD"), planned: false };
+}
+
+export const VALUE_PARTS = ["THEME", "MEDIA", "MOTION", "WORDS"] as const;
+
+/** The pages of a category's four values parts, each in the part's own file. */
+export function categoryValuePages(category: string, folder: string, cat: Record<string, CatKind[]>, specCat: Record<string, Spec> | undefined, titles: Record<string, string>): Page[] {
+  return VALUE_PARTS.map((part, at) => {
+    const kinds = cat[part] ?? [];
+    const entries = [headEntry(part, titles[part], specCat?.[part]), ...kinds.map((k) => kindEntry(part, k, specCat?.[part] ?? {}))];
+    return { file: `${folder}/${String(at + 5).padStart(2, "0")}-${part.toLowerCase()}.html`, title: titles[part], category, part, kinds: kinds.map((k) => k.code), entries, ask: sentence(titles[`${part}-ask`]) || "", layout: "CANVAS" };
+  });
+}
+
+/** The Shared pages: Brand, Drawing, Motion and Voice, each a section for each thing the language keeps the same everywhere. */
+export function sharedPages(parts: Array<{ code: string; title: string; description: string; values?: { ALL?: string[] } }>, shared: Record<string, Spec> | undefined): Page[] {
+  return parts.map((part, at) => {
+    const setting = shared?.[part.code] as Spec | undefined;
+    const values = (setting?.values ?? {}) as Spec;
+    const keys = part.values?.ALL ?? [];
+    const why = typeof setting?.why === "string" ? (setting.why as string) : part.description;
+    const entries: Entry[] = keys.map((key) => {
+      const value = values[key];
+      const head = feat({ eyebrow: eyebrow(String(setting?.source ?? "NONE").toLowerCase()), title: human(key), description: sentence(why) });
+      let drawn: Tree[] = [];
+      if (part.code === "BRAND") drawn = [row([btn("Primary", "PRIMARY", "SOLID"), btn("Default", undefined, "OUTLINE"), badge("Primary", "PRIMARY", "SOLID"), badge("Info", "INFO"), badge("Warning", "WARNING")], "SM"), txt("The typeface, at three steps", "HEADING_MD"), txt("Notification settings", "TITLE_MD"), txt("Shown to everyone in your organization", "CONTENT_MD")];
+      else if (part.code === "MOTION") drawn = [grid([U("DSSkeleton", { type: "LIST", count: 2 }), U("DSSpinner", { label: "Loading members" })], 2, 1, 1)];
+      else if (part.code === "VOICE") drawn = [txt("Lumen Labs keeps every site and app of your team in one place.", "CONTENT_LG"), muted("The sample product's words stand at each level; this language writes no voice rule yet.")];
+      const tbl = valuesTable(value);
+      const kids: unknown[] = [head, ...drawn, ...(tbl ? [tbl] : value === null || value === undefined ? [muted(`The language sets nothing for ${human(key).toLowerCase()}.`)] : [])];
+      return { kind: human(key), case: "", note: sentence(why) || sentence(part.description), node: sec(kids, "MD"), planned: false };
+    });
+    if (!entries.length) entries.push({ kind: part.title, case: "", note: sentence(part.description), node: sec([feat({ title: part.title, description: sentence(part.description) })], "MD"), planned: false });
+    return { file: `01-shared/${String(at + 1).padStart(2, "0")}-${slugOf(part.code)}.html`, title: part.title, category: "SHARED", part: part.code, kinds: keys.map(slugOf), entries, ask: sentence(part.description), layout: "CANVAS" };
+  });
+}

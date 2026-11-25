@@ -26,5 +26,5 @@ export type Page = {
 export type CatCase = { code: string; when?: string; status?: string; missing?: string; units?: unknown };
 export type CatKind = {
   code: string; title: string; description: string; status: string; missing?: string;
-  cases?: CatCase[]; defaultCase?: string; order?: Array<string | { kind: string; case?: string }>; units?: unknown; placement?: unknown;
+  cases?: CatCase[]; defaultCase?: string; style?: unknown; order?: Array<string | { kind: string; case?: string }>; units?: unknown; placement?: unknown;
 };
