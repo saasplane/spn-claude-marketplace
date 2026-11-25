@@ -686,3 +686,4 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **Features that each answer their own question stand in sections of their own; one section holds several features only when they answer one question** (`RULE.SUPPORT.SURFACE.593` · MUST · skill:spn-surface/design)
 - **A choice left out is refused, never defaulted** (`RULE.SUPPORT.SURFACE.596` · MUST · skill:spn-surface/design)
 - **The render returns markup only, and a page that shows a copy builds the page around it** (`RULE.SUPPORT.SURFACE.597` · MUST · skill:spn-surface/design)
+- **A help centre always draws `DSBreadcrumb` under the bar, one link for each level above the page and the page itself unlinked, and so does any site whose bar does not list its groups or that runs deeper than three levels** (`RULE.SUPPORT.SURFACE.598` · MUST · skill:spn-surface/design)

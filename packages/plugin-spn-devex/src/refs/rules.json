@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "fd62e319"
+    "commit": "62e2b12f"
   },
   "rules": [
     {
@@ -38787,6 +38787,19 @@
           "heading": "The rules this step holds"
         }
       ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.598",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A help centre always draws `DSBreadcrumb` under the bar, one link for each level above the page and the page itself unlinked, and so does any site whose bar does not list its groups or that runs deeper than three levels",
+      "chapter": "04-capabilities/02-support/01-surface/04-standards-patterns/01-common/02-flow-patterns.md",
+      "heading": "Find your way down a site",
+      "decision": null,
+      "restated": []
     }
   ]
 }
