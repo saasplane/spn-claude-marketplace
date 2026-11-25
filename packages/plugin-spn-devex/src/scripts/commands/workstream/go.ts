@@ -107,7 +107,8 @@ function scopeOf(ws: string, scope: string[], lead: string, root: string): { she
     }
     const kindFaults: string[] = [];
     for (const entry of sheet.entries) {
-      if (landed.has(entry.id)) continue;
+      // A change its commits already carry (041 Q72) has no patch left to apply: its stale patch is never refused.
+      if (landed.has(entry.id) || entry.landed?.commits?.length) continue;
       const fix = (command: string): string => `: run \`workstream sheet ${command} ${basename(ws)}/${arc} ${entry.id}${command === "edit" ? " --command \"…\" --proof \"…\"" : ""}\``;
       if (entry.kind === "step" && !stepIsWhole(entry)) kindFaults.push(`${entry.id} is a step with no command or proof${fix("edit")}`);
       else if (patchOwed(entry)) kindFaults.push(`${entry.id} is a change with no patch${fix("patch")}`);

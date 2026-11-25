@@ -772,6 +772,10 @@ console.log("\n=== write: an entry a landed apply part holds is not refused for 
   const moved = cli(world.root, ["workstream", "go", "write", "N001"]);
   ok("[MKT.SCRIPTS.559] an entry that changed after its part landed is checked again, and refused while its patch is stale",
     moved.code === 1 && moved.out.includes("E1 is a change whose patch no longer applies"), moved.out);
+  writeFileSync(sheetFile, JSON.stringify(sheetOf([entry("E1", "spn-x:src/l1.ts", { kind: "change", what: "moved after landing", patch: { file: "patches/E1.diff", base }, landed: { commits: [base] } })]), null, 2));
+  const carried = cli(world.root, ["workstream", "go", "write", "N001"]);
+  ok("[MKT.SCRIPTS.663] a change its commits carry is not refused for a stale patch",
+    carried.code === 0 && !carried.out.includes("no longer applies"), carried.out);
 }
 
 console.log("\n=== start: a wait on a dropped part is settled (MKT.SCRIPTS.560)");
