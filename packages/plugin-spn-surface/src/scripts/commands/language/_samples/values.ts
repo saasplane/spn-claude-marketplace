@@ -57,7 +57,7 @@ function sample(part: string, kind: CatKind): Tree[] {
     return [txt(SENTENCE[code] ?? sentence(kind.description), typography, extra)];
   }
   if (part === "THEME") {
-    const card = (title: string, raised: boolean): Tree => U("DSCard", { color: raised ? "BASE" : "DEFAULT" }, [U("DSCard.Content", {}, [txt(title, "TITLE_MD"), muted("Owned by Dana Lee")])]);
+    const card = (title: string, raised: boolean): Tree => U("DSCard", { color: raised ? "BASE" : "DEFAULT" }, [U("DSCard.Content", {}, [col([txt(title, "TITLE_MD"), muted("Owned by Dana Lee")], "XS")])]);
     switch (code) {
       case "ITEM_LOOK": return [grid([feat({ pageLevel: "WIDGET", title: "A door", description: "Raised, in the quiet tint.", surface: { color: "DEFAULT", raised: true } }), feat({ pageLevel: "WIDGET", title: "A point", description: "Flat, on the page itself." })], 2, 2, 1)];
       case "DARK_MODE_LOOK": return [grid([card("Raised card", true), card("Quiet card", false)], 2, 2, 1), muted("Press Dark in the bar above to see the same units in dark.")];
@@ -96,7 +96,7 @@ function kindEntry(part: string, kind: CatKind, spec: Spec): Entry {
   if (planned) return { kind: kind.title, case: "", note: noteOf(kind), node: plannedSection(kind.title, sentence(kind.description), kind.title), planned: true };
   const drawn = sample(part, kind);
   const style = valuesTable({ ...((kind.style ?? {}) as Spec) });
-  const kids: unknown[] = [feat({ title: kind.title, description: sentence(kind.description) }), ...drawn, ...(style ? [style] : [])];
+  const kids: unknown[] = [feat({ title: kind.title, description: sentence(kind.description) }), ...(drawn.length ? [col(drawn, "MD")] : []), ...(style ? [style] : [])];
   void spec;
   return { kind: kind.title, case: "", note: noteOf(kind), node: sec(kids, "MD"), planned: false };
 }
@@ -135,7 +135,7 @@ export function sharedPages(parts: Array<{ code: string; title: string; descript
       else if (part.code === "MOTION") drawn = [grid([U("DSSkeleton", { type: "LIST", count: 2 }), U("DSSpinner", { label: "Loading members" })], 2, 1, 1)];
       else if (part.code === "VOICE") drawn = [txt("Lumen Labs keeps every site and app of your team in one place.", "CONTENT_LG"), muted("The sample product's words stand at each level; this language writes no voice rule yet.")];
       const tbl = valuesTable(value);
-      const kids: unknown[] = [head, ...drawn, ...(tbl ? [tbl] : value === null || value === undefined ? [muted(`The language sets nothing for ${human(key).toLowerCase()}.`)] : [])];
+      const kids: unknown[] = [head, ...(drawn.length ? [col(drawn, "MD")] : []), ...(tbl ? [tbl] : value === null || value === undefined ? [muted(`The language sets nothing for ${human(key).toLowerCase()}.`)] : [])];
       return { kind: human(key), case: "", note: sentence(why) || sentence(part.description), node: sec(kids, "MD"), planned: false };
     });
     if (!entries.length) entries.push({ kind: part.title, case: "", note: sentence(part.description), node: sec([feat({ title: part.title, description: sentence(part.description) })], "MD"), planned: false });
