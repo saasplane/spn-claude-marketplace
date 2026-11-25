@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/10-architecture-layouts.md",
-      "seen": "078a2767"
+      "seen": "59dca294"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-layouts/",
@@ -46,7 +46,7 @@ Read this before you choose a layout for an app, or before you build or draw a l
 | `TOPNAV` | a bar across the top, with the content below it | a website, with the few entries that fit on one line: MARKETING, a shallow RESOURCES site, a MARKETPLACE, or PORTAL |
 | `CANVAS` | none: the body alone | a landing page, a sign-in, an app that cannot start, or a tool that fills the window |
 
-Which layouts each surface category may use is the Layouts part of its category in the Surface Catalogue, and a design language picks among them: `RAIL` and `DOCK` serve DASHBOARD or RESOURCES and DASHBOARD or PORTAL, `TOPNAV` serves MARKETING, RESOURCES, MARKETPLACE and PORTAL, and `CANVAS` serves MARKETING, DASHBOARD and PORTAL.
+Which layouts each surface category may use is the Layouts part of its category in the Surface Catalogue, and a design language picks among them: `RAIL` and `DOCK` serve DASHBOARD or RESOURCES and DASHBOARD or PORTAL, `TOPNAV` serves MARKETING, MARKETPLACE, RESOURCES and PORTAL, and `CANVAS` serves MARKETING, DASHBOARD and PORTAL.
 
 **The library draws `DSLayout`** from its props table and its samples block (`architecture-components.md`, *The page model*). Its showcase layout is Full screen, so each cell is a whole screen at the width of a device. As its usage it draws a workspace's dashboard in the type `RAIL`, on a desktop window. A layout has no page of its own for a sizing: it has Overview, Main, Playground, one page for each value of `config.mtype` (`RAIL`, `DOCK`, `TOPNAV`, `CANVAS`), each holding Main's sections with that type fixed and its tabs from the unit's `types` list, and Screens. The one state it lists is Open, `open`, on the rail, which is shut at rest. On the web a type page adds a row of controls so a developer can try a look on every tab; the library draws none. `DSSitePage` is the layout's second unit, a wrapper that draws nothing of its own, with the pages Overview, Main and Playground.
 
@@ -152,7 +152,7 @@ A place has a short form for where its room is short: `startNodeCollapsed`, `act
 - **Not found and No access MUST keep the layout of the surface they belong to.** Only the page is missing or closed, so the navigation stays and the person goes on from it; `CANVAS` is for an app that cannot start, where no navigation can be drawn.
 - **A rail MUST stay open where its entries carry no icon.** Shut, such a rail would show nothing, so its config sets `collapsible` to false and the rail draws no trigger. The rail of a RESOURCES site, whose entries are the titles of its pages, is one.
 - **`CANVAS` gives the page the height the window leaves, so a tool can fill the window.** A drawing board or an editor is one block that takes that height and keeps the page from scrolling; only the board inside it pans and zooms, and the tool's panels are the page's own blocks over it.
-- **A RESOURCES site MUST take `RAIL` where its pages run in groups of several levels, and `TOPNAV` where it is shallow and starts from a search.** Guides and API docs are the first, and a help centre the second.
+- **A RESOURCES site MUST take `RAIL` where its pages run several levels deep, and `TOPNAV` where it is a help centre started from a search, of any depth.** Guides and API docs take the rail. A help centre draws the breadcrumb under its bar, and its group and topic pages take the top nav's case `SIDE_LIST`, which is planned.
 
 ## The bar's width and the navigation's size — 🔮
 

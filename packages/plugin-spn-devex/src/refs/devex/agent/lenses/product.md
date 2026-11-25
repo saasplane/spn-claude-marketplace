@@ -17,7 +17,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/01-surface-types.md",
       "section": "Who an app is for",
-      "seen": "215bd960"
+      "seen": "e54c9e65"
     }
   ]
 }

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
-      "seen": "b48a1073"
+      "seen": "0fb0d490"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
@@ -25,7 +25,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
-      "seen": "64c44cb6"
+      "seen": "63c70729"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md",
@@ -33,7 +33,7 @@
     },
     {
       "path": "spn-foundation/CONCEPT.md",
-      "seen": "bb8a560e"
+      "seen": "da223611"
     }
   ],
   "decisions": [
@@ -270,6 +270,12 @@ constraint matters and why each index exists.
 
 **A domain's overview is its face in HTML**: it sits in `artifacts/public/docs/<domain>/`, links into the `constructs/` folder beside it, and
 carries the same glossary. Extra reading paths beneath it carry none.
+
+**An overview moves with the construct pages it summarises: writing a construct page again rewrites each overview that
+summarises it, in the same work and unasked** (`RULE.DEVEX.WORKSPACE.581` · MUST · check:doc-check). Its `spn:doc` block
+carries `summarises`, one `{ "page", "seen" }` for each construct page it opens a door to, written by `docs page stamp
+<overview>` after the sections are rewritten, never by hand. `docs page check` reports an entry whose seat file changed, one
+that leads nowhere and a door the list does not name, and `docs page write <seat>` names the overviews it leaves owed.
 
 **The invariants between the seats hold this shape up, and the folders are only where they land.** A
 domain folder exists only where the concept names that domain. The glossary is generated, never

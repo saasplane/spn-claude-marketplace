@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
-      "seen": "b1e0a3a9"
+      "seen": "8c4dd605"
     }
   ]
 }
@@ -35,7 +35,7 @@ A site or an app follows one design language, and every page reads it before it 
 
 ## The parts — 🔮
 
-A design language is described for each surface category it states, in the same eight parts, in the groups Structure and Style, beside one Shared group. The surface categories are `MARKETING`, `RESOURCES` and `MARKETPLACE` for a site, and `DASHBOARD` and `PORTAL` for an app. Shared holds four parts, Structure holds four and Style holds four, as the Surface Catalogue states, and every choice in the language names a unit or a token of the design system.
+A design language is described for each surface category it states, in the same eight parts, in the groups Structure and Style, beside one Shared group. The surface categories are `MARKETING`, `MARKETPLACE` and `RESOURCES` for a site, and `DASHBOARD` and `PORTAL` for an app. Shared holds four parts, Structure holds four and Style holds four, as the Surface Catalogue states, and every choice in the language names a unit or a token of the design system.
 
 | Part | The choices it holds |
 | --- | --- |

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-components/",
-      "seen": "553a65ae"
+      "seen": "ed29cb97"
     }
   ]
 }
@@ -1035,22 +1035,55 @@ A row states its kind in `mtype`, which takes `DSComparisonRowType`: `FIELD` giv
 
 ### DSQuote
 
-`DSQuote` draws a person's or a company's words and who said them as a figure: the words in a blockquote, the speaker in its caption, a name, a line under it, and a photo or a logo. Stars before the words make it a review. A site builds every testimonial, success story and review from it, in its own style, by five choices and no more: who it is from, where that stands, a rating, the level and alignment, and a frame (Q68 B).
+`DSQuote` is a person's or a company's words and who said them, drawn as a figure. The words stand in a blockquote, and who said them stands in its caption: a name, a line under it, and a photo or a logo. Stars before the words make it a review. A site builds every testimonial, success story and review from it, in its own style, by the choices below and no more: who it is from, where that stands, a title and a description, a mark, a rating, the level and alignment, and a frame (Q68 B, Q74 A). The quote leads: a title and a description are optional, and the quote's style follows its level and what it holds.
+
+**Props.**
 
 | Prop | What it takes | Default |
 | --- | --- | --- |
-| `quote` | the words, `IDSText` | required |
-| `speaker` | `title`, a person's or a company's name; `description`, the line under it; `media`, `IDSItemMedia` as `DSItem` takes it (`AVATAR` · `MARK` · `AVATAR_GROUP` · `ICON` · `CUSTOM`) | required; no picture where `media` is left out |
-| `speakerPlacement` | `DSQuoteSpeakerPlacementType`: `BOTTOM` · `TOP` · `START` · `END`, in the reading direction | `BOTTOM` |
-| `rating` | stars out of five, read only, named *Rated n out of 5* to a reader | none |
-| `pageLevel` | the level that sizes the words, the speaker's line and the picture: `WIDGET` for a card in a row, `CONTAINER` for one quote across a slide | `WIDGET` |
-| `textAlign` | `START` · `CENTER`, `CENTER` for a quote across a slide | `START` |
-| `surface` | a card frame, as a feature's is; a key left out takes the quote's own, `BASE`, `SUBTLE`, rounded, with no border and no shadow | none: the words stand on the page |
-| `className` · `testData` | the figure's classes and the test hook | none |
+| `title` | `IDSText`: a short lead-in over the words, such as a number (*7 modules*), drawn smaller than the words, which keep their step with or without it. Leave it out where the words need no headline | none |
+| `description` | `IDSText`: the line under the title, muted. It stands with the title or alone, and the quote leads either way | none |
+| `quote` | `IDSText`: the words, drawn in a blockquote | required |
+| `mark` | `IDSQuoteMark` · `null`: the opening quote mark at the start of the words. Left out, every level draws a glyph above them in the line tone; an object draws that mark, as the mark's kinds give it; `null` draws none. It does not depend on the title or the description | left out: a `GLYPH` above the words |
+| `speaker` | `IDSQuoteSpeaker`: who said it, drawn in the figure's caption | required |
+| ↳ `speaker.title` | `IDSText`: a person's name, or a company's name where the words are a company's | required |
+| ↳ `speaker.description` | `IDSText`: the line under the name: a person's role and company, or a line on what the company does | none |
+| ↳ `speaker.media` | `IDSItemMedia`: `AVATAR` · `MARK` · `AVATAR_GROUP` · `ICON` · `CUSTOM`: the speaker's picture, as `DSItem` takes it: a person's avatar, a company's mark, a team's avatars, or a node of the page's own such as a portrait | none: the speaker is words only |
+| `speakerPlacement` | `DSQuoteSpeakerPlacementType`: `BOTTOM` · `TOP` · `START` · `END`: where the speaker stands: under the words, over them, or beside them at the start or the end, in the reading direction | `BOTTOM` |
+| `verticalAlign` | `DSVerticalAlignType`: `TOP` · `CENTER` · `BOTTOM`: where the words stand against a portrait beside them (`START` or `END`): at the top of the picture, at its centre or at its foot. Where the speaker has no portrait the words stand at the top, and `TOP` and `BOTTOM` placements ignore it | `CENTER` |
+| `rating` | `number`: stars out of five, read only, which make the quote a review, drawn by `DSRatingView` | none |
+| `pageLevel` | `DSPageLevelType`: the level that sizes the words, the lead-in, the speaker's line and the picture: `WIDGET` for a card in a row of two or three, `GROUP` for a card in a row of four or in slides, `CONTAINER` for one quote across a slide | `WIDGET` |
+| `textAlign` | `DSHorizontalAlignType`: `START` · `CENTER`: `CENTER` for a quote across a slide | `START` |
+| `surface` | `IDSFrameSurface`: a card frame, as a feature's frame is; a key left out takes the quote's own default, `BASE`, `SUBTLE`, rounded, with no border and no shadow | none: the words stand on the page |
+| `className` | `string`: the classes of the figure | none |
+| `testData` | `IDSTestData`: from `IDSBaseProps` | none |
 
-- **The words are sized by the level, wherever the speaker stands:** at `PAGE` and `CONTAINER` the quote is the section's message, `HEADING_XL`, 40px, and `HEADING_LG`, 34px, in the display face, 32 and 30px on a phone; from `WIDGET` down a card in a row, one step above a feature's description, 18, 16, 14 and 13px to `INLINE`. The speaker's name and line are `DSItem`'s parts at the same level and carry no heading.
-- **One quote across a section stands its speaker beside the words; quotes in a row, a grid or a carousel stand it under them** (the developer, 2026-11-25). With `START` or `END` the speaker takes a column a third of the quote wide from the tablet up, a `CUSTOM` portrait filling its width at its own ratio and an avatar's photo drawn large and cut to 4:5; on a phone it folds under the words and its picture is drawn as `DSItem` draws it. `BOTTOM` and `TOP` draw the small box beside the name, as `DSItem` does.
-- **A quote's stars are its own for now**, read only; `DSRatingView` is the unit for every other rating.
+**Rules.**
+
+- **The words are sized by the level, wherever the speaker stands, and the quote carries the weight** (Q74 A). At `PAGE` and `CONTAINER` a quote is the section's message, and its words take a heading step in the display face, light (300): `HEADING_XL`, 40px, at `PAGE` and `HEADING_LG`, 34px, at `CONTAINER`, 32 and 30px on a phone. From `WIDGET` down a quote is a card in a row, and its words are regular (400), one step above a feature's description: 20, 18, 16 and 14px from `WIDGET` to `INLINE`. The speaker's name and line are drawn by `DSItem`'s parts at the same level, and they carry no heading.
+- **The words keep a measure of 62 characters**, as a feature's description does, so a quote across a section reads in one sweep of the eye.
+- **A title and a description are a lead-in, smaller than the words, and the words keep their step with or without them** (Q74 A). The title is semibold: 28px at `PAGE`, 22px at `CONTAINER`, 18px at `WIDGET` and 14px from `GROUP` down. The description is muted: 16px at `PAGE` and `CONTAINER`, 14px at `WIDGET` and 13px below. The two stand tight together, and the lead-in leaves its own room under it before the stars or the quote: 32px at `PAGE`, 24px at `CONTAINER`, 16px at `WIDGET` and 12px below. Either may stand alone.
+- **A quote has a mark by default, at every level, and the mark does not depend on the title or the description** (Q74 A). The mark is always the opening quote, drawn as one shape. Its kinds are `GLYPH`, which has two placements, and `MARK`, as the mark of `DSQuote` gives them. Left out, `mark` is a `GLYPH` above the words, in the line tone (`--surface-border`), the soft grey of a border, so it reads as decoration beside the words and adapts to light and dark and to a filled frame; `color` on a `GLYPH` draws that hue instead. `mark={null}` draws none.
+- **A quote reads in this order: the lead-in, the stars, the quote block, the speaker** (the speaker first where `speakerPlacement` is `TOP`). The mark and the words are one quote block, so the stars never stand between the mark and the words. A screen reader reads the words, and the mark is decoration, hidden from it.
+- **One quote across a section stands its speaker beside the words; quotes in a row, a grid or a carousel stand it under them** (the developer, 2026-11-25). `START` and `END` put the speaker in a column from the tablet up, a quarter of the quote wide: at most 320px at `PAGE` and 288px at `CONTAINER`, and at most 20rem from `WIDGET` down. A portrait given as `CUSTOM` fills the column's width, and an avatar's photo is drawn large, both cut to 4:5 and never wider than 19.2rem below `CONTAINER`. The portrait is smaller than a third of the quote, and the words stand centred on the picture alone, with the name under the picture; `verticalAlign` `TOP` stands them at its top, and `BOTTOM` at its foot (the developer, 2026-11-25, "go for both"). Where the speaker has no portrait the words stand at the top. On a phone the speaker folds under the words and its picture is drawn as `DSItem` draws it. `BOTTOM` and `TOP` draw the picture as `DSItem` does, the small box beside the name.
+- **Quotes in a row or in slides stand at one height, and their speakers stand at the foot** (RULE.SUPPORT.SURFACE.530). A quote over or under its words fills the height its place gives it, and the words take the room that is left, so the speakers of a row line up whatever the length of each quote, and in a frame the speaker stands at the foot. In a grid row two or three across take `WIDGET`, and four across take `GROUP`. In slides `DSCarousel` stretches every slide to the tallest, so the cards of a slideshow are one height, and rows in slides take `GROUP`.
+- **A quote's rating is `DSRatingView`, read only, before the words.** A reader hears it as one sentence, *Rated 5 out of 5*, so the stars of a review read the same as every other rating.
+
+#### The mark of `DSQuote`
+
+`mark` is one of two kinds, named by `mtype` as `DSItem`'s media is: `IDSQuoteMark` is `IDSQuoteMarkGlyph` or `IDSQuoteMarkMark`. Left out it is `{ mtype: GLYPH }`, and `null` draws none.
+
+| Type | Values | What it names |
+| --- | --- | --- |
+| `DSQuoteMarkType` | `GLYPH` | a large opening quote, above the words or behind the start of the first line |
+| `DSQuoteMarkType` | `MARK` | a `DSMark` drawn inline just before the first word, centred on the first line |
+| `DSQuoteMarkPlacementType` | `ABOVE` | a `GLYPH` on a line of its own above the words, at their start edge, or centred where the quote is. The default |
+| `DSQuoteMarkPlacementType` | `BEHIND` | a `GLYPH` drawn behind the start of the first line, faint (15%), so the words keep their place |
+
+| Kind | Takes | What it draws |
+| --- | --- | --- |
+| `IDSQuoteMarkGlyph` | `mtype` `GLYPH`; `placement` (`ABOVE` where left out); `color` (`DSColorType`, the line tone where left out) | the opening quote as one shape, in the words' own type size: 2.5 times it at `PAGE` and `CONTAINER` (100px, 85px), 3 times at `WIDGET` (60px) and 2 times below (36px, 32px, 28px). Above, it leaves 8px under it to the words down to `WIDGET` and 4px below. Behind, it is 3 times at `PAGE` and `CONTAINER` (120px, 102px), 2.5 times at `WIDGET` (50px) and 2 times below, and it hangs up and toward the start, most of it in the room beside the first line, inside the level's frame inset; a centred quote has it behind the middle of the line |
+| `IDSQuoteMarkMark` | `mtype` `MARK`; what `DSMark` takes, except `size`, `scaleSize` and `ariaLabel`, which the quote owns because the mark is decoration | a `DSMark` before the first word, its box 64px at `PAGE`, 56px at `CONTAINER`, 44px at `WIDGET`, 40px at `GROUP`, 36px at `CONTENT` and 32px at `INLINE`. With no `icon` and no `text` it draws the opening quote as a shape; `text` or `icon` replaces it. `color` is `DEFAULT` and `variant` `SUBTLE` where left out |
 
 ### DSFeature
 

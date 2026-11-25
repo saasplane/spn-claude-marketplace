@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/04-standards-patterns.md",
-      "seen": "dfb37fb1"
+      "seen": "ec52c81e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-standards-patterns/",
-      "seen": "98c2f3b5"
+      "seen": "bd948446"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/03-app-page-kinds.md",
@@ -30,7 +30,7 @@
 
 Source of truth: the foundation's Patterns construct (`docs/02-constructs/02-support/01-surface/04-standards-patterns.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/04-standards-patterns/`), which hold the task patterns and the flow patterns; and the Surface Catalogue's app page kinds (`docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/03-app-page-kinds.md`, with the web's part in `02-web/01-app-page-kinds.md`), which hold what were the app page kinds, each in a common folder with what only a browser has in a web folder, and the two folders of specs that this plugin carries a copy of.
 
-This ref restates the two groups of patterns, the task patterns, and the app page kinds of the Surface Catalogue. The site container kinds and the flow patterns have refs of their own beside this one, `site-patterns.md` and `flow-patterns.md`.
+This ref restates the two groups of patterns, the task patterns, and the rules that choose among the app page kinds of the Surface Catalogue; the kinds themselves are read with `spn-surface catalogue show`. The rules of the site page and container kinds and the flow patterns have refs of their own beside this one, `site-patterns.md` and `flow-patterns.md`.
 
 Patterns is the fourth of sixteen Surface constructs. It fills in the six parts of a pattern (the previous standard of this folder) once for each task intent a person has in an app today, and it holds the flow patterns, for a path across pages to one outcome. The page kinds, the arrangements for a whole screen of an app and for a page of a site, and the sections of a site's page, are the Surface Catalogue's: this ref restates the app page kinds, and `site-patterns.md` the container kinds of a site.
 
@@ -165,26 +165,7 @@ This is guidance. A case guides the design and no check forces one, so the partn
 
 ## The app page kinds — 🔮
 
-An app page kind says: for this kind of data and this person, show the screen this way. Fourteen are named. A page whose data and person match a row takes that pattern, and its **For** line names the kinds it serves.
-
-| App page kind | The data | The person | Kind | For |
-| --- | --- | --- | --- | --- |
-| Find in a list | a set that grows as people work | comes often, to find one | a whole page | Team · Individual |
-| A record and its setup | one record, and a few things set up for it | comes rarely, to see where things stand | a whole page | Team · Individual |
-| A record and what belongs to it | one record, with lists of other records attached | comes to attach or remove one, or to read what happened | a whole page | Team |
-| Set up by kind | fixed kinds, with one or a few of each | comes rarely, to connect or change one | a whole page | Team |
-| Compare across kinds | one fixed set of settings, for a fixed set of kinds | comes rarely, to check or change a default | a whole page | Team |
-| Groups and their items | things in groups, where a group is a heading | comes to see the whole and open one item | a whole page | Team · Learner |
-| An overview | counts, and what waits for a person | has just arrived | a whole page | Team · Individual |
-| A record and its steps | one record that moves through known steps | moves it on, with the right role | a whole page | Team · Individual |
-| Choose many | many things to tick | ticks several | entering or changing | Team · Individual |
-| An editor with its preview | content a person writes, and what it becomes | must see the result while writing | entering or changing | Team |
-| An entry over the page | a small or a medium form | needs the page it belongs to, which stays beneath or beside the entry | entering or changing | Team · Individual |
-| Inherit or override | a value that follows a default until someone sets their own | must see which of the two it is, and be able to go back | entering or changing | Team |
-| An entry that is a page | a large form, with sections or a part that repeats | fills it in one sitting | entering or changing | Team · Individual |
-| Change in place, in a list | many small values of one kind | changes one after another | entering or changing | Team |
-
-Eight are the arrangement of a page a person arrives at. The other six are how a person enters or changes something, and each of those opens from one of the eight.
+**The app page kinds, with the persons each serves, are the catalogue's, and this ref holds no copy of them** (`RULE.SUPPORT.SURFACE.601` · MUST · skill:spn-surface/design): `spn-surface catalogue show DASHBOARD PAGES` and `catalogue show PORTAL PAGES`, and one kind whole with `catalogue show <CATEGORY> PAGES <KIND>`. The rules that choose among them follow.
 
 - **The app page kinds are one closed set** (`RULE.SUPPORT.SURFACE.051` · MUST · skill:spn-surface/design). A page chooses one and invents none, and a page no page kind fits is derived from the patterns that fit it, as *A page no pattern fits* says; both are advice. The name of each pattern is proposed: the developer of SaaS Plane has not confirmed the names one by one.
 - **An app page kind MUST be built from units that exist, and it is never a block of its own** (`RULE.SUPPORT.SURFACE.048` · MUST · skill:spn-surface/design). No stack builds anything for an app page kind. A page follows one with the blocks the design system already has.
@@ -313,205 +294,28 @@ A panel whose content is only cards lets them stand flush; any other content sit
 
 ## Each app page kind, by level — 🔮
 
+Each app page kind's tree by level is its catalogue kind's units and cases: `spn-surface catalogue show <CATEGORY> PAGES <KIND>`. Under each name below stand only the rules that kind carries.
+
 The levels are the layout, the page level, the containers, the widgets and cards, and the components (`RULE.SUPPORT.SURFACE.202` · MUST · skill:spn-surface/design). Every app page kind fills the content of the app's layout. It names no layout of its own: its spec draws it in the layout of its live page, as the sketch's setting. The page level is the head of the page: `DSPageLevel` at `PAGE` above the containers, or the header of the one container that is the page, with `fullPage`. A card stands at the level of a widget. The units named below are the ones the pattern is drawn with. Which unit shows a part that holds many of one thing is still the choice of step 2. Each section opens with its **For** line (`RULE.SUPPORT.SURFACE.332` · MUST · skill:spn-surface/design).
-
-### Find in a list
-
-- **For** Team · Individual. For an Individual, on their own orders or bookings, the `LIST` layout on every screen, with a search box and two or three filters in view.
-- **When.** The data grows as people work, and a person comes often, to find one record. The page shows a search, the filter people use most already on, and the records at the full width. A record that has things of its own opens as a page. A record of a few facts and nothing else opens as a look beside the list.
-- **Page level.** The header of the panel, with `fullPage`: the title, a line under it and the main action.
-- **Container.** One `DSPanelContainer`. Its content is two parts: the filter bar, and the records. Its footer holds the paging: the page gives `DSDataTable` a place in the footer, and the table draws its paging there.
-- **Widget.** `DSFilterBar` and `DSDataTable`, in the layout that step 2 chose.
-- **Component.** `DSDrawer`, for the look of a small record beside its list.
-- **On a tablet and a phone.** A tablet keeps `TABLE` with fewer columns, and its filter bar holds fewer boxes. On a phone the data table is in its `LIST` layout, and the filter bar is one button that says how many filters are on. The look of a small record is a screen of its own on a phone.
-- **Specs.** `find-in-a-list.dg.json` · `find-in-a-list-look.dg.json`.
-
-### A record and its setup
-
-- **For** Team · Individual. For an Individual, on their own account, everyday words, each thing on its own panel, and nothing harmful without undo.
-- **When.** The data is one record and a few things set up for it. A person comes rarely, to see where things stand. The page shows the record as its header, one part for each thing set up, and an action that can do harm apart from the others, at the end.
-- **Page level.** `DSPageLevel` at `PAGE`, holding `DSItem`: the record, its picture, its name, and under the name its facts.
-- **Container.** One `DSPanelContainer` for each thing set up: its header, with its title and its actions, then its content.
-- **Widget.** None.
-- **Card.** `DSCardWidget` for each thing set up that has titled parts; a plain `DSCard` for who owns the record.
-- **Component.** `DSSwitch` for a thing that is only on or off. `DSBadge` for a state that is not normal.
-- **On a tablet and a phone.** At a desktop the large part is the main column and the short part stands beside it. On a tablet and a phone all of it is one column, in the order a person reads: the header, the main column, then the column that stood beside it.
-- **Spec.** `record-and-its-setup.dg.json`.
-
-### A record and what belongs to it
-
-- **For** Team.
-- **When.** The data is one record with lists of other records attached. A person comes to attach or remove one, or to read what happened.
-- **Layout.** The page level, then the attached lists, side by side where the page is wide.
-- **Page level.** `DSPageLevel` at `PAGE`, holding `DSItem`: the way back, the record's picture, its name, and under the name its state and one more fact.
-- **Container.** One `DSPanelContainer` for each attached list. A list a person adds to has a box at its top that finds a record as they type, with Add beside it. A list that is only read has none.
-- **Widget.** None.
-- **Component.** `DSList` holding `DSItem`: each attached record is a line that ends with the action that removes it. `DSEmpty` for the empty state of a list. No list shows a count.
-- **On a tablet and a phone.** Three lists stand side by side at a desktop, two and one on a tablet, and one column on a phone.
-- **Spec.** `record-and-what-belongs-to-it.dg.json`.
-
-### Set up by kind
-
-- **For** Team.
-- **When.** The data has fixed kinds, with one or a few of each. A person comes rarely, to connect or change one. The page shows every kind always, also a kind that has nothing yet. The kinds in use come first, and the action that adds stands inside the kind.
-- **Page level.** `DSPageLevel` at `PAGE`: the title of the page, and a line under it.
-- **Container.** One `DSPanelContainer`, holding the kinds.
-- **Widget.** `DSDataTable` in its `GRID` layout, where the kinds come from a query that takes a page, a text or a filter. It draws one card for each kind.
-- **Card.** `DSCardWidget`, one for each kind, a widget of its own. Its title is the kind, with the icon of that kind before it.
-- **Component.** `DSItem` and `DSEmpty`. Under the title of a card stands the provider as an item. A kind with nothing yet says so and offers the action.
-- **On a tablet and a phone.** Three cards across at a desktop, two on a tablet, and one on a phone.
-- **Spec.** `set-up-by-kind.dg.json`.
-
-### Compare across kinds
-
-- **For** Team.
-- **When.** The data is one fixed set of settings for a fixed set of kinds. A person comes rarely, to check or change a default. The page reads first, and has no search and no paging, because the settings are few and fixed.
-- **Page level.** The header of the panel, with `fullPage`: the title of the page, and a line under it.
-- **Container.** One `DSPanelContainer`, holding the table.
-- **Widget.** None.
-- **Component.** `DSTable`: a setting in each row and a kind in each column, with an Edit under each kind. `DSDialog` with `DSForm` for the change. On a phone, `DSTabs` and `DSDataUnit`.
-- **On a tablet and a phone.** A tablet keeps the table. On a phone a person reads one kind at a time, as labelled values, with the kinds as tabs and Edit in the footer. Tabs fit here because the kinds are a closed set. The entry that changes one kind is a dialog at a desktop, and a sheet from the bottom of the screen on a phone.
-- **Specs.** `compare-across-kinds.dg.json` · `compare-across-kinds-edit.dg.json`.
 
 ### Choose many
 
-- **For** Team · Individual. For an Individual, on what they are told about, few choices, as switches.
-- **When.** The data is many things to tick, and a person ticks several. Where the data says which group each thing belongs to, the page has one part for each group. Where it does not, the things are one list with a search.
 - **A heading is not made up for choices whose data names no group** (`RULE.SUPPORT.SURFACE.055` · GUIDE). A made-up heading puts a choice where a person does not look for it.
-- **Layout.** The content, or the content of the entry the choices stand in: one panel, or the parts of the entry's content.
-- **Page level.** The header of the panel, with `fullPage`, where the choices are a page; the entry's own header where they stand in an entry.
-- **Container.** One `DSPanelContainer`: a part of its content for each group under the title of the group, or one part for the whole list, and its actions in its footer. The choices of every group are saved once, so a group is a part of the content and never a panel of its own.
-- **Widget.** None.
-- **Component.** `DSForm`, with `DSSwitch` or `DSCheckbox`, and `DSList`. The choices stand in columns.
-- **On a tablet and a phone.** On a phone the choices stand one under another.
-- **Specs.** `choose-many-in-groups.dg.json` · `choose-many-in-one-list.dg.json`.
 
 ### An editor with its preview
 
-- **For** Team.
-- **When.** The data is content a person writes and what that content becomes. The person must see the result while writing.
 - **An editor with its preview is one panel, and each thing a person writes stands beside its own result** (`RULE.SUPPORT.SURFACE.115` · GUIDE). The page is an entry that is a page. Its content has a part for the details that have no preview, and then one part for each thing a person writes, under the title of that thing.
-- **Where the content has several forms, a row of tabs chooses the form.** The tabs stand at the top of the content, and every part under them belongs to the chosen form. Where the record is saved whole, one save holds every form.
-- **Layout.** One panel.
-- **Page level.** The header of the panel, with `fullPage`: the way back, before the title.
-- **Container.** One `DSPanelContainer`: the tabs, the details and one part for each thing written as the parts of its content, each part under its own title; its actions at the start of its footer, which takes `sticky` so that it stays in view.
-- **Widget.** None.
-- **Component.** `DSTabs` for the forms of the content, such as its channels. `DSForm` for the fields of the details. `DSTextarea` for the editor of each thing written, and the rendered result beside it.
-- **On a tablet and a phone.** At a desktop the editor of each part and its result stand side by side. On a tablet and a phone a person sees one of the two at a time, the writing or the result. A second row of tabs moves between them, and the choice holds for every part of the content at once.
-- **Spec.** `editor-with-preview.dg.json`.
-
-### An entry over the page
-
-- **For** Team · Individual. For an Individual, small entries only; a medium one becomes an entry that is a page, in steps.
-- **When.** The data is a small or a medium form, and the page it belongs to stays beneath or beside it. Step 4 says which is small and which is medium.
-- **Layout.** The content of the page the entry belongs to. It stays in view beneath a dialog, or beside a sheet.
-- **Page level.** The page level of the page the entry belongs to. The entry takes none of its own: its title stands in the header of its panel.
-- **Container.** One `DSPanelContainer` inside the overlay. Its title and the action that closes it stand in its header. Its fields are its content. Its actions stand in its footer.
-- **Widget.** None.
-- **Component.** `DSDialog` for a small form. `DSSheet` for a medium one. `DSDrawer` for a look at one record. `DSForm` for the fields.
-- **On a tablet and a phone.** A tablet keeps the sheet beside its page. On a phone a medium entry takes the full screen, and a small one, a dialog, becomes a sheet from the bottom of the screen.
-- **On the web** the entry is an address: see *On the web: the address of a screen* below.
-- **Spec.** `entry-over-the-page.dg.json`. It draws a medium entry. A dialog over its page has no figure, because a skeleton lays no frame over another.
-
-### Inherit or override
-
-- **For** Team.
-- **When.** The data is a value that follows a default until someone sets their own. The person must see which of the two it is, and be able to go back.
-- **Layout.** The page level, then one panel for each part.
-- **Page level.** `DSPageLevel` at `PAGE`: the title of what the values belong to, with the way back before it.
-- **Container.** One `DSPanelContainer` for each part. The line under its title says whether the part follows the default or holds its own values. Its header or its footer holds the one action that changes that.
-- **Widget.** None.
-- **Component.** `DSDataUnit` for the values that are read. `DSButton` for the action to set its own, or to go back.
-- **Following the default is the normal state, so it shows no badge.**
-- **On a tablet and a phone.** The values a person reads stand three across at a desktop and a tablet, and one under another on a phone. Two parts stand side by side at a desktop, and one under another on a tablet and a phone.
-- **Spec.** `inherit-or-override.dg.json`.
 
 ### Groups and their items
-
-- **For** Team · Learner. For a Learner, the groups of a doc or a showcase.
-- **When.** The data is things in groups, where a group is a heading. A person comes to see the whole and to open one item.
-- **The page kind is two parts: the groups, and the items of the chosen one.** What shows each part is chosen separately, by the data of that part.
-
-| A part is shown as | When its data is |
-| --- | --- |
-| parts of the page, with nothing to choose | the groups only: few and fixed, so all of it fits one page |
-| a list | few, each told by its name and a little more that fits one line |
-| a table | some, each with two or three facts a person compares |
-| a data table, with a search, filters and paging | many: a person must find one first |
-| cards | few, each with a picture or more than a line can hold |
-| a view of one thing | the items only: the chosen group is one record to read, as one message of a mailbox is |
-
-Whether the set of groups is closed decides the arrangement, before any count does.
-
-| The groups | The arrangement |
-| --- | --- |
-| a closed set, few, and all the items fit on about two screens | one page, a panel for each group, all open |
-| a closed set, few, each one long | a tab for each group |
-| can be added to, by a module, a partner or a person; or many | the groups as a list at the left, the items of the chosen group at the right |
-| any, where the items of a group grow without limit | the same, with a data table at the right, which is then Find in a list |
 
 - **A set of groups that can be added to is a list, and not a row of tabs** (`RULE.SUPPORT.SURFACE.080` · GUIDE). A row of tabs has the width of the page and no more.
 - **Both parts are in view at a desktop only** (`RULE.SUPPORT.SURFACE.079` · MUST · skill:spn-surface/design). On a tablet and on a phone the items of the chosen group take the place of the groups, with a back action. On the web the swap also changes the address: see *On the web: the address of a screen* below.
 - **Many groups a person searches fit the `LIST` layout of `DSDataTable`, and not its `TABLE` layout** (`RULE.SUPPORT.SURFACE.069` · GUIDE). The part is narrow, and a person picks one group by its name.
-- **Ask whether a group is a thing a person manages.** Where the product fixes the groups, a group is a heading. Where people make them, a group has its own actions.
-- **Page level.** `DSPageLevel` at `PAGE`: the title of the page, and a line under it.
-- **Container.** `DSPanelContainer`: one for each group, or two side by side. Where two stand side by side, the chosen group is the title of the panel at the right. The action that adds an item stands in that header.
-- **Widget.** `DSDataTable` in its `LIST` layout, where the groups are many.
-- **Component.** `DSList` holding `DSItem`, for the groups as lines, with a band behind the chosen one. `DSTable`, where the items are a table. `DSBadge` for a state that is not normal.
-- **On a tablet and a phone.** A closed set stays one page, one panel under another. In the three other specs a tablet and a phone show one part at a time.
-- **Specs.** `groups-and-their-items.dg.json` for a closed set. `groups-and-their-items-two-lists.dg.json` for a list beside a list. `groups-and-their-items-open.dg.json` for a set that can be added to. `groups-and-their-items-many.dg.json` for many groups. `one-action.dg.json` for the page of one item.
 
 ### An overview
 
-- **For** Team · Individual. For an Individual, a greeting, what waits for them as one card, and the next step, with no row of counts.
-- **When.** The data is counts and what waits for a person, and the person has just arrived. The page shows how much there is, then what needs them, then the places they often go to.
 - **Before anything is counted.** A new place holds nothing yet, and a row of zeros tells a person nothing about what to do. **While the place holds nothing, an overview says what it shows before anything is counted** (`RULE.SUPPORT.SURFACE.365` · GUIDE): the welcome, once, and one card that names the first step with its action, in place of the row of numbers. The numbers appear once there is something to count.
 - **Each number loads and fails by itself, with Try again** (`RULE.SUPPORT.SURFACE.365` · GUIDE). A number the person may not see is not drawn. First run, in `flow-patterns.md`, is the flow that starts here.
-- **Layout.** The page level, a row of numbers, then the panels.
-- **Page level.** `DSPageLevel` at `PAGE`: the title of the page.
-- **Container.** `DSPanelContainer`: what waits for the person, and the places they often go to.
-- **Widget.** None.
-- **Card.** `DSCard` for each number, a card of its own, however many stand side by side.
-- **Component.** `DSDataUnit` for the number in its card. `DSList` for each thing that waits, as a line that ends with its action.
-- **On a tablet and a phone.** The numbers stand four across at a desktop, and two across on a tablet and a phone. The two panels stand side by side at a desktop, and one under another on a tablet and a phone.
-- **Spec.** `overview.dg.json`.
-
-### A record and its steps
-
-- **For** Team · Individual. For an Individual, the steps are read and never moved, and the only action is their own, such as cancel.
-- **When.** The data is one record that moves through known steps. A person with the right role moves it on. The page shows the step the record is at, and only the actions that are open at that step.
-- **Layout.** The page level, the steps, then the panels.
-- **Page level.** `DSPageLevel` at `PAGE`, holding `DSItem`: the way back, the record's picture, its name, and on the line under the name its state and its facts. Its end holds only the actions open at this step.
-- **Container.** `DSPanelContainer`: the steps, and one panel for each group of checks of the record.
-- **Widget.** None.
-- **Component.** `DSDataUnit` for each check. `DSBadge` only on the value that is not normal. `DSButton` for the actions open at this step.
-- **The steps are four plain words in the spec**, with the step the record is at as the heavy one. The design system has no unit for a strip of steps today.
-- **On a tablet and a phone.** The checks stand two across where two parts share the width at a desktop, three across on a tablet, and one under another on a phone. On a phone the steps stand one under another, and the page level folds its actions into one *more* icon when they do not fit beside the way back, the picture and the title, whatever their number.
-- **Spec.** `record-and-its-steps.dg.json`.
-
-### An entry that is a page
-
-- **For** Team · Individual. For an Individual, one group of fields a screen, with `DSStepper` to show where they stand, a way back to each group, and the place saved.
-- **When.** The data is a large form, with sections or a part that repeats. A person fills it in one sitting.
-- **Layout.** One panel.
-- **Page level.** The header of the panel, with `fullPage`: the way back, before the title.
-- **Container.** One `DSPanelContainer`. Its sections are the parts of its content, each with its own title. Its actions stand in its footer, which takes `sticky` so that it stays in view.
-- **Widget.** None.
-- **Component.** `DSForm` for the fields, each with its title above its control.
-- **The sections are parts of one form that is saved once.** So they are not panels of their own, and no list of the sections stands beside the form.
-- **On a tablet and a phone.** Fields that are short and belong together share a row at a desktop. On a phone each field takes a row.
-- **Spec.** `entry-as-a-page.dg.json`.
-
-### Change in place, in a list
-
-- **For** Team.
-- **When.** The data is many small values of one kind, and a person changes one after another. The page is a data table whose rows are read. The action of a row turns its value from words into a box, and the action that saves it stands beside the box. The page holds no form, and nothing opens over it.
-- **Page level.** The header of the panel, with `fullPage`: the title, and a line under it.
-- **Container.** One `DSPanelContainer`: the filter bar and the rows in its content, and the paging in its footer.
-- **Widget.** `DSDataTable` and `DSFilterBar`.
-- **Component.** `DSInput`, the box in the one cell that is being changed, as wide as the cell.
-- **On a tablet and a phone.** On a phone the table is in its `LIST` layout. A row that is read is a line. The row that is being changed is its text with its box under it, and the same two actions beside the box.
-- **Spec.** `change-in-place.dg.json`.
 
 ## How many panels a page uses — 🔮
 
@@ -635,6 +439,7 @@ This ref states the four groups of the surface patterns, which task pattern cove
 | `RULE.SUPPORT.SURFACE.205` | a sign-in is one compact panel on a canvas, its providers one row of icons and every control a form field. It is advice |
 | `RULE.SUPPORT.SURFACE.217` | a part of a page takes the unit it is for, a panel, a card widget, a card or an item, and a skeleton naming another is refused. It is advice |
 | `RULE.SUPPORT.SURFACE.332` | every pattern names the persons it serves, with one line where it runs differently for one; that a page no page kind fits is derived and does not wait is advice |
+| `RULE.SUPPORT.SURFACE.598` | that a help centre, and any site whose bar does not list its groups or that runs deeper than three levels, draws the breadcrumb under the bar, one link a level and the page unlinked |
 | `RULE.SUPPORT.SURFACE.333` | where two page kinds fit a page's data, the person decides between them |
 | `RULE.SUPPORT.SURFACE.363` | switched-off rows stay in their own list, each with the badge *Inactive*. It is advice |
 | `RULE.SUPPORT.SURFACE.364` | the pages beside a sign-in take the sign-in's panel. It is advice |

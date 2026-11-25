@@ -14457,7 +14457,18 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "heading": "Overviews kept in step",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "What each seat holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/writing-a-page.md",
+          "heading": "The six steps"
+        }
+      ]
     },
     {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",
@@ -34667,11 +34678,6 @@
       "restated": [
         {
           "plugin": "spn-surface",
-          "path": "refs/support/surface/flow-patterns.md",
-          "heading": "First run"
-        },
-        {
-          "plugin": "spn-surface",
           "path": "refs/support/surface/standards-patterns.md",
           "heading": "An overview"
         },
@@ -38734,6 +38740,11 @@
       "restated": [
         {
           "plugin": "spn-surface",
+          "path": "refs/support/surface/site-patterns.md",
+          "heading": "The sections, by name — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
           "heading": "The rules this step holds"
         }
@@ -38814,6 +38825,21 @@
       "decision": null,
       "restated": [
         {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/marketing.md",
+          "heading": "Produces to"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/flow-patterns.md",
+          "heading": "Find your way down a site"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/site-patterns.md",
+          "heading": "The kinds of page, by level — 🔮"
+        },
+        {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
           "heading": "The rules this step holds"
@@ -38832,6 +38858,21 @@
       "heading": "The snapshot",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/delivery-library.md",
+          "heading": "The snapshot"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/site-patterns.md",
+          "heading": "The kinds of page, by level — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/standards-patterns.md",
+          "heading": "The app page kinds — 🔮"
+        },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",

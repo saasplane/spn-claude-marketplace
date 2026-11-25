@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/16-delivery-providers.md",
-      "seen": "f76839b8"
+      "seen": "5b5a4683"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/16-delivery-providers/",
-      "seen": "756e21d5"
+      "seen": "2e13004e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/16-delivery-providers/02-ts/01-design-system.md",
@@ -15,7 +15,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-standards-patterns/",
-      "seen": "98c2f3b5"
+      "seen": "bd948446"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-widgets/",
@@ -33,7 +33,7 @@
 
 Source of truth: the foundation's Providers construct (`docs/02-constructs/02-support/01-surface/16-delivery-providers.md`), its capability chapters (`docs/04-capabilities/02-support/01-surface/16-delivery-providers/`), and the TypeScript provider's own chapter, `16-delivery-providers/02-ts/01-design-system.md`. Providers is the sixteenth and last of the Surface constructs.
 
-Read this before you ask which provider draws or builds a block, which one a repository uses, or how `@saasplane/support-web-ds-ts` realizes the app's two contexts. A provider is named for what it realizes on, as in the Apps and Infra domains, and Surface has three: **Figma**, a design tool, which draws the library; **ts**, the TypeScript stack, which builds the web today; and **native**, later. A provider realizes a platform, Web or Native, and never a surface category: MARKETING, RESOURCES, DASHBOARD and PORTAL are the same on any provider. **The thing to unlearn: Figma and code are one thing.** Figma draws the look and `ts` builds it, and they sit in separate folders of their own. Both follow the book.
+Read this before you ask which provider draws or builds a block, which one a repository uses, or how `@saasplane/support-web-ds-ts` realizes the app's two contexts. A provider is named for what it realizes on, as in the Apps and Infra domains, and Surface has three: **Figma**, a design tool, which draws the library; **ts**, the TypeScript stack, which builds the web today; and **native**, later. A provider realizes a platform, Web or Native, and never a surface category: MARKETING, MARKETPLACE, RESOURCES, DASHBOARD and PORTAL are the same on any provider. **The thing to unlearn: Figma and code are one thing.** Figma draws the look and `ts` builds it, and they sit in separate folders of their own. Both follow the book.
 
 ## Terms
 

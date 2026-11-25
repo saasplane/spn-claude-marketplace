@@ -14,12 +14,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/01-surface-types.md",
       "section": "Who an app is for",
-      "seen": "215bd960"
+      "seen": "e54c9e65"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/02-site-page-kinds.md",
       "section": "The kinds of page, by level",
-      "seen": "29dae105"
+      "seen": "10a30630"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/04-site-container-kinds.md",
@@ -96,7 +96,8 @@
   - **A number stands in one card**: the number first, then its plain label, then what it gives the reader. A number apart from its label, a label with no benefit, and a count of how the system is built are findings.
   - **Every number MUST be read from the real system**, and a made-up number MUST NOT appear. A true claim keeps its MUST while the rest of a page's words are advice.
 - **The site page kinds and container kinds** — held by this lens worn, beside `UX`, who names each section's container kind.
-  - **A kind of page is named by its job and its level, never by its subject**: site home → group home → topic, three levels by default, with a docs home and a contact page beside a group home, and an audience page, a guide and a values page beside a topic (site page kinds § The kinds of page, by level).
+  - **A kind of page is named by its job and its level, never by its subject**: site home → group home → topic, three levels by default, with a docs home and a contact page beside a group home, and an audience page, a guide and a values page beside a topic (site page kinds § The kinds of page, by level). A marketplace's kinds stand in levels of their own, Find, Choose and Act, and a help centre's group homes hold shelves and paged topics; each category's kinds are `spn-surface catalogue show <CATEGORY> PAGES`.
+  - **A help centre always draws the breadcrumb under its bar, one link a level and the page itself unlinked, and so does any site whose bar does not list its groups or that runs deeper than three levels** (`RULE.SUPPORT.SURFACE.598` · MUST · skill:spn-surface/design).
   - **Its sections run in the order its reader asks their questions, and are never counted**; a page skips a question its reader does not ask. A site home asks what is it → what does today's way cost me → what do I get → is it real → where does each part live → what does it cost → what will I ask → how do I start (`RULE.SUPPORT.SURFACE.340` · MUST · skill:spn-surface/design).
   - **This lens calls which one or two sections take the page's emphasis.** Those sections take size `LG`, a hero `XL`, and a product picture in them is raised `LG` (site container kinds § What holds across).
   - **The fill follows the reading, never the turn.** A section is `BASE`, and takes `DEFAULT` only where the kind of reading changes from its neighbours: a statement read whole, code read closely, offers compared. `PRIMARY` is the closing call's alone, and a hero takes no fill (`RULE.SUPPORT.SURFACE.341` · GUIDE).

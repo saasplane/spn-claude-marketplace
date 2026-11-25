@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/14-delivery-library.md",
-      "seen": "bfedad72"
+      "seen": "6feb372e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/14-delivery-library/",
@@ -82,6 +82,8 @@ The primary ramp comes from one seed by a formula, and the radius of each size s
 ## The snapshot
 
 A person who wants to know where the library and a stack differ should not have to read either one in full. A snapshot is one file that states a design system in the Surface domain's own words. It is written from the book, from the library and from each stack's code, in one form. The one written from the book is the CONSTRUCT snapshot: the tool reads it from each unit's column, *The library draws*, and from the token pages. It is the plugin's only input and the third side of every comparison: the library is compared with it, and a stack with the library. It holds no word of a design tool and no word of a stack, so the web and a native stack write exactly the same file. The command `spnutils apps surface construct` writes the CONSTRUCT snapshot from the book, `spnutils apps surface library` takes in the inventory of each library file and writes the library's snapshot from the five, and `spnutils apps surface snapshot <package>` writes a stack's from its code. The three snapshots are made with no model. A file holds a time in UTC, and a command prints it in local time with its offset. A snapshot is the machine's own state and it never enters a repository, with one exception. The CONSTRUCT snapshot comes from the book alone, so spn-surface carries a copy of it, written from the book of each release, at `refs/support/surface/construct.snapshot.json` beside this ref. Whatever reads it in the plugin reads that copy and nothing else: never the book, a sibling checkout or the machine's home folder (`RULE.SUPPORT.SURFACE.392` · MUST · skill:spn-surface/design). `spn-surface unit show` reads one unit from that copy, with its props, values, defaults, usage and cases.
+
+**spn-surface carries the catalogue too, and the design skill reads it one slice at a time** (`RULE.SUPPORT.SURFACE.601` · MUST · skill:spn-surface/design). The plugins build copies the book's `docs/specs/surface/catalogue.json`, as it copies the templates. `spn-surface catalogue show <CATEGORY> [<PART>] [<KIND>]` returns one category, one part of it, or one kind with its cases, in words or as `--json`. The design skill calls it for the slice the page in hand needs, and a restate keeps only the rules, never a copy of the kinds.
 
 A snapshot has four parts and three levels:
 
@@ -890,6 +892,7 @@ This ref states what the library draws, how its files are layered, and what stay
 | `RULE.SUPPORT.SURFACE.447` | a part of a unit that is another unit is an instance of that unit's set, at the version its props give, with its record's words, icon and size as overrides, and a part no version matches stays as its record drew it and is reported |
 | `RULE.SUPPORT.SURFACE.448` | every page of a file is read into records at once, and a unit is drawn only after every unit it is built from that the same file holds |
 | `RULE.SUPPORT.SURFACE.392` | spn-surface carries the CONSTRUCT snapshot of each release's book, the one snapshot a repository holds, and what reads it in the plugin reads that copy alone |
+| `RULE.SUPPORT.SURFACE.601` | spn-surface carries the book's catalogue, copied by the plugins build, and the design skill reads it one slice at a time with `spn-surface catalogue show <CATEGORY> [<PART>] [<KIND>]`; a restate keeps only the rules, never a copy of the kinds |
 | `RULE.SUPPORT.SURFACE.296` | the page level is a mode of the collection Level, and a form a level changes stays crossed with the allowed pairs only |
 | `RULE.SUPPORT.SURFACE.037` | how a library file is organised holds for any library, the builder's and a partner's own, and the division into files is its owner's: the builder's for its design system, a partner's for its own library, which uses the builder's published library and never edits it |
 | `RULE.SUPPORT.SURFACE.038` | a set's properties are its size, its states and the shared `variant`, a prop of forms of the block, and a property a named unit keeps crossed, and the unit's column says which |

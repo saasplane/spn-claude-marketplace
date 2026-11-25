@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "5d54760f"
+      "seen": "da18d3ff"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-layouts/01-common/01-layout.md",
@@ -117,7 +117,7 @@ Read the page itself, never a description of it — the frame, the preview, the 
   - **One panel for each thing a person reads or saves as a whole**; the page that reads a record and the page that changes it hold the same parts in the same order (`RULE.SUPPORT.SURFACE.115` · GUIDE) (`RULE.SUPPORT.SURFACE.116` · GUIDE) (`RULE.SUPPORT.SURFACE.117` · GUIDE).
   - **Groups and their items are both in view at a desktop only**; on a tablet and a phone the items replace the groups, with a back action and a changed address (`RULE.SUPPORT.SURFACE.079` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.080` · GUIDE) (`RULE.SUPPORT.SURFACE.099` · MUST · skill:spn-surface/design).
   - **A finding on a proposed rule says that the rule is proposed** — the apps plugin's surface refs mark each one.
-- **Site container kinds** — a doc and a marketing page take them, an app's screen takes an app page kind; held by this lens worn, beside `MARKETING` on a marketing page.
+- **Site container kinds** — a doc, a marketing page and a marketplace's page take them, an app's screen takes an app page kind; held by this lens worn, beside `MARKETING` on a marketing page.
   - **Each section follows one site container kind, named by the content signals and never by where it stands**, asked in order and stopping at the first yes: the page's first words → Hero; its last call and nothing else → Closing call; words alone → Statement; real code read line by line → Real sample; a press changes what is shown → Choose to see; items each a thing of its own → Feature grid; items that open pages → Doors; an order the reader follows → Steps; numbers from the real system → Numbers; questions with answers → Questions; one picture the words introduce → Show it; none of these → Points (site container kinds § How a site's section is chosen · `RULE.SUPPORT.SURFACE.340`, `.343`).
   - **Then the eight questions of look, in order.** Fill: `DEFAULT` only where the kind of reading changes from the neighbours, otherwise `BASE`, and `PRIMARY` for the closing call alone. Size: `LG` for the page's one or two strongest sections, which `MARKETING` calls. Highlight and Gradient: the one raised frame and the hero's or closing call's band, never both on one section. Media: framed by its kind, placed by its width and its panes, the words first on a phone. Shape: a picture keeps the shape it is made in. Alignment: centred only where nothing is scanned. Columns: set by the count, four at most, lines side by side one sentence each of about one length (site container kinds § What holds across · `RULE.SUPPORT.SURFACE.341`–`.343`, `.346`).
   - **The brand at the start of a bar, and in a footer, opens the home of what it names; a sign-in step draws it without the link** (`RULE.SUPPORT.SURFACE.443` · GUIDE). A brand that is only a picture is a finding: a person who has gone deep into a site expects it to take them back to where it begins.

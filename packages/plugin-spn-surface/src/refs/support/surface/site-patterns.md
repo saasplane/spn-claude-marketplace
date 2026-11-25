@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/04-site-container-kinds.md",
-      "seen": "a3fec5b2"
+      "seen": "6b0b5ba2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/02-web/02-site-container-kinds.md",
@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/02-site-page-kinds.md",
-      "seen": "03263017"
+      "seen": "705ee258"
     }
   ]
 }
@@ -70,285 +70,46 @@ The order matters. A grid of things that each open a page is a Feature grid and 
 
 ## The kinds of page, by level — 🔮
 
-A site stands in levels, and each kind of page has one job at its level. The main line runs from Home down to the topics: **Home → Group home → Topic**, three levels by default, and a group home serves any level between the home and the topics. Every other kind stands at one of those levels, beside the page that usually stands there. Each name says the page's job and where it stands, and never its subject, so a partner's site uses the same names for its own pages.
+**The site page kinds, with their sections in the order of their reader's questions, are the catalogue's, and this ref holds no copy of them** (`RULE.SUPPORT.SURFACE.601` · MUST · skill:spn-surface/design). Read a category's with `spn-surface catalogue show <CATEGORY> PAGES` (MARKETING, MARKETPLACE or RESOURCES), and one kind whole, with its cases, with `catalogue show <CATEGORY> PAGES <KIND>`. The rules that hold across them follow.
 
 - **A kind of page orders its sections as its reader asks their questions, and does not count them** (`RULE.SUPPORT.SURFACE.340` · MUST · skill:spn-surface/design). A page skips a question its reader does not ask. A count of sections would make a page add a section with nothing to say, or cut one a reader needs.
 
-| Level | Kind | Contract name | Sample breadcrumb | Its sections, in the order of its reader's questions (the usual container kind in brackets) |
-| --- | --- | --- | --- | --- |
-| 1 | **Home** | `HOME` | Home | What is it (Hero) → what does today's way cost me (Statement or Points, filled) → what do I get (Points, Show it, Feature grid) → is it real (Show it, Real sample, Numbers, quotes) → where does each part live (Doors) → what does it cost (plans) → what will I ask (Questions) → how do I start (Doors, Closing call). An app's signed-out home is a Home that skips the questions its reader does not ask: what it is, what you get, and how to start. |
-| 2 | **Group home** | `GROUP_HOME` | Home › Build & Launch | What is this group (Hero) → why it matters (Statement) → its parts (Doors) → the strongest part, shown (Show it) → what do I do now (Closing call). A group that sells nothing, such as a group of resources, skips why it matters and the strongest part, and needs no closing call: what is here (Hero) → the places (Doors). On a resources site a Group home is one help topic, a group's front page with its guides and articles in one place: what is this topic (Hero) → its guides and articles (Doors) → what will I ask (Questions). |
-| 2 | **Docs**, beside a group home, on a resources site | `DOCS` | Surface Web › Showcase | What this place is (Hero, a doc page's head) → how to read one page (Show it, a teaching picture kept flat) → the map (Doors for each group, a Feature grid for a set of groups). |
-| 2 | **Contact**, beside a group home | `CONTACT` | Home › Contact | Who to reach and why (Hero) → the addresses (Doors or Points) → what is not ready yet (Points). It needs no closing call. |
-| 2 | **Pricing**, beside a group home | `PRICING` | Home › Pricing | What it costs, in a line (Hero, with no picture) → the plans side by side (Feature grid, its plans use) → what each plan holds, row by row, where plans differ in more than three ways (a comparison of the plans, in Points beside each plan, never a data table) → what will I ask about paying (Questions) → how do I start (Closing call). A site that sells nothing yet, such as one in alpha, has no pricing page and says how to reach it on its contact page instead. |
-| 2 | **About**, beside a group home | `ABOUT` | Home › About | Who we are and why we exist (Hero) → what we believe (Statement) → how far we have come (Numbers) → the people (Feature grid, its directory use, each person a mark and a line) → where to reach us, or work with us (Doors) → what do I do now (Closing call). |
-| 2 | **Blog**, beside a group home | `BLOG` | Home › Blog | What is written here, and for whom (Hero, with no picture) → the newest piece, led (Show it, its picture and its first lines) → every piece, newest first (Feature grid, its directory use: each a title, a line, a date and who wrote it) → where to follow (Doors). It sells nothing, so it needs no closing call. |
-| 2 | **Search**, beside a group home, on a resources site | `SEARCH` | Home › Search | The results of a search, in a help centre started from a search. What was asked (Hero) → what answers it, grouped by kind (Feature grid) → where else to look (Doors). |
-| 2 | **Changelog**, beside a group home, on a resources site | `CHANGELOG` | Home › Changelog | What changed in which version, newest first, each version dated. What this page records (Hero) → each version in turn, newest first (the reading, as an Article's) → where next (Doors). |
-| last | **Topic** | `TOPIC` | Home › Build & Launch › Surface | What is this part (Hero) → what problem does it end (Statement or Points, filled) → how does it work (Steps, Show it, Choose to see) → show me the code (Real sample) → what do I get (Points) → how do I know it holds (Points) → where next (Doors) → what do I do now (Closing call). |
-| last | **Audience**, beside a topic | `AUDIENCE` | Home › Solutions › For leaders | Who it is for (Hero) → the question this reader asks (Statement) → find yourself (Choose to see or Doors) → what changes for you (Points, Show it, Real sample) → what proves it (Statement or Points) → where next (Doors) → what do I do now (Closing call). |
-| last | **Guide**, beside a topic, on a resources site | `GUIDE` | Home › Resources › Get started | What you will have at the end (Hero, with Steps) → each step in turn (Real sample or Show it, the code placed by its length) → how you know it worked (in each step's words) → where next (Doors, or a Closing call with the product). It sells nothing. |
-| last | **Reference**, beside a guide, on a resources site | `REFERENCE` | Home › Docs › Reference › One endpoint | One endpoint, command, record or config option, stated in full, in a `RAIL` of API docs. What is this (Hero) → what is true of it, in full (the reading, as an Article's) → how is it used, in code (Real sample) → where next (Doors). It is for a Learner who looks one thing up. Where the Learner is doing a task end to end, the page is a Guide. |
-| last | **Values**, beside a topic | `VALUES` | Home › DevEx › Principles | What we decide by (Hero) → each group of principles (Points, with no fill and no media) → what do I do now (Closing call). |
-| last | **Article**, under a blog | `ARTICLE` | Home › Blog › An article | The title, who wrote it and when (Hero, a doc page's head) → the reading (the site frame around long text: headings, figures, code placed by its length, at a reading width) → where next (Doors, the related pieces). An article is read whole, so it carries no sections between its paragraphs. **A blog is a listing and a detail of articles with a reading order of its own.** Blog lists the articles, the newest first, and an Article is one of them, read whole. Both stay MARKETING's; the general Listing and Detail belong to a marketplace. |
-| — | **Landing**, outside the levels | `LANDING` | none: reached from a campaign | What is this offer (Hero) → why should I care (Points) → is it real (Real sample, Numbers, quotes) → what is the catch (Questions) → do it now (Closing call, with its one action). It stands in `CANVAS`, with no site navigation and a short footer, so nothing leads the Visitor away from the one thing the page asks. **A Guide is a page of a RESOURCES site, for a Learner.** A technical platform has guides, and a marketing site links to them; a product with no technical side has none, and its marketing pages end on a sign-up instead. **Not found keeps the layout of its site**, so the site's navigation stays beside it, with a short message, a search on a site that has one, and the way back. Two pages take no container kind. A page of the kind **Text**, with no sections, such as a privacy notice or the terms, is a doc: Privacy and Terms are the titles of such pages in a site's navigation, and never kinds. A sign-up's choice of path is an app's screen, and takes an app page kind. |
-
-A marketplace's page kinds stand in levels of their own, in *The kinds of page of a marketplace* below.
-
-The contract name is the `code` a design language's spec gives the kind under PAGES, and the catalogue holds it as the same `code`. **A page kind's code is the name a reader sees in a site's navigation, in capitals, with no `PAGE` suffix**: Home is `HOME`, Contact is `CONTACT`, About is `ABOUT`, Blog is `BLOG`, Listing is `LISTING`, Detail is `DETAIL` and Landing is `LANDING`, and a name with two words keeps an underscore, as `GROUP_HOME` does. A page's own title in the navigation, such as Privacy or Terms, is a page of a kind and never a kind: it is a page of Text. The catalogue holds two more kinds that take no sections of their own: `TEXT`, and `NOT_FOUND`, the page for an address that leads nowhere. On a resources site, `HOME` is the start of the whole site, and the catalogue gives it the sections Hero, Feature grid and Doors.
-
-**A design language may define a page kind of its own in its spec, built from the sections below.** The kinds above are the catalogue it picks from, and a kind it adds is stated in that language's own spec and never added here.
-
-The breadcrumb only shows where a kind stands; a site need not draw one. A group home serves any level between the home and the topics, so a site whose groups divide again uses a group home at the second level too, and three levels stay the default. A Guide is a page of a RESOURCES site, for a Learner: a technical platform has guides and a marketing site links to them, and a product with no technical side has none. A blog is a listing and a detail of articles with a reading order of its own: Blog is the listing of articles, led by the newest, and an Article is their detail, read whole. They stay MARKETING's, and the general Listing and Detail are a marketplace's (below). **Not found keeps the layout of its site**, so the site's navigation stays beside it, with a short message, a search on a site that has one, and the way back. Two pages take no container kind: a page of the kind **Text**, with no sections, such as a privacy notice or the terms, is a doc, and a sign-up's choice of path is an app's screen, and takes an app page kind.
+- **A help centre always draws `DSBreadcrumb` under the bar, one link for each level above the page and the page itself unlinked, and so does any site whose bar does not list its groups or that runs deeper than three levels** (`RULE.SUPPORT.SURFACE.598` · MUST · skill:spn-surface/design). Any other site may draw none.
 
 ## The kinds of page of a marketplace — 🔮
 
-A marketplace is a public site of records: a shop, a site of cars, a job board, a matrimony site. Its reader is a Seeker, who came to find one record among many and choose it. Its pages argue no case. They help the Seeker look, narrow and compare, and every page ends where the Seeker can go on looking.
-
-The pages fall into three groups, and a Seeker goes back and forth between them many times in one visit. They **find** the records, from a search, a category or a brand; they **choose** one, on its own page, beside others, or from what they kept; then they **act**: buy, book, enrol, apply, connect or ask for the price. Only a site that sells takes a cart and a checkout; a job board, a matrimony site or a site of cars ends on the Detail page with the record's own action.
-
-| Group | Level | Kind | Contract name | Sample breadcrumb | Its sections, in the order of its reader's questions (the usual container kind in brackets) |
-| --- | --- | --- | --- | --- | --- |
-| Find | 1 | **Home** | `HOME` | Home | What is here, and can I find mine (Find: one field, or the fields a domain searches by) → where does each kind live (Doors, the categories as tiles) → what is on offer (Highlight, the deals banner) → the few worth a look first (Records, by shelf: popular, new, deals, brands) → can I trust this place (Numbers, the trust stats) → who it worked for (Testimonials, success stories) → what will I ask (Questions) → where else can I browse (Doors, link groups) → where is everything else (Footer). |
-| Find | 2 or deeper | **Category** | `CATEGORY` | Home › Phones › Android phones | One category of records, the page an entry of the menu opens. What is in this category (Hero, its words alone) → its smaller categories (Doors, as cards) → the few worth a look first (Records, by shelf) → every record in it, narrowed (Records, filtered) → what will I ask (Questions). A category with no smaller ones skips its doors. The same page serves as a city or community landing, such as stays in Goa or a community's profiles: a filtered result and a page a search engine finds. |
-| Find | last | **Brand** | `BRAND` | Home › Brands › One maker | The owner's page: a seller, host, teacher, employer, dealer or agent. Who makes these, and can I trust them (Hero, the brand's head: its mark, its name, its rating and how many records it has) → what they are known for (Points) → every record of theirs, narrowed (Records, filtered) → who vouches for them (Testimonials, reviews) → where else to look (Doors). |
-| Find | 2 | **Listing** | `LISTING` | Home › Jobs | Every record of one kind. What is listed here, and for whom (Hero, its words alone) → the few worth a look first (Records, by shelf) → every record, narrowed the way a reader looks for one (Records, filtered) → what will I ask before I choose (Questions) → where do I go if none fits (Doors). Where the records fall into categories a reader picks first, each category is a page of its own. |
-| Find | 2 | **Results**, beside a listing | `RESULTS` | Home › Phones › Under 300 | The list a Seeker browses and narrows with filters, reached from a category, a brand or a shared link, because the filters chosen are the page's address. What did I choose (Hero, its words alone, the filters as tags) → the records that match, narrowed further (Records, filtered) → where do I go if none fits (Doors, link groups of similar searches). |
-| Find | 2 | **Search**, beside a listing | `SEARCH` | Home › Search | What a typed query returns, across every category. What was asked (Find, the words kept in the field with the count of what answers them) → which categories hold it (Doors, as rows, each with its count) → the records that answer it, narrowed (Records, filtered) → where else to look (Doors, link groups). A search that finds nothing says so and offers to widen it. |
-| Choose | last | **Detail**, under a listing or a category | `DETAIL` | Home › Jobs › One job | One record, the page a card opens, in one of six cases below. Its head is the record's pictures beside its facts and an action panel: the one action with its price, a check that the record can be had, its variants and its offers. The panel is a sticky column beside the pictures on a desktop, stands under the words on a tablet, and is a bar fixed at the foot on a phone, where the pictures become a swipe row with the next one peeking. A long page carries a row of pills for its sections that stays at the top. |
-| Choose | last | **Compare** | `COMPARE` | Home › Phones › Compare | Two to four records a reader chose, side by side. Which ones am I comparing (Hero, its words alone) → how do they differ, row by row (Compare, the records: their pictures first, then their facts in groups, each record's own action under its column). The Seeker picks the records from their cards, and the chosen ones wait in a tray at the foot of the page until Compare opens. |
-| Choose | 2 | **Saved** | `SAVED` | Home › Saved | The records a reader kept to come back to, on this device or in their account. What have I kept (Hero, its words alone) → the records kept, newest first (Records, saved) → where do I go to find more (Doors). A record no longer offered stays on the list, marked as gone, until the reader takes it off. |
-| Act | 2 | **Cart**, on a site that sells | `CART` | Home › Cart | The records a Seeker chose to buy. What have I chosen (Hero, its words alone) → how many of each, what each costs and the total, then one way to checkout (Order, the cart). An empty cart says so and leads back to the records. |
-| Act | last | **Checkout** | `CHECKOUT` | Home › Cart › Checkout | The steps from a cart to an order, one at a time (Checkout steps). Who you are: sign in, or go on as a guest with an email, never forced to sign in → where it goes: the address and how it comes → how you pay: the payment provider's own fields → is it all right: the order read back, and one action, Place order. Each step keeps what was entered when the Seeker goes back, and on a desktop the order stands beside the steps. |
-| Act | last | **Order placed** | `ORDER_PLACED` | Home › Cart › Order placed | The page after an order is placed. Did it work, and what did I order (Hero, its words alone, then Order, read back) → what happens next (Steps, in a row) → where do I follow it (Closing call, whose one action opens the order in PORTAL after sign-in). A guest is offered an account there, and never made to take one. |
-| Act | 2 | **Plans**, on a site that sells memberships | `PLANS` | Home › Plans | The memberships a site sells, such as a matrimony site's paid plans. What does a membership open (Hero, its words alone) → which one is mine (Plans) → how do they differ, free against paid (Compare, the plans) → what will I ask (Questions) → how do I start (Closing call). |
-
-**A Detail page takes one case, by what the Seeker does with the record.**
-
-| Case | The record | Its sections after the head | Its action |
-| --- | --- | --- | --- |
-| **Buy** | a product | its highlights (Points) → its specifications → reviews → its questions and answers → its owner → its policies → shelves of similar records and of what is bought together | Add to cart |
-| **Book** | a stay, a trip or a table | its highlights → its options by date, such as rooms → reviews → where it is (Locations, a map) → its host → its rules → questions → similar records | Reserve; a price is real only once the dates are chosen |
-| **Enrol** | a course | what you will learn (Points) → its syllabus → its batches (Options) → its teacher → reviews → questions → similar courses → Enrol again at the end (Closing call) | Enrol |
-| **Apply** | a job, with a head of words and no gallery | its criteria (Specifications) → its description (Reading column) → its employer → similar jobs → link groups | Apply |
-| **Connect** | a person's profile | their facts → about them → similar profiles. Its pictures and contact show only as its person allows, and contact opens after both agree | Send interest |
-| **Facts** | a car or a home chosen by its facts | its specifications → its variants (Options) → a calculator → reviews → where it is → its dealer or agent → questions → a shelf to compare with rivals | a lead, such as Get the price or Request details, through an enquiry |
-
-The owner stands on every Detail page with the trust facts of their trade: their rating, how long they have been here and how fast they reply. Wherever stars show, they are `DSRatingView`.
-
-A marketplace also holds Text and Not found, the standard pages of every site. The sections each kind names are the container kinds below, and the catalogue gives each section's case.
-
-- **What needs a person's account opens in a PORTAL, after sign-in.** Their orders and an order's tracking steps, returns, addresses, payment methods, the saved list kept in the account, and a seeker's applications or enquiries are pages of a PORTAL. The marketplace adds no page kind for them; the app page kinds carry them (`standards-patterns.md`).
-- **The records open on the view they are chosen by.** Products are chosen by their pictures, so they open on the grid: four to a row on a desktop, two on a tablet and two on a phone, or one where a card carries a photo row or long facts. Jobs and cars are chosen by their facts, so they open on the list. The view switch stays either way. Where place decides, such as stays and homes, the list stands beside a map; where records are scanned fast, such as jobs, the chosen record opens in a pane beside the list from 1024 up.
-- **Four filters or fewer stand in a bar above the records; more stand as facets** (`DSFacetGroup`, `architecture-components.md`): on a desktop a rail at the start, about 16rem wide, each facet a group that opens with a count beside each choice; on a tablet and a phone a Filters button opens the same facets in a sheet, with a button that shows the results, and the sort is a button of its own.
-- **A Seeker keeps a record with one press, from its card or from its page**: on this device, or in their account where they are signed in, and the Saved page shows what was kept.
+A marketplace's page kinds, in the groups Find, Choose and Act, are `spn-surface catalogue show MARKETPLACE PAGES`; what needs a person's account opens in PORTAL after sign-in.
 
 ## The sections, by name — 🔮
 
-Each section gives the question it answers, its **For** line, what calls for it, its look in the design system's units and props, how it stacks on a phone, when not to use it, and its spec in `refs/support/surface/site-patterns/`. Shown features, a directory, plans and quotes are uses of the Feature grid, because their look is the grid's.
+**Each container kind, with its units, placement, style and cases, is the catalogue's**: `spn-surface catalogue show <CATEGORY> CONTAINERS` lists them, and `catalogue show <CATEGORY> CONTAINERS <KIND>` gives one whole. Under each name below stand only the rules that kind carries.
 
-| Container kind | It answers | Calls for it |
-| --- | --- | --- |
-| Hero | What is this, and is it for me? | the page's one claim, as its first words |
-| Statement | Why does this matter? | words alone, read whole |
-| Points | What do I get? What is true of it? | items, each a title and one line, with no link and no order |
-| Steps | How does it work? How do I start? | items in the order a reader follows them |
-| Show it | Show me. | one picture the words introduce |
-| Real sample | Is it real? Show me the code. | a quotation of the real source |
-| Choose to see | Which one is me? What happens at each step? | a few options, where a press changes the picture |
-| Doors | Where do I go next? Where do I start? | items that each open another page |
-| Feature grid | What is in the set? Which plan is mine? Who else uses it? | a set of things, each of its own |
-| Numbers | Does it work for teams like mine? | numbers read from the real system |
-| Questions | What do people ask before they start? | questions, each with a short answer |
-| Closing call | What do I do now? | the page's last words and its one call to act |
-| Highlight | What matters most here? | one thing the page wants remembered, shown whole in a lit frame |
-| Reading column | Let me read it through. | a long text read whole: an article, a reference page, a changelog, a text page |
-| Records | What is here, all of it? | the records of one kind, each a door to its own page |
-| Plans | Which plan is mine? | the plans side by side, each with what it costs and holds |
-| Compare | What does each hold, row by row? | the same facts of several plans, alternatives or records, read across |
-| People | Who is behind this? | the people of a team, each a mark, a name and a line |
-| Find | Where is the answer? | the question a reader came with, and a way to search |
-| Footer | Where is everything else? Who is behind this? | the brand, the site's links and its legal line, at the foot of every page |
+- **Features that each answer their own question stand in sections of their own; one section holds several features only when they answer one question** (`RULE.SUPPORT.SURFACE.593` · MUST · skill:spn-surface/design). On the same fill the sections share one background, and `parting` `HAIRLINE` marks where each ends. The closing call is the one exception: it may hold the page's highlight above its call.
 
 ### Hero
 
-- **For** Visitor · Learner · Seeker. For a Learner it is a doc page's head: `size` `MD`, `START`, with no actions. For a Seeker on one record's page it is that record's head: its pictures beside its name, its key facts, its price and one main action.
-- **Calls for it.** The section that says what the page is: its one claim, and what shows it at a glance.
 - **Look.** `DSSectionContainer` `size` `LG`, or `XL` where the hero is the page's emphasis, `color` `BASE`. Inside it, a `DSFeature` at `pageLevel` `PAGE`. The media keeps the frame of its kind: a product is `frames` `MEDIA` with `surface` raised, `elevation` `LG`; a diagram is flat; a mood picture is `type` `BACKDROP`. Use `type` `SPLIT_END` for one picture the title names, and `MEDIA_BOTTOM` for two panes or a wide picture. Centre the words, `textAlign` `CENTER`, only when nothing stands beside or under them. A state such as Alpha is a `BADGE` `eyebrow` in `PRIMARY`, at the level's `variant`. The stack names kinds, so it goes in up to four `BADGE` `facts`, each `OUTLINE` in `DEFAULT` (`RULE.SUPPORT.SURFACE.371` · GUIDE). The actions are the page's one `SOLID` primary, then one `OUTLINE`. With items, use `actionsPlacement` `BEFORE_ITEMS`. A hero takes no `reveal`.
-- **On a phone.** The words, the facts and the buttons, then the picture: the facts are the head's own, and the actions stand after the head.
-- **A hero with slides turns its ground and keeps its words still.** The slideshow is the section's own ground, as a scene is: a `DSCarousel` in the `DSSectionContainer`'s `mediaNode`, edge to edge, its arrows and dots over the slides, and the `DSFeature` over it at the start with its words and no media of its own. Only the slides turn; the claim, its facts and its one main action stay still. The section's `mediaScrim` keeps the words readable on every slide, and from the tablet up the words keep to three fifths of the width. On a phone the slides stand under the words, as a scene does.
-- **Not when.** The section is a slideshow of several claims: give each claim its own section. A hero's slides turn the media only, and never the words. A hero takes no fill.
-- **Specs.** `hero.dg.json`, the picture beside the words; `hero-under.dg.json`, two panes or a wide picture under them.
-
-### Statement
-
-- **For** Visitor.
-- **Calls for it.** Words alone, read whole: a title, a description, and at most three text facts. No items and no media.
-- **Look.** `DSSectionContainer` `size` `MD`. Inside it, a `DSFeature` at `CONTAINER` with `textAlign` `CENTER` and `reveal` `text` `RISE`. Use `color` `DEFAULT` with `inset` where the statement states the problem the page ends, because the kind of reading changes from its neighbours. Otherwise `BASE`.
-- **On a phone.** As it is.
-- **Not when.** The claim has parts a reader scans: use Points. It says the hero again.
-- **Spec.** `statement.dg.json`.
 
 ### Points
 
-- **For** Visitor · Learner · Seeker.
-- **Calls for it.** Items, from two up to eight, each a title and one line about the section's one subject. No link, no order, and not numbers that prove a claim.
-- **Look.** A `DSFeature` at `CONTAINER`, `items.type` `GRID`, flat (no `items.surface`), `textAlign` `START`. `gridColumns` follows the count: 2/2/1 for two or four; 3/2/1 for three or six, or 3/3/1 when the lines are short; 4/2/1 for seven or eight; 3/2/1 for five. Items side by side are one sentence each, of about one length. Use `items.orientation` `HORIZONTAL` when the lines are short. Points in one column, beside a picture or as a column of checks, are `items.type` `LIST`, with a line between each two. The fill is `BASE`; `DEFAULT` only where the points state the problem the page ends. Where the words run long and a picture draws the points themselves, use the head across.
-- **With icons.** When each point has an icon that names its kind, give each item `media` `ICON`: the design system draws it on the title's first line, at its level's size, with the description under the title. Six such points stand 3/2/1, flat, with no lines.
-- **On a phone.** The words, then one point under another.
-- **Not when.** The items link: Doors. Each item is a thing of its own: Feature grid. The items run in an order: Steps. The items are numbers: Numbers.
-- **Spec.** `points.dg.json`.
 - **Before and after.** The old way against the new is Points, and never a table. Each point is a question the reader asks: its line is the new way's answer, and the old way is a text fact labelled *Today*. A data table is an app's reading unit and never draws a site's section (`RULE.SUPPORT.SURFACE.293` · MUST · skill:spn-surface/design).
-
-Readers scan points, and the eye comes back to a left edge; a centred point of two or three lines loses that edge. One column of points is the design system's list.
-
-### Steps
-
-- **For** Visitor · Learner. For a Learner each step carries its command and the line that says it worked.
-- **Calls for it.** Items in the order a reader follows them, read and not pressed.
-- **Look.** `items.numbered` true, flat, with a line between each two: `items.type` `LIST`, which draws the lines by default. A row of steps is `GRID` with `items.borderType` `GRID`. An item's `anchor` may only scroll to the step's own section on the same page. With a picture, `type` `SPLIT_END`, the steps a `LIST` beside it. Where the words run long and the picture draws the steps, use the head across.
-- **On a phone.** One step under another, then the picture.
-- **Not when.** Each step opens a page of its own: Doors, numbered. A press changes the picture: Choose to see.
-- **Spec.** `steps.dg.json`.
 
 ### Show it
 
-- **For** Visitor · Learner. For a Learner a diagram comes before the product.
-- **Calls for it.** One picture the words introduce: the product, a diagram, a photo, or code panes compared.
 - **Look.** A `DSFeature` with `mediaNode`. The frame follows the kind of the media (`RULE.SUPPORT.SURFACE.293` · MUST · skill:spn-surface/design): a product is `frames` `MEDIA`, `surface` raised, `elevation` `MD`, or `LG` in the page's emphasis; an illustration or a diagram is flat on the section; a photo is flush and rounded; code panes are flat, each as tall as its lines. Use `type` `SPLIT_END` when the picture is one thing the title names and reads at half width, about 630px at 1440; `MEDIA_BOTTOM` for two or more panes compared, a wide table or chart, or four thumbnails. Points go beside the picture as a `LIST`, or across above it as a `GRID`. Where the picture and the words differ in height, `verticalAlign` stands the shorter against the taller: a picture shorter than its words takes `CENTER`, the default, or `BOTTOM` where it draws the points and its foot meets the last of them; a picture taller than its words takes `TOP`. Where the words run long and the picture draws the points, use the head across. `reveal`: `text` `RISE`, `media` `FADE`, `items` `RISE`. The fill is `BASE`; `DEFAULT` only where the neighbours hold another kind of reading.
-- **The product playing.** When the picture is the product doing one thing in motion, the `mediaNode` is the product built from units and playing, flat with no frame of its own. At `CONTAINER` it may lead the section, above the words, with `type` `MEDIA_TOP`. Art behind it that is no look of the design system is left out.
-- **On a phone.** The words first, then the points, then the picture. Panes stand two by two, or one under another.
-- **Not when.** The picture says again what the items or another section's picture already say: cut it. The section is code read closely: Real sample. A press changes the picture: Choose to see.
-- **Specs.** `show-it.dg.json`, the product raised beside the words and their points; `show-it-under.dg.json`, two panes compared under the words with the points across.
-
-### Real sample
-
-- **For** Learner · Visitor. For a Visitor only where the reader is a builder, because working code persuades a builder.
-- **Calls for it.** A quotation of the real source, read line by line.
-- **Look.** The `mediaNode` is a `DSCodeBlockView` titled with its file, flat in its own frame and not raised. Use `color` `DEFAULT` with `inset` where the neighbours hold another kind of reading; a guide whose every section holds code stays `BASE`. `size` `LG` when the sample is the page's argument, `MD` when it only shows a detail. The place follows the line length: `MEDIA_BOTTOM` when any line runs past about 70 characters, `SPLIT_END` for short, tall code, with the words at the top of their column by `verticalAlign` `TOP`. The lines are the file's own, with … where lines are cut.
-- **On a phone.** The words, then the code, which scrolls sideways and does not wrap.
-- **Not when.** The code is two things compared: Show it, with code panes on `BASE`.
-- **Specs.** `real-sample.dg.json`, short, tall code beside the words; `real-sample-under.dg.json`, code with a long line under them.
 
 ### Choose to see
 
-- **For** Visitor · Learner.
-- **Calls for it.** A few options, where the reader's press changes the picture. The picture decides the form: a small picture that reads at half width stands beside the options; a page or a product screen, which half width cannot show, stands under them.
-- **Beside.** `type` `SPLIT_END`. The options are a `LIST`, `items.type` `LIST`, boxed and raised: `items.surface` raised, `elevation` `MD`, on the door fill. The chosen one is `selected`, and each option's line says what it changes. The picture beside them is small and whole at about 630px of 1440, such as a loop, a tree or a diagram, and keeps the frame of its kind.
 - **Under.** `type` `MEDIA_BOTTOM`, and the `mediaNode` is a `DSTabs` at `pageLevel` `CONTAINER` with `type` `PILL`, the look of a website's pages (`RULE.SUPPORT.SURFACE.209` · GUIDE); the level gives its size, and it stands grouped on its track. Tab names are short, one or two words. The tabs only choose which panel is open, and the open tab's panel is the page's own node: the tab's line, one description that says what only this part says, then its picture at the feature's full width. The line and the description are the page's words at the title and description steps of `WIDGET`, so no tab and no `DSFeature` prop is needed. Every panel's picture is one shape, so the section does not jump as the tabs change, and each has its own alt.
-- **On a phone.** Beside: each option says its result in words, and the picture stays at rest below, not pinned. Under: the words, then the pills, which keep one row and scroll sideways, then the open tab's line, its description and its picture, which keeps a legible width and scrolls sideways in its own frame, named as a region so the keyboard scrolls it too.
-- **Not when.** A press changes nothing: Steps or Points. A press opens a page: Doors.
-- **Specs.** `choose-to-see.dg.json`, the options beside their picture; `choose-to-see-under.dg.json`, the pills over the open tab's panel.
 
 ### Doors
 
-- **For** Visitor · Learner · Seeker. For a Learner a doc ends on doors, not on a closing call. For a Seeker the doors are the categories, and the smaller categories inside one.
-- **Calls for it.** Items that each open another page.
 - **Look.** The items are boxed and raised `MD` on the fill that stands off the section: `items.surface` `color` `DEFAULT`, raised, `elevation` `MD`, on a `BASE` section (`RULE.SUPPORT.SURFACE.293` · MUST · skill:spn-surface/design). Each item has an `anchor`. A door stands for a page of its own, so where it has a picture, the picture is a mark, `media` `MARK`. Each may end on an `endNode`: `ARROW_UP_RIGHT` when it leaves the site, `ARROW_RIGHT` inside it. `GRID` columns follow the count, as for Points. Use a `LIST` when each door names a person or carries a long line. A door does not stand on a filled section. A button beside the doors opens a different place, such as the group's overview, not a page a door already opens.
-- **On a phone.** One door under another.
-- **Not when.** The item is read and not pressed: Points. The door opens the page the closing call already opens: say it once.
-- **Spec.** `doors.dg.json`.
-
-Five doors in a row cannot be drawn: the columns stop at four. Three over two reads as a choice made on purpose.
 
 ### Feature grid
 
-- **For** Visitor · Learner · Seeker. Plans, quotes and a directory are for a Visitor; a showcase's groups for a Learner; what one record holds for a Seeker.
-- **Calls for it.** A set of things, each of its own: a module, an integration, a group of components, a feature shown with a picture of its own, a plan or a quote. Each carries more than a title and a line: its own picture, its own mark, its facts, its own points, or its own page.
 - **Look.** `DSFeatureGridSectionContainer` with `section` (`BASE`, `MD`), `heading` (its actions stand under it) and `grid` by count. Each cell is a `DSFeature` at `pageLevel` `GROUP`, with `media` `MARK`: a short point under the heading. A cell with a picture of its own, or a plan, is at `WIDGET`. Give cells an `eyebrow` when they share a family, and `facts` for the count. **A cell's eyebrow is its group or kind as text, the overline the feature draws, and a badge only when it says a state, in that state's hue** (`RULE.SUPPORT.SURFACE.372` · GUIDE). A cell with an `anchor` is a door: `frames` `TEXT` and `MEDIA`, `surface` raised, `elevation` `MD`, on `DEFAULT`, so its mark stands inside the one box that lights. A cell that opens nothing is boxed and flat: `frames` `TEXT` and `MEDIA`, `surface` bordered. The cells of a row stand at one height (`RULE.SUPPORT.SURFACE.530` · MUST · skill:spn-surface/design).
-- **Shown features.** Two to four features of one product, each with a small picture of the product doing it. Each cell is a `DSFeature` at `WIDGET` with `type` `MEDIA_TOP`; its `mediaNode` is the picture, built from the design system's own units, flat and unframed. The words stand under it at `START`: a title that makes the claim, and one line. The grid draws lines between the cells, `grid.borderType` `GRID`, and no box around any cell, in 2/1/1 or 3/1/1.
-- **Directory.** Many things of one kind, read as a catalogue, such as integrations or data sources. Each cell has `media` `MARK`, the name as its title, `facts` with `factsPlacement` `AFTER_TITLE` for its kind and how it connects (*CRM · OAuth*), and one line. The cells are lined, not boxed, `grid.borderType` `GRID`, in 3/2/1, so the set reads as one table. A cell that opens the thing's page has an `anchor` and is pressed whole.
 - **Plans.** The section is `DEFAULT`, because comparing offers is another kind of reading. Each plan holds one eyebrow, its name; a second word such as Most popular is the plan's highlight, a `BADGE` fact in `PRIMARY` at the level's `variant`, not a second eyebrow (`RULE.SUPPORT.SURFACE.373` · GUIDE). Its `items` is a `LIST` of what it holds, each with a check icon, and it has one action. The recommended plan is raised `MD` and carries that highlight. A row-by-row comparison under the plans is `DSComparison`.
-- **Quotes.** Each cell's `description` is the quote, its `media` an `AVATAR`, and its `facts` the role and the team. The cells are bordered and flat.
-- **On a phone.** The heading and its button, then one cell under another.
-- **Not when.** The items are parts or points of one subject, each a title and a line with no picture of its own: they stay a feature's items. Seven modules with one line each stay a list too. There is no price yet: say so in Points.
-- **Spec.** `feature-grid.dg.json`.
-
-The data decides the unit. A set of things of their own is a grid section, and the parts of one thing are a feature's items. A part that comes with a picture of its own is a feature of its own, so it is a grid section too (`architecture-containers.md`, the grid section).
-
-### Numbers
-
-- **For** Visitor.
-- **Calls for it.** Up to four numbers read from the real system, each with a plain label that says what it gives the reader.
-- **Look.** `items.type` `STATS`, flat, in one row. `textAlign` `START`, or `CENTER` when they stand alone under centred words.
-- **On a phone.** Two by two, or one under another.
-- **Not when.** The number is made up, counts how the system is built, or stands apart from its label. Each is a finding by the words of a marketing page (`standards-core.md`).
-- **Spec.** `numbers.dg.json`.
-
-### Questions
-
-- **For** Visitor · Learner · Seeker.
-- **Calls for it.** Questions, from three up to eight, each with a short answer.
-- **Look.** A `DSFeature` at `CONTAINER`, `BASE`, whose title and description stand centred over the accordion, `textAlign` `CENTER`, and whose `contentNode` is a `bordered` `DSAccordionGroup` with its first question open. The section takes `width` `NARROW`, centred, which draws the reading measure while its ground still reaches edge to edge; the `DSFeature` draws the head and the accordion at that width, and the words of each question start at the start. The accordion runs by the task pattern Disclose (`standards-patterns.md`).
-- **On a phone.** As it is.
-- **Not when.** The answers are long reading: write a doc page.
-- **Spec.** `questions.dg.json`.
-
-### Closing call
-
-- **For** Visitor · Seeker. A Learner's page has none: a doc closes on where to go next. A Seeker meets one only on a record's own page, carrying that record's one action.
-- **Calls for it.** The page's last words, and its one call to act.
-- **Look.** `DSSectionContainer` `size` `SM`, `color` `PRIMARY`, `strength` `SUBTLE`, with `inset`. A site whose brand reads as a solid band may use `SOLID`, with buttons coloured `DEFAULT`. Inside, a `DSFeature` with `textAlign` `CENTER` and words alone. One `SOLID` primary, and at most one `OUTLINE` that opens a page no door above it opens. The words are not framed. One variant has a product picture beside, with `type` `SPLIT_END` and `START`, when the call is to go and see the product.
-- **On a phone.** The words, then the buttons, one under another.
-- **Not when.** Doors already end the page.
-- **Specs.** `closing-call.dg.json`, centred on `PRIMARY`, `SUBTLE`; `closing-call-beside.dg.json`, the variant with the product beside.
-
-One call is enough. A second button that opens a door the reader has just passed says the same thing twice.
-
-### Highlight
-
-- **Calls for it.** One thing the page wants remembered, shown whole in a lit frame.
-- **Look.** `DSSectionContainer` holding one `DSFeature` framed raised and full, at most once on a page and never first. The case it draws by default is the kind's own, and the other cases are in the Surface Catalogue.
-- **Spec.** `highlight.dg.json`.
-
-### Reading column
-
-- **Calls for it.** A long text read whole: an article, a reference page, a changelog, a text page.
-- **Look.** `DSSectionContainer` at `width` `NARROW`, which draws the reading measure, holding one `DSFeature` at the start; the section's ground and media still reach edge to edge. The case it draws by default is the kind's own, and the other cases are in the Surface Catalogue.
-- **Spec.** `reading-column.dg.json`.
-
-### Records
-
-- **For** Visitor · Learner · Seeker. For a Seeker it is most of a marketplace: the records by shelf, the records narrowed by filters, or the ones they kept.
-- **Calls for it.** The records of one kind, each a door to its own page.
-- **Look.** `DSFeatureGridSectionContainer` of cells, each a title, a line and one fact. The case it draws by default is the kind's own, and the other cases are in the Surface Catalogue.
-- **Spec.** `records.dg.json`.
-
-### Plans
-
-- **Calls for it.** The plans side by side, each with what it costs and holds.
-- **Look.** `DSFeatureGridSectionContainer` of cells, each a plan with one action. The case it draws by default is the kind's own, and the other cases are in the Surface Catalogue.
-- **Spec.** `plans.dg.json`.
-
-### Compare
-
-- **For** Visitor · Seeker. For a Seeker the columns are the two to four records they chose, each with its own action.
-- **Calls for it.** The same facts of several plans, alternatives or records, read across.
-- **Look.** `DSFeatureGridSectionContainer` of cells holding the same facts in the same order. The case it draws by default is the kind's own, and the other cases are in the Surface Catalogue.
-- **Spec.** `compare.dg.json`.
-
-### People
-
-- **Calls for it.** The people of a team, each a mark, a name and a line.
-- **Look.** `DSFeatureGridSectionContainer` of cells, each with a mark. The case it draws by default is the kind's own, and the other cases are in the Surface Catalogue.
-- **Spec.** `people.dg.json`.
-
-### Find
-
-- **For** Learner · Seeker. For a Seeker it is the first section of a marketplace's home and of its search page.
-- **Calls for it.** The question a reader came with, and a way to search.
-- **Look.** `DSSectionContainer` holding one `DSFeature` with one action that opens the search. The case it draws by default is the kind's own, and the other cases are in the Surface Catalogue.
-- **Spec.** `find.dg.json`.
-
-### Footer
-
-- **For** Visitor · Learner · Seeker.
-- **Calls for it.** The foot of every page of a site: the brand, the places the site holds and its legal line. No content signal chooses it, because every site's page ends on one.
-- **Look.** `DSSectionContainer` `size` `SM`, with no line above it. In it, the brand linked to the site's home (`architecture-layouts.md`) and its one line; under them columns, each a `DSList` with its title and flush rows of quiet links, so the words keep the column's edge; last, one hairline above a legal bar of the legal line and its links.
-- **On a phone.** The brand and its line, then one column of links under another, then the legal bar.
-- **Not when.** The page is an app's screen or a sign-in step. The links duplicate a menu in a long list: keep the columns to the groups a visitor looks for at the foot.
-
-A footer has one shape, so two sites do not build two.
 
 ## What holds across — 🔮
 

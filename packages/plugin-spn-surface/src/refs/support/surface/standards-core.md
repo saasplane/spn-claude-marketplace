@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/01-surface-types.md",
-      "seen": "ab8db7f6"
+      "seen": "9ec364d4"
     }
   ]
 }
@@ -118,8 +118,8 @@ A surface is a **site**, which people read, or an **app**, which people work in.
 | Category | Family | Person |
 | --- | --- | --- |
 | **MARKETING** | SITE | Visitor |
-| **RESOURCES** | SITE | Learner |
 | **MARKETPLACE** | SITE | Seeker |
+| **RESOURCES** | SITE | Learner |
 | **DASHBOARD** | APP | Team |
 | **PORTAL** | APP | Individual |
 
@@ -137,7 +137,7 @@ A **person** is who an app is for, named by how they use it. It is never a busin
 | Person | Who they are | How often they come | Trained | Their device | What they never forgive |
 | --- | --- | --- | --- | --- | --- |
 | **Team** | people who use the app as their job: staff, an operator, a seller running a shop, a client firm's employees, the administrator who sets it up | every day or every week; setup pages rarely | yes, or they learn on the job | a desktop, a keyboard and a pointer; a phone for a quick check or an approval | lost work, a slow task they repeat all day, or a page that hides where a task stands |
-| **Individual** | many people who use the app for themselves: a shopper, a traveller, a patient, a policyholder, a daily news reader | rarely, or now and then; every day for what they read | never | often a phone, by touch, sometimes on a poor connection | a confusing step, an error they cannot fix, or a form that asks too much |
+| **Individual** | many people who use the app for themselves or for their family, and never as a company's team: a shopper, a traveller, a patient, a policyholder, a daily news reader, a parent who books for the whole family | rarely, or now and then; every day for what they read | never | often a phone, by touch, sometimes on a poor connection | a confusing step, an error they cannot fix, or a form that asks too much |
 | **Visitor** | a person not signed in, deciding whether a product is for them | once, or a few times while they decide | never | any; often a phone, from a link | a first screen that hides what it is, or a made-up claim |
 | **Learner** | a person reading to learn or to get a thing working: a developer in the docs, a person in a help article | in bursts, when they need it | in their own trade, and new to this product | a desktop, beside their work | a missing or wrong step, or a sample that does not run |
 | **Seeker** | a person finding and choosing one record among many: a shopper in a shop, a buyer looking at cars, a job seeker, a person looking for a match | again and again while they look, then rarely once they have chosen | never | often a phone, from a search or a link | a search that finds nothing, a filter that loses their place, or a record that turns out to be gone |
