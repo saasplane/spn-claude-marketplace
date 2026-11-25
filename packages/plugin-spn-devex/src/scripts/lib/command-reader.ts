@@ -74,7 +74,7 @@ export const PLUGIN_SUBJECTS: Record<string, Record<string, string[]>> = {
     restates: ["decisions", "docs", "files"],
     workstream: ["arc", "correction", "decision", "fact", "finding", "go", "layout", "progress", "question", "report", "row", "rows", "sheet", "state", "suggestion", "work"],
   },
-  "spn-surface": {},
+  "spn-surface": { language: ["samples"] },
   "spn-apps": { library: ["catalogue"] },
   "spn-infra": {},
 };

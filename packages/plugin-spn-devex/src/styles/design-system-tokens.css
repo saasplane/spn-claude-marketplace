@@ -1,4 +1,4 @@
-/* The design system's own variables, copied whole by `spn-devex docs styles cut` from support-web-ds-ts v11.21.0. Never edited by hand: cut copies them again. */
+/* The design system's own variables, copied whole by `spn-devex docs styles cut` from support-web-ds-ts v11.26.0. Never edited by hand: cut copies them again. */
 /* =========================================================================
    DESIGN TOKENS  —  see docs/04-capabilities/05-web/support-web-ds-ts/03-design-system.md
    Tier 0 seed (only per-theme knob) · Tier 1 ramps · Tier 2 roles
@@ -139,7 +139,7 @@
   --font-display: 'DSThemeDisplay', 'DSDefaultDisplay', var(--font-text);
   --font-code: 'DSThemeCode', 'DSDefaultCode', ui-monospace, monospace;
   /* The family of the display steps (HEADING_LG and up, TITLE_XXL2 and up): the text family at the root; a site's page,
-       wrapped in DSSiteLayout, switches it to the display family (see the site scope at the end of this file). */
+       wrapped in DSSitePage, switches it to the display family (see the site scope at the end of this file). */
   --font-heading: var(--font-text);
   --font-weight-regular: 400;
   --font-weight-medium: 500;
@@ -1788,7 +1788,7 @@
 }
 
 /* THE SITE SCOPE
-   A site's page, a marketing page or a doc of a web app, is wrapped once in DSSiteLayout, which renders
+   A site's page, a marketing page or a doc of a web app, is wrapped once in DSSitePage, which renders
    data-ds-page='SITE'. Inside it the display steps read the display family. A page a person works on is never wrapped,
    so --font-heading stays the text family there. */
 [data-ds-page='SITE'] {
