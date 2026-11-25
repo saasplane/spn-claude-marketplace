@@ -21334,11 +21334,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/module/README.md",
           "heading": "The web module — the same layers, a person as the transport"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
