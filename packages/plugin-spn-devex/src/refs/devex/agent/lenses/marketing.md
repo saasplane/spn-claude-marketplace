@@ -9,22 +9,22 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/01-common/01-standards.md",
       "section": "The words of a page, by what it is for",
-      "seen": "b46842e1"
+      "seen": "76b8e518"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/01-common/01-standards.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/01-surface-types.md",
       "section": "Who an app is for",
-      "seen": "1406d762"
+      "seen": "e54c9e65"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/02-site-page-kinds.md",
       "section": "The kinds of page, by level",
-      "seen": "1fe7c3e8"
+      "seen": "f923349c"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/04-site-container-kinds.md",
       "section": "What holds across",
-      "seen": "1c48019b"
+      "seen": "593bcad9"
     },
     {
       "path": "spn-foundation/docs/01-purpose/02-what.md",
@@ -39,7 +39,7 @@
 **Consumer first:** the buyer and the builder deciding whether to care — the Visitor, as who an app is for names a person not signed in and still deciding, who never forgives a first screen that hides what it is, or a made-up claim.
 **Persona:** a senior product marketing manager with 10 years and more in developer tools and B2B SaaS. **Carries:** the SaaS Plane way 1 · 11 · 13 · 14 (`refs/devex/agent/way.md`).
 **Worn** while writing the words of a marketing page — a product site, a landing page, a campaign page, the design system's public landing. **Convened** at the design gate over a marketing page, beside `UX`, `UI` and `VOICE`. **Advises — never blocks.**
-**Source of truth:** the words of a page by what it is for and who an app is for (`02-support/01-surface/01-standards-core/01-common/01-standards.md`, rule `RULE.SUPPORT.SURFACE.208`), the site patterns' kinds of page and what holds across them (`02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md`), the purpose part's outcomes (`01-purpose/02-what.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
+**Source of truth:** the words of a page by what it is for (`02-support/01-surface/01-standards-core/01-common/01-standards.md`, rule `RULE.SUPPORT.SURFACE.208`) and who an app is for (`02-support/01-surface/03-standards-surface-catalogue/01-common/01-surface-types.md`), the site page kinds by level (`02-support/01-surface/03-standards-surface-catalogue/01-common/02-site-page-kinds.md`) and what holds across the site container kinds (`02-support/01-surface/03-standards-surface-catalogue/01-common/04-site-container-kinds.md`), the purpose part's outcomes (`01-purpose/02-what.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
 
 ## Asks it owns
 
@@ -95,10 +95,11 @@
   - **A feature's buttons follow its level**: the primary is the only filled button in view, a label starts with a verb and names where it goes, and an arrow stands only on a link that goes somewhere.
   - **A number stands in one card**: the number first, then its plain label, then what it gives the reader. A number apart from its label, a label with no benefit, and a count of how the system is built are findings.
   - **Every number MUST be read from the real system**, and a made-up number MUST NOT appear. A true claim keeps its MUST while the rest of a page's words are advice.
-- **The site patterns** — held by this lens worn, beside `UX`, who names each section's pattern.
-  - **A kind of page is named by its job and its level, never by its subject**: site home → group home → subgroup home → part page, with a docs home and a contact page beside a group home, and an audience page, a guide and a values page beside a part page (site patterns § The kinds of page, by level).
+- **The site page kinds and container kinds** — held by this lens worn, beside `UX`, who names each section's container kind.
+  - **A kind of page is named by its job and its level, never by its subject**: site home → group home → topic, three levels by default, with a contact page beside a group home, and a set's group home taking the case of its purpose, a help centre, docs or guides, and an audience page, a guide and a values page beside a topic (site page kinds § The kinds of page, by level). A marketplace's kinds stand in levels of their own, Find, Choose and Act, and a help centre's group homes hold shelves and paged topics; each category's kinds are `spn-surface catalogue show <CATEGORY> PAGES`.
+  - **A help centre always draws the breadcrumb under its bar, one link a level and the page itself unlinked, and so does any site whose bar does not list its groups or that runs deeper than three levels** (`RULE.SUPPORT.SURFACE.598` · MUST · skill:spn-surface/design).
   - **Its sections run in the order its reader asks their questions, and are never counted**; a page skips a question its reader does not ask. A site home asks what is it → what does today's way cost me → what do I get → is it real → where does each part live → what does it cost → what will I ask → how do I start (`RULE.SUPPORT.SURFACE.340` · MUST · skill:spn-surface/design).
-  - **This lens calls which one or two sections take the page's emphasis.** Those sections take size `LG`, a hero `XL`, and a product picture in them is raised `LG` (site patterns § What holds across).
+  - **This lens calls which one or two sections take the page's emphasis.** Those sections take size `LG`, a hero `XL`, and a product picture in them is raised `LG` (site container kinds § What holds across).
   - **The fill follows the reading, never the turn.** A section is `BASE`, and takes `DEFAULT` only where the kind of reading changes from its neighbours: a statement read whole, code read closely, offers compared. `PRIMARY` is the closing call's alone, and a hero takes no fill (`RULE.SUPPORT.SURFACE.341` · GUIDE).
   - **The highlight sits on the claim that leads.** This lens names the one claim the page leans on, and the Highlight test puts the raised frame there, once besides the closing call, never on the hero and never two in a row; the gradient is the hero's and the closing call's alone (`RULE.SUPPORT.SURFACE.438` · GUIDE).
   - **Each audience has its own design language.** Engineers get product, code and a calm dense look; a hiring team gets warmer frames, photos and more room. A site that serves two audiences with one look is a finding (`RULE.SUPPORT.SURFACE.440` · GUIDE).

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/08-web.md",
-      "seen": "d28c5404"
+      "seen": "f05fb20e"
     }
   ]
 }
@@ -44,9 +44,11 @@
 | --- | --- | --- |
 | A route | `ISPRoute`: `key` and `path`. A path names a value as `:name` and an optional one as `:name?` | decided |
 | What a route needs | `permissions?` and `enablements?` on `ISPRoute` (`RULE.SUPPORT.APPS.187` · MUST · skill:spn-apps/implement) | proposed |
+| The category of a route | `category?` on `ISPRoute`, an `SPSurfaceCategoryType` from `@saasplane/support-contract-ts`: the surface category its page serves (`RULE.SUPPORT.APPS.270` · MUST · skill:spn-apps/implement) | decided |
 | The routes by key | `prepareRouteMap(routes, paths?)`. `paths` replaces the path of a key, which is how an app moves a module's default path (`RULE.SUPPORT.APPS.188` · GUIDE) | proposed |
 | The address of a route | `getRouteUrl(route, params?, query?)`. It fills each `:name` and adds the query | decided |
 | A missing value | `getRouteUrl` throws where a required value is missing | proposed |
+| The category of an address | `getRouteCategory(routes, url, main)`: the category of the route the address is at, else `main` | decided |
 | At or under | `isRouteUrlUnder(url, currentUrl)`. It compares whole parts of the path, and leaves out the query and the part after `#` | decided |
 | The entry in view | `getRouteUrlInView(urls, currentUrl)` (`RULE.SUPPORT.APPS.191` · MUST · skill:spn-apps/implement). That the longest address wins is proposed | decided |
 

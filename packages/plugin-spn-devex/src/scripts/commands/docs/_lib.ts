@@ -2421,6 +2421,15 @@ export function face(tree: string, write: boolean, scope: FaceScope = { paths: [
   const tags = asked("tags") ? writeTagLines(tree, write, scope.paths) : { touched: [], findings: [] };
   findings.push(...tags.findings);
 
+  // A check that would write is a check that failed (S80): a generated block that no longer matches its source is a RULE
+  // finding, so `docs face check` exits 1 on it and a commit or a CI step can hold on the exit alone.
+  if (!write) {
+    for (const file of touched)
+      findings.push({ check: "face", grade: "RULE", file: join(tree, file), message: "a generated block no longer matches its source; `spn-devex docs face write` writes it again" });
+    for (const file of tags.touched)
+      findings.push({ check: "face", grade: "RULE", file: join(tree, String(file)), message: "a tag line no longer matches its block; `spn-devex docs face write` writes it again" });
+  }
+
   // Each line speaks for the blocks the run asked for, and for those alone.
   if (asked("glossary") || asked("constructs") || asked("contents") || asked("surface-catalogue") || asked("surface-design-language"))
     console.log(touched.length

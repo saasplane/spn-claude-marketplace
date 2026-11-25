@@ -515,71 +515,149 @@ try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(
   });
 })();
 
-/* THE SURFACE PAGE: the bar's three switches, and the frame's document. The page's markup stands in `<template id="page">`; this builds
-   the frame's document from it, linking `design-system.css` from the folder this script was served from, the cut of the design system
-   that `<meta name="surface-ds">` names, and the app's stylesheet at the path `<meta name="surface-app-css">` names. Width sizes the frame; mode sets
-   `data-mode` on the frame's own `<html>`, and notes shows or hides each `[data-note]` in it, both set directly with no message. The
-   choice is kept in this browser, so the next page opens in the same view (05-pages.md, The surface preview). */
+/* THE SURFACE PAGE: the bar's three switches, and the frame's document. The page's markup stands in one `<template id="page-<MODE>-<DEVICE>">`
+   for each device and mode that was rendered; the switches pick the template for the choice and swap the frame's markup, and where there is none
+   for it they restyle the nearest one only (mode on the frame's `<html>`, width on the frame). The frame's document holds the template's
+   markup and nothing else, linking `design-system.css` from the folder this script was served from (the cut of the design system that
+   `<meta name="surface-ds">` names) and the app's stylesheet at the path `<meta name="surface-app-css">` names. Notes live outside the page, in
+   `<script type="application/json" id="sample-notes">`, a list of { n, kind, case, status, text }, `n` the place of a top-level section
+   counted from 0; a note is a number, a short title and one plain sentence, with no link; the Notes switch opens a panel beside the stage and puts a small numbered badge over each section's top-left, and does neither when off. A `#<id>` in
+   the page's address scrolls the frame to that element. The choice is kept in this browser (05-pages.md, The surface preview). */
 (function () {
   var root = document.querySelector('.sds-surface'); if (!root) return;
   var frame = root.querySelector('.sds-surface-frame');
-  var template = document.getElementById('page');
+  var stage = root.querySelector('.sds-surface-stage');
+  var layer = root.querySelector('.sds-surface-notes');
+  var panel = root.querySelector('.sds-surface-panel');
   var state = { width: 'desktop', mode: 'light', notes: false };
   try { var kept = JSON.parse(localStorage.getItem('sds-surface') || '{}'); for (var k in state) if (k in kept) state[k] = kept[k]; } catch (e) {}
   function meta(name) { var m = document.querySelector('meta[name="' + name + '"]'); return m ? (m.getAttribute('content') || '').trim() : ''; }
   function attr(text) { return String(text).replace(/&/g, '&amp;').replace(/"/g, '&quot;'); }
+  function text(v) { return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
   var own = document.querySelector('script[src*="docs-page.js"]');
   var folder = own ? own.getAttribute('src').replace(/[^\/]*$/, '') : '';
   var appCss = meta('surface-app-css');
-  // A note is a sticky note: one class, the drawn from the design system's warning tokens, so it follows light, dark and the theme, drawn in the frame's document.
-  var NOTE_CSS = '.sds-note{position:absolute;top:12px;left:12px;z-index:60;max-width:300px;padding:8px 10px;border:1px solid var(--warning);border-radius:8px;background:var(--warning-subtle);color:var(--on-warning-subtle);font:500 13px/1.45 system-ui,sans-serif;box-shadow:0 4px 12px rgba(0,0,0,.18)}';
-  function pageDocument() {
+  var notes = []; try { var nj = document.getElementById('sample-notes'); notes = nj ? JSON.parse(nj.textContent || '[]') : []; } catch (e) {}
+  var templates = Array.prototype.slice.call(document.querySelectorAll('template[id^="page-"], template#page'));
+  var DEVICE = { desktop: 'DESKTOP', tablet: 'TABLET', phone: 'PHONE' };
+  // The template for the choice: the exact one, else the same device in the other mode, else the other devices in the same mode, else any.
+  function pick() {
+    var mode = state.mode.toUpperCase(), device = DEVICE[state.width] || 'DESKTOP';
+    function by(id) { return document.getElementById(id) && document.getElementById(id).tagName === 'TEMPLATE' ? document.getElementById(id) : null; }
+    var found = by('page-' + mode + '-' + device) || by('page-' + (mode === 'LIGHT' ? 'DARK' : 'LIGHT') + '-' + device);
+    for (var i = 0; i < templates.length && !found; i++) if (templates[i].id.indexOf('page-' + mode + '-') === 0) found = templates[i];
+    return found || templates[0] || null;
+  }
+  var shown = null;
+  function pageDocument(template) {
     return '<!doctype html><html lang="en" data-mode="' + state.mode + '"><head><meta charset="utf-8">' +
       '<meta name="viewport" content="width=device-width, initial-scale=1">' +
       '<link rel="stylesheet" href="' + attr(folder + 'design-system.css') + '">' +
       (appCss && appCss.charAt(0) !== '{' ? '<link rel="stylesheet" href="' + attr(appCss) + '">' : '') +
-      '<style>html,body{margin:0}body{background:var(--surface,var(--background));color:var(--foreground)}' + NOTE_CSS + '</style></head><body>' +
+      '<style>html,body{margin:0}body{background:var(--surface,var(--background));color:var(--foreground)}</style></head><body>' +
       (template ? template.innerHTML : '') + '</body></html>';
   }
-  // The mode and the notes are set on the frame's own document, which is this page's origin.
-  function set() {
-    try {
-      var inner = frame.contentDocument; if (!inner || !inner.documentElement) return;
-      inner.documentElement.setAttribute('data-mode', state.mode);
-      Array.prototype.forEach.call(inner.querySelectorAll('[data-note]'), function (n) { n.hidden = !state.notes; });
-    } catch (e) {}
+  function inner() { try { return frame.contentDocument && frame.contentDocument.documentElement ? frame.contentDocument : null; } catch (e) { return null; } }
+  // The top-level sections of the page, in order: the section containers that stand in no other section, within the page's own roots
+  // (`[data-layout-page]`, else `[data-ds-page]`); where a root holds none, its children are the sections.
+  function sections(doc) {
+    var all = '[data-layout-page],[class*="&>[data-item-head]"]';
+    var roots = Array.prototype.filter.call(doc.querySelectorAll(all), function (e) { return !e.parentElement.closest(all); });
+    if (!roots.length) roots = Array.prototype.slice.call(doc.querySelectorAll('[data-ds-page]'));
+    var out = [];
+    roots.forEach(function (r) {
+      var q = Array.prototype.filter.call(r.querySelectorAll('[data-slot=section-container]'), function (e) {
+        var up = e.parentElement.closest('[data-slot=section-container]'); return up === null || !r.contains(up);
+      });
+      if (q.length) { out = out.concat(q); return; }
+      var k = Array.prototype.slice.call(r.children);
+      if (k.length === 1 && k[0].hasAttribute('data-place')) k = Array.prototype.slice.call(k[0].children);
+      out = out.concat(k);
+    });
+    return out;
   }
-  // Each device frames the page at its own width, so the page lays itself out as on that device; where the stage is
-  // narrower, the frame is scaled down whole and never narrowed, so Desktop never falls into the tablet's layout.
   var WIDTHS = { desktop: 1440, tablet: 768, phone: 390 };
-  var stage = root.querySelector('.sds-surface-stage');
+  var scale = 1, left = 0;
+  // The frame takes the stage's whole width: the device's width is scaled to fit it, never above 1, centred, so the right edge is never cropped.
   function fit() {
     var w = WIDTHS[state.width] || WIDTHS.desktop, room = stage.clientWidth, high = stage.clientHeight;
-    var scale = Math.min(1, room / w);
+    scale = Math.min(1, room / w);
     frame.style.width = w + 'px';
     frame.style.height = (high / scale) + 'px';
     frame.style.transform = scale < 1 ? 'scale(' + scale + ')' : '';
-    frame.style.marginLeft = Math.max(0, (room - w * scale) / 2) + 'px';
+    left = Math.max(0, (room - w * scale) / 2);
+    frame.style.marginLeft = left + 'px';
   }
-  addEventListener('resize', fit);
+  // A note's short title: the kind's name and, where it matters, its case in words.
+  function words(w) { w = String(w || '').replace(/[-_]+/g, ' ').trim(); return w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : ''; }
+  function title(note) { return [words(note.kind), note.case ? String(note.case).trim() : ''].filter(Boolean).join(' \u00b7 '); }
+  var NOTICE = 'All words, names, dates and figures on this page are sample values.';
+  // Notes opens a panel beside the stage (a sheet under it on a narrow window), solid, listing the notes in order; the page itself carries
+  // only a small numbered badge at each section's top-left, in the page's side room. A note scrolls the frame to its section.
+  function drawNotes() {
+    panel.hidden = !state.notes; layer.hidden = !state.notes; layer.textContent = '';
+    if (!state.notes) { panel.textContent = ''; return; }
+    if (!panel.firstChild) {
+      var html = '<p>' + text(NOTICE) + '</p><ol>';
+      notes.forEach(function (note, i) {
+        var line = text(String(note.text || '').split(NOTICE).join('').trim());
+        html += '<li data-note="' + i + '"><b>' + (i + 1) + '</b><strong title="' + attr(title(note)) + '">' + text(title(note)) + '</strong>' + (line ? '<span>' + line + '</span>' : '') + '</li>';
+      });
+      panel.innerHTML = html + '</ol>';
+    }
+    var doc = inner(); if (!doc || !notes.length) return;
+    var list = sections(doc), badges = '';
+    notes.forEach(function (note, i) {
+      var section = list[note.n | 0]; if (!section) return;
+      var box = section.getBoundingClientRect(), top = box.top * scale + 3;
+      if (top + 20 < 0 || top > stage.clientHeight) return;
+      badges += '<span class="sds-surface-badge" data-note="' + i + '" style="top:' + Math.max(3, top) + 'px;left:' + (left + Math.max(0, box.left) * scale + 3) + 'px">' + (i + 1) + '</span>';
+    });
+    layer.innerHTML = badges;
+  }
+  // A `#<id>` scrolls the frame to the element of that id; failing that, to the first section whose note's kind is that word.
+  function anchor() {
+    var doc = inner(), id = decodeURIComponent((location.hash || '').slice(1)); if (!doc || !id) return;
+    var el = doc.getElementById(id);
+    if (!el) { var list = sections(doc); for (var i = 0; i < notes.length && !el; i++) if (notes[i].kind === id) el = list[notes[i].n | 0]; }
+    if (el && el.scrollIntoView) el.scrollIntoView();
+  }
+  function set() {
+    var doc = inner(); if (!doc) return;
+    doc.documentElement.setAttribute('data-mode', state.mode);
+    drawNotes();
+  }
   function apply() {
     root.setAttribute('data-width', state.width);
+    panel.hidden = !state.notes;
     fit();
     Array.prototype.forEach.call(root.querySelectorAll('[data-surface]'), function (b) {
       var key = b.getAttribute('data-surface'), value = b.getAttribute('data-value');
       b.setAttribute('aria-pressed', String(key === 'notes' ? state.notes : state[key] === value));
     });
     try { localStorage.setItem('sds-surface', JSON.stringify(state)); } catch (e) {}
-    set();
+    var want = pick();
+    if (want !== shown) { shown = want; frame.srcdoc = pageDocument(want); } else set();
   }
+  addEventListener('resize', function () { fit(); drawNotes(); });
+  addEventListener('hashchange', anchor);
   root.addEventListener('click', function (e) {
+    var n = e.target.closest('[data-note]');
+    if (n) {
+      var i = +n.getAttribute('data-note'), doc = inner();
+      if (n.classList.contains('sds-surface-badge')) { var item = panel.querySelector('li[data-note="' + i + '"]'); if (item) item.scrollIntoView({ block: 'nearest' }); }
+      else if (doc && notes[i]) { var target = sections(doc)[notes[i].n | 0]; if (target) target.scrollIntoView(); }
+      return;
+    }
     var b = e.target.closest('[data-surface]'); if (!b) return;
     var key = b.getAttribute('data-surface');
     if (key === 'notes') state.notes = !state.notes; else state[key] = b.getAttribute('data-value');
     apply();
   });
-  frame.addEventListener('load', set);
-  frame.srcdoc = pageDocument();
+  frame.addEventListener('load', function () {
+    set(); anchor();
+    var win = frame.contentWindow; if (win) { win.addEventListener('scroll', drawNotes, { passive: true }); win.addEventListener('resize', drawNotes); }
+  });
   apply();
 })();
 
@@ -650,3 +728,29 @@ try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(
     });
   });
 })();
+
+/* A JSON FACT'S DIALOG: its chip opens it with showModal and focus goes to the close button; the close button, Escape and a click outside close it,
+   and focus returns to the chip. Copy JSON copies the value's formatted JSON. */
+document.addEventListener('click', function (e) {
+  var t = e.target && e.target.closest ? e.target : null;
+  if (!t) return;
+  var chip = t.closest('.sds-json-chip');
+  if (chip) {
+    var dlg = document.getElementById(chip.getAttribute('data-json-open'));
+    if (dlg && dlg.showModal && !dlg.open) {
+      chip.setAttribute('aria-expanded', 'true');
+      dlg.addEventListener('close', function () { chip.setAttribute('aria-expanded', 'false'); chip.focus(); }, { once: true });
+      dlg.showModal();
+      var x = dlg.querySelector('.sds-json-close'); if (x) x.focus();
+    }
+    return;
+  }
+  if (t.closest('.sds-json-close')) { t.closest('dialog').close(); return; }
+  if (t.classList && t.classList.contains('sds-json-dialog')) { t.close(); return; }
+  var b = t.closest('.sds-json-copy');
+  if (!b) return;
+  var live = b.closest('.sds-json-code') && b.closest('.sds-json-code').querySelector('.sds-json-live');
+  var done = function () { b.classList.add('sds-is-copied'); if (live) live.textContent = 'Copied'; setTimeout(function () { b.classList.remove('sds-is-copied'); if (live) live.textContent = ''; }, 1500); };
+  var text = b.getAttribute('data-json') || '';
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, done); else done();
+});

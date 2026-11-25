@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
-      "seen": "3c1e6d65"
+      "seen": "0fb0d490"
     }
   ]
 }
@@ -32,7 +32,7 @@
 
 3. **Fill.** The masthead's three levels first (Title, Subtitle, Description). Then each section: its block by rule 549 (`blocks.md`, the table of which content takes which block), its figure by rule 548, its words by the voice. Every placeholder is filled and every section holds something, or the section is removed where the kind allows it. A section is never left with its heading and a placeholder.
 
-4. **Check.** `spn-devex docs page check <file>`: no placeholder, no empty section, no finding. Act on every hint too; a hint is the block or figure the page should have used.
+4. **Check.** `spn-devex docs page check <file>`: no placeholder, no empty section, no finding. Act on every hint too; a hint is the block or figure the page should have used. Where `docs page write` named an overview it leaves owed, rewrite that overview's sections from the construct page as it now reads, then `spn-devex docs page stamp <overview>`, in the same work and unasked (`RULE.DEVEX.WORKSPACE.581` · MUST · check:doc-check).
 
 5. **Look.** `spn-devex docs look <file>`, in light and in dark, at the Mac widths of the Docs look. A page you have not looked at is a page you have not seen.
 

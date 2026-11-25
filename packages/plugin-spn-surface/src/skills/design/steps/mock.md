@@ -4,12 +4,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
       "section": "`SKELETON` — a mock of a layout",
-      "seen": "f6e93189"
+      "seen": "5dbe783b"
     },
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/06-architecture-components.md",
+      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/07-architecture-components.md",
       "section": "The choice table",
-      "seen": "15f17128"
+      "seen": "5c7c26f4"
     }
   ]
 }
@@ -45,6 +45,7 @@ Its provenance is the foundation book's docs chapter, on the skeleton and the fl
 ## What a mock is, and what it is not
 
 - **A mock names units, and never their props.** It shows where each block stands and which unit it is: `DSPanelContainer`, `DSDataTable`, `DSCard`, an item line, a button. The choice table gives each unit its props when the page is built, so a mock writes no variant, colour or size.
+- **A unit the render will not draw with the props given is a finding of the render, and the mock says so.** The book states that a tree holds units, placements, slots and text, that media is a slot and never a path to an image, and that a unit which will not render with its props is a finding and never a silent gap. Draw the page as far as the render allows, and name what stays in words.
 - **A skeleton shows no look.** No colour that means something, no size in pixels, no theme, no unit drawn by hand from the library. The library holds the look: the render draws a built unit with it, and the Figma step draws it in Figma.
 - **A mock is drawn in a skeleton's own words and nothing else.** Out of it are clicking from page to page, sending the mock to Figma, and a native screen.
 
@@ -54,7 +55,7 @@ Before the first unit or skeleton, write the facts of step 0 and step 2 at the h
 
 ## One skeleton for each page, in the order a person meets them
 
-- **A page of a unit the design system does not build yet is one spec, a skeleton marked `"planned": true`, started from the spec of its pattern** (`refs/support/surface/standards-patterns.md`, under *The specs a screen starts from*). Copy the pattern's spec, put the page's own words and data in place of the samples, and keep the arrangement. Never start from an empty file.
+- **A page of a unit the design system does not build yet is one spec, a skeleton marked `"planned": true`, started from the spec of its page kind** (`refs/support/surface/standards-patterns.md`, under *The specs a screen starts from*). Copy the page kind's spec, put the page's own words and data in place of the samples, and keep the arrangement. Never start from an empty file.
 - **The spec draws every level of the page, from the tree**: its `layout`, each view's page level as `page`, and the `unit` of each panel, widget and card. Each line of the tree is a frame, a part, an item or a control of the spec.
 - **A view for each screen class only where the arrangement changes.** A desktop view, and a phone view where the arrangement differs at a phone, as step 3 of the tree says: a data table that becomes a list, two parts that become one with a way back. A frame that only takes the whole screen on a phone, such as a sheet, gets no phone view. A tablet view only where the tablet differs from both.
 - **Each dialog, sheet or drawer is its own view**, a whole frame of its own over the page it opens from. It is a view a person sees as one task, and it holds its own main action.

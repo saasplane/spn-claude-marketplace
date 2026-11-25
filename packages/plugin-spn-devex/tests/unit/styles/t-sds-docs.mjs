@@ -34,6 +34,8 @@ const open = (blocks) => {
   // The page is a page with no figure and no mode switch: the docs design language's behaviour (the mode switch, a figure's steps,
   // its tap to open, its motion) finds nothing on it, and the script must still colour the blocks.
   const document = {
+    // The page's one listener, for a JSON fact's chip that opens its dialog, finds no chip on this page.
+    addEventListener() {},
     getElementById: () => null,
     querySelector: () => null,
     documentElement: { getAttribute: () => null, setAttribute() {} },
@@ -159,7 +161,7 @@ console.log("=== the shared script — a tabset shows one panel, takes the arrow
     const set = { querySelectorAll: () => tabs, querySelector: () => bar, classList: { add: (c) => classes.add(c) } };
     classes.clear();
     const document = {
-      getElementById: (id) => panels[id] ?? null, querySelector: () => null, createElement: (t) => el(t),
+      addEventListener() {}, getElementById: (id) => panels[id] ?? null, querySelector: () => null, createElement: (t) => el(t),
       documentElement: { getAttribute: () => null, setAttribute() {} },
       querySelectorAll: (selector) => (selector === ".sds-tabset" ? [set] : []),
     };

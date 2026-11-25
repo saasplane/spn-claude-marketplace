@@ -61,13 +61,14 @@ export const slugOf = (name: string): string => name.toLowerCase().replace(/[^a-
 
 /**
  * The surface page template filled with one copy: the name in its `<title>`, bar title and frame title, the page's id, the two metas, and the
- * page's markup in place of the sample between `<template id="page">` and its end. A template that holds no such tags is refused by the caller.
+ * page's markup in place of the sample between the template's first `<template id="page-<MODE>-<DEVICE>">` tag and its end. A template that holds no such tags is refused by the caller.
  */
 export function fillTemplate(template: string, markup: string, options: { name: string; ds: string; appCss: string }): string {
-  const open = template.indexOf('<template id="page">');
+  const tag = /<template id="page(?:-(?:LIGHT|DARK)-(?:DESKTOP|TABLET|PHONE))?">/.exec(template);
+  const open = tag ? tag.index : -1;
   const close = template.indexOf("</template>", open);
-  if (open < 0 || close < 0) throw new UsageFault("takes a surface page template that holds a `<template id=\"page\">`, and this one does not.");
-  const head = template.slice(0, open + '<template id="page">'.length);
+  if (!tag || close < 0) throw new UsageFault("takes a surface page template that holds a `<template id=\"page-<MODE>-<DEVICE>\">`, and this one does not.");
+  const head = template.slice(0, open + tag[0].length);
   const filled = `${head}\n${markup}${template.slice(close)}`
     .replace(/\{\{NAME\}\}/g, escapeHtml(options.name))
     .replace(/\{\{page\}\}/g, slugOf(options.name))

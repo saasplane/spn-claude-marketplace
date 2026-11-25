@@ -60,6 +60,7 @@ const ARC_PART = ARC_ID.source.slice(1, -1);
 import { blockFit, fitKind, templateFrameFindings } from "../lib/block-fit.ts";
 import { shownCommandFindings } from "./shown-commands.ts";
 import { tableHintsOf } from "../commands/docs/blocks.ts";
+import { stampFindings } from "../lib/overview-stamp.ts";
 import { findPartnerWords } from "./partner-words.ts";
 import { titleFindingsOnDisk } from "./page-title.ts";
 import { whereTreeFindings } from "./where-tree.ts";
@@ -219,7 +220,7 @@ function pocketKind(parts: string[]): { place: string; suffix: string } | null {
   if (inside !== null)
     return inside.slice(0, -1).includes(CONSTRUCT_PAGES)
       ? { place: `in ${CONSTRUCT_PAGES}/`, suffix: CONSTRUCT_PAGE_SUFFIX }
-      : { place: `under ${POCKET.artifacts}/${ARTIFACT.docs}/, in no ${CONSTRUCT_PAGES}/ folder,`, suffix: OVERVIEW_PAGE_SUFFIX };
+      : { place: `under ${POCKET.artifacts}/${VISIBILITY.public}/${ARTIFACT.docs}/, in no ${CONSTRUCT_PAGES}/ folder,`, suffix: OVERVIEW_PAGE_SUFFIX };
   return parts.includes(POCKET.artifacts) && parts.at(-2) === ARTIFACT.guides
     ? { place: `in ${ARTIFACT.guides}/`, suffix: GUIDE_PAGE_SUFFIX } : null;
 }
@@ -574,7 +575,7 @@ export function approachShape(text: string, exempt = false, closed = false): Fin
   const missing = ["why", "what", "how"].filter((s) => !heads.includes(s));
   if (missing.length)
     return [["RULE", "carries no " + missing.join(" + ") + " — this explains rather than argues, so " +
-      `it is an overview: ${POCKET.artifacts}/${ARTIFACT.docs}/<domain>/<name>${OVERVIEW_PAGE_SUFFIX} (RULE.DEVEX.WORKSPACE.102 / 040). An approach ` +
+      `it is an overview: ${POCKET.artifacts}/${VISIBILITY.public}/${ARTIFACT.docs}/<domain>/<name>${OVERVIEW_PAGE_SUFFIX} (RULE.DEVEX.WORKSPACE.102 / 040). An approach ` +
       "is an opening, then Why > What > Plan > How > Open > Deferred"]];
   if (exempt) return [];
 
@@ -748,14 +749,17 @@ export function surfacePageShape(text: string): Finding[] {
   if (!/class="sds-surface-bar"/.test(bare) || !/class="sds-surface-title"/.test(bare)) parts.push("has no bar with the page's title");
   else if (switches.length) parts.push(`has no ${switches.join(" and no ")} switch in its bar`);
   if (!/<iframe\b[^>]*class="[^"]*sds-surface-frame[^"]*"[^>]*>/.test(bare)) parts.push("has no frame for the page");
-  if (!/<template\s+id="page"[^>]*>/.test(bare)) parts.push("has no `<template id=\"page\">` holding the page's markup");
+  if (!/<template\s+id="page(?:-(?:LIGHT|DARK)-(?:DESKTOP|TABLET|PHONE))?"[^>]*>/.test(bare)) parts.push("has no `<template id=\"page-<MODE>-<DEVICE>\">` holding the page's markup");
+  if (/<template\s+id="page-[^"]*"[\s\S]*?(?:data-section=|class="sds-note")/.test(bare)) parts.push("holds a section wrapper or a note aside in the page's markup (the frame holds the render's output and nothing else; notes live in `#sample-notes`)");
+  const notesJson = /<script\s+type="application\/json"\s+id="sample-notes"[^>]*>([\s\S]*?)<\/script>/.exec(bare)?.[1];
+  if (notesJson !== undefined) { try { if (!Array.isArray(JSON.parse(notesJson))) throw new Error("not a list"); } catch { parts.push("has a `#sample-notes` that is no JSON list"); } }
   const ds = /<meta\s+name="surface-ds"\s+content="([^"]*)"/.exec(bare)?.[1];
   if (ds === undefined) parts.push("has no `surface-ds` meta naming the design system's version");
   else if (!slots && !/^\d+\.\d+\.\d+$/.test(ds.trim())) parts.push(`names \`${ds}\` in its \`surface-ds\` meta, which is no version`);
   const app = /<meta\s+name="surface-app-css"\s+content="([^"]*)"/.exec(bare)?.[1];
   if (app === undefined) parts.push("has no `surface-app-css` meta naming the app's stylesheet");
   else if (!slots && app.trim() && /^([a-z][a-z0-9+.-]*:|\/)/i.test(app.trim())) parts.push("names an app stylesheet that is no relative path (it is empty for Surface's own look)");
-  const outside = bare.replace(/<template\b[\s\S]*?<\/template>/i, " ").replace(/<header\b[\s\S]*?<\/header>/i, "");
+  const outside = bare.replace(/<template\b[\s\S]*?<\/template>/gi, " ").replace(/<script\b[\s\S]*?<\/script>/gi, " ").replace(/<header\b[\s\S]*?<\/header>/i, "");
   if (/<(?:h2|h3|section|table|ul|ol|p)\b/i.test(outside)) parts.push("holds words of its own beside the bar and the template");
   if (!parts.length) return [];
   return [["RULE", `a surface page ${parts.join(", and ")} (RULE.DEVEX.WORKSPACE.535, .536) · keep to the template: the bar, the frame and the page's markup in its template, with the two metas`]];
@@ -1576,6 +1580,8 @@ export function check(path: string, text: string, fragment = false): Finding[] {
   // Every page that carries a rail owes it the shared script, a preview and a samples index as much
   // as an approach page: a page rewritten whole and short of that line shows an empty outline.
   if (isHtml && !fragment) out.push(...pageFurniture(text));
+  // AN OVERVIEW MOVES WITH THE CONSTRUCT PAGES IT SUMMARISES (RULE.DEVEX.WORKSPACE.581): its stamp is read against their seat files as they are now.
+  if (isHtml && !fragment) out.push(...stampFindings(path, text));
 
   if ((isApproach || isOverview) && !fragment) {
     if (!/who this is for|audience/i.test(text))

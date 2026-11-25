@@ -37,6 +37,20 @@ ok("a part the outline names and a category lacks is refused", checkCatalogue({ 
 console.log("=== the catalogue frame");
 const text = renderCatalogue(catalogue, "docs/specs/surface/catalogue.json");
 ok("it opens with the Shared panel and one tab a part", text.startsWith("~~~group Shared | kept the same\n~~~tabs look=LINE\n--- Brand\n"));
+{
+  const anchors = [...text.matchAll(/^  Anchor: (\S+)$/gm)].map((m) => m[1]);
+  ok("every kind's entry carries an anchor, <category>-<kind> in lower case with hyphens, once", anchors.length > 0 && anchors.every((a) => /^[a-z]+-[a-z0-9-]+$/.test(a)) && new Set(anchors).size === anchors.length && anchors.some((a) => a.startsWith("marketing-")), anchors.slice(0, 5).join());
+}
+{
+  // A kind's whole entry stands once, in its own place: units, placement and style as JSON facts, default case, level, order and cases in words, a planned kind marked.
+  const rich = checkCatalogue({ ...raw, categories: { MARKETING: { ...raw.categories.MARKETING, CONTAINERS: [kind("HERO", { status: "PLANNED", missing: "DSHeroScene", units: { container: { unit: "DSSectionContainer" } }, placement: { level: "2 OR DEEPER" }, style: { ground: "BASE" },
+    defaultCase: "ON_SCENE", order: ["HERO", { kind: "DOORS", case: "DOOR_CARDS" }], cases: [{ code: "ON_SCENE", when: "the scene sets the ground", status: "PLANNED", missing: "DSScene" }] })] } } }).catalogue;
+  const entry = renderCatalogue(rich, "docs/specs/surface/catalogue.json");
+  ok("a kind's units, placement and style are JSON facts, its default case, level and order are in words, and each case is a line with what it needs",
+    entry.includes("  Units: `{") && entry.includes("  Placement: `{") && entry.includes("  Style: `{") && entry.includes("  Default case: on scene") && entry.includes("  At level: 2 or deeper")
+      && entry.includes("  Order: Hero → Doors (door cards)") && entry.includes("  Case: On scene | the scene sets the ground Planned: needs DSScene."), entry.slice(entry.indexOf("Hero |"), entry.indexOf("Hero |") + 900));
+  ok("a planned kind is marked as planned and says what it needs", entry.includes("[HERO] [PLANNED]") && entry.includes("Planned: needs DSHeroScene."));
+}
 ok("a category is a heading and a Structure and a Style panel", text.includes("### MARKETING — a site for a Visitor\n\n~~~group Structure | how pages are built") && text.includes("~~~group Style | how pages look"));
 ok("a kind's code and its floor are tags in one fact, and no state is drawn", text.includes("  Code: [TOPNAV] [FLOOR]") && !text.includes("State"));
 ok("an empty part is its note as one row", text.includes("None defined yet | a site takes the one default theme"));
@@ -79,6 +93,7 @@ const page = renderLanguage(catalogue, r, { specPath: "specs/design-languages/de
 ok("it opens with the language's panel and links the parent's page", page.startsWith("~~~group Language | demo 1.0.0") && page.includes("Extends: [surface@1](13-language-surface.md)"));
 ok("a kind's state stands as a tag beside its code", page.includes("  Code: [HERO] [CUSTOMISED]") && page.includes("  Code: [NUMBERS] [NOT_USED]") && page.includes("  Code: [PLANS] [NEW]"));
 ok("the part's source and its values stand in the tab", page.includes("Filled by: [OWN]") && page.includes("  Source: [OWN]"));
+ok("a value's key stands in words as its row's title, and its JSON is emitted for the writer to draw", !page.includes("\ntheBrand\n") && /\nThe brand\n  Source: \[(OWN|INHERITED)\]/.test(page) && /  Value: `\{"primary"/.test(page), page.slice(0, 900));
 ok("a wholly inherited category is one line", renderLanguage(catalogue, resolveLanguage(catalogue, [root, spec("quiet", "surface@1")]), { specPath: "s.json" }).includes("Inherited whole from surface@1: this language says nothing here."));
 // A LIST holds up to three facts beside its badge (RULE.DEVEX.WORKSPACE.576), so the writer never stops on a block it generates.
 const factsBesideBadge = (md) => [...md.matchAll(/```catalog[^\n]*\n([\s\S]*?)```/g)].map(([, body]) => {

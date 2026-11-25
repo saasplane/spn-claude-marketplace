@@ -1228,19 +1228,37 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
    Desktop and the device's width at Tablet and Phone, centred on the sunken ground. The page scrolls inside the frame, so the bar never
    leaves. No rail, no masthead: the page is the content (developer, 2026-11-19: "also can we keep that bar sticky"). */
 .sds-surface { position: fixed; inset: 0; display: flex; flex-direction: column; background: var(--surface-sunken); }
-.sds-surface-bar { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1.5rem; padding: .5rem 1rem;
+.sds-surface-body { flex: 1; min-height: 0; display: flex; }
+.sds-surface-bar { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: nowrap; align-items: center; gap: .5rem 1.5rem; padding: .5rem calc(max(0px, (100% - var(--sds-page-max)) / 2) + var(--sds-page-pad));
   background: var(--surface); border-bottom: 1px solid var(--surface-border);
   font-family: var(--font-text); font-size: var(--font-content-md-size); line-height: var(--font-content-md-line-height); color: var(--fg); }
-.sds-surface-title { margin: 0 auto 0 0; font-family: var(--font-heading); font-size: var(--font-title-lg-size); line-height: var(--font-title-lg-line-height); font-weight: var(--font-weight-semibold); }
+.sds-surface-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 0 auto 0 0; font-family: var(--font-heading); font-size: var(--font-title-lg-size); line-height: var(--font-title-lg-line-height); font-weight: var(--font-weight-semibold); }
 .sds-surface-switch { display: inline-flex; gap: 2px; padding: 2px; border: 1px solid var(--surface-border); border-radius: var(--radius-lg); background: var(--surface-sunken); }
 .sds-surface-switch button { font: inherit; color: var(--fg-muted); background: none; border: 0; border-radius: var(--radius-md); padding: .2rem .7rem; cursor: pointer; }
 .sds-surface-switch button:hover { color: var(--fg); }
 .sds-surface-switch button[aria-pressed="true"] { color: var(--fg); background: var(--surface); box-shadow: 0 0 0 1px var(--surface-border); }
-.sds-surface-stage { flex: 1; min-height: 0; position: relative; overflow: hidden; }
+.sds-surface-stage { flex: 1; min-width: 0; min-height: 0; position: relative; overflow: hidden; }
 /* The script gives the frame its device's width (desktop 1440, tablet 768, phone 390) and scales it to the stage; it is never narrowed. */
 .sds-surface-frame { display: block; width: 1440px; height: 100%; border: 0; background: var(--surface); transform-origin: 0 0; }
 .sds-surface[data-width="tablet"] .sds-surface-frame, .sds-surface[data-width="phone"] .sds-surface-frame { box-shadow: 0 0 0 1px var(--surface-border); }
-@media (max-width: 640px) { .sds-surface-bar { gap: .4rem .75rem; } .sds-surface-title { flex-basis: 100%; } }
+@media (max-width: 40rem) { .sds-surface-bar { flex-wrap: wrap; gap: .4rem .75rem; padding-inline: 16px; } .sds-surface-title { flex-basis: 100%; } }
+/* THE NOTES: Notes opens a panel beside the stage, so nothing lies over the page's words. The panel is plain and solid (the raised surface, its border, the page's
+   text colour, no alpha, no blur); over the page there are only the numbered badges, in the page's side room at each section's top-left. */
+.sds-surface-panel { flex: none; box-sizing: border-box; width: 20rem; overflow: auto; padding: 1rem 1.25rem 1.5rem; color: var(--fg); background: var(--surface-raised); border-left: 1px solid var(--surface-border);
+  font-family: var(--font-text); font-size: var(--font-content-md-size); line-height: var(--font-content-md-line-height); }
+.sds-surface-panel > p { margin: 0 0 1rem; color: var(--fg-quiet); }
+.sds-surface-panel ol { margin: 0; padding: 0; list-style: none; }
+.sds-surface-panel li { display: grid; grid-template-columns: 1.5rem 1fr; gap: .15rem .6rem; padding: .7rem 0; border-top: 1px solid var(--surface-border); cursor: pointer; }
+.sds-surface-panel li:hover { background: var(--surface-hover); }
+.sds-surface-panel li > b, .sds-surface-badge { display: inline-grid; place-items: center; width: 1.5rem; height: 1.5rem; font-size: var(--font-content-xs-size); font-weight: var(--font-weight-semibold); color: var(--fg); background: var(--surface-raised); border: 1px solid var(--surface-border-strong); border-radius: 999px; box-shadow: var(--shadow-elevation-sm); }
+.sds-surface-panel li > strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: var(--font-weight-semibold); }
+.sds-surface-panel li > span { grid-column: 2; color: var(--fg); }
+.sds-surface-notes { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; }
+.sds-surface-badge { position: absolute; width: 1.125rem; height: 1.125rem; font-size: .6875rem; pointer-events: auto; cursor: pointer; }
+@media (max-width: 47.99rem) {
+  .sds-surface-body { flex-direction: column; }
+  .sds-surface-panel { width: auto; flex: 0 0 40%; border-left: 0; border-top: 1px solid var(--surface-border); }
+}
 }
 
 /* BLOCKS (N017): the info-card CATALOG in three layouts and with media, TABS, the group panels, the fold and the inline UNIT. Folded in from the sample's docs-language-additions.css, unlayered as the sample loads it so each rule wins over the layered base. Every colour, size and radius is a token above, so both themes follow. */
@@ -1652,6 +1670,132 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   letter-spacing: normal;
 }
 .sds-facts .sds-fact-key { margin-right: .3em; }
+/* A FACT WHOSE VALUE IS JSON (rule 580): a chip (a tree icon and the first keys in words) that opens a native dialog of two panels:
+   the value in words, and the formatted JSON. Every value is a token the sheet already has, so both modes follow the page. The icon is Lucide's
+   list-tree, copy and check (ISC licence, (c) Lucide Contributors; THIRD-PARTY-NOTICES.md), drawn inline by the writer. */
+.sds-json-chip {
+  --chip-ink: var(--surface-brand-fg, var(--sds-accent));
+  --chip-text: color-mix(in oklch, var(--chip-ink) 75%, var(--sds-ink));
+  display: inline-flex;
+  align-items: center;
+  gap: .4em;
+  box-sizing: border-box;
+  height: 1.5em;
+  margin: 0;
+  padding: 0 .65em 0 .5em;
+  vertical-align: middle;
+  font: inherit;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--chip-text);
+  background: color-mix(in oklch, var(--chip-ink) 12%, transparent);
+  border: 1px solid color-mix(in oklch, var(--chip-ink) 80%, transparent);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color var(--motion-hover, 150ms) ease-out, border-color var(--motion-hover, 150ms) ease-out;
+}
+.sds-json-chip:hover { background: color-mix(in oklch, var(--chip-ink) 14%, transparent); border-color: var(--chip-ink); }
+.sds-json-chip[aria-expanded="true"] { background: color-mix(in oklch, var(--chip-ink) 14%, transparent); border-color: var(--chip-ink); box-shadow: 0 0 0 1px var(--chip-ink); }
+.sds-json-chip:focus-visible,
+.sds-json-copy:focus-visible,
+.sds-json-close:focus-visible { outline: 2px solid var(--sds-accent); outline-offset: 2px; }
+.sds-json-chip .sds-json-mark { flex: none; width: 14px; height: 14px; }
+.sds-json-dialog {
+  box-sizing: border-box;
+  width: min(720px, 95vw);
+  max-width: 95vw;
+  max-height: 80vh;
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  flex-direction: column;
+  color: var(--sds-ink);
+  background: var(--sds-paper);
+  border: 1px solid var(--sds-rule);
+  border-radius: var(--size-md-radius);
+  box-shadow: 0 25px 50px -12px var(--shadow-color);
+  font-family: var(--sds-ui);
+  font-size: var(--sds-small);
+  line-height: var(--sds-small-lh);
+  font-weight: var(--font-weight-regular);
+  letter-spacing: normal;
+  text-transform: none;
+  text-align: left;
+  white-space: normal;
+}
+.sds-json-dialog[data-extent="FIT"] { width: fit-content; min-width: min(720px, 95vw); max-width: 85vw; }
+.sds-json-dialog[open] { display: flex; animation: sds-json-rise var(--motion-dialog) var(--motion-ease-enter); }
+.sds-json-dialog::backdrop { background: var(--surface-overlay); }
+.sds-json-dialog[open]::backdrop { animation: sds-json-fade var(--motion-dialog) var(--motion-ease-enter); }
+@keyframes sds-json-rise { from { opacity: 0; scale: .96; } to { opacity: 1; scale: 1; } }
+@keyframes sds-json-fade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .sds-json-dialog[open], .sds-json-dialog[open]::backdrop { animation: none; } .sds-json-chip { transition: none; } }
+.sds-json-head { display: flex; align-items: center; gap: .5rem; flex: none; padding: 1rem .75rem 1rem 1.25rem; border-bottom: 1px solid var(--sds-rule); }
+.sds-json-titles { flex: 1 1 auto; min-width: 0; }
+.sds-json-dialog .sds-json-title { margin: 0; padding: 0; border: 0; font-family: var(--font-heading); font-size: var(--font-heading-xs-size); line-height: var(--font-heading-xs-line-height); font-weight: var(--font-weight-semibold); color: var(--sds-ink); letter-spacing: normal; text-transform: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }  /* the design system's dialog title: a CONTAINER-level header item, HEADING_XS, 18px semibold */
+.sds-json-copy, .sds-json-close {
+  position: relative; flex: none; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; width: 2rem; height: 2rem; margin: 0; padding: 0;
+  font: inherit; line-height: 1; color: var(--sds-slate); background: transparent; border: 1px solid transparent; border-radius: var(--radius-md); cursor: pointer;
+}
+.sds-json-close::after { content: ""; position: absolute; inset: -4px; }
+.sds-json-close { margin: -.5rem 0; }
+.sds-json-copy:hover, .sds-json-close:hover { color: var(--sds-ink); background: var(--surface-hover, var(--sds-card)); }
+.sds-json-copy .sds-json-ico-check { display: none; }
+.sds-json-copy.sds-is-copied { color: var(--sds-ink); border-color: var(--sds-accent); }
+.sds-json-copy.sds-is-copied .sds-json-ico-copy { display: none; }
+.sds-json-copy.sds-is-copied .sds-json-ico-check { display: block; }
+.sds-json-copy[data-tip]:hover::after, .sds-json-copy[data-tip]:focus-visible::after {
+  content: attr(data-tip); position: absolute; z-index: 2; top: calc(100% + 6px); right: 0; padding: .25rem .5rem; white-space: nowrap; pointer-events: none;
+  font-size: var(--sds-xs); line-height: var(--sds-caption-lh); color: var(--sds-paper); background: var(--sds-ink); border-radius: var(--radius-sm);
+}
+.sds-json-live { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.sds-json-body { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); }
+/* Each panel scrolls on its own, down and across, with a thin scrollbar and a soft shadow at an edge where more lies beyond (the cover gradients
+   scroll with the content, the shadow gradients stay: a shadow shows only where the cover has moved off). The dialog itself never scrolls. */
+.sds-json-body > section:not(.sds-json-code) { --pane: var(--sds-paper); }
+.sds-json-body > section:not(.sds-json-code), .sds-json-scroll {
+  --edge: color-mix(in srgb, var(--sds-ink) 11%, transparent);
+  min-width: 0; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--surface-border-strong) transparent;
+  background:
+    linear-gradient(var(--pane) 30%, transparent) top / 100% 2rem no-repeat local,
+    linear-gradient(transparent, var(--pane) 70%) bottom / 100% 2rem no-repeat local,
+    linear-gradient(90deg, var(--pane) 30%, transparent) left / 2rem 100% no-repeat local,
+    linear-gradient(270deg, var(--pane) 30%, transparent) right / 2rem 100% no-repeat local,
+    radial-gradient(farthest-side at 50% 0, var(--edge), transparent) top / 100% .6rem no-repeat scroll,
+    radial-gradient(farthest-side at 50% 100%, var(--edge), transparent) bottom / 100% .6rem no-repeat scroll,
+    radial-gradient(farthest-side at 0 50%, var(--edge), transparent) left / .6rem 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, var(--edge), transparent) right / .6rem 100% no-repeat scroll,
+    var(--pane);
+}
+.sds-json-body > section:not(.sds-json-code) { padding: 1.25rem; }
+.sds-json-body > section:focus-visible, .sds-json-scroll:focus-visible { outline: 2px solid var(--sds-accent); outline-offset: -2px; }
+.sds-json-code { --pane: var(--sds-card); position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; background: var(--sds-card); border-left: 1px solid var(--sds-rule); }
+.sds-json-caprow { flex: none; display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .625rem .75rem .25rem 1.25rem; }
+.sds-json-caprow .sds-json-cap { margin: 0; }
+.sds-json-scroll { flex: 1 1 auto; min-height: 0; padding: .5rem 1.25rem 1.25rem; }
+.sds-json-cap { margin: 0 0 .8rem; font-size: var(--sds-xs); line-height: var(--sds-caption-lh); font-weight: var(--font-weight-medium); letter-spacing: .06em; text-transform: uppercase; color: var(--sds-faint); }
+.sds-json-dialog dl { margin: 0; }
+.sds-json-dialog dl > div { padding: .45rem 0; }
+.sds-json-dialog dl > div + div { border-top: 1px solid var(--surface-divider, var(--sds-rule)); }
+.sds-json-dialog dt { margin: 0 0 .2rem; font-size: var(--sds-xs); line-height: var(--sds-caption-lh); font-weight: var(--font-weight-medium); color: var(--sds-faint); }
+.sds-json-dialog dd { margin: 0; color: var(--sds-ink); overflow-wrap: anywhere; }
+.sds-json-dialog dl.sds-json-nest { margin: .35rem 0 .1rem; padding-left: .9rem; border-left: 2px solid var(--sds-rule); }
+.sds-json-dialog dl.sds-json-nest > div { padding: .3rem 0; border-top: 0; }
+.sds-json-dialog code { font-family: var(--sds-mono); font-size: .85em; padding: .08em .45em; color: var(--sds-ink); background: var(--sds-card); border: 1px solid var(--sds-rule); border-radius: var(--radius-sm); }
+.sds-json-tags { display: flex; flex-wrap: wrap; gap: .35rem; margin: 0; padding: 0; list-style: none; }
+.sds-json-tags li { margin: 0; padding: 0; font-size: var(--sds-small); line-height: 1.4; }
+.sds-json-tags li:not(:has(code)) { padding: .08em .6em; background: var(--sds-card); border: 1px solid var(--sds-rule); border-radius: 999px; }
+.sds-json-code pre { margin: 0; padding: 0; background: none; border: 0; border-radius: 0; overflow: visible; width: max-content; min-width: 100%; font-family: var(--sds-mono); font-size: var(--sds-small); line-height: 1.6; color: var(--sds-ink); white-space: pre; }
+.sds-json-code pre code { padding: 0; font-size: inherit; background: none; border: 0; border-radius: 0; }
+.sds-json-code .sds-jk { color: var(--sds-ink); }
+.sds-json-code .sds-js { color: var(--sds-tk-s); }
+.sds-json-code .sds-jn { color: var(--sds-tk-n); }
+.sds-json-code .sds-jb { color: var(--sds-tk-k); }
+@media (max-width: 47.99rem) {
+  .sds-json-dialog, .sds-json-dialog[data-extent="FIT"] { width: 95vw; min-width: 0; max-width: 95vw; }
+  .sds-json-body { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); }
+  .sds-json-code { border-left: 0; border-top: 1px solid var(--sds-rule); }
+}
 .sds-tile .sds-tile-facts code {
   font-size: inherit;
 }
@@ -2137,6 +2281,10 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
   color: var(--sds-text-description-card);
 }
 .sds-fold.sds-guidance > p:last-child { margin-bottom: .3rem; }
+/* The cases of a kind: a short list in the same type as the guidance, each case's name in the title colour, then its words. */
+.sds-fold.sds-guidance > ul { margin: .15rem 0 .3rem; padding: 0 0 0 2.1em; font-family: inherit; font-size: var(--sds-xs, .75rem); line-height: 1.45; color: var(--sds-text-description-card); }
+.sds-fold.sds-guidance > ul > li { margin: .15rem 0; padding: 0; font-family: inherit; font-size: inherit; line-height: inherit; }
+.sds-fold.sds-guidance > ul > li > strong { margin-right: .4rem; font-size: inherit; font-weight: var(--font-weight-semibold, 600); color: var(--sds-text-title-card); }
 .sds-fold.sds-guidance > p > strong {
   margin-right: .4rem;
   font-size: inherit;

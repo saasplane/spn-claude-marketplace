@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "Closing call, the product beside",
- "caption": "The variant for a call to go and see the product: the same section, PRIMARY, SUBTLE, with inset, and a DSFeature that splits as SPLIT_END, the words at START with the two actions under them, and the product picture beside, framed MEDIA and raised MD as a product is. On a phone the words, the buttons one under another, then the picture. The page that holds this section is wrapped once in DSSiteLayout. This band is the closing call's emphasis (the Gradient test): the design language's emphasis where it sets one, PRIMARY and SUBTLE where it sets none, and never on a frame.",
+ "caption": "The variant for a call to go and see the product: the same section, PRIMARY, SUBTLE, with inset, and a DSFeature that splits as SPLIT_END, the words at START with the two actions under them, and the product picture beside, framed MEDIA and raised MD as a product is. On a phone the words, the buttons one under another, then the picture. The page that holds this section is wrapped once in DSSitePage. This band is the closing call's emphasis (the Gradient test): the design language's emphasis where it sets one, PRIMARY and SUBTLE where it sets none, and never on a frame.",
  "layout": {
   "type": "TOPNAV",
   "body": {

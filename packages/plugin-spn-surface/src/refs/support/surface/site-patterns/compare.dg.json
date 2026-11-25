@@ -1,0 +1,498 @@
+{
+  "kind": "skeleton",
+  "title": "Compare",
+  "caption": "A DSFeatureGridSectionContainer of cells side by side, one for each plan or alternative, each holding the same facts so a row reads across. The page that holds this section is wrapped once in DSSitePage.",
+  "layout": {
+    "type": "TOPNAV",
+    "body": {
+      "width": "FULL"
+    },
+    "navigation": {
+      "nav": [
+        "Product",
+        "Pricing",
+        "Docs"
+      ],
+      "chosen": "Product"
+    },
+    "content": {
+      "attached": true
+    }
+  },
+  "views": [
+    {
+      "viewport": "DESKTOP",
+      "frame": {
+        "rows": [
+          {
+            "items": [
+              {
+                "fill": true,
+                "frame": {
+                  "unit": "DSFeatureGridSectionContainer",
+                  "rows": [
+                    {
+                      "items": [
+                        {
+                          "head": {
+                            "title": "What each holds",
+                            "description": "One line on what the rows compare."
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "items": [
+                        {
+                          "control": "button",
+                          "text": "See the whole set"
+                        }
+                      ]
+                    },
+                    {
+                      "items": [
+                        {
+                          "fill": true,
+                          "frame": {
+                            "unit": "DSFeature",
+                            "rows": [
+                              {
+                                "items": [
+                                  {
+                                    "head": {
+                                      "pageLevel": "WIDGET",
+                                      "media": {
+                                        "mtype": "MARK"
+                                      },
+                                      "eyebrow": "The one compared",
+                                      "title": "Its name",
+                                      "description": "The same facts, in the same order, as the others.",
+                                      "facts": [
+                                        "A fact",
+                                        "A fact"
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            ],
+                            "frames": [
+                              "TEXT",
+                              "MEDIA"
+                            ],
+                            "surface": {
+                              "bordered": true
+                            }
+                          }
+                        },
+                        {
+                          "fill": true,
+                          "frame": {
+                            "unit": "DSFeature",
+                            "rows": [
+                              {
+                                "items": [
+                                  {
+                                    "head": {
+                                      "pageLevel": "WIDGET",
+                                      "media": {
+                                        "mtype": "MARK"
+                                      },
+                                      "eyebrow": "The one compared",
+                                      "title": "Its name",
+                                      "description": "The same facts, in the same order, as the others.",
+                                      "facts": [
+                                        "A fact",
+                                        "A fact"
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            ],
+                            "frames": [
+                              "TEXT",
+                              "MEDIA"
+                            ],
+                            "surface": {
+                              "bordered": true
+                            }
+                          }
+                        },
+                        {
+                          "fill": true,
+                          "frame": {
+                            "unit": "DSFeature",
+                            "rows": [
+                              {
+                                "items": [
+                                  {
+                                    "head": {
+                                      "pageLevel": "WIDGET",
+                                      "media": {
+                                        "mtype": "MARK"
+                                      },
+                                      "eyebrow": "The one compared",
+                                      "title": "Its name",
+                                      "description": "The same facts, in the same order, as the others.",
+                                      "facts": [
+                                        "A fact",
+                                        "A fact"
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            ],
+                            "frames": [
+                              "TEXT",
+                              "MEDIA"
+                            ],
+                            "surface": {
+                              "bordered": true
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "section": {
+                    "color": "BASE",
+                    "size": "MD"
+                  },
+                  "grid": {
+                    "desktop": 3,
+                    "tablet": 2,
+                    "mobile": 1
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "size": "XS"
+      }
+    },
+    {
+      "viewport": "TABLET",
+      "frame": {
+        "rows": [
+          {
+            "items": [
+              {
+                "fill": true,
+                "frame": {
+                  "unit": "DSFeatureGridSectionContainer",
+                  "rows": [
+                    {
+                      "items": [
+                        {
+                          "head": {
+                            "title": "What each holds",
+                            "description": "One line on what the rows compare."
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "items": [
+                        {
+                          "control": "button",
+                          "text": "See the whole set"
+                        }
+                      ]
+                    },
+                    {
+                      "items": [
+                        {
+                          "fill": true,
+                          "frame": {
+                            "unit": "DSFeature",
+                            "rows": [
+                              {
+                                "items": [
+                                  {
+                                    "head": {
+                                      "pageLevel": "WIDGET",
+                                      "media": {
+                                        "mtype": "MARK"
+                                      },
+                                      "eyebrow": "The one compared",
+                                      "title": "Its name",
+                                      "description": "The same facts, in the same order, as the others.",
+                                      "facts": [
+                                        "A fact",
+                                        "A fact"
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            ],
+                            "frames": [
+                              "TEXT",
+                              "MEDIA"
+                            ],
+                            "surface": {
+                              "bordered": true
+                            }
+                          }
+                        },
+                        {
+                          "fill": true,
+                          "frame": {
+                            "unit": "DSFeature",
+                            "rows": [
+                              {
+                                "items": [
+                                  {
+                                    "head": {
+                                      "pageLevel": "WIDGET",
+                                      "media": {
+                                        "mtype": "MARK"
+                                      },
+                                      "eyebrow": "The one compared",
+                                      "title": "Its name",
+                                      "description": "The same facts, in the same order, as the others.",
+                                      "facts": [
+                                        "A fact",
+                                        "A fact"
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            ],
+                            "frames": [
+                              "TEXT",
+                              "MEDIA"
+                            ],
+                            "surface": {
+                              "bordered": true
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "items": [
+                        {
+                          "fill": true,
+                          "frame": {
+                            "unit": "DSFeature",
+                            "rows": [
+                              {
+                                "items": [
+                                  {
+                                    "head": {
+                                      "pageLevel": "WIDGET",
+                                      "media": {
+                                        "mtype": "MARK"
+                                      },
+                                      "eyebrow": "The one compared",
+                                      "title": "Its name",
+                                      "description": "The same facts, in the same order, as the others.",
+                                      "facts": [
+                                        "A fact",
+                                        "A fact"
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            ],
+                            "frames": [
+                              "TEXT",
+                              "MEDIA"
+                            ],
+                            "surface": {
+                              "bordered": true
+                            }
+                          }
+                        },
+                        {
+                          "spacer": true
+                        }
+                      ]
+                    }
+                  ],
+                  "section": {
+                    "color": "BASE",
+                    "size": "MD"
+                  },
+                  "grid": {
+                    "desktop": 3,
+                    "tablet": 2,
+                    "mobile": 1
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "size": "XS"
+      }
+    },
+    {
+      "viewport": "MOBILE",
+      "frame": {
+        "rows": [
+          {
+            "items": [
+              {
+                "fill": true,
+                "frame": {
+                  "unit": "DSFeatureGridSectionContainer",
+                  "rows": [
+                    {
+                      "items": [
+                        {
+                          "head": {
+                            "title": "What each holds",
+                            "description": "One line on what the rows compare."
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "items": [
+                        {
+                          "control": "button",
+                          "text": "See the whole set"
+                        }
+                      ]
+                    },
+                    {
+                      "items": [
+                        {
+                          "fill": true,
+                          "frame": {
+                            "unit": "DSFeature",
+                            "rows": [
+                              {
+                                "items": [
+                                  {
+                                    "head": {
+                                      "pageLevel": "WIDGET",
+                                      "media": {
+                                        "mtype": "MARK"
+                                      },
+                                      "eyebrow": "The one compared",
+                                      "title": "Its name",
+                                      "description": "The same facts, in the same order, as the others.",
+                                      "facts": [
+                                        "A fact",
+                                        "A fact"
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            ],
+                            "frames": [
+                              "TEXT",
+                              "MEDIA"
+                            ],
+                            "surface": {
+                              "bordered": true
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "items": [
+                        {
+                          "fill": true,
+                          "frame": {
+                            "unit": "DSFeature",
+                            "rows": [
+                              {
+                                "items": [
+                                  {
+                                    "head": {
+                                      "pageLevel": "WIDGET",
+                                      "media": {
+                                        "mtype": "MARK"
+                                      },
+                                      "eyebrow": "The one compared",
+                                      "title": "Its name",
+                                      "description": "The same facts, in the same order, as the others.",
+                                      "facts": [
+                                        "A fact",
+                                        "A fact"
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            ],
+                            "frames": [
+                              "TEXT",
+                              "MEDIA"
+                            ],
+                            "surface": {
+                              "bordered": true
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "items": [
+                        {
+                          "fill": true,
+                          "frame": {
+                            "unit": "DSFeature",
+                            "rows": [
+                              {
+                                "items": [
+                                  {
+                                    "head": {
+                                      "pageLevel": "WIDGET",
+                                      "media": {
+                                        "mtype": "MARK"
+                                      },
+                                      "eyebrow": "The one compared",
+                                      "title": "Its name",
+                                      "description": "The same facts, in the same order, as the others.",
+                                      "facts": [
+                                        "A fact",
+                                        "A fact"
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            ],
+                            "frames": [
+                              "TEXT",
+                              "MEDIA"
+                            ],
+                            "surface": {
+                              "bordered": true
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "section": {
+                    "color": "BASE",
+                    "size": "MD"
+                  },
+                  "grid": {
+                    "desktop": 3,
+                    "tablet": 2,
+                    "mobile": 1
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "size": "XS"
+      }
+    }
+  ]
+}

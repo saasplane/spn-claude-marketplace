@@ -1,0 +1,174 @@
+{
+ "name": "sample",
+ "version": "1.0.0",
+ "extends": "surface@1",
+ "domain": {
+  "product": "A demo product that sells forms",
+  "records": [
+   "Form",
+   "Submission"
+  ],
+  "reads": "people who build and fill forms"
+ },
+ "references": [
+  {
+   "id": "demo-reference",
+   "url": "https://example.com",
+   "read": "2026-11-24"
+  }
+ ],
+ "shared": {
+  "BRAND": {
+   "source": "OWN",
+   "values": {
+    "mtype": "BRAND",
+    "theBrand": {
+     "primary": "#0a5cff"
+    }
+   },
+   "why": "The demo's own primary."
+  },
+  "DRAWING": {
+   "source": "OWN",
+   "values": {
+    "mtype": "DRAWING",
+    "characters": {
+     "agent": "a small round robot"
+    }
+   },
+   "why": "The demo draws one character and keeps the rest of Surface's drawing."
+  }
+ },
+ "categories": {
+  "MARKETING": {
+   "CONTAINERS": {
+    "source": "OWN",
+    "customise": [
+     {
+      "code": "HERO",
+      "change": "always the extra-large size",
+      "config": {
+       "mtype": "CONTAINERS",
+       "size": "XL"
+      }
+     }
+    ],
+    "add": [
+     {
+      "code": "FORM_TEMPLATES",
+      "title": "Form templates",
+      "description": "the forms a visitor can start from",
+      "config": {
+       "mtype": "CONTAINERS",
+       "unit": "DSSectionContainer",
+       "size": "MD"
+      },
+      "guidance": {
+       "for": {
+        "persons": [
+         "VISITOR"
+        ]
+       },
+       "chooseWhen": "the visitor picks a starting form from the ones the product ships",
+       "notWhen": [
+        {
+         "condition": "there is one form",
+         "instead": "POINTS"
+        }
+       ],
+       "rules": []
+      }
+     }
+    ],
+    "notUsed": [
+     "NUMBERS"
+    ],
+    "values": {
+     "mtype": "CONTAINERS",
+     "grounds": {
+      "BASE": "white"
+     }
+    },
+    "why": "The demo sells with a plan table and no numbers."
+   },
+   "PAGES": {
+    "source": "OWN",
+    "pick": "ALL",
+    "customise": [
+     {
+      "code": "GROUP_HOME",
+      "change": "its hero has the picture under the words",
+      "config": {
+       "mtype": "PAGES",
+       "order": [
+        {
+         "kind": "HERO",
+         "case": "UNDER"
+        },
+        "STATEMENT",
+        "DOORS",
+        "SHOW_IT",
+        "CLOSING_CALL"
+       ]
+      }
+     }
+    ],
+    "add": [],
+    "notUsed": [],
+    "values": {
+     "mtype": "PAGES"
+    },
+    "why": "A form product opens a group with the picture under its claim, because the product screens are wide."
+   }
+  },
+  "PORTAL": {
+   "WIDGETS": {
+    "source": "NONE",
+    "why": "The demo has no portal widgets yet."
+   }
+  },
+  "CONSOLE": {
+   "family": "APP",
+   "person": "TEAM",
+   "from": "the demo's admin",
+   "PAGES": {
+    "source": "OWN",
+    "pick": "ALL",
+    "add": [
+     {
+      "code": "FORMS",
+      "title": "Forms",
+      "description": "the list of forms",
+      "config": {
+       "mtype": "PAGES",
+       "level": 1,
+       "sections": []
+      },
+      "guidance": {
+       "for": {
+        "persons": [
+         "TEAM"
+        ]
+       },
+       "chooseWhen": "the team opens its forms"
+      }
+     }
+    ],
+    "why": "A console of the demo's own."
+   }
+  }
+ },
+ "gaps": {
+  "notInTheLanguage": [
+   "No dark mode yet"
+  ],
+  "designSystemGaps": {
+   "source": "NONE",
+   "why": "None recorded.",
+   "cases": []
+  },
+  "whatTheAgentMustAsk": [
+   "Which plans exist"
+  ]
+ }
+}

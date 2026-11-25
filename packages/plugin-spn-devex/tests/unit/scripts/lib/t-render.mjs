@@ -109,15 +109,15 @@ ok("a table that is not the Terms table carries no such class",
 const { cutVersions, integrityTable, newestVersion, linesFor } = await import(pathToFileURL(resolve(HERE, "..", "plugin-support-lib", "src", "lib", "page-styles.ts")).href);
 const { readFileSync } = await import("node:fs");
 const STYLES_HOME = resolve(HERE, "src", "styles");
-ok("the newest version of the shared styles is 1.17.0, which serves design-system-units.css and design-system.css, so every page writer links it",
-  newestVersion(Object.keys(cutVersions(STYLES_HOME))) === "1.17.0");
+ok("the newest version of the shared styles is 1.17.1, which serves design-system-units.css and design-system.css, so every page writer links it",
+  newestVersion(Object.keys(cutVersions(STYLES_HOME))) === "1.17.1");
 ok("and 1.10.0 serves the Terms shares: a fixed layout, and the stacked rows under 40rem",
   /table\.sds-terms\{table-layout:fixed\}|table\.sds-terms\s*\{[^}]*table-layout:\s*fixed/.test(readFileSync(resolve(HERE, "..", "..", "public", "assets", "docs", "1.10.0", "sds-docs.css"), "utf8"))
   && readFileSync(resolve(HERE, "..", "..", "public", "assets", "docs", "1.10.0", "sds-docs.css"), "utf8").includes("max-width:40rem"));
 for (const name of ["construct", "overview", "blocks"]) {
   const template = readFileSync(resolve(HERE, "src", "refs", "devex", "workspace", "docs", "templates", "docs", "pages", `${name}-template.html`), "utf8");
-  ok(`the ${name} template links 1.17.0, the version every page writer links, with its hash`,
-    template.includes(linesFor("1.17.0", undefined, integrityTable(STYLES_HOME)["1.17.0"]).stylesheet) && !template.includes("/1.15.0/"));
+  ok(`the ${name} template links 1.17.1, the version every page writer links, with its hash`,
+    template.includes(linesFor("1.17.1", undefined, integrityTable(STYLES_HOME)["1.17.1"]).stylesheet) && !template.includes("/1.15.0/"));
 }
 const binds = rowsOf(produced(table(["Rule", "What it decides", "Weight"], ["`RD.X.1`", "what every provider delivers", "MUST"])), "<thead>");
 ok("Binds keeps the Weight a reader compares down, and folds what a rule decides into the rule's cell",
@@ -412,6 +412,8 @@ console.log("\n=== the page renderer — a catalog in three layouts, with media 
   ok("[MKT.SCRIPTS.614] media=MARK draws the icon in a mark, and an icon that is not named is a finding with a plain circle",
     made(fence("catalog media=MARK", "Site | a site | globe\n  For: a Visitor")).html.includes('data-media="MARK"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5')
       && made(fence("catalog media=MARK", "Site | a site | nonesuch\n  For: a Visitor")).findings.some((f) => f.message.includes("nonesuch")));
+  ok("[MKT.SCRIPTS.667] media=MARK draws MARKETPLACE's search icon, a lens and its handle, with no finding",
+    ((one) => one.html.includes('data-media="MARK"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.34-4.34"/>') && !one.findings.length)(made(fence("catalog media=MARK", "MARKETPLACE | a site for a Seeker | search\n  Person: Seeker"))));
   ok("[MKT.SCRIPTS.614] media=AVATAR draws initials, the name's first letter or the third cell",
     made(fence("catalog media=AVATAR", "Team | who work\n  Often: daily")).html.includes('data-media="AVATAR">T</span>') && made(fence("catalog media=AVATAR", "Team | who work | ab\n  Often: daily")).html.includes('data-media="AVATAR">AB</span>'));
   ok("[MKT.SCRIPTS.614] media=AVATAR_GROUP draws several overlapping initials",
@@ -666,6 +668,53 @@ console.log("\n=== the page renderer — the page's name and its title are two t
     furniture: { stylesheet: "", script: "", footer: "" }, home: { href: "../up.html", label: "Up" }, hub: "../../hub.html" });
   ok("[MKT.SCRIPTS.614] where the repository has a hub the organization links it, and the location links the page above",
     hubbed.html.includes('<span class="sds-line1"><a href="../../hub.html">SaaS Plane</a> &middot; <a href="../up.html">spn-probe</a> &middot; Probe</span>'), hubbed.html.slice(0, 900));
+}
+
+{
+  // A fact whose value is JSON opens in a popover (rule 580).
+  const catalog = (value) => produced("```catalog layout=LIST\nRoom | the room\n  Value: " + value + "\n```\n");
+  const obj = catalog('`{"roomAndLayouts": {"kind": "SPLIT", "sizes": [1, 2]}, "tone": "WARM", "tags": ["A", "B"]}`');
+  ok("[MKT.SCRIPTS.660] a JSON object fact draws a chip with a tree icon and its first keys in words (no count), bound to a dialog",
+    /<button type="button" class="sds-json-chip" data-json-open="(sds-json-\d+)" aria-haspopup="dialog" aria-expanded="false"[^>]*><svg class="sds-json-mark"[^>]*aria-hidden="true"[\s\S]*?<\/svg><span class="sds-json-label">Room and layouts, Tone<\/span><\/button><dialog id="\1" class="sds-json-dialog"/.test(obj), obj.slice(-1200));
+  const head = obj.slice(obj.indexOf('<div class="sds-json-head">'), obj.indexOf('<div class="sds-json-body">'));
+  ok("[MKT.SCRIPTS.660] the dialog's head is one slim line: the fact's name and the close button, no count and no Copy button",
+    head.includes('<div class="sds-json-title" id=') && head.includes('>Value</div></div><button type="button" class="sds-json-close" aria-label="Close"') && !/\d+ (keys?|items?)/.test(head) && !head.includes("sds-json-copy") && !head.includes("sds-json-count") && !obj.includes("sds-json-count"), head);
+  ok("[MKT.SCRIPTS.660] Copy JSON is a copy icon button at the JSON panel's top right, labelled and with a tooltip, holding the JSON, with a check icon and a polite live region",
+    /<div class="sds-json-caprow"><div class="sds-json-cap">JSON<\/div><button type="button" class="sds-json-copy" aria-label="Copy JSON" data-tip="Copy JSON" data-json="\{\n  &quot;roomAndLayouts&quot;[^>]*><svg class="sds-json-ico-copy"[\s\S]*?<svg class="sds-json-ico-check"/.test(obj)
+      && obj.includes('<span class="sds-json-live" role="status" aria-live="polite"></span>') && /<div class="sds-json-scroll" role="region" tabindex="0" aria-label="JSON">/.test(obj));
+  ok("[MKT.SCRIPTS.660] the words panel lists each key in words, an enum code in code, a list as tags, a nested object indented",
+    obj.includes('<section class="sds-json-words"') && obj.includes("<dt>Room and layouts</dt><dd><dl class=\"sds-json-nest\">") && obj.includes("<dt>Kind</dt><dd><code>SPLIT</code></dd>") && obj.includes('<ul class="sds-json-tags"><li><code>A</code></li><li><code>B</code></li></ul>'), obj.slice(-2400));
+  ok("[MKT.SCRIPTS.660] the JSON panel holds the indented JSON with its keys, strings and numbers marked, and the fact no longer draws one line of code",
+    obj.includes('<span class="sds-jk">"roomAndLayouts"</span>:') && obj.includes('<span class="sds-js">"SPLIT"</span>') && obj.includes('<span class="sds-jn">1</span>') && !/<dd><code>\{/.test(obj));
+  const arr = catalog('`["ONE", "TWO", "THREE"]`');
+  ok("[MKT.SCRIPTS.660] a JSON list draws a chip with its first items in words, and no count", arr.includes('<span class="sds-json-label">One, Two</span>') && arr.includes('aria-label="One, Two, JSON value, opens a dialog"') && !/\d+ items/.test(arr) && arr.includes("<li><code>ONE</code></li>"), arr.slice(-900));
+  ok("[MKT.SCRIPTS.660] a value that is not JSON draws as before, and no dialog stands for it",
+    !catalog("`PLAIN`").includes("<dialog") && catalog("`PLAIN`").includes("<code>PLAIN</code>") && !catalog("`{not json}`").includes("<dialog") && catalog("a sentence").includes("a sentence"));
+  ok("[MKT.SCRIPTS.660] a short value takes the design system's XL extent, and each panel is focusable and labelled",
+    obj.includes('class="sds-json-dialog" data-extent="XL"') && obj.includes('role="region" tabindex="0" aria-label="In words"') && obj.includes('role="region" tabindex="0" aria-label="JSON"'));
+  const long = catalog('`{"alpha": ' + JSON.stringify(Array.from({ length: 30 }, (_, i) => "ITEM_" + i)) + '}`');
+  ok("[MKT.SCRIPTS.660] a value of more than 24 formatted lines takes the FIT extent", long.includes('class="sds-json-dialog" data-extent="FIT"'));
+  const wide = catalog('`{"note": "' + "w".repeat(60) + '"}`');
+  ok("[MKT.SCRIPTS.660] a value with a line over 56 characters takes FIT",
+    wide.includes('data-extent="FIT"') && !wide.includes('data-extent="XL"'));
+  const css = (await import("node:fs")).readFileSync(resolve(HERE, "src", "styles", "docs-language.src.css"), "utf8");
+  ok("[MKT.SCRIPTS.660] the stylesheet gives the dialog the XL width capped at 95vw, FIT capped at 85vw, 80vh at most, panels that scroll alone, and panels stacking under 48rem",
+    /\.sds-json-chip\s*\{/.test(css) && /\.sds-json-dialog\s*\{[^}]*width:\s*min\(720px, 95vw\)[^}]*max-height:\s*80vh/.test(css) && /data-extent="FIT"\][^}]*max-width:\s*85vw/.test(css)
+    && /\.sds-json-body > section:not\(\.sds-json-code\), \.sds-json-scroll\s*\{[^}]*overflow:\s*auto/.test(css) && /max-width:\s*47\.99rem/.test(css));
+  ok("[MKT.SCRIPTS.660] the stylesheet gives the head the SM step, a 32px close button with a 40px hit area, and pins Copy beside the JSON caption",
+    /\.sds-json-head\s*\{[^}]*padding:\s*1rem \.75rem 1rem 1\.25rem/.test(css) && /\.sds-json-close\s*\{[^}]*width:\s*2rem/.test(css) && /\.sds-json-close::after\s*\{[^}]*inset:\s*-4px/.test(css) && /\.sds-json-caprow\s*\{/.test(css) && !css.includes(".sds-json-count"));
+  const js = (await import("node:fs")).readFileSync(resolve(HERE, "src", "styles", "docs-page.js"), "utf8");
+  ok("[MKT.SCRIPTS.660] the page script opens with showModal, closes on the button and outside, returns focus to the chip and copies the JSON",
+    js.includes("showModal") && js.includes(".sds-json-close") && js.includes("chip.focus()") && js.includes("navigator.clipboard.writeText"));
+}
+
+{
+  // A catalog item's `Anchor:` line is the id of its row or tile (S87: the entry a sample's note links to), and is no fact.
+  const tiles = produced("```catalog layout=LIST\nClosing call | What do I do now?\n  Code: [CLOSING_CALL]\n  Anchor: marketing-closing-call\n```\n");
+  ok("[MKT.SCRIPTS.661] an `Anchor:` line is the id of the item's tile, and no fact is drawn for it", tiles.includes('<div class="sds-tile" id="marketing-closing-call">') && !tiles.includes(">Anchor<"), tiles.slice(-600));
+  const row = produced("~~~group G | a group\n```catalog layout=LIST\nClosing call | What do I do now?\n  Code: [CLOSING_CALL]\n  Anchor: marketing-closing-call\n```\n~~~\n");
+  ok("[MKT.SCRIPTS.661] and in a group panel it is the id of the row", row.includes('<tr id="marketing-closing-call">') && !row.includes(">Anchor<"), row.slice(-700));
+  ok("[MKT.SCRIPTS.661] an item with no `Anchor:` gets no id", !produced("```catalog layout=LIST\nHero | what\n  Code: [HERO]\n```\n").includes('class="sds-tile" id='));
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-render` : `\n  all ${total} passed — t-render`);

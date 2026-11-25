@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/README.md",
-      "seen": "e66fcc7d"
+      "seen": "28b8f32b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
-      "seen": "3c1e6d65"
+      "seen": "0fb0d490"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
@@ -21,11 +21,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
-      "seen": "bab5ea2c"
+      "seen": "e9990751"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
-      "seen": "64c44cb6"
+      "seen": "63c70729"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md",
@@ -33,7 +33,7 @@
     },
     {
       "path": "spn-foundation/CONCEPT.md",
-      "seen": "39823e4e"
+      "seen": "da223611"
     }
   ],
   "decisions": [
@@ -271,6 +271,12 @@ constraint matters and why each index exists.
 **A domain's overview is its face in HTML**: it sits in `artifacts/public/docs/<domain>/`, links into the `constructs/` folder beside it, and
 carries the same glossary. Extra reading paths beneath it carry none.
 
+**An overview moves with the construct pages it summarises: writing a construct page again rewrites each overview that
+summarises it, in the same work and unasked** (`RULE.DEVEX.WORKSPACE.581` · MUST · check:doc-check). Its `spn:doc` block
+carries `summarises`, one `{ "page", "seen" }` for each construct page it opens a door to, written by `docs page stamp
+<overview>` after the sections are rewritten, never by hand. `docs page check` reports an entry whose seat file changed, one
+that leads nowhere and a door the list does not name, and `docs page write <seat>` names the overviews it leaves owed.
+
 **The invariants between the seats hold this shape up, and the folders are only where they land.** A
 domain folder exists only where the concept names that domain. The glossary is generated, never
 typed. Every noun in a behaviour row resolves to the glossary. Every
@@ -507,7 +513,7 @@ Every page somebody writes by hand is copied from a template, and the templates 
 
 **The page templates, and the seat files behind them**: `hub-template.html` for the one hub a repository has, `overview-template.html` for one reading path or the hub of a repository other than the foundation, `construct-template.html` for a produced construct page (`docs page` copies its two lines that load the shared stylesheet and script into every page it produces), `guide-template.html` for a guide page that `docs guide` produces, `index-template.html` for the index that `docs index` produces, `approach-template.html` for a workstream's argument, `arc-template.html` for an arc's page in a workstream, `surface-page-template.html` for a surface page review (below), `page-template.html` for the bare frame every other template shares, and `report-template.html` for a report — one shell for all five report types. `construct-seat-template.md` is the seat file an author actually writes, and `capability-template.md` one capability chapter. `blocks-template.html` is copied into nothing: it shows every block and every figure kind rendered, and you consult it beside a page template. **A hub has no breadcrumb above its masthead** (`RULE.DEVEX.WORKSPACE.220` · MUST · check:corpus): it is the root, so no page sits above it for a link to lead back to.
 
-**A surface preview is one file, the surface page template in `templates/surface/`, for reviewing a site's or an app's pages, and only once the app's design language exists** (`RULE.DEVEX.WORKSPACE.534` · GUIDE). Reach for it when the developer asks to review the pages of a surface, and never before the design language the pages follow is written; until then the review is of the design language, on the arc's page. **The page holds a bar and the page's markup and nothing else** (`RULE.DEVEX.WORKSPACE.535` · MUST · skill:spn-devex/ideate): the bar has the page's title, the width switch (Desktop, Tablet, Phone), the mode switch (Light, Dark) and Notes, off by default, and the markup stands in one `<template id="page">`, which is what `spnutils apps surface render` prints or the body of a copy of a running page. The markup is the work's own, so the sample rule (`RULE.DEVEX.WORKSPACE.267` · MUST · check:workstream-state) holds for it. **The page names the design system and the app's stylesheet in two metas, and the shared script builds the frame's document** (`RULE.DEVEX.WORKSPACE.536` · MUST · skill:spn-devex/ideate): the `surface-ds` meta names the version of the design system the markup was drawn with, the `surface-app-css` meta names the app's stylesheet by a relative path, or is empty for Surface's own look, and the script links `design-system.css` from the published `assets/docs/<docs version>/design-system.css`, the folder it was served from, links the app's stylesheet, sets `data-mode` from the Light and Dark switch and sizes the frame by the width switch; the switches set the frame's own document directly, so no message and no meta in the markup is needed, and a note is an element marked `data-note`, hidden until Notes is on. `spn-devex docs check` refuses a surface page without the template, the two metas or the bar. **The frame's document, the metas and the note marker change only with a new stylesheet version** (`RULE.DEVEX.WORKSPACE.537` · MUST · skill:spn-devex/ideate). **A group of previews reviews the app's top navigation and footer once**, in its layout sample `00-layout` with the menus open and the phone drawer; every other page shows its own content only.
+**A surface preview is one file, the surface page template in `templates/surface/`, for reviewing a site's or an app's pages, and only once the app's design language exists** (`RULE.DEVEX.WORKSPACE.534` · GUIDE). Reach for it when the developer asks to review the pages of a surface, and never before the design language the pages follow is written; until then the review is of the design language, on the arc's page. **The page holds a bar, the frame and the page's markup and nothing else** (`RULE.DEVEX.WORKSPACE.535` · MUST · skill:spn-devex/ideate): the bar has the page's title, the width switch (Desktop, Tablet, Phone), the mode switch (Light, Dark) and Notes, off by default, and pads its sides by `--sds-page-pad`; the frame takes the stage's full width with the device's width scaled to fit; the markup stands in one `<template id="page-<MODE>-<DEVICE>">` for each device and mode rendered, which is what `spnutils apps surface render` prints or the body of a copy of a running page, with no wrapper, aside or attribute added. The notes stand outside the page in `<script type="application/json" id="sample-notes">`, and a `#<id>` in the address scrolls the frame to that element. The markup is the work's own, so the sample rule (`RULE.DEVEX.WORKSPACE.267` · MUST · check:workstream-state) holds for it. **The page names the design system and the app's stylesheet in two metas, and the shared script builds the frame's document** (`RULE.DEVEX.WORKSPACE.536` · MUST · skill:spn-devex/ideate): the `surface-ds` meta names the version of the design system the markup was drawn with, the `surface-app-css` meta names the app's stylesheet by a relative path, or is empty for Surface's own look, and the script links `design-system.css` from the published `assets/docs/<docs version>/design-system.css`, the folder it was served from, links the app's stylesheet, sets `data-mode` from the Light and Dark switch and sizes the frame by the width switch; the switches set the frame's own document directly, so no message and no meta in the markup is needed, and a note is an element marked `data-note`, hidden until Notes is on. `spn-devex docs check` refuses a surface page without the template, the two metas or the bar. **The frame's document, the metas and the note marker change only with a new stylesheet version** (`RULE.DEVEX.WORKSPACE.537` · MUST · skill:spn-devex/ideate). **A group of previews reviews the app's top navigation and footer once**, in its layout sample `00-layout` with the menus open and the phone drawer; every other page shows its own content only.
 
 **A template's placeholders are short names in capitals, each explained once, in a comment at the top of the file** (`<!-- Placeholders: {{NAME}} … -->`), and the same value takes the same name everywhere on a page: `{{NAME}}` is the page's short name, at most three words, in the `<title>`, the outline's title, the eyebrow's last segment and the index entry; `{{TITLE}}` is the heading, in the `<h1>` alone; `{{UP-HREF}}` (and `{{HUB-HREF}}` on a construct page) are the links of the eyebrow's first line, the breadcrumb. A placeholder inside example content shows the shape of a row and stays. The block's optional `name` holds the short name where `title` is longer; the page writer fills `{{NAME}}` from `name`, and from `title` where there is none, and refuses a `name` of more than three words (`RULE.DEVEX.WORKSPACE.517` · MUST · check:doc-check). **The rules every page kind shares are stated once, in the chapter, and no template repeats them**: headings carry no count and are never links, numbers are for file names, the book's own words are translated, and a card is a title, a description and a *Read more*. **The book's own words are translated on every page a newcomer reads**: say *the agent's viewpoint*, and note once that the book calls it a lens. A word a first-time reader cannot guess is explained where it first appears, or replaced by the plain word. A count is never an explanation: *the eight phases* tells a newcomer nothing, so say what the phases are. A door is a *Read …* line under the text, naming what it opens in the words the heading already carries — *Read Agent →*. A card that carries an action — a link or a button — keeps it at the card's bottom edge: the cards of one row are as tall as the tallest, so the actions line up however long the text above each one is.
 

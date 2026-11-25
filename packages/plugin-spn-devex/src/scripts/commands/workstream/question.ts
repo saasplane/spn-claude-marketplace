@@ -4,6 +4,7 @@
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 // Input takes either case (`q28`, `Q28`, `036/Q28`); a stored id stays lowercase and everything printed or logged names the card with the capital.
 //
+//   spn-devex workstream question list [<workstream>] [--state open|answered|withdrawn|all] [--every]
 //   spn-devex workstream question raise <workstream>/<arc> --file card.json
 //   spn-devex workstream question show Q<n> --in <notes/<arc>/arc.html>
 //   spn-devex workstream question brief <workstream>/Q<n>
@@ -17,13 +18,17 @@
 // those entries of the sheet, and each go plan that holds the arc written again. It refuses only entries the sheet
 // does not hold, and names all of them at once. `--entries none` records that the answer changes no repository file, and
 // `cite` does the same for a card answered earlier: the sheet check accepts a card cited in an entry or recorded as none.
+//
+// `list` reads and never writes. A window is bound to its own workstreams (RULE.DEVEX.WORKSPACE.236), so with no workstream named it
+// lists the ones this window owns, the same set the hooks mark `(owned)` (`windowWorkstreams`), and scans every workstream only when
+// told to with `--every`.
 
 import { readFileSync, writeFileSync } from "node:fs";
 import { basename, resolve } from "node:path";
-import { type Action, VALUE, UsageFault, readAddress, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
+import { type Action, FLAG, VALUE, UsageFault, readAddress, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import {
-  approachOf, arcIdsOf, fromWorkstream, inline, logEvent, now, questionsFileOf, readArc, readQuestions, readSheet, resolveRef, sheetFileOf, whatEntryOf, workspaceOf,
-  writeJsonl, writeOpenBlocks, writeWhole,
+  approachOf, arcIdsOf, findWorkstream, fromWorkstream, inline, logEvent, now, questionsFileOf, readArc, readQuestions, readSheet, resolveRef, sheetFileOf, whatEntryOf,
+  workspaceOf, workstreamsOf, writeJsonl, writeOpenBlocks, writeWhole,
 } from "../../lib/workstream.ts";
 import { readGo } from "../../lib/go-plan.ts";
 import { isFile } from "../../lib/payload.ts";
@@ -31,6 +36,7 @@ import { PANELS_BLIND, raiseFaults, runningWorkFault } from "../../checks/questi
 import { panelsVisible } from "../../checks/split-plan.ts";
 import { QUESTION_ID, RECORD_VERSION, cardFaults, cardId, cardName, type Card, type Question } from "../../lib/workstream-schema.ts";
 import { precedentLines } from "../../lib/precedent.ts";
+import { windowWorkstreams } from "../../lib/window.ts";
 import { afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, typed } from "./_shared.ts";
 import { actions as goActions } from "./go.ts";
 
@@ -270,7 +276,49 @@ function settle(args: string[], state: "answered" | "withdrawn"): number {
   return 0;
 }
 
+/** The states `list` reads, and `all`. Open is the default. */
+const LIST_STATES = ["open", "answered", "withdrawn", "all"] as const;
+
+/**
+ * The cards of the window's own workstreams, or of the one named, in one state: one line each, its id, its arc, its title and the
+ * day it was raised. With no workstream named and no `--every`, it reads only the workstreams this window owns, and where it owns
+ * none it says so in one line rather than scanning the others.
+ */
+function list(args: string[]): number {
+  const words = readWords(args, { state: [...LIST_STATES], every: FLAG });
+  if (words.paths.length > 1) throw new UsageFault("takes one workstream at most.");
+  const every = words.given("every");
+  if (every && words.paths.length) throw new UsageFault("takes a workstream or `--every`, never both.");
+  const state = words.value("state") ?? "open";
+  const root = workspaceOf();
+  let folders: string[];
+  if (words.paths.length) {
+    const ws = findWorkstream(words.paths[0], root);
+    if (!ws) throw new UsageFault(`finds no workstream \`${words.paths[0]}\`.`);
+    folders = [ws];
+  } else {
+    if (!root) throw new UsageFault("finds no workspace here, so it has no workstream to read — name one.");
+    if (every) folders = workstreamsOf(root);
+    else {
+      const session = (process.env.CLAUDE_CODE_SESSION_ID ?? "").trim() || undefined;
+      folders = windowWorkstreams(root, session).map((name) => findWorkstream(name, root)).filter((ws): ws is string => ws !== null);
+      if (!folders.length) {
+        console.log("this window owns no open workstream, so no questions are listed: name a workstream, or pass --every to read every open and backlog one");
+        return 0;
+      }
+    }
+  }
+  for (const ws of folders) {
+    const cards = readQuestions(ws).filter((one) => state === "all" || one.state === state);
+    console.log(`${basename(ws)} · ${cards.length} ${state === "all" ? "" : `${state} `}question(s)`);
+    for (const card of cards)
+      console.log(`  ${cardName(card.id)} · ${card.arc} · ${card.title} · raised ${(card.raised ?? "").slice(0, 10)}${state === "all" ? ` · ${card.state}` : ""}`);
+  }
+  return 0;
+}
+
 export const actions: Record<string, Action> = {
+  list: { describe: "list the cards of this window's own workstreams, or of the one named, in one state; --every reads every open and backlog workstream", usage: "[<workstream>] [--state open|answered|withdrawn|all] [--every]", run: list },
   raise: { describe: "raise a card: the next number, the record, the card in the approach page's Open", usage: "<workstream>/<arc> --file card.json (the card holds why, what, viewsLead, views, options, recommended, nearest, signs, others, about, preview and settled)", run: raise },
   brief: { describe: "print a fresh view's brief from the card: the problem and the constraints first, no options, the proposals to follow", usage: "<workstream>/Q<n>", run: brief },
   show: { describe: "show an open card on an arc's page, in its Open", usage: "Q<n> --in <notes/<arc>/arc.html>", run: show },

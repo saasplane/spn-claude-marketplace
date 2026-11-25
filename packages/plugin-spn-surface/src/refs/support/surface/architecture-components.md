@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/06-architecture-components.md",
-      "seen": "d5c1bde4"
+      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/07-architecture-components.md",
+      "seen": "91003ce6"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/06-architecture-components/",
-      "seen": "4aea8166"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-components/",
+      "seen": "fc3f0156"
     }
   ]
 }
@@ -15,7 +15,7 @@
 
 # Components — The Blocks a Surface Is Built From
 
-Source of truth: the foundation's Components construct (`docs/02-constructs/02-support/01-surface/06-architecture-components.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/06-architecture-components/`). Components is the sixth of thirteen Surface constructs.
+Source of truth: the foundation's Components construct (`docs/02-constructs/02-support/01-surface/07-architecture-components.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/07-architecture-components/`). Components is the seventh of sixteen Surface constructs.
 
 Read this before you place a block on a page, before you propose a new one, or before you draw or build a component on a new stack. **The thing to unlearn: a missing control is never a reason to write one inside a page.** A control built inside a page gets none of the theme, the density, the accessibility or the translation that every listed block has. Propose it to the design system. A core unit is named and grouped here, and only then drawn and built.
 
@@ -34,7 +34,7 @@ Read this before you place a block on a page, before you propose a new one, or b
 | Page level | `DSPageLevelType` — the level of a page a block stands at: `PAGE` · `CONTAINER` · `WIDGET` · `GROUP` · `CONTENT` · `INLINE`. The item line and the tabs take it through `pageLevel` |
 | Mark | a picture or an icon that stands for a thing or a person. It is round unless a page chooses another shape |
 | Choice table | what says which value each closed prop of a unit takes: its cases, a mapping where the data decides, the limits across a view, and an index of every value the code accepts, each ruled or never |
-| Mock | a page or a flow drawn before it is built, as its skeletons: one for each page and each task state, and the flow file that orders them |
+| Mock | a page or a flow shown before it is built, as its page previews, one for each page and each task state, and the flow file that orders them |
 | Composite | a block built from components that carries one task end to end, and that no other component is built from |
 | Core unit | a block the book names, which every stack builds under that name. A stack may provide further units of its own |
 
@@ -44,18 +44,19 @@ A **block** is any unit a surface is built from — a layout, a container, a wid
 
 ## The groups — 🔮
 
-Twelve groups, each answering one need of a surface. The list holds the core units: the library draws one page per group, each provider keeps one folder per group, the showcase opens each group of units with an Overview page, and a new core unit joins this list before it is drawn or built anywhere. A stack may provide further units of its own beside them, and this list names none of those.
+Thirteen groups, each answering one need of a surface. The list holds the core units: the library draws one page per group, each provider keeps one folder per group, the showcase opens each group of units with an Overview page, and a new core unit joins this list before it is drawn or built anywhere. A stack may provide further units of its own beside them, and this list names none of those.
 
 | Group | Answers | Blocks |
 | --- | --- | --- |
 | Actions | the ways a person asks for something | `DSButton` · `DSButtonGroup` · `DSToolbar` |
-| Data display | how records and values are shown | `DSAccordion` · `DSAccordionGroup` · `DSActorView` · `DSAddressView` · `DSAvatar` · `DSAvatarGroup` · `DSBadge` · `DSCard` · `DSCarousel` · `DSCodeBlockView` · `DSColorView` · `DSDataFieldView` · `DSDataUnit` · `DSDataUnitGroup` · `DSItem` · `DSItemCard` · `DSItemFacts` · `DSJSONView` · `DSList` · `DSStatusActiveView` · `DSTable` |
+| Data display | how records and values are shown | `DSAccordion` · `DSAccordionGroup` · `DSActorView` · `DSAddressView` · `DSAvatar` · `DSAvatarGroup` · `DSBadge` · `DSCard` · `DSCarousel` · `DSCodeBlockView` · `DSColorView` · `DSDataFieldView` · `DSDataUnit` · `DSDataUnitGroup` · `DSItem` · `DSItemCard` · `DSItemFacts` · `DSJSONView` · `DSList` · `DSRatingView` · `DSStatusActiveView` · `DSTable` |
 | Data entry · Fields | every input a form is built from | `DSInput` · `DSInputNumber` · `DSInputOTP` · `DSInputPhone` · `DSTextarea` · `DSLabel` · `DSCheckbox` · `DSCheckboxGroup` · `DSRadio` · `DSRadioGroup` · `DSSwitch` · `DSToggle` · `DSToggleGroup` · `DSToggleGroupMulti` · `DSSlider` · `DSSliderRange` · `DSTagGroup` |
 | Data entry · Pickers | choosing from a set, a date or a time | `DSSelect` · `DSSelectMulti` · `DSAutocomplete` · `DSAutocompleteMulti` · `DSCommand` · `DSCommandPalette` · `DSDatePicker` · `DSDateRangePicker` · `DSTimePicker` · `DSDateTimePicker` · `DSCalendar` · `DSColorPicker` |
 | Data entry · Compound fields | the form frame, and inputs built from other inputs | `DSForm` · `DSAddressForm` · `DSAttachment` · `DSAttachmentMulti` · `DSJSONControl` · `DSDataFieldForm` · `DSDataFieldBuilder` · `DSImagePicker` · `DSThemeForm` |
-| Composites | blocks built from components that carry one task end to end and that no other component is built from | `DSDataTable` · `DSFilterBar` · `DSComparison` · `DSFeature` |
+| Composites | blocks built from components that carry one task end to end and that no other component is built from | `DSDataTable` · `DSFilterBar` · `DSFacetGroup` · `DSComparison` · `DSQuote` · `DSFeature` |
 | Feedback | what a surface says while it works, and when it fails | `DSAlert` · `DSSpinner` · `DSToast` · `DSProgress` · `DSProgressCircle` · `DSSkeleton` · `DSEmpty` |
-| Structure | the small blocks that divide, scroll or fold a part of a page, or stand it on a fill | `DSCollapsible` · `DSHScroll` · `DSScrollArea` · `DSSeparator` · `DSSurface` |
+| Structure | the small blocks that divide, scroll or fold a part of a page, or stand it on a fill | `DSCollapsible` · `DSHScroll` · `DSScrollArea` · `DSSeparator` · `DSSurface` · `DSPageLevel` |
+| Page | the units that work across a page's content: the head of a page that stands in no box, a page setting, and the page frames, which place a page's parts in slots | `DSPageHead` · `DSPageCategory` · `DSPageFrameListDetail` · `DSPageFrameGroups` · `DSPageFrameAside` |
 | Media | images and icons | `DSAspectRatio` · `DSIcon` · `DSMark` · `DSImage` |
 | Navigation | moving between places | `DSBreadcrumb` · `DSMenubar` · `DSNavList` · `DSNavMenu` · `DSNavBarSide` · `DSNavBarTop` · `DSNavEntry` · `DSPagination` · `DSTabs` · `DSStepper` · `DSLink` · `DSAnchor` |
 | Overlays | interruption | `DSDialog` · `DSConfirmDialog` · `DSDrawer` · `DSSheet` · `DSEntryOverlay` · `DSBackdrop` |
@@ -67,7 +68,7 @@ A designer reads a block in the design library, so each table of the book also s
 
 The library draws a sheet for each block of Utility whose behaviour a person feels: a sheet of states for `DSAuthz` (allowed, denied, fallback), `DSSticky` (in flow, stuck) and `DSAnchorContainer`, and one sheet of formats for the formatters. `DSAnchor` of Navigation has a small sheet of states, and `DSAspectRatio` of Media has one sheet of ratios. `DSElementObserver` has an entry with its description and no states. `DSPortal`, a block of the web alone, is the stack's own: the book does not list it and the library does not draw it. The composites are stated under Composites below. The widget, the container and the layout sit one layer up and each have a construct of their own: `architecture-widgets.md`, `architecture-containers.md`, `architecture-layouts.md`.
 
-Six units joined the groups with their own rows in the book:
+Five units joined the groups with their own rows in the book:
 
 | Unit | Group | What it does |
 | --- | --- | --- |
@@ -76,7 +77,6 @@ Six units joined the groups with their own rows in the book:
 | `DSStatusActiveView` | Data display | shows whether a record is active, the same way on every page: a badge in the success colour with the word Active, or in the default colour with the word Inactive. The page may give its own words |
 | `DSThemeForm` | Data entry · Compound fields | the form that edits the theme an app chooses: five layers of choices, each with its own reset, and a reset of every choice. It applies nothing and keeps nothing: the page holds the theme and hands each change back |
 | `DSEntryOverlay` | Overlays | the overlay an entry opens in, over the page it belongs to: a dialog for a small entry and a sheet at the right for a medium one, both 480 px wide. The caller draws the entry with the overlay's parts |
-| `DSListDetail` | the web stack's own composite | places a list beside the detail of its chosen row |
 
 **A prop that takes a vocabulary is marked in the book's rows of props.** Beside the prop, the row names the vocabulary, as `type` (`DSTimePickerType`) of `DSTimePicker` or `format` (`SPDateFormatType`) of `DSDatePicker`. The values, and for the design system's own vocabularies the default, are in the tables of `architecture-names.md`. A shared vocabulary of the platform, one named `SP…Type`, is stated in the second of those tables. `variant`, `color` and `size` name no vocabulary in a row, because they take the three shared names and their vocabularies.
 
@@ -86,7 +86,7 @@ The surface has two levels (`RULE.SUPPORT.SURFACE.081` · MUST · skill:spn-surf
 
 | Level | Holds | Who states it |
 | --- | --- | --- |
-| The core | the units the book names, with their props, their vocabularies and their rules; the task patterns; the app patterns and their skeletons | the book, once, for every stack |
+| The core | the units the book names, with their props, their vocabularies and their rules; the task patterns; the app page kinds and their page previews | the book, once, for every stack |
 | A stack's own | further units that help build apps on that stack, most of them put together from core units | the stack, in its own docs |
 
 - **A stack's design system MUST build every core unit, and it MAY provide further units of its own that help build apps.** Such a unit is usually put together from core units, for a need that many pages of that stack share.
@@ -94,7 +94,7 @@ The surface has two levels (`RULE.SUPPORT.SURFACE.081` · MUST · skill:spn-surf
 - **A stack's own unit MUST keep every rule a core unit keeps.** It reads the same tokens, takes the three shared names where it has them, and draws each shared state with its one picture.
 - **A unit that every stack should build joins the core units, in the book first.** A unit that stays with one stack needs no line there.
 
-So an agent that builds a page reads its pattern and its skeleton from the book. It then picks the units from the stack's design system, the core units and the stack's own, or from a partner's own code.
+So an agent that builds a page reads its pattern and its page preview from the book. It then picks the units from the stack's design system, the core units and the stack's own, or from a partner's own code.
 
 ### A new unit weighs every axis the surface offers
 
@@ -324,7 +324,7 @@ Every realization — the design library's drawing, and each stack's build — g
 
 Some blocks are drawn from data: a select from its options, a menu from its nodes, a table from its columns. The **host** takes the data; the **item** is the unit the host draws once for each entry. A field that is drawn (such as `label`, `startIcon`) sits as a property of the item under its own name; the kind of a node sits in one property, `type`; a field that is not drawn (`key`, `data`, `anchor`, `permissions`) and the data shape as a whole stay in the book, in words. **One item serves every host that takes one data shape** — the three menus (dropdown menu, context menu, menubar) take one shape and draw one item; a host whose data differs declares its own item. The same node is drawn differently by where it sits: a group is a section at the top of a menu and a flyout deeper down.
 
-A unit that is drawn from data shows each trait its data takes, and a column of its table names the host's data as `its <prop>, their traits across the <crossed prop>s`. The traits are the keys of the item's type, read from the unit's own interface: `label`, `disabled`, `startIcon` and `endIcon` are drawn by every unit that takes them. **A unit draws every trait its data's type carries**; where a unit cannot draw one, the trait comes off that unit's type rather than being listed as not drawn, so the library lists the traits a unit draws and no more, and a drawing never shows what the web does not. The key tables of each host's items stay in the book, in `01-common/02-data-driven.md`.
+A unit that is drawn from data shows each trait its data takes, and a column of its table names the host's data as `its <prop>, their traits across the <crossed prop>s`. The traits are the keys of the item's type, read from the unit's own interface: `label`, `disabled`, `startIcon` and `endIcon` are drawn by every unit that takes them. **A unit draws every trait its data's type carries**; where a unit cannot draw one, the trait comes off that unit's type rather than being listed as not drawn, so the library lists the traits a unit draws and no more, and a drawing never shows what the web does not. The key tables of each host's items stay in the book, in `01-common/02-data-driven.md`. An option's `count`, how many records it would match, such as the results a facet's choice leaves, is drawn quietly after its label in the person's number format by `DSCheckboxGroup`, `DSRadioGroup`, `DSToggleGroup` and `DSToggleGroupMulti`; left out, nothing is drawn (Q64 A).
 
 ## What a table's rows answer — 🔮
 
@@ -368,7 +368,8 @@ Each rule below is of one block or one prop. The props, their values and their d
 | `DSCard` | **A card's size MUST set its own spacing and reach no block it holds** (`RULE.SUPPORT.SURFACE.114` · MUST · skill:spn-surface/design). The size pads the card's parts and sets the gaps between them; a block inside, a button, a badge, a row's words and its chevron, takes the size of the place above the card, so a large card is roomier and what it holds is drawn as it is anywhere else (`architecture-containers.md` states it for every box). **A card MAY hold the parts `DSCard.Header`, `DSCard.Content` and `DSCard.Footer`.** A part pads itself, from the size of the card. Each part takes `flush`, which drops that padding so that what the part holds reaches the edge of the card, and no other prop. The title of a card is an item line in its header, and it starts where what the card holds starts. `divided` draws a line between each two parts, from edge to edge. It is a prop of the card that the page writes, and it is no by default. A card takes each key of its `surface` from its own prop where the prop is given, else from the card look of the theme, and the parts its frame holds from its `frames` (`architecture-app.md`). A pressed card is pressed whole, its flat header with it. A part not listed in `frames` stands flat outside the frame, half the card's gap from the frame beside it (`RULE.SUPPORT.SURFACE.262` · MUST · skill:spn-surface/design). **A panel or a card that holds parts, or more than one content part, has a title:** an item line in its header, at the level its box gives, `CONTAINER` for a panel and `WIDGET` for a card. A card that is one plain block of content needs none. A card takes no height of its own (`RULE.SUPPORT.SURFACE.270` · MUST · skill:spn-surface/design): in a block it is as tall as what it holds, and in a grid or a row every card stands as tall as the tallest, so the cards of one row end on one line. `fullHeight` makes the card fill the height of a place with a set height. A content part of a card is never shorter than what it holds, and only the last content part grows to fill the card, so the footer stands at the end. What then tells a card from a panel is in `architecture-containers.md` |
 | `DSItem` | **A `DSItem` draws its picture, its text and its end node, and nothing around them** (`RULE.SUPPORT.SURFACE.175` · MUST · skill:spn-surface/design). It takes no padding, no border and no fill under the pointer, at any level and at any size, and no `bleed`. Its `anchor` stays: one link that covers the item, with its end node outside the link and a focus ring. The place it stands in gives it its room and its highlight. A row of `DSList.Item` pads by its size and lights up under the pointer where the row or the item it holds is a link. A row in a `flush` part keeps the padding of its size above and below and takes the inset of its place at its two sides, so its text lines up with a title in a part that insets and its band runs from edge to edge. A data table's list, a card widget's rows, the header and the parts of a panel and of a card, the header of an overlay and the trigger of a menu that wraps an item line give that room the same way |
 | `DSColorView` | **Shows a stored colour that a person reads:** a small swatch, and the value beside it as text. With no colour it shows a dash, or the words of `emptyLabel`. `swatchOnly` draws the swatch alone. A colour that is part of a block's own look, such as a badge drawn in its colour, is not shown through this block |
-| `DSCarousel` | **A carousel MUST mark every slide that is not in view `inert` and `aria-hidden`** (`RULE.SUPPORT.SURFACE.311` · MUST · skill:spn-surface/design). It is the standard carousel pattern. A slide out of view can then be neither reached by the keyboard nor read by a screen reader, and a carousel that shows several slides keeps all of them readable, so a carousel of features adds no `h1` for each slide to the page |
+| `DSCarousel` | **A carousel MUST mark every slide that is not in view `inert` and `aria-hidden`** (`RULE.SUPPORT.SURFACE.311` · MUST · skill:spn-surface/design). It is the standard carousel pattern. A slide out of view can then be neither reached by the keyboard nor read by a screen reader, and a carousel that shows several slides keeps all of them readable, so a carousel of features adds no `h1` for each slide to the page. With `overlay`, the arrows and dots stand over full-bleed slides and the carousel fills the height of its place, such as a section's `mediaNode`: every slide stretches to it and a picture covers its slide; in a place of no set height it is as tall as its slides. It is a labelled region that names itself, its slides and its dots through `translate`, as its arrows do. A slideshow behind a hero is a `DSCarousel` with `overlay` in the section's `mediaNode`: its arrows and dots take the pointer again there, and the section's `mediaScrim` keeps the words readable over every slide (`architecture-containers.md`) |
+| `DSRatingView` | **A rating, read only, in whole and half stars.** It takes `value` (0 to `max`, `max` 5 by default), and may add the value as a number (`showValue`), the review `count` and a `breakdown` of bars, the highest star level first; `size` sets the number's step and `scaleSize` each star, 10px at `XXS` to 56px at `XXL5`. A record card, a review summary and an owner card use it wherever stars stand. The stars are one image to a reader, one sentence through `translate` such as *Rated 4.5 out of 5, 128 reviews*, in the app's number format, and a rating is drawn to the nearest half star, its number keeping one decimal. Writing a review takes a control the design system does not hold yet |
 | `DSTagGroup` | **A set of tags a person removes from.** Each tag is drawn as a `DSBadge` with its close action, and the keyboard reaches each one. The page holds the set: it adds a tag elsewhere, and takes the tag out when the group reports that one was removed. A choice from a fixed set is `DSToggleGroupMulti`, and not this block |
 | `DSToggle` · `DSToggleGroup` · `DSToggleGroupMulti` | **A pressed toggle MUST keep its border in every colour, and a pressed toggle of the default hue MUST take a fill a person can see** (`RULE.SUPPORT.SURFACE.146` · MUST · skill:spn-surface/design). A pressed toggle draws `QUIET` of its hue. So the pressed option of a group keeps its edge beside the others. Of the default hue, the pressed fill is `surface-soft-hover`, one step stronger than the fill under the pointer, with the strong border |
 | `DSCalendar` | **The month grid by itself, on the page.** It is the grid that `DSDatePicker` opens, with no field and no popover around it. Its value is one date, or none |
@@ -413,7 +414,7 @@ A button is chosen by its view, then by whether it is the view's main action, th
 | any view | another action | a header or a footer | `OUTLINE` (the place's) | `DEFAULT` | the place's | nothing | `RULE.SUPPORT.SURFACE.376` |
 | any view | another action | the content, or no box | `OUTLINE` (the unit's) | `DEFAULT` | the size above | nothing | `RULE.SUPPORT.SURFACE.376` |
 
-**The limits across a view.** A view holds at most one `SOLID` button, its main action, and a view with no main action holds none (`RULE.SUPPORT.SURFACE.370` · GUIDE). A dialog, a drawer or a sheet over a page is a view of its own and holds its own. On a site page the closing call repeats the hero's one act at the page's end, so its `SOLID` and the hero's are one main action said twice, not on screen together (the site patterns). A feature leads with at most one `SOLID` `PRIMARY` (`RULE.SUPPORT.SURFACE.234` · MUST · skill:spn-surface/design).
+**The limits across a view.** A view holds at most one `SOLID` button, its main action, and a view with no main action holds none (`RULE.SUPPORT.SURFACE.370` · GUIDE). A dialog, a drawer or a sheet over a page is a view of its own and holds its own. On a site page the closing call repeats the hero's one act at the page's end, so its `SOLID` and the hero's are one main action said twice, not on screen together (the site container kinds). A feature leads with at most one `SOLID` `PRIMARY` (`RULE.SUPPORT.SURFACE.234` · MUST · skill:spn-surface/design).
 
 **The limits across a header.** A header shows at most one main action, the one given `PRIMARY`, and one or two secondaries (`RULE.SUPPORT.SURFACE.390` · GUIDE). On a record that moves through states, the main action is the move its state expects next, and it changes when the state changes. Every other move open at that state is a secondary, `DEFAULT`, and a record whose state expects no next move has no main action. A move shows only when the state allows it, and is left out and not drawn disabled. The two secondaries that stand are the two a person takes most. A third and every one after it stand behind "⋯", a `DSDropdownMenu` whose trigger is a `DSButton` with the icon `MORE_HORIZONTAL` alone, so the place draws it `GHOST`, or `OUTLINE` in the head of a page. The main action stays out of "⋯". A menu item has no colour, so a move there that deletes or ends something takes `ERROR` on its confirmation. Every move of a record, every track's included, stands in the record's header. Write no `variant` on a header's buttons: give the main action `color={DSColorType.PRIMARY}` and the place draws the rest.
 
@@ -712,7 +713,7 @@ Tabs are chosen by where they stand: the level says their size and, where the pa
 A step is `IDSStepperItem`, which extends `IDSDataOption`, so a step is an option, as a tab is: `key`, `label`, `disabled`, `data` and `testData` are the option's; `startIcon` is its indicator where `type` is `ICON` (ignored by `NUMBER` and `DOT`); `endIcon` stands after its title, such as a lock on a step the person cannot open yet; `description` is the line under the title; and `taskState` takes `DSTaskStateType`, `IDLE` · `WORKING` · `DONE` · `FAILED`. `NUMBER` draws each step's number and is the one form that draws numbers; `ICON` draws each step's `startIcon`, and a step with none falls back to a dot; `DOT` draws a dot. A done step draws its check in `NUMBER` and `ICON`, and a filled dot in `DOT`.
 
 - **A stepper MUST take its steps as data, and a step MUST take a task state and invent no state of its own** (`RULE.SUPPORT.SURFACE.308` · GUIDE) (`RULE.SUPPORT.SURFACE.309` · MUST · skill:spn-surface/design). There is no `PENDING` and no `IN_PROGRESS`: pending is `IDLE`, and in progress is `WORKING`. `EMPTY` and `DENIED` are task states of a block's data, and a step takes neither.
-- **Each step of a flow usually draws every task state its task can reach, and the joins between its pages hold what the task and app patterns hold on one page** (`RULE.SUPPORT.SURFACE.409` · GUIDE) (`RULE.SUPPORT.SURFACE.361` · MUST · skill:spn-surface/design). A flow spreads one task over several pages, so a state left out of one step is a state a person meets with nothing drawn for it.
+- **Each step of a flow usually draws every task state its task can reach, and the joins between its pages hold what the task patterns and app page kinds hold on one page** (`RULE.SUPPORT.SURFACE.409` · GUIDE) (`RULE.SUPPORT.SURFACE.361` · MUST · skill:spn-surface/design). A flow spreads one task over several pages, so a state left out of one step is a state a person meets with nothing drawn for it.
 - **A step's task state MUST be the one its `taskState` gives, else the one its place gives against `activeKey`** (`RULE.SUPPORT.SURFACE.308` · GUIDE). Unset, the steps before the active one are `DONE`, the active one `WORKING` and the steps after it `IDLE`; no step is `FAILED` unless the page says so. A form in steps gives `activeKey` alone; a timeline gives each step its own `taskState`, because two may be in progress at once. A step's own `taskState` wins.
 
 | Task state | Unset, which steps take it | The indicator | The bar after it | Words for a screen reader |
@@ -819,14 +820,14 @@ The web builds the navigation units in place of `DSNavigationMenu` and the lists
 
 ## Composites — 🔮
 
-A composite is a block built from components that carries one task end to end, and a page places it whole: a data table finds and shows records, a filter bar narrows them, a comparison sets subjects side by side, a feature pitches a thing and asks the reader to act. A page does not reach inside one to rearrange its parts (`RULE.SUPPORT.SURFACE.230` · MUST · skill:spn-surface/design).
+A composite is a block built from components that carries one task end to end, and a page places it whole: a data table finds and shows records, a filter bar narrows them, a facet group narrows a marketplace's results by many facets, a comparison sets subjects side by side, a quote sets a person's or a company's words beside who said them, a feature pitches a thing and asks the reader to act. A page does not reach inside one to rearrange its parts (`RULE.SUPPORT.SURFACE.230` · MUST · skill:spn-surface/design).
 
 **A composite carries one task end to end, and no other component is built from it.** A component that others are built from stays in its group, however many parts it has: the item line, the list, the table and the card stay in Data display, because the rows of a list, the records of a data table, `DSCardWidget` and the header of a panel are built from them.
 
 | Unit | Others built from it | Group |
 | --- | --- | --- |
 | `DSItem`, `DSList`, `DSTable`, `DSCard` | yes: a list's row, `DSItemCard`, `DSItemFacts`, a data table's records, `DSCardWidget`, the header of a panel | Data display |
-| `DSDataTable`, `DSFilterBar`, `DSComparison` | no: only panels and pages use them | Composites |
+| `DSDataTable`, `DSFilterBar`, `DSFacetGroup`, `DSComparison`, `DSQuote` | no: only containers and pages use them | Composites |
 | `DSFeature` | no | Composites |
 
 A composite owns its inner wiring and its size. It takes one size, from its own prop or from the block above it, and **passes that size to every part inside it**, so a page sets one size for the whole composite and never dresses its parts separately. A composite adds no states of its own: the states its records can be in are the task state of `standards-interaction.md`, and this ref carries no second definition of them.
@@ -835,10 +836,12 @@ A composite owns its inner wiring and its size. It takes one size, from its own 
 | --- | --- |
 | `DSDataTable` | How does a page show many records as one block, with its own search, sort and paging? |
 | `DSFilterBar` | How does a page let a person narrow those records, and see what is narrowed? |
+| `DSFacetGroup` | How does a marketplace narrow its results by more filters than a bar holds, and say how many each choice leaves? |
 | `DSComparison` | How does a page set a few subjects side by side across the same settings, from data alone? |
+| `DSQuote` | How does a site show a person's or a company's words and who said them, as a testimonial, a story or a review? |
 | `DSFeature` | How does a page make a claim at any level and ask the reader to act, from data alone? |
 
-**Surface's core composites are the data table, the filter bar, the comparison and the feature** (`RULE.SUPPORT.SURFACE.230` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.181` · MUST · skill:spn-surface/design). Every stack builds each of them, and the design library draws each of them. A stack may provide further composites of its own, as the core units above state. The web stack has one, `DSListDetail`, which places a list beside the detail of its chosen row. It is not a core unit (`RULE.SUPPORT.SURFACE.099` · MUST · skill:spn-surface/design), and the book states no rule for it: `architecture-containers.md` states what a person sees on such a page.
+**Surface's core composites are the data table, the filter bar, the facet group, the comparison, the quote and the feature** (`RULE.SUPPORT.SURFACE.230` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.181` · MUST · skill:spn-surface/design). Every stack builds each of them, and the design library draws each of them. A stack may provide further composites of its own, as the core units above state. The web stack has one, `DSListDetail`, which places a list beside the detail of its chosen row. It is not a core unit (`RULE.SUPPORT.SURFACE.099` · MUST · skill:spn-surface/design), and the book states no rule for it: `architecture-containers.md` states what a person sees on such a page.
 
 ### DSDataTable
 
@@ -991,6 +994,9 @@ The bar has one form, read from its start to its end. A person who has used one 
 - **At a tablet the bar MUST hold fewer fields in view, and the rest wait behind the action that shows them.** A tablet has less width than a desktop, so fewer boxes fit across it.
 - **On a phone the bar MUST be one button that says how many filters are on, such as *Filters (2)*, with the action that clears them beside it.** A phone has no room for a row of boxes. One button keeps the records in view. Its number tells a person that the records are narrowed before they open anything.
 
+- **A quick filter applies the moment it is pressed, and *All* clears its group** (`RULE.SUPPORT.SURFACE.619` · GUIDE). `groups` takes `IDSFilterBarGroup[]`: each group one dimension of about six values or fewer, such as a status, its counts applying every other filter and not its own, drawn as `groupType` says. `fields` is optional, so a bar may be pills alone. A bar with groups draws no mark; the bar is one row, the groups, then the fields and the actions, wrapping between the groups and the fields, never inside either. On a phone each group stands on its own line and slides sideways, and the fields fold into *Filters (n)*; a bar of groups alone draws no button on a phone either and is as wide as its pills, so a page may place it beside a title or in a toolbar.
+- **A bar of fields fits the width it is given.** Its mark stands inside the controls and is left out under 448 px of the bar's own width, and the controls ask for no more width than the bar has, each field at least 128 px, so a bar in a list column keeps *Clear* in view.
+
 **What the composite does.** `DSFilterBar` draws the fields, the action that shows the hidden ones, the line, and the search and clear actions in this order. Its fields share the width equally. It draws the filter icon in a round shape, as tall as the fields beside it. It keeps in view the fields a page marks `primary`, and beside them a number of the others: up to `moreLimit` at a desktop, three unless the page sets it, and up to `moreLimitTablet` at a tablet, one unless the page sets it. So the bar holds fewer fields at a tablet by itself. On a phone it is the one button: the button opens the fields in a drawer from the bottom of the screen, with the extent `FIT`, so the drawer is as tall as its fields and scrolls only when the window runs out (`RULE.SUPPORT.SURFACE.246` · MUST · skill:spn-surface/design). The size of the bar sets only how dense its controls are, and never how far the drawer reaches. With no filter on, the button reads *Filters* and the clear action is not shown.
 
 
@@ -1013,6 +1019,75 @@ A row states its kind in `mtype`, which takes `DSComparisonRowType`: `FIELD` giv
 - **The first column MUST hold the label of each row and stay pinned while the subjects scroll sideways.**
 - **The composite fills a `flush` content part of a panel, as `DSDataTable` does.** A set that needs paging, a search or a sort is a data table.
 
+### DSFacetGroup
+
+`DSFacetGroup` holds the facets a marketplace narrows its results by, where there are more than four filters; with four or fewer, `DSFilterBar` stays above the results (Q64 A). Each facet is a title that folds open and shut over its choices: checkboxes for a choice of many, radios for a choice of one such as a rating, or a two-thumb slider for a range such as a price. A facet of choices shows its first six, then Show more. The group is controlled and fetches nothing: the chosen values come in through `value`, every change goes out through `onChange`, and the page holds the counts and the results.
+
+| Prop | The page gives | What the composite does with it |
+| --- | --- | --- |
+| `facets` | each an `mtype` of `DSFacetGroupFacetType` (`MANY` · `ONE` · `RANGE`), a `key`, a `title`, `expanded` (open at first by default), and `options` with their `count` and a `limit` (6 by default) for a choice, or `min`, `max` and `step` (1 by default) for a range | one facet each, in order |
+| `value` · `onChange` | the chosen values by facet key: a list of keys for `MANY`, one key for `ONE`, a `[from, to]` pair for `RANGE`; null, an empty list or a missing key chooses nothing | hands out every change on the rail, and the draft the sheet's button applies, as the whole new value |
+| `placement` | `DSFacetGroupPlacementType`: `RAIL` on a desktop and `SHEET` on a tablet and a phone by default | a column about 16rem wide at the start of the results, or a *Filters (n)* button that opens a sheet |
+| `title` · `applyLabel` · `icon` | the words over the rail and the sheet (Filters), the sheet's apply button (Show results, or the page's own such as *Show 128 results*), and the trigger's glyph (the funnel) | |
+| `onDraftChange` · `open` · `onOpenChange` | the sheet's draft on each change, and the value again when it closes unapplied, so the page can count again; the sheet's open state where the page holds it | |
+| `size` · `testData` | the size step, the place's by default, and the test hook | |
+
+- **On the rail each change is handed out at once; in the sheet the changes are a draft until its button applies them.** The rail shows Clear all once something is chosen, and the trigger counts the choices made.
+- **A choice's count is the option's own `count`,** drawn quietly after its label in the person's number format. The group's words, Filters, Show more, Show less, Clear all and Show results, come through `translate`.
+- **The facets stand where the marketplace's page kinds put them** (`site-patterns.md`, *The kinds of page of a marketplace*), and the look is proved in the showcase under *Composites › DSFacetGroup* once its samples are drawn.
+
+### DSQuote
+
+`DSQuote` is a person's or a company's words and who said them, drawn as a figure. The words stand in a blockquote, and who said them stands in its caption: a name, a line under it, and a photo or a logo. Stars before the words make it a review. A site builds every testimonial, success story and review from it, in its own style, by the choices below and no more: who it is from, where that stands, a title and a description, a mark, a rating, the level and alignment, and a frame (Q68 B, Q74 A). The quote leads: a title and a description are optional, and the quote's style follows its level and what it holds.
+
+**Props.**
+
+| Prop | What it takes | Default |
+| --- | --- | --- |
+| `title` | `IDSText`: a short lead-in over the words, such as a number (*7 modules*), drawn smaller than the words, which keep their step with or without it. Leave it out where the words need no headline | none |
+| `description` | `IDSText`: the line under the title, muted. It stands with the title or alone, and the quote leads either way | none |
+| `quote` | `IDSText`: the words, drawn in a blockquote | required |
+| `mark` | `IDSQuoteMark` · `null`: the opening quote mark at the start of the words. Left out, every level draws a glyph above them in the line tone; an object draws that mark, as the mark's kinds give it; `null` draws none. It does not depend on the title or the description | left out: a `GLYPH` above the words |
+| `speaker` | `IDSQuoteSpeaker`: who said it, drawn in the figure's caption | required |
+| ↳ `speaker.title` | `IDSText`: a person's name, or a company's name where the words are a company's | required |
+| ↳ `speaker.description` | `IDSText`: the line under the name: a person's role and company, or a line on what the company does | none |
+| ↳ `speaker.media` | `IDSItemMedia`: `AVATAR` · `MARK` · `AVATAR_GROUP` · `ICON` · `CUSTOM`: the speaker's picture, as `DSItem` takes it: a person's avatar, a company's mark, a team's avatars, or a node of the page's own such as a portrait | none: the speaker is words only |
+| `speakerPlacement` | `DSQuoteSpeakerPlacementType`: `BOTTOM` · `TOP` · `START` · `END`: where the speaker stands: under the words, over them, or beside them at the start or the end, in the reading direction | `BOTTOM` |
+| `verticalAlign` | `DSVerticalAlignType`: `TOP` · `CENTER` · `BOTTOM`: where the words stand against a portrait beside them (`START` or `END`): at the top of the picture, at its centre or at its foot. Where the speaker has no portrait the words stand at the top, and `TOP` and `BOTTOM` placements ignore it | `CENTER` |
+| `rating` | `number`: stars out of five, read only, which make the quote a review, drawn by `DSRatingView` | none |
+| `pageLevel` | `DSPageLevelType`: the level that sizes the words, the lead-in, the speaker's line and the picture: `WIDGET` for a card in a row of two or three, `GROUP` for a card in a row of four or in slides, `CONTAINER` for one quote across a slide | `WIDGET` |
+| `textAlign` | `DSHorizontalAlignType`: `START` · `CENTER`: `CENTER` for a quote across a slide | `START` |
+| `surface` | `IDSFrameSurface`: a card frame, as a feature's frame is; a key left out takes the quote's own default, `BASE`, `SUBTLE`, rounded, with no border and no shadow | none: the words stand on the page |
+| `className` | `string`: the classes of the figure | none |
+| `testData` | `IDSTestData`: from `IDSBaseProps` | none |
+
+**Rules.**
+
+- **The words are sized by the level, wherever the speaker stands, and the quote carries the weight** (Q74 A). At `PAGE` and `CONTAINER` a quote is the section's message, and its words take a heading step in the display face, light (300): `HEADING_XL`, 40px, at `PAGE` and `HEADING_LG`, 34px, at `CONTAINER`, 32 and 30px on a phone. From `WIDGET` down a quote is a card in a row, and its words are regular (400), one step above a feature's description: 20, 18, 16 and 14px from `WIDGET` to `INLINE`. The speaker's name and line are drawn by `DSItem`'s parts at the same level, and they carry no heading.
+- **The words keep a measure of 62 characters**, as a feature's description does, so a quote across a section reads in one sweep of the eye.
+- **A title and a description are a lead-in, smaller than the words, and the words keep their step with or without them** (Q74 A). The title is semibold: 28px at `PAGE`, 22px at `CONTAINER`, 18px at `WIDGET` and 14px from `GROUP` down. The description is muted: 16px at `PAGE` and `CONTAINER`, 14px at `WIDGET` and 13px below. The two stand tight together, and the lead-in leaves its own room under it before the stars or the quote: 32px at `PAGE`, 24px at `CONTAINER`, 16px at `WIDGET` and 12px below. Either may stand alone.
+- **A quote has a mark by default, at every level, and the mark does not depend on the title or the description** (Q74 A). The mark is always the opening quote, drawn as one shape. Its kinds are `GLYPH`, which has two placements, and `MARK`, as the mark of `DSQuote` gives them. Left out, `mark` is a `GLYPH` above the words, in the line tone (`--surface-border`), the soft grey of a border, so it reads as decoration beside the words and adapts to light and dark and to a filled frame; `color` on a `GLYPH` draws that hue instead. `mark={null}` draws none.
+- **A quote reads in this order: the lead-in, the stars, the quote block, the speaker** (the speaker first where `speakerPlacement` is `TOP`). The mark and the words are one quote block, so the stars never stand between the mark and the words. A screen reader reads the words, and the mark is decoration, hidden from it.
+- **One quote across a section stands its speaker beside the words; quotes in a row, a grid or a carousel stand it under them** (the developer, 2026-11-25). `START` and `END` put the speaker in a column from the tablet up, a quarter of the quote wide: at most 320px at `PAGE` and 288px at `CONTAINER`, and at most 20rem from `WIDGET` down. A portrait given as `CUSTOM` fills the column's width, and an avatar's photo is drawn large, both cut to 4:5 and never wider than 19.2rem below `CONTAINER`. The portrait is smaller than a third of the quote, and the words stand centred on the picture alone, with the name under the picture; `verticalAlign` `TOP` stands them at its top, and `BOTTOM` at its foot (the developer, 2026-11-25, "go for both"). Where the speaker has no portrait the words stand at the top. On a phone the speaker folds under the words and its picture is drawn as `DSItem` draws it. `BOTTOM` and `TOP` draw the picture as `DSItem` does, the small box beside the name.
+- **Quotes in a row or in slides stand at one height, and their speakers stand at the foot** (RULE.SUPPORT.SURFACE.530). A quote over or under its words fills the height its place gives it, and the words take the room that is left, so the speakers of a row line up whatever the length of each quote, and in a frame the speaker stands at the foot. In a grid row two or three across take `WIDGET`, and four across take `GROUP`. In slides `DSCarousel` stretches every slide to the tallest, so the cards of a slideshow are one height, and rows in slides take `GROUP`.
+- **A quote's rating is `DSRatingView`, read only, before the words.** A reader hears it as one sentence, *Rated 5 out of 5*, so the stars of a review read the same as every other rating.
+
+#### The mark of `DSQuote`
+
+`mark` is one of two kinds, named by `mtype` as `DSItem`'s media is: `IDSQuoteMark` is `IDSQuoteMarkGlyph` or `IDSQuoteMarkMark`. Left out it is `{ mtype: GLYPH }`, and `null` draws none.
+
+| Type | Values | What it names |
+| --- | --- | --- |
+| `DSQuoteMarkType` | `GLYPH` | a large opening quote, above the words or behind the start of the first line |
+| `DSQuoteMarkType` | `MARK` | a `DSMark` drawn inline just before the first word, centred on the first line |
+| `DSQuoteMarkPlacementType` | `ABOVE` | a `GLYPH` on a line of its own above the words, at their start edge, or centred where the quote is. The default |
+| `DSQuoteMarkPlacementType` | `BEHIND` | a `GLYPH` drawn behind the start of the first line, faint (15%), so the words keep their place |
+
+| Kind | Takes | What it draws |
+| --- | --- | --- |
+| `IDSQuoteMarkGlyph` | `mtype` `GLYPH`; `placement` (`ABOVE` where left out); `color` (`DSColorType`, the line tone where left out) | the opening quote as one shape, in the words' own type size: 2.5 times it at `PAGE` and `CONTAINER` (100px, 85px), 3 times at `WIDGET` (60px) and 2 times below (36px, 32px, 28px). Above, it leaves 8px under it to the words down to `WIDGET` and 4px below. Behind, it is 3 times at `PAGE` and `CONTAINER` (120px, 102px), 2.5 times at `WIDGET` (50px) and 2 times below, and it hangs up and toward the start, most of it in the room beside the first line, inside the level's frame inset; a centred quote has it behind the middle of the line |
+| `IDSQuoteMarkMark` | `mtype` `MARK`; what `DSMark` takes, except `size`, `scaleSize` and `ariaLabel`, which the quote owns because the mark is decoration | a `DSMark` before the first word, its box 64px at `PAGE`, 56px at `CONTAINER`, 44px at `WIDGET`, 40px at `GROUP`, 36px at `CONTENT` and 32px at `INLINE`. With no `icon` and no `text` it draws the opening quote as a shape; `text` or `icon` replaces it. `color` is `DEFAULT` and `variant` `SUBTLE` where left out |
+
 ### DSFeature
 
 `DSFeature` pitches one thing and ends on what to do: a hero, the head of a section with its items, a closing call, the tile of an integration. A page that draws these by hand gives each its own sizes and its own phone size, so no two match. A page gives the feature data only, and its level and its form are all it chooses about how it looks (`RULE.SUPPORT.SURFACE.233` · MUST · skill:spn-surface/design).
@@ -1034,7 +1109,7 @@ A row states its kind in `mtype`, which takes `DSComparisonRowType`: `FIELD` giv
 
 | Key | Takes | What it decides |
 | --- | --- | --- |
-| `nodes` | `IDSFeatureItem[]`: the props of `DSItem`, whole, but `pageLevel`, `orientation` and `backAnchor`, and a `key`, and `selected` | the items, in the order they are drawn |
+| `nodes` | `IDSFeatureItem[]`: the props of `DSItem`, whole, but `pageLevel` and `orientation`, and a `key`, and `selected` | the items, in the order they are drawn |
 | `type` | `DSFeatureItemsType`: `GRID` · `LIST` · `STATS`. `GRID` when unset | how the items are drawn |
 | `numbered` | yes or no. No by default | whether the numbers 1 to n stand before the titles, as text. `GRID` and `LIST` only |
 | `orientation` | `DSOrientationType`. Unset, `VERTICAL` for `GRID` and `HORIZONTAL` for `LIST` | how every item stands |
@@ -1079,17 +1154,20 @@ A node a page hands in ends in `Node`, so the node of art is `mediaNode` and `me
 
 - **`BACKDROP` MUST keep the words readable.** The words stand over the media where `textAlign` puts them, on a scrim of the surface's own fill, and on a phone the scrim covers the whole width. From the tablet up the scrim follows the words: with `START` it is full at the start of the reading direction and clear at its end, so a right-to-left page has it on the right; with `END` it is the mirror, full at the end; with `CENTER` it is an even wash across the whole feature.
 - **In `ITEMS_SPLIT_END` and `ITEMS_SPLIT_START` the words MUST stand across the feature, and `textAlign` MUST line up the words alone** (`RULE.SUPPORT.SURFACE.233` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.248` · MUST · skill:spn-surface/design). The eyebrow, the title, the description, the facts and the actions before the items stand across; the items, or a `contentNode`, and the actions after them stand at the start of their column beside the media. The columns are `1.1fr` to `1fr` from the tablet up, mirrored for the start. With no items and no `contentNode` nothing is split, and the feature draws as `SPLIT_END` or `SPLIT_START`.
+- **In `ITEMS_SPLIT_END` and `ITEMS_SPLIT_START` the items set the row's height, and the art beside them is held to it** (Q59 B). From the tablet up the media part fills the row and reaches into the level's room before the actions, `--level-<level>-actions-gap`, above and below, adding nothing to the height. A picture is shown whole, `object-contain`, never cropped, and any other node is cut at that height. `CENTER` centres the art on the items; `TOP` and `BOTTOM` hold its edge to the items' edge and reach into the room on that side only where the art is taller. The art lines up with its column's outer edge, mirrored in a right-to-left language. On a phone, and in every other form, the art keeps its own size.
 - **A split MUST stand its two columns by `verticalAlign`: `TOP`, `CENTER` or `BOTTOM`, `CENTER` when unset** (`RULE.SUPPORT.SURFACE.248` · MUST · skill:spn-surface/design). It is read in `SPLIT_END`, `SPLIT_START`, `ITEMS_SPLIT_END` and `ITEMS_SPLIT_START`, and nowhere else. The row is as tall as its taller column, so one value moves the shorter one.
 - **The text MUST align inside the place its type gives it, by `textAlign`, and `BACKDROP`'s scrim MUST follow it** (`RULE.SUPPORT.SURFACE.248` · MUST · skill:spn-surface/design). `textAlign` takes `DSHorizontalAlignType`: `START`, the default, `CENTER` or `END`, read in the reading direction, so `END` on a right-to-left page stands at the left. It applies in every type, and in a split inside the text's column; in `ITEMS_SPLIT_END` and `ITEMS_SPLIT_START` it moves the words across the feature alone, and the split under them stands at the start. It moves the eyebrow, the title, the description and the facts, the row of actions, and a small `media` in the level's box. A wide `mediaNode` stands where the type puts it. The items, `items` or a `contentNode`, keep their own layout: the block of items takes the width of the text part and is not aligned again. A centred pitch is a type with `textAlign` `CENTER`, so the type answers one question, where the media stands.
 
 | Level | Title: step, desktop · phone | Description | Eyebrow, and facts after the title | To the description | To facts below | Before the actions | Words to media | Inset, framed | Box of a small media | Buttons | Items at | An item: title over description | Between two items | `STATS`: number over label |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `PAGE` | `HEADING_XXL2`, 56 · 40px; `HEADING_XXL3`, 64 · 44px in an `XL` section (RULE.SUPPORT.SURFACE.424) | `CONTENT_XXL`, 20px | 8px | 8px | 12px | 40px | 64px | 40px | 80px | `LG` | `WIDGET` | 16px over 14px, `h3` | 24px | 40px over 18px |
-| `CONTAINER` | `HEADING_XL`, 40 · 32px | `CONTENT_XL`, 18px | 8px | 8px | 12px | 32px | 48px | 32px | 64px | `LG` | `WIDGET` | 16px over 14px, `h3` | 24px | 22px over 16px |
+| `PAGE` | `HEADING_XXL2`, 56 · 40px; `HEADING_XXL3`, 64 · 44px in an `XL` section (RULE.SUPPORT.SURFACE.424) | `CONTENT_XXL`, 20px | 8px | 8px | 12px | 40px | 64px | 40px | 80px | `LG` | `WIDGET` | 16px over 14px, `h3` | 24px | `HEADING_XXL3`, 64px, over 18px |
+| `CONTAINER` | `HEADING_XL`, 40 · 32px | `CONTENT_XL`, 18px | 8px | 8px | 12px | 32px | 48px | 32px | 64px | `LG` | `WIDGET` | 16px over 14px, `h3` | 24px | `HEADING_XXL`, 48px, over 16px |
 | `WIDGET` | `HEADING_SM`, 22px | `CONTENT_LG`, 16px | 2px | 2px | 2px | 24px | 24px | 24px | 56px | `MD` | `GROUP` | 14px over 14px, `h4` | 16px | 18px over 14px |
 | `GROUP` | `HEADING_XS`, 18px | `CONTENT_MD`, 14px | 2px | 2px | 2px | 16px | 16px | 16px | 44px | `SM` | `CONTENT` | 13px over 13px, no tag | 12px | 13px over 13px |
 | `CONTENT` | the item line's row, 13px | the item line's row, 13px | 2px | 0px | 2px | 12px | 12px | 12px | 32px | `SM` | `CONTENT` | 13px over 13px, no tag | 12px | 12px over 12px |
 | `INLINE` | the item line's small row, 12px | the item line's small row, 12px | 2px | 0px | 2px | 12px | 12px | 12px | 28px | `XS` | `INLINE` | 12px over 12px, no tag | 12px | 12px over 12px |
+
+**A statistic's figure is the largest type in its section, one step above the section's title** (S89): `HEADING_XXL3`, 64px, at `PAGE` over a 56px title, and `HEADING_XXL`, 48px, at `CONTAINER` over a 40px title, in the display family on a site's page. Below `CONTAINER` it keeps 18, 13 and 12px. The figure is the section's message, so it never reads as a caption under a larger title.
 
 A frame pads by the room before the actions (`RULE.SUPPORT.SURFACE.273` · MUST · skill:spn-surface/design), so the edge stands from the words as far as the words stand from the buttons; from `WIDGET` down it pads as a card of size `XL`, `MD`, `SM`, `SM`.
 
@@ -1108,7 +1186,7 @@ Each of these but the box of a small media is a token of the level (`architectur
 - **The items of a `GRID` and of `STATS` MUST keep a width of at most one column width per column, and stand where `textAlign` puts them** (`RULE.SUPPORT.SURFACE.269` · MUST · skill:spn-surface/design). The column width is 20rem, one value of the design system. The width is an upper bound: a narrower place still steps the columns down by its own width.
 - **Whatever stands boxed in a grid stands as tall as the tallest of its row, and a feature takes no height of its own** (`RULE.SUPPORT.SURFACE.530` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.531` · MUST · skill:spn-surface/design). A card, a feature, an item card and a record's card in a data table's grid take no height of their own, so the frames of one row end on one line; in a grid cell a feature fills the cell and carries the height down to its frame, and a page writes no prop or class for it.
 - **The items of a `LIST` MUST take the width of the text part, at most `62ch`, the measure of the description** (`RULE.SUPPORT.SURFACE.291` · MUST · skill:spn-surface/design). A `LIST` is a grid of one column, but the column cap is a grid's rule, so a row reads as wide as the description above it and no wider.
-- **A feature's items MUST be parted in one of four ways on every form, and the defaults MUST stay as they were** (`RULE.SUPPORT.SURFACE.269` · MUST · skill:spn-surface/design). `NONE` stands the items one room apart, the frame padding of the level the items are drawn at. `GRID` draws a line between each two. `EDGE` draws the lines between them and one around the outside, rounded with the theme's corners. Boxed, which is `surface` set, puts each item in a frame of its own, that room apart, and `borderType` is then not read. A `LIST` draws `GRID` where `borderType` is unset, and a `GRID` and `STATS` draw `NONE`.
+- **A feature's items MUST be parted in one of these ways on every form, and the defaults MUST stay as they were** (`RULE.SUPPORT.SURFACE.269` · MUST · skill:spn-surface/design). `NONE` stands the items one room apart, the frame padding of the level the items are drawn at. `GRID` draws a line between each two. `EDGE` draws the lines between them and one around the outside, rounded with the theme's corners. Boxed, which is `surface` set, puts each item in a frame of its own, that room apart, and `borderType` is then not read. A `LIST` draws `GRID` where `borderType` is unset, and a `GRID` and `STATS` draw `NONE`.
 
 | Form | `NONE` | `GRID` | `EDGE` | Boxed |
 | --- | --- | --- | --- | --- |
@@ -1185,20 +1263,39 @@ A feature is chosen by the level it stands at and by what proves its claim: a pi
 | `factsPlacement` | `AFTER_DESCRIPTION` | every case but a plan's price. It is the unit's own default |
 | `factsPlacement` | `AFTER_TITLE` | facts that say what the feature is before its sentence (`RULE.SUPPORT.SURFACE.242` · GUIDE) |
 
-### DSListDetail
+## Page — 🔮
 
-`DSListDetail` places a list beside the detail of its chosen row. It is the web stack's own composite, and the book states its props and its choice table. A page gives it the list, the detail where a row is chosen, and the address of the list; the unit holds no data and does not know which row is chosen.
+The Page group holds the units that work across a page's content (`RULE.SUPPORT.SURFACE.613` · MUST · skill:spn-surface/design): `DSPageHead`, the head of a page that stands in no box; `DSPageCategory`, a page setting that gives the pages it holds their surface category and draws nothing; and the page frames. `DSPageLevel` gives a box's parts their level and stands in Structure.
 
-| Setting | The page gives | What the composite draws |
+- **`DSPageLevel` MUST give a level, a part and `flush` to what it holds, and lay out nothing** (`RULE.SUPPORT.SURFACE.626` · MUST · skill:spn-surface/design). A head is laid out by `DSPageHead` or by its box's own head. Its `HEADER` layout stays one major version, deprecated.
+- **A page whose head stands in no box MUST open with `DSPageHead`, and every way back MUST be one row above the title line** (`RULE.SUPPORT.SURFACE.622` · MUST · skill:spn-surface/design). The row is a link with an arrow before the words of where it leads, `backLabel`, or Back where none are given, 4 px above the title line and flush with its start. `DSPanelContainer.Header` draws the same row from its `backAnchor` and `backLabel`, and a page frame draws it on a phone. `DSPageHead` takes `header` (the props of `DSItem`, its title the page's `h1`), `headerActions` (the main one `PRIMARY`, `SOLID` one size above the place's, the others `OUTLINE`), `backAnchor` and `backLabel`.
+
+### The page frames
+
+A page frame places a page's parts in slots, folds them by screen class, and draws no box and no navigation. `DSPageFrameListDetail` places a list beside the detail of its chosen row, and `DSListDetail` is its deprecated alias for one major version. `DSPageFrameGroups` places the groups, the list and the detail. `DSPageFrameAside` places a main part beside an aside of small facts about the record. A page gives each frame its parts and the addresses they go back by; the frame holds no data and does not know which row is chosen.
+
+- **A page frame MUST place its parts and give them nothing else** (`RULE.SUPPORT.SURFACE.623` · MUST · skill:spn-surface/design). It gives no padding and no size to what fills a slot. `fullHeight` makes each part as tall as the frame, the layout's content, with a panel in it scrolling its own content and keeping its header and footer in view. `attached` joins panels at a desktop into one surface: they touch, square the corners they touch and draw the line between them once. A slot of cards is never attached, and where one part shows alone `attached` changes nothing.
+- **What fills a slot follows the part's job, never its size** (`RULE.SUPPORT.SURFACE.625` · MUST · skill:spn-surface/design), as `architecture-containers.md` states: navigation drawn flat, a container a person works in, widgets for small facts.
+
+| The parts are | `fullHeight` | `attached` |
 | --- | --- | --- |
-| `list` | any node | the list, in a column at the start at a desktop; on its own where the page gives no `detail`, on every screen |
-| `detail` | any node, where a row is chosen | the detail beside the list at a desktop; alone below a desktop, with `backAnchor` as the way back |
-| `backAnchor` | the address of the list | nothing of its own: the `DSPanelContainer.Header` in the detail draws it as its way back below a desktop |
-| `listWidth` | `DSListDetailListWidthType`, `WIDE` where left out | the width of the list's column at a desktop |
+| panels a person works in side by side, each scrolling its own content: a chat, a mailbox | on | on |
+| panels on a page that scrolls as a whole, such as a record and its parts | off | on where the two read as one view |
+| card widgets, or a list of cards beside a detail | off | off |
 
-- **`DSListDetail` never navigates itself, and it reads the chosen row from nothing.** The page reads the address and passes `detail` or not. Below a desktop it shows the detail alone where there is one, else the list alone.
+| Frame | Its slots | Its other props |
+| --- | --- | --- |
+| `DSPageFrameListDetail` | `list`, `detail`, `emptyDetail` | `backAnchor` (required), `backLabel`, `listWidth`, `fullHeight`, `attached` |
+| `DSPageFrameGroups` | `groups`, `list`, `detail`, `emptyDetail` | `groupsLabel`, `groupsAnchor` (required), `groupsWidth` (`COMPACT` when unset), `backAnchor` (required), `backLabel`, `listWidth`, `fullHeight`, `attached` |
+| `DSPageFrameAside` | `main`, `aside` | `asideWidth`, `fullHeight`, `attached` |
 
-#### The choice table of `DSListDetail`
+Every width takes `DSListDetailListWidthType`: `WIDE`, 320 px and the default but for the groups, `NARROW`, 256 px, and `COMPACT`, 224 px.
+
+- **A frame never navigates itself, and it reads the chosen row from nothing.** The page reads the address and passes `detail` or not. Below a desktop it shows the detail alone where there is one, else the list alone.
+- **`DSPageFrameGroups` folds its three parts by screen class** (`RULE.SUPPORT.SURFACE.610` · GUIDE): groups, list and detail at a desktop; the groups as a menu above the list, named by `groupsLabel`, on a tablet; one part at a time on a phone, the list going back to the groups by `groupsAnchor` and the detail to the list by `backAnchor`. The groups are navigation, a `DSNavList` with counts.
+- **`DSPageFrameListDetail` is the two-column form, and a chat is that form with `emptyDetail`** (`RULE.SUPPORT.SURFACE.611` · GUIDE), with `fullHeight` and `attached`, so the conversations and the thread each scroll in one surface.
+
+#### The choice table of `DSPageFrameListDetail`
 
 A list beside a detail is chosen by what the rows say and by how much room the detail needs.
 
@@ -1320,6 +1417,10 @@ One item line serves every level of a page, and `pageLevel` says which one it st
   | `CONTENT` | 14px | 13px |
   | `INLINE` | 12px | 12px |
 - **A line that says who did a thing and when is an item line at `INLINE`.** Its picture is the `AVATAR` of the person, its title the name, and the time a fact, in the form the date units give it. A stack may keep a unit of its own that draws it.
+- **`DSItem` MUST be an item line that knows nothing of navigation** (`RULE.SUPPORT.SURFACE.624` · MUST · skill:spn-surface/design). The way back is the head's, `DSPageHead` or a panel's header, never the item's.
+- **Unread and the accent edge MUST be marks of the record's box, and the item line inside MUST read the unread mark from it** (`RULE.SUPPORT.SURFACE.620` · MUST · skill:spn-surface/design). `DSList.Item`, `DSCard`, `DSItemCard` (through `card`), `DSCardWidget` and `DSTable.Row` take `unread` and `accentColor`; `DSList` and `DSTable` take `unreadColor`, `PRIMARY` when unset; `DSDataTable` reads `data.getRecordUnread`, `data.getRecordAccent` and `settings.unreadColor` in every layout, and a card in a `GRID` cell takes none of its own. The item inside takes the heavier title on its title text and the word Unread for a screen reader.
+- **An unread row shows a notch just inside its start edge and a heavier title, and never a tint of the whole row** (`RULE.SUPPORT.SURFACE.607` · GUIDE). A tint would collide with the band of the record in view and with the row under the pointer.
+- **A record's box takes at most one accent edge, and the unread notch stands inside it** (`RULE.SUPPORT.SURFACE.621` · GUIDE). The edge is a 3 px line down the start edge in one colour for the record's state or kind, said in words too. The notch stands 6 px in from the start edge, so the two never touch.
 - **A record's item line MUST be its module's `<State>Item`, and a place MUST give it only `IDSItemPlacementProps`** (`RULE.SUPPORT.APPS.218` · MUST · skill:spn-apps/implement). The web module that owns a record makes `DSItem` specific for it once, so the record reads the same in its picker, in its list and on its own page: `RoleItem` draws a role. The Item decides every part once, the title, the description, the picture, the facts and their order, the same at all six levels from `PAGE` to `INLINE`, and the level sets only the sizes. An `INLINE` line has room for little, so there the Item keeps what a person needs to tell its record apart in a line of text, the description, the facts or both, decided once for its record and never by a place: a person's Item may keep the email and drop the facts, a release's may keep its version and state and drop the description. The level comes from where the Item stands, never from the room it has. The record's state shows only when the record is off, first among the facts, and its code shows at every level. The Item fetches nothing and holds no action: an action belongs to the row or the header that holds it. A place says where the line stands and where it leads (`pageLevel`, `orientation`, `anchor`, `showArrow`, `backAnchor`) and gives its own data at the end (`endNode`, `endAlign`), never a badge or a state of the record, which stand in its facts. It may leave out the description with `hideDescription`, or every fact with `hideFacts`, and it never changes a part or adds one. The design system declares `IDSItemPlacementProps` once, so no Item restates it.
 - **A mark in an item line MUST be a rounded square where the page names no shape, and its corner MUST follow its box.** The corner is one of the theme's radius steps: 6px at 24 and 28px, 8px at 32 and 36px, and 10px from 40px up. A page that names a shape still gets it.
 - **An item line that is a title MUST start where what stands under it starts** (`RULE.SUPPORT.SURFACE.109` · MUST · skill:spn-surface/design). A title is an item line at the level `PAGE`, `CONTAINER`, `WIDGET` or `GROUP`. It takes no padding of its own at its two sides. So the title of a group starts where the labels of the fields under it start, in a part that insets, in a card, in a dialog and in a sheet. The head of a page starts where the framed parts under it start. Above and below, a title keeps the padding of its place, which the part that holds it gives.
@@ -2818,7 +2919,7 @@ Words are chosen by what they are to the person reading. Their step says how lar
 | a description that stands a step back under a title the page draws itself | under the title | the step of its level | left out | `QUIET` | left out | left out | the step and the tone | `RULE.SUPPORT.SURFACE.143` |
 | a note that stands back from what it notes: a line under a list, the time or the person beside an entry, a site's fine print | under or beside what it notes | `CONTENT_SM`, or `CONTENT_XS` for fine print | left out | `SUBTLE` | left out | left out | the step and the tone | this table |
 | a title the page draws itself, where no box gives one: a group of a form, a name in a step | over what it names | `TITLE_SM` to `TITLE_LG`, by its level | left out | left out | left out | left out | the step | `RULE.SUPPORT.SURFACE.103` |
-| a display heading: a site's band, a home's greeting | the head of a band | `HEADING_LG` and up, as the site patterns give it | left out | left out | left out | left out | the step | `RULE.SUPPORT.SURFACE.103` |
+| a display heading: a site's band, a home's greeting | the head of a band | `HEADING_LG` and up, as the site container kinds give it | left out | left out | left out | left out | the step | `RULE.SUPPORT.SURFACE.103` |
 | a sentence that reports a state: a count gone wrong, a check that passed | in the part it reports on | the place's step | `ERROR` or `SUCCESS`, the hue a badge gives the state | left out | left out | left out | the step and the colour | `RULE.SUPPORT.SURFACE.369` |
 | a short label over a title that the site's look sets in capitals | over the title | `CONTENT_XS` | left out | `MUTED` | `UPPERCASE` | left out | the step, the tone and the format | this table |
 | a word a tooltip explains: a term, an abbreviation | in a line of words | the line's step | left out | left out | left out | `DOTTED` | the underline | this table |
@@ -3079,7 +3180,7 @@ This ref states which components exist, in which group, and what every one must 
 | `RULE.SUPPORT.SURFACE.228` | superseded: a vertical item line spaces its description and its facts by its level; the words are now set alike in either orientation (`RULE.SUPPORT.SURFACE.272` · MUST · skill:spn-surface/design) |
 | `RULE.SUPPORT.SURFACE.224` | `DSTabs` at the level `PAGE` draw `PILL` where no `type` is named, grouped on its track and not raised; `LINE` stays at `CONTAINER` and `WIDGET` and `SWITCH` at the other levels |
 | `RULE.SUPPORT.SURFACE.187` | a default mark draws its icon muted and a ringed mark its ring in the icon's colour, and a `PAGE` item's description is `CONTENT_LG`, 16px |
-| `RULE.SUPPORT.SURFACE.230` | a block built from components for one task is a component of the group Composites; the data table, the filter bar, the comparison and the feature are core composites, and the unit for a list beside its detail is not a core unit |
+| `RULE.SUPPORT.SURFACE.230` | a block built from components for one task is a component of the group Composites; the data table, the filter bar, the facet group, the comparison, the quote and the feature are core composites, and the unit for a list beside its detail is not a core unit |
 | `RULE.SUPPORT.SURFACE.233` | a feature is sized by its level alone, placed by its type, and draws the default of its level for a type the level does not allow |
 | `RULE.SUPPORT.SURFACE.234` | a feature's actions are data and take their size from its level, with at most one solid primary |
 | `RULE.SUPPORT.SURFACE.235` | a feature draws its items as item lines at a level it gives them by its own, the gap between two items following its level, the feature and each item taking the heading element of their level, the statistics keeping their sizes one level below the feature's, and the feature giving the items' orientation |
@@ -3177,6 +3278,22 @@ This ref states which components exist, in which group, and what every one must 
 | `RULE.SUPPORT.SURFACE.389` | a mark is no link and no level rings a mark, so `LINK` and `SUBTLE_OUTLINE` have no case written yet on a mark. It is advice |
 | `RULE.SUPPORT.SURFACE.390` | a header shows at most one main action and one or two secondaries, the rest behind "⋯"; on a record moving through states the main action is the move its state expects next. It is advice |
 | `RULE.SUPPORT.SURFACE.391` | a badge in a table cell is `XS`, because a person scans a table row by row. It is advice |
+| `RULE.SUPPORT.SURFACE.606` | a table's first cell leads with an avatar only for a person or an organization, with a mark only for rows of mixed kinds, and with its text alone for a table of one kind |
+| `RULE.SUPPORT.SURFACE.607` | an unread row shows a notch just inside its start edge and a heavier title, and never a tint of the whole row |
+| `RULE.SUPPORT.SURFACE.608` | on a phone a record with more than four facts a person still needs keeps them as label and value pairs under its lead |
+| `RULE.SUPPORT.SURFACE.609` | a person's column set is kept with the saved view |
+| `RULE.SUPPORT.SURFACE.610` | `DSPageFrameGroups` folds its three parts by screen class: groups, list and detail at a desktop, the groups as a menu above the list on a tablet, one part at a time on a phone |
+| `RULE.SUPPORT.SURFACE.611` | `DSPageFrameListDetail` is the two-column form, and a chat is that form with `emptyDetail` |
+| `RULE.SUPPORT.SURFACE.614` | only the lead cell of a row takes two lines, and every other cell one |
+| `RULE.SUPPORT.SURFACE.615` | a listing shows a picture only where it tells one record from another, an avatar, a logo, a mark or an image, in the place its layout gives it |
+| `RULE.SUPPORT.SURFACE.616` | a media field is named by its role, a person's avatar, a square logo, a wordmark or a cover, and a page fills a slot by that role |
+| `RULE.SUPPORT.SURFACE.619` | a quick pill of `DSFilterBar` applies the moment it is pressed, and *All* clears its group |
+| `RULE.SUPPORT.SURFACE.620` | unread and the accent edge are marks of the record's box, the row, the card or the table row, and the item line inside reads the unread mark from its box and never draws one of its own |
+| `RULE.SUPPORT.SURFACE.621` | a record's box takes at most one accent edge, a 3 px line at its start in one colour that says the record's state or kind, and the unread notch stands 6 px inside the start edge so the two never touch |
+| `RULE.SUPPORT.SURFACE.622` | a page whose head stands in no box opens with `DSPageHead`, and every way back, of a page head, a panel header or a page frame on a phone, is one row above the title line: a link with an arrow and the words of where it leads, Back where none are given |
+| `RULE.SUPPORT.SURFACE.623` | a page frame places its parts and nothing else: it gives no padding and no size to what fills a slot, `fullHeight` makes each part as tall as the frame with a panel scrolling its own content, and `attached` joins panels into one surface and is never given where a slot holds cards |
+| `RULE.SUPPORT.SURFACE.624` | `DSItem` is an item line and knows nothing of navigation: the way back is the head's, never the item's |
+| `RULE.SUPPORT.SURFACE.626` | `DSPageLevel` gives a level, a part and `flush` to what it holds and lays out nothing, as `DSSurface` gives a surface; a head is laid out by `DSPageHead` or by its box's own head, and the `HEADER` layout stays one major version, deprecated |
 
 ## Proof
 

@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/05-architecture-core.md",
-      "seen": "e76a0423"
+      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/06-architecture-core.md",
+      "seen": "045e26f1"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/05-architecture-core/",
-      "seen": "abbaeead"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/06-architecture-core/",
+      "seen": "eb8c1fad"
     }
   ]
 }
@@ -15,7 +15,7 @@
 
 # Core — The Tokens Every Block Reads
 
-Source of truth: the foundation's Core construct (`docs/02-constructs/02-support/01-surface/05-architecture-core.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/05-architecture-core/`), which are **done**: every role, every step of the scale and every type step carries a value there. Core is the fifth of thirteen Surface constructs, and names the tokens every block is drawn with.
+Source of truth: the foundation's Core construct (`docs/02-constructs/02-support/01-surface/06-architecture-core.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/06-architecture-core/`), which are **done**: every role, every step of the scale and every type step carries a value there. Core is the sixth of sixteen Surface constructs, and the first of the Architecture group, and names the tokens every block is drawn with.
 
 Read this before you ask what a block may read, or before you add a role, a step of the scale, a scale size or an icon.
 
@@ -30,8 +30,12 @@ Read this before you ask what a block may read, or before you add a role, a step
 | Scale size | `DSScaleSizeType` — a step that says how large a thing that is shown is drawn. Each unit that takes it holds its own pixels for the step |
 | Horizontal align | `DSHorizontalAlignType` — where a part stands on the horizontal axis: `START` · `CENTER` · `END`, in the reading direction |
 | Vertical align | `DSVerticalAlignType` — where a part stands on the vertical axis of its box: `TOP` · `CENTER` · `BOTTOM` |
-| Type step | one size, one weight and one line height of the type scale |
-| Icon | one of the named pictures a block may draw in place of its label, from a closed set |
+| Type step | `DSTypographyType` — one size, one weight and one line height of the type scale |
+| Icon | `DSIconType` — one of the named pictures a block may draw in place of its label, from a closed set |
+| Part of a box | `DSBoxPartType` — the header, the content or the footer of any box |
+| Motion | `DSMotionType` — how a unit moves into place the first time it scrolls into view |
+| Grid | `IDSGrid` — how the cells of a grid stand |
+| Frame surface | `IDSFrameSurface` — the paint of a frame |
 
 ## The token groups — ✅
 

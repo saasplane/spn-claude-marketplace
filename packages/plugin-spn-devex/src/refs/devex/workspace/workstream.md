@@ -61,7 +61,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
-      "seen": "3c1e6d65"
+      "seen": "0fb0d490"
     }
   ]
 }
@@ -172,6 +172,7 @@ name, so `workstream arc stamp write` is the group `workstream`, the subject `ar
 | `suggestion add <workstream> "<title>" [--preview …]` | raises a suggestion: the next number, raised |
 | `suggestion state <workstream> <sN> <state> [--words "…"]` | moves it on: shaped, decided, parked or dropped, with the words beside the move; a parked one may carry a mark that it changes how you work |
 | `suggestion edit <workstream> <sN> [--title …] [--preview …]` | changes its title or its preview, never its state |
+| `question list [<workstream>] [--state open\|answered\|withdrawn\|all] [--every]` | the cards of the workstreams this window owns, open by default, one line each: id, arc, title and the day raised. A window speaks only of its own workstreams (`RULE.DEVEX.WORKSPACE.236` · MUST · short), so it reads another only when named, and every one only with `--every` |
 | `question raise · show · answer · cite · withdraw` | a card from raised to answered, and `cite` for one answered earlier (`--entries none` where it changes no repository file); [`docs/decision-cards.md`](docs/decision-cards.md) states them |
 | `finding write · decide · show` | a saved review's findings as records in the arc's `findings.jsonl`, each naming its view and number; `finding decide <arc> <Fn>` answers one with `--carried` (sheet entries that exist), `--decided` (a card that exists) or `--dropped "<reason>"`; `show --open` lists the unanswered |
 | `correction write <arc> --said "…" --answered-by <book\|code\|review\|none> --ref <file:line> --work <kind>` | logs a correction made on something already answered and prints the map row or reference to amend; `none` is recorded and does not count |
@@ -617,7 +618,7 @@ changes nothing under anybody's feet. The run reaches it later and follows the n
 
 **Before a card or a suggestion is raised, three questions are asked** (see `refs/devex/workspace/docs/decision-cards.md`): is it already answered, is the premise true, and does the answer change what a person sees or pays for, a boundary, a promise or a real trade-off. An engineering call with a clear recommendation is the agent's, logged by `workstream decision write` and reported in one line the developer can reverse.
 
-**An answered card binds every later workstream** (`RULE.DEVEX.WORKSPACE.498` · MUST · short). Before the agent settles a doubt, or amends a register row to match what the code does, it searches the closed workstreams' `questions.jsonl` for the question. An answer found there stands. Code that drifted from an answer goes back to the answer, or comes to the developer as a card that cites it. A card the developer answered once is never asked again, and never quietly undone.
+**An answered card binds every later workstream** (`RULE.DEVEX.WORKSPACE.498` · MUST · short). Before the agent settles a doubt, or amends a register row to match what the code does, it searches the closed workstreams' answered cards for the question, with `workstream question list <workstream> --state answered`. An answer found there stands. Code that drifted from an answer goes back to the answer, or comes to the developer as a card that cites it. A card the developer answered once is never asked again, and never quietly undone.
 
 **You decide what the book, the plugin references and the lenses settle — MUST**
 (`RULE.DEVEX.WORKSPACE.193` · MUST · short). While you work any request — shaping, iterating or executing — read what

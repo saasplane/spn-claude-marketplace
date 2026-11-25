@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/08-architecture-containers.md",
-      "seen": "d9e9bed2"
+      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/09-architecture-containers.md",
+      "seen": "c4910916"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "ec4b3a10"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-containers/",
+      "seen": "e87bd9db"
     }
   ]
 }
@@ -15,7 +15,7 @@
 
 # Containers — How a Part of a Page Is Framed
 
-Source of truth: the foundation's Containers construct (`docs/02-constructs/02-support/01-surface/08-architecture-containers.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/08-architecture-containers/`). Containers is the eighth of thirteen Surface constructs.
+Source of truth: the foundation's Containers construct (`docs/02-constructs/02-support/01-surface/09-architecture-containers.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/09-architecture-containers/`). Containers is the ninth of sixteen Surface constructs.
 
 Read this before you frame a part of a page, or before you draw or build the panel on a new stack.
 
@@ -77,13 +77,13 @@ What a page puts in each part follows one form. A person then finds the name and
 
 - **A page puts the title and the actions of a panel in its header, and what closes its work in its footer** (`RULE.SUPPORT.SURFACE.074` · GUIDE). The header places its first block, the title, at the start, where it grows, and every other block as one group of actions at the end, in the order written (`RULE.SUPPORT.SURFACE.178` · MUST · skill:spn-surface/design), so the title and the actions need no placing by the page. Which action is the main one, and how many stand before "⋯", is the button's *limits across a header* in `architecture-components.md` (`RULE.SUPPORT.SURFACE.390` · GUIDE).
 - **The action of one part of the content stands at the end of that part's title, and not in the header.** The header holds the actions of the whole panel.
-- **A page uses one panel for each thing a person reads or saves as a whole** (`RULE.SUPPORT.SURFACE.116` · GUIDE). The sections of that thing are its content parts, and two things that are read or saved apart are two panels. `standards-patterns.md` states the rule once, for every pattern.
+- **A page uses one panel for each thing a person reads or saves as a whole** (`RULE.SUPPORT.SURFACE.116` · GUIDE). The sections of that thing are its content parts, and two things that are read or saved apart are two panels. The Surface Catalogue states the rule once, for every app page kind (`standards-patterns.md` holds the task and flow patterns).
 - **A panel MUST give the title in its header the level of its box, `CONTAINER` unless the panel is the whole page, and a panel that is the whole page MUST say so with `fullPage`** (`RULE.SUPPORT.SURFACE.107` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.179` · MUST · skill:spn-surface/design). The title of a header is an item line. A panel takes `fullPage`, a boolean that is `false` where the page gives none and that is not a size: it says that this panel is the page. The level of its box is `CONTAINER`, or `PAGE` with `fullPage`, and the panel gives it to its header, its content and its footer as their place. With `fullPage` the header is the page head: the title is the `h1` with no level of its own, the main action is solid one step above the size, and every other action is an outline. A data table panel container takes `fullPage` in its `panel` and gives it to its box, and it takes no level from its title: the `pageLevel` of a title styles the title alone, as on any item line. A title the page gives no level takes the level of its box: `WIDGET` in a card, `GROUP` in the head of a part of a card widget, and `CONTAINER` in a dialog, a sheet or a drawer, as `architecture-components.md` states for each box. So every page of an app opens with the same head, and only its body differs.
-- **The back action of a header MUST stand level with the line of the title** (`RULE.SUPPORT.SURFACE.108` · MUST · skill:spn-surface/design). `DSPanelContainer.Header` draws a back action before its title where the page gives it an address to go back to. That action does not stand level with the middle of the title and the lines under it together. A person then reads the way back and the name of the page on one line.
-- **A page that holds several panels puts its head above them, outside any frame, with its way back** (`RULE.SUPPORT.SURFACE.120` · GUIDE). A page with one panel puts its head in the header of that panel. A page with several has no one panel that its head belongs to, so the head stands alone above them all. It is an item line at the level `PAGE`, with the way back before its title, level with the line of the title.
+- **The way back of a header MUST be a row of its own above the title line** (`RULE.SUPPORT.SURFACE.108` · MUST · skill:spn-surface/design). `DSPanelContainer.Header` draws it where the page gives it an address to go back to: a link with an arrow and the words of where it leads, `backLabel`, or Back, 4 px above the title line and flush with its start. It is the row of `DSPageHead` (`RULE.SUPPORT.SURFACE.622` · MUST · skill:spn-surface/design), so the title keeps the start of its line.
+- **A page that holds several panels puts its head above them, outside any frame, with its way back** (`RULE.SUPPORT.SURFACE.120` · GUIDE). A page with one panel puts its head in the header of that panel. A page with several has no one panel that its head belongs to, so the head stands alone above them all. It is `DSPageHead`, whose title line is an item at the level `PAGE`, with the way back in a row above the title line.
 - **The design system MUST draw that head and its way back.** A page gives the title and the address to go back to, and writes no row, no back button and no padding of its own. So the head of a page looks the same whether the page has one panel or several.
 - **The actions that close the work of an entry stand in one place and in one order** (`RULE.SUPPORT.SURFACE.095` · GUIDE). Over the page, in a dialog, a sheet, a drawer or a popover, they stand at the end of the footer: the action that leaves the work first, and the main action last, at the very end. In an entry that is a page of its own they stand at the start of the footer, the main action first, because the fields of a page line up at its start. A value changed in place, as in a row of a data table, keeps its two actions beside the box, the one that saves first, because a person reaches them in the order of reading. The main action is a solid button and the action that leaves an outline button, in both places.
-- **A header above the outline is the value of `frames` that lists `CONTENT` and `FOOTER` and leaves `HEADER` out.** The app patterns are drawn in that form. The look is still the theme's to choose: a theme that lists the header too moves the outline, and no page changes.
+- **A header above the outline is the value of `frames` that lists `CONTENT` and `FOOTER` and leaves `HEADER` out.** The app page kinds are drawn in that form. The look is still the theme's to choose: a theme that lists the header too moves the outline, and no page changes.
 
 Here is how the parts serve the pages most apps have.
 
@@ -91,9 +91,9 @@ Here is how the parts serve the pages most apps have.
 | --- | --- | --- | --- |
 | A listing | the page title, a line under it where one is needed, and actions at the end | a filter bar where the listing has one, and a data table in a `flush` part | the paging of the records |
 | A form | the title of the form | its sections, one under another, each under its own title | the actions that save the form or leave it |
-| A dashboard | flat | raised, holding widgets that show numbers | none |
+| An overview | flat | raised, holding widgets that show numbers | none |
 
-**What the units do.** A listing's paging in the footer of the panel is the form the app patterns are drawn in. `DSDataTable` hands its paging to a place the page gives it. The page puts an element in `DSPanelContainer.Footer` and names it as `settings.pagination.footerElement`, and the table draws its record count and its pager there. The table is handed a place and knows no panel, because a composite is a component, a layer before the panel. Where a page gives no place, the table draws its paging in a footer of its own, at the foot of the records.
+**What the units do.** A listing's paging in the footer of the panel is the form the app page kinds are drawn in. `DSDataTable` hands its paging to a place the page gives it. The page puts an element in `DSPanelContainer.Footer` and names it as `settings.pagination.footerElement`, and the table draws its record count and its pager there. The table is handed a place and knows no panel, because a composite is a component, a layer before the panel. Where a page gives no place, the table draws its paging in a footer of its own, at the foot of the records.
 
 ## The look — 🔮
 
@@ -103,7 +103,8 @@ The look of a panel is the props `frames`, `surface` and `unframed`, set out in 
 | --- | --- | --- | --- | --- |
 | `children` | `ReactNode`: the parts | required | the parts of the panel, in one order: `.Header`, `.Content`, `.Footer`; each part is a named place the look of the panel reaches | PART · Parts |
 | ↳ `Header.flush` | `boolean` | `false` | what the part holds fills it from edge to edge, with no inset | LOOK · Flush header |
-| ↳ `Header.backAnchor` | `IDSBaseAnchor` | none | a way back, a ghost icon button with an arrow at the start of the title line; with none, the one a `DSListDetail` above offers | ACTIONS · Back link |
+| ↳ `Header.backAnchor` | `IDSBaseAnchor` | none | a way back, a row of its own above the title line: a link with an arrow and the words of where it leads; with none, the one a page frame above offers below a desktop | ACTIONS · Back link |
+| ↳ `Header.backLabel` | `IDSText` | Back | the words of that way back, such as Settings; with none, the frame's | WORDS · Back label |
 | ↳ `Content.flush` | `boolean` | `false` | what the part holds fills it from edge to edge, with no inset | LOOK · Flush content |
 | ↳ `Footer.flush` | `boolean` | `false` | what the part holds fills it from edge to edge, with no inset | LOOK · Flush footer |
 | ↳ `Footer.sticky` | `boolean` | `false` | the footer stays at the bottom of the screen while its panel is on screen. Scroll behaviour, so it is not drawn. | BEHAVIOUR |
@@ -171,6 +172,8 @@ A container takes no background color, no padding value, no margin, no container
 
 A section is one part of a page, set apart from the next by a fill of its own and its own room above and below: the hero of a website, a row of three pillars, the strip behind a closing call, a tinted greeting that opens an app's page. `DSSectionContainer` is the unit (`RULE.SUPPORT.SURFACE.243` · MUST · skill:spn-surface/design), and it draws a `<section>`. It has no header, no footer, no frame and no parts. It holds one child. What stands in it sets its own level: a pitch on a website is a `DSFeature` placed in the section, with its own `pageLevel`, and the section hands down no level. It takes a `color` (`BASE` when unset), a `strength` (`SUBTLE` when unset) and `painted`, as a surface does, a `className`, a `size` (the app's when unset), `flush`, a `mediaNode` and an `id`.
 
+Each container kind of MARKETING and RESOURCES, the site categories of the Surface Catalogue, is realized by a section container, named in the site container kinds of the catalogue, so no section is defined twice.
+
 | prop | type | default | what it does and when to use it | library |
 | --- | --- | --- | --- | --- |
 | `children` | `ReactNode`: one child | required | what the section holds; it holds one child, which sets its own level, and the section hands down none | SLOT · Child |
@@ -185,7 +188,9 @@ A section is one part of a page, set apart from the next by a fill of its own an
 | `className` | `string` | none | that the app paints this one section: the class sets the paint token `--surface-fill`, a colour, in light and in `[data-mode='dark']`, and the section's fill is it. Nothing else a class sets on the section is supported | WIRING |
 | `size` | `DSSizeType` | the app's size | the room above and below, and the size every block inside the section takes. A section's room is `MD` under a design language that sets none | SIZE |
 | `flush` | `boolean` | `false` | whether the section draws no room of its own on any side, above, below or at the sides, so that the child runs to the edges of the section's place. It means here what it means on a card part, a panel part and `DSList`: it draws no padding of its own (rule RULE.SUPPORT.SURFACE.313 · MUST · skill:spn-surface/design) | LOOK · Flush |
-| `mediaNode` | `ReactNode` | none | art drawn behind the child from one edge of the place to the other: a picture, a gradient, a video, a canvas | SLOT · Art behind |
+| `mediaNode` | `ReactNode` | none | art drawn behind the child from one edge of the place to the other: a picture, a gradient, a video, a canvas, or a slideshow, a `DSCarousel` with `overlay`. Still art is hidden from a reader; art that holds a control, a slideshow's arrows and dots, is not | SLOT · Art behind |
+| `mediaScrim` | `DSHorizontalAlignType`: `START` · `CENTER` · `END` | none: the words stand on the art | where the words stand over `mediaNode`, on a scrim of the section's own fill, as a `BACKDROP` feature's words do: `START` dense at the start and clear at the end, `END` its mirror, `CENTER` an even wash, and the whole width on a phone. The scrim lies over the art and under the art's own controls, and the child keeps to the part it covers, three fifths of the box from the tablet up. Read only where `mediaNode` is set | LOOK · Media scrim |
+| `width` | `DSLayoutWidthType`: `FULL` · `XWIDE` · `WIDE` · `MEDIUM` · `NARROW` | none: nothing is capped | caps what the section holds at that layout width's own measure, centred inside the side room, as `DSLayout` reads it; the ground, the `mediaNode` and the scrim stay edge to edge, a phone narrower than the width keeps the full width, and `FULL` caps nothing. It narrows this section's content only and is not the page's layout width: `NARROW`, 768px at most, draws the reading measure of questions and of a reading column (Q71 A) | SIZE · Content width |
 | `inset` | `boolean` | `false` | an inner shadow along the section's top and bottom edges, over its fill and its `mediaNode`, from the one token `--shadow-inset`. It sets the section apart from the sections above and below it | LOOK · Inset |
 | `parting` | `DSSectionPartingType`: `NONE` · `HAIRLINE` | the design language's, else `NONE` | how the section is set apart from the next one: `HAIRLINE` draws one thin line along its lower edge, and `NONE` leaves the fill and the room to part them | LOOK · Parting |
 | `pattern` | `DSSectionPatternType`: `NONE` · `DOTS` · `LINES` · `GRID` | the design language's, else `NONE` | a pattern drawn behind the child, over the fill and under `mediaNode`, in the section's own hue at a low strength | LOOK · Pattern |
@@ -206,6 +211,7 @@ A section is one part of a page, set apart from the next by a fill of its own an
 | `XL` | 128px · 72px | 48px · 32px | the hero |
 
 - **A section MUST reach the edges of its place and no further** (`RULE.SUPPORT.SURFACE.254` · MUST · skill:spn-surface/design). The place is the window in TOPNAV and CANVAS and in the header and the footer of every layout (in TOPNAV the content, where the content draws a frame of its own), and the content part in RAIL and DOCK, as `architecture-layouts.md` marks it. The section's fill, its `mediaNode` and the child of a `flush` section run from one edge of the place to the other, and the section's words stay in the body's box. The child of a `flush` section lines its own words up with the box by `--section-box-inset`. In an app the fill stops at the navigation, and a content drawn bordered, raised or floating keeps its line, its corners and its shadow. Where the browser's scrollbar takes width from the window, the section adds no sideways scroll. A page does not put a section inside a panel, a card, an overlay or the nav column, since a section sets a part of a page apart and frames nothing; that part is advice.
+- **Where the words stand over the art, the section's `mediaScrim` keeps them readable.** It draws a scrim of the section's own fill over the `mediaNode`, dense at the start, at the end or evenly, and the words keep to the three fifths it covers from the tablet up. So a slideshow can stand behind a hero and every slide leaves the claim readable. With no `mediaScrim` the words stand on the art itself, as a scene's do.
 - **A section's fill MAY be a gradient of its own colour** (`RULE.SUPPORT.SURFACE.415` · MUST · skill:spn-surface/design). A surface's fill is one shape everywhere it is painted, `IDSSurfaceFillProps` (`color`, `strength`, `gradient`), declared once and taken by `DSSurface`, `DSSectionContainer`, the panel container, the card and the feature; a navigation bar takes no gradient. A gradient is `LINEAR` or `RADIAL`; its `origin` is a `DSPlacementType` (left out, a radial is centred and a linear runs from the top; a linear from a corner runs to the opposite corner); its `end` is the same colour softer, toward the page, by 15, 30, 45 or 60%, or stronger by 15 or 30%, and clear where left out; its `reach` is 25, 50, 75 or 100% of the way, flat beyond. Every value keeps the section's words readable across the whole band in both modes, so no value changes the words' colour. `BASE`, `painted` and an app's own fill stay flat, and `mediaNode` draws over the gradient.
 - **Sections MUST be told apart by a change of fill, never by a line** (`RULE.SUPPORT.SURFACE.416` · MUST · skill:spn-surface/design). Two sections side by side never share a tinted fill, and a site's page carries its brand fill at most three times: its opening, one pause mid-page and its closing call. A section whose words have no media beside them stands centred, its head and its items; a section with media beside its words stands at the start, where every start-aligned section's words share one edge with the bar's first item.
 - **A partner MAY paint one section with a class of their own, through the paint token** (`RULE.SUPPORT.SURFACE.192` · MUST · skill:spn-surface/design). The class sets `--surface-fill`, a colour, in light and in `[data-mode='dark']`, and the section draws that colour from edge to edge of its place in place of its `color`. A section that takes a dark colour in a light page, or a light one in a dark page, names the mode of that colour with `painted`, so that what it holds takes that mode's tokens and its text.
@@ -291,9 +297,9 @@ The card, `DSCard`, stays a separate block beside the panel, taking `surface` an
 - **A card's size MUST set its own spacing and reach no block it holds** (`RULE.SUPPORT.SURFACE.114` · MUST · skill:spn-surface/design). The size pads the card's parts and sets the gaps between them; a block inside, a button, a badge, a row's words and its chevron, takes the size of the place above the card, so a large card is roomier and what it holds is drawn as it is anywhere else. A row of a list and a title in a `flush` part still take the inset of the card's size at their sides, because that inset is spacing, so each starts where the card's own parts start their content. A card that states no size pads by the size it stands in.
 - **A `flush` part of a card MUST say so to what it holds, as a `flush` part of a panel does.** The header, the content and the footer of a card all do this.
 - **The card MUST take `surface` and `frames` for its look, and the paint of its frame MUST come from the theme's `component.card`** (`RULE.SUPPORT.SURFACE.261` · MUST · skill:spn-surface/design). `surface` is an `IDSFrameSurface`, and its keys mean on a card what they mean on a panel.
-- **A card MAY take `frames`, `DSBoxPartType[]`, and its default MUST be `HEADER`, `CONTENT` and `FOOTER`** (`RULE.SUPPORT.SURFACE.262` · MUST · skill:spn-surface/design). Two listed parts next to each other share one frame, and a part not listed sits flat, half the card's gap from the frame beside it. A header takes the same room at a size whether it stands in the frame or flat, so two cards of one size side by side line their headers up. So a dashboard tile may stand its title flat above a framed body by listing `CONTENT` alone. `DSCardWidget` takes `frames` and hands them to its card.
+- **A card MAY take `frames`, `DSBoxPartType[]`, and its default MUST be `HEADER`, `CONTENT` and `FOOTER`** (`RULE.SUPPORT.SURFACE.262` · MUST · skill:spn-surface/design). Two listed parts next to each other share one frame, and a part not listed sits flat, half the card's gap from the frame beside it. A header takes the same room at a size whether it stands in the frame or flat, so two cards of one size side by side line their headers up. So an overview tile may stand its title flat above a framed body by listing `CONTENT` alone. `DSCardWidget` takes `frames` and hands them to its card.
 - **A card and a panel MUST be told apart by level and purpose, and no unit MUST merge them** (`RULE.SUPPORT.SURFACE.263` · MUST · skill:spn-surface/design). There is no `DSCardContainer`, no `DSFeatureContainer` and no `DSFeatureSectionContainer`.
-- **A card MAY sit inside the content of a panel.** A dashboard MAY also use cards and no panel at all.
+- **A card MAY sit inside the content of a panel.** An overview page MAY also use cards and no panel at all.
 
 ### The frames of a box
 
@@ -330,7 +336,7 @@ A block with `bordered` in a `flush` part keeps its border, because its own prop
 
 ## A panel in use — 🔮
 
-The three parts below are a panel in use. Each says how the same header, content and footer carry one of the app patterns of `standards-patterns.md`. None adds a prop or a part to the panel.
+The three parts below are a panel in use. Each says how the same header, content and footer carry one of the app page kinds, the Pages of DASHBOARD and PORTAL in the Surface Catalogue. None adds a prop or a part to the panel.
 
 ### An entry over the page
 
@@ -365,21 +371,33 @@ Some pages hold things in groups: the fields of each record type, or the actions
 | Screen class | What the page shows |
 | --- | --- |
 | A desktop | both parts. The groups stand at the left and stay in view, and the items of the chosen group stand at the right |
-| A tablet and a phone | one part at a time. A person chooses a group, the items of that group are shown where the groups were, and a back action returns to the groups |
+| A tablet and a phone | one part at a time. A person chooses a group, the items of that group are shown where the groups were, and the way back above their title returns to the groups |
 
 - **Both parts are in view at a desktop only** (`RULE.SUPPORT.SURFACE.079` · MUST · skill:spn-surface/design). There a person goes from one group to the next without losing the list.
 - **On a tablet and on a phone the items take the place of the groups.** The two parts do not fit side by side there.
 - **The part that holds the groups MAY be narrow, and a named choice MUST say so** (`RULE.SUPPORT.SURFACE.119` · MUST · skill:spn-surface/design). Where a group is read by its name alone, the items need most of the width. A unit that places the two parts keeps its usual width for the groups where the page chooses none, and it offers a narrower one by name. A page **MUST NOT** write a width of its own. The choice holds at a desktop, where both parts are in view.
-- On the web the swap also changes the address, as `standards-patterns.md` states under *On the web: the address of a screen*.
+- On the web the swap also changes the address, as the web's app page kinds state under *On the web: the address of a screen*.
 - **Each part is shown by what its own data asks for: a list, a table, a data table, or a view of one thing** (`RULE.SUPPORT.SURFACE.049` · GUIDE). The groups and the items seldom hold data of the same shape.
 - **A set of groups that can be added to is a list, and not a row of tabs** (`RULE.SUPPORT.SURFACE.080` · GUIDE). A row of tabs is safe only where the set cannot grow past the width of the page. A list takes any number of groups.
 - **Many groups that a person searches are a data table in its `LIST` layout** (`RULE.SUPPORT.SURFACE.069` · GUIDE), stated in `architecture-components.md`. A group is read by its name, as a line, and the groups stand in a narrow part of the page.
 
 Where the groups are few and fixed, the page needs no swap. Each group is a panel of its own, one under another on one page, and nothing is hidden.
 
-**What the units do.** The app patterns draw the back action on the title line of the panel that holds the items. `DSPanelContainer.Header` has a small place for it before the title: a page gives the header the address to go back to, and the header draws a back action there, in one group with its first block, so the title stays at the start and the last block at the end. The back action stands level with the line of the title. While the items stand alone, that back action is the way back to the groups.
+**What the units do.** The app page kinds draw the way back in the header of the panel that holds the items: a page gives the header the address to go back to and its words, and the header draws the row above its title line. While the items stand alone, that row is the way back to the groups.
 
-**The foundation names no core unit that places the two parts** (`RULE.SUPPORT.SURFACE.099` · MUST · skill:spn-surface/design). The rules above say what a person sees, and they hold whatever places the parts. The web stack has a unit of its own that places them, `DSListDetail`: both parts at a desktop, and one at a time on a tablet and a phone. Its `listWidth` is the named choice for the width of the groups. `providers.md` names it and its values.
+**The foundation names no core unit that places the two parts** (`RULE.SUPPORT.SURFACE.099` · MUST · skill:spn-surface/design). The rules above say what a person sees, and they hold whatever places the parts. The web stack has page frames of its own that place them, `DSPageFrameListDetail` and `DSPageFrameGroups`: every part at a desktop, and one at a time on a phone. Their widths are the named choice for the width of the groups. `architecture-components.md` states them and `providers.md` names their folder.
+
+### Two containers side by side
+
+- **A page MUST set at most two containers side by side, one taking the larger share** (`RULE.SUPPORT.SURFACE.625` · MUST · skill:spn-surface/design). A third box beside them splits a person's attention three ways and leaves each part too narrow to work in. What a part is follows its job, never its size:
+
+  | The part's job | What it is | Today's example |
+  | --- | --- | --- |
+  | a person moves between sets, and works in none of them | navigation, drawn flat | a mailbox's folders, a `DSNavList` in the groups of `DSPageFrameGroups` |
+  | a person works in it, reads it, or chooses one thing from it | a container | the list and the detail of `DSPageFrameListDetail`, each a `DSPanelContainer` |
+  | it holds small facts about the one record the page is about | widgets | the aside of `DSPageFrameAside`, `DSCardWidget`s one under another |
+
+- **A part in a page frame's slot fills it.** In a frame with `fullHeight` a panel scrolls its own content and keeps its header and footer in view, and in a frame with `attached` it squares the corners it touches and the line between two panels is drawn once (`RULE.SUPPORT.SURFACE.623` · MUST · skill:spn-surface/design). A card widget stands apart, so a slot of cards is never attached.
 
 ## Boundary
 
@@ -421,7 +439,7 @@ This ref states what frames a part of a page, what that frame looks like, and wh
 | `RULE.SUPPORT.SURFACE.116` | a page uses one panel for each thing a person reads or saves as a whole |
 | `RULE.SUPPORT.SURFACE.107` | the level a box gives the title in its header: `CONTAINER` for a panel, `PAGE` for a listing that is the page, `WIDGET` for a card |
 | `RULE.SUPPORT.SURFACE.179` | a panel that is the whole page says so with the boolean `fullPage`, and its header, content and footer then take the level `PAGE` as their place |
-| `RULE.SUPPORT.SURFACE.108` | the back action of a header stands level with the line of the title |
+| `RULE.SUPPORT.SURFACE.108` | the way back of a header is a row of its own above the title line, the row of `DSPageHead` |
 | `RULE.SUPPORT.SURFACE.120` | a page that holds several panels has its head above them, outside any frame, with its way back, and writes nothing by hand for it. It is advice |
 | `RULE.SUPPORT.SURFACE.119` | the part that holds the groups may be narrow, by a named choice and never by a width the page writes. It is a MAY |
 | `RULE.SUPPORT.SURFACE.075` | an entry opens as a dialog, a sheet or a page of its own, by its size. The two numbers are proposed. It is advice |
@@ -436,6 +454,8 @@ This ref states what frames a part of a page, what that frame looks like, and wh
 | `RULE.SUPPORT.SURFACE.312` | the unit that frames a part of a page is the panel, where the book's container chapter calls it a container |
 | `RULE.SUPPORT.SURFACE.178` | every box tells its level, its part and `flush` to what each part holds, and an action takes its size and its look from its place: the main action solid in the head of a page and in a footer, quiet in a panel's header, outline in a card's, subtle in a group's head |
 | `RULE.SUPPORT.SURFACE.367` | the footer of a panel takes `sticky`, which keeps it in view |
+| `RULE.SUPPORT.SURFACE.612` | a settings page keeps the actions that cannot be undone in a danger zone, its last titled panel, set apart, each action behind a confirm |
+| `RULE.SUPPORT.SURFACE.625` | a page sets at most two containers side by side, one taking the larger share; a column a person moves between sets in is navigation, drawn flat; a part a person works in, reads or chooses one thing from is a container; small facts about the one record are widgets; and a part is placed by its job, never by its size |
 
 ## Proof
 

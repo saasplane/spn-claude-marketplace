@@ -50,7 +50,7 @@ export function fitKind(path: string): FitKind | null {
   // A construct page is produced from its seat file, which is read in its place.
   if (base.endsWith("-report.html") || /^report-/.test(base)) return "report";
   if (base.endsWith("-guide.html")) return "guide";
-  if (/(?:^|[\\/])hub\.html$|-hub\.html$/.test(path) || base === "index.html" && /[\\/]artifacts[\\/]docs[\\/]index\.html$/.test(path)) return "hub";
+  if (/(?:^|[\\/])hub\.html$|-hub\.html$/.test(path) || base === "index.html" && /[\\/]artifacts[\\/](?:public[\\/])?docs[\\/]index\.html$/.test(path)) return "hub";
   return null;
 }
 

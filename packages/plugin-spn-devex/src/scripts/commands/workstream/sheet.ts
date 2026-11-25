@@ -17,7 +17,7 @@
 
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
-import { basename, dirname, join, resolve } from "node:path";
+import { basename, dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { workspaceRoot } from "../../../../../plugin-support-lib/src/lib/timing.ts";
@@ -221,7 +221,7 @@ const EDIT_LISTS:Record<string, keyof SheetEntry> = {
 
 function edit(args: string[]): number {
   const words = readWords(args, {
-    what: VALUE, op: ENTRY_OPS, file: VALUE, "decided-by": VALUE, facts: VALUE, then: VALUE, rules: VALUE, callers: VALUE, docs: VALUE, book: VALUE, tiers: VALUE, credits: VALUE, trace: VALUE, judged: FLAG, mechanical: FLAG, kind: ENTRY_KINDS, command: VALUE, proof: VALUE,
+    what: VALUE, op: ENTRY_OPS, file: VALUE, "decided-by": VALUE, facts: VALUE, then: VALUE, rules: VALUE, callers: VALUE, docs: VALUE, book: VALUE, tiers: VALUE, credits: VALUE, trace: VALUE, judged: FLAG, mechanical: FLAG, kind: ENTRY_KINDS, command: VALUE, proof: VALUE, landed: VALUE,
   });
   const [ref, id, ...more] = words.paths;
   if (!id || more.length) throw new UsageFault("takes an arc and one entry: `sheet edit <workstream>/<arc> <E> [--what …] [--tiers …] …`.");
@@ -251,6 +251,17 @@ function edit(args: string[]): number {
   for (const name of ["kind", "command", "proof"] as const) {
     const value = words.value(name);
     if (value !== null) { next[name] = value; changed.push(name); }
+  }
+  // A CHANGE ALREADY COMMITTED on the arc's branch names its commits in place of a patch; each is read as a full commit of the branch (041 Q72).
+  const landed = listOf(words, "landed");
+  if (landed) {
+    if (!landed.length) delete next.landed;
+    else {
+      const read = commitsOnBranch(ws, next.file, landed);
+      if (read.faults.length) return refused(read.faults.map((fault) => `${id} ${fault}`));
+      next.landed = { commits: read.commits };
+    }
+    changed.push("landed");
   }
   if (!changed.length) throw new UsageFault("changes nothing: name a field to change.");
   const entries = sheet.entries.map((one, place) => (place === at ? next : one));
@@ -289,6 +300,24 @@ function checkoutOf(ws: string, file: string): { dir: string; rel: string; repo:
 
 const gitIn = (dir: string, args: string[]): string =>
   execFileSync("git", ["-C", dir, ...args], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], maxBuffer: 64 * 1024 * 1024 });
+
+/**
+ * Each commit named, read in the entry's repository for this workstream (its worktree, else its checkout) as a full commit that the
+ * branch checked out there holds; a commit it cannot find, or one that is not on that branch, is a fault.
+ */
+export function commitsOnBranch(ws: string, file: string, named: readonly string[]): { commits: string[]; faults: string[] } {
+  const where = checkoutOf(ws, file);
+  if (!where || !existsSync(where.dir)) return { commits: [], faults: [`names commits, and its file \`${file}\` has no checkout to read them in`] };
+  const commits: string[] = [], faults: string[] = [];
+  for (const one of named) {
+    let full = "";
+    try { full = gitIn(where.dir, ["rev-parse", "--verify", "--quiet", `${one}^{commit}`]).trim(); } catch { /* not a commit here */ }
+    if (!full) { faults.push(`names ${one}, which is no commit in ${where.repo}`); continue; }
+    try { gitIn(where.dir, ["merge-base", "--is-ancestor", full, "HEAD"]); commits.push(full); }
+    catch { faults.push(`names ${one.slice(0, 10)}, which is not on ${where.repo}'s branch at ${relative(workspaceOf(ws) ?? "", where.dir) || where.dir}`); }
+  }
+  return { commits, faults };
+}
 
 /**
  * The arc's worktree for an entry's file: `.worktrees/<workstream>/<repo>` and the path in it. Null where the file reads as no
@@ -620,7 +649,7 @@ export const stepIsWhole = (entry: Pick<SheetEntry, "command" | "proof">): boole
  * and null where it owes none (it has a patch, it is a step, it has no kind, or it is a generated file, which is a finding of its own).
  */
 export function patchOwed(entry: SheetEntry): "refuse" | null {
-  if (entryKind(entry) !== "change" || entry.patch || entryWork(entry) === "GENERATED") return null;
+  if (entryKind(entry) !== "change" || entry.patch || entry.landed || entryWork(entry) === "GENERATED") return null;
   return "refuse";
 }
 
@@ -631,7 +660,7 @@ function kindFindings(arc: string, entries: readonly SheetEntry[]): string[] {
     const kind = entryKind(entry);
     if (!kind) continue;
     if (kind === "step" && !stepIsWhole(entry)) out.push(`${entry.id} is a step and has no command or no proof: \`sheet edit ${arc} ${entry.id} --command "…" --proof "…"\``);
-    if (kind === "change" && !entry.patch && entryWork(entry) === "GENERATED") out.push(`${entry.id} is a generated file and a change: make it a step that runs its generator, with its command and proof`);
+    if (kind === "change" && !entry.patch && !entry.landed && entryWork(entry) === "GENERATED") out.push(`${entry.id} is a generated file and a change: make it a step that runs its generator, with its command and proof`);
     if (patchOwed(entry)) out.push(`${entry.id} is a change and has no patch: \`sheet patch ${arc} ${entry.id}\` keeps it`);
   }
   return out;
@@ -707,11 +736,14 @@ export function sheetFindings(ws: string, arc: string): string[] {
   // AN ENTRY ALREADY SETTLED IS HISTORY: one that holds its patch, or that a landed row holds, quoted what it changed as it stood,
   // and an ellipsis in that quote is no unfilled name. The check reads only what is still to be written (E2219).
   const landed = new Set(data.rows.filter((row) => row.state === "landed").flatMap((row) => row.entries ?? []));
-  out.push(...unnamedFindings(entries.filter((entry) => !entry.patch && !landed.has(entry.id)), readJsonl(factsFileOf(ws, arc)) as Fact[]));
+  out.push(...unnamedFindings(entries.filter((entry) => !entry.patch && !entry.landed && !landed.has(entry.id)), readJsonl(factsFileOf(ws, arc)) as Fact[]));
+  // A LANDED ENTRY STANDS IN PLACE OF A PATCH only while each of its commits is on the branch the go reads.
+  for (const entry of entries.filter((one) => one.landed?.commits?.length))
+    out.push(...commitsOnBranch(ws, entry.file, entry.landed!.commits).faults.map((fault) => `${entry.id} is landed and ${fault}`));
   out.push(...blockFindings(ws, arc, entries));
   // A JUDGED ENTRY KEEPS ITS CHANGE AND ITS THINKING: a diff from `sheet patch` and a `trace`.
   for (const entry of entries.filter((one) => one.judged === true)) {
-    if (!entry.patch && !patchOwed(entry)) out.push(`${entry.id} is judged and has no patch: \`sheet patch ${arc} ${entry.id}\` keeps its change`);
+    if (!entry.patch && !entry.landed && !patchOwed(entry)) out.push(`${entry.id} is judged and has no patch: \`sheet patch ${arc} ${entry.id}\` keeps its change`);
     if (typeof entry.trace !== "string" || !entry.trace.trim()) out.push(`${entry.id} is judged and has no trace: \`sheet edit ${arc} ${entry.id} --trace "…"\``);
   }
   // A RELEASE or PROOF row names its files through no entry, so it is never this finding.
@@ -813,7 +845,7 @@ function check(args: string[]): number {
 
 export const actions: Record<string, Action> = {
   write: { describe: "write the arc's whole sheet from a file, every entry validated and every fact one the arc holds", usage: "<workstream>/<arc> --file <sheet.json>", run: write },
-  edit: { describe: "change one entry of the sheet; a missing entry is refused, and `sheet write` is named", usage: "<workstream>/<arc> <E> [--what …] [--op …] [--file …] [--decided-by …] [--facts …] [--then …] [--rules …] [--callers …] [--docs …] [--book …] [--tiers unit=ID,ID;contract=ID] [--credits ID,ID|none] [--trace \"…\"] [--judged|--mechanical] [--kind change|step] [--command \"…\"] [--proof \"…\"]", run: edit },
+  edit: { describe: "change one entry of the sheet; a missing entry is refused, and `sheet write` is named", usage: "<workstream>/<arc> <E> [--what …] [--op …] [--file …] [--decided-by …] [--facts …] [--then …] [--rules …] [--callers …] [--docs …] [--book …] [--tiers unit=ID,ID;contract=ID] [--credits ID,ID|none] [--trace \"…\"] [--judged|--mechanical] [--kind change|step] [--command \"…\"] [--proof \"…\"] [--landed <sha,sha>|none]", run: edit },
   drop: { describe: "take an entry out of the sheet; --note carries why into its one log line", usage: "<workstream>/<arc> <E> --note \"…\"", run: drop },
   show: { describe: "print the sheet, or one row's or one go part's entries; --json prints every field", usage: "<workstream>/<arc> [--row <id>] [--part <part>] [--json]", run: show },
   patch: { describe: "keep an entry's change as a diff against the commit its facts pin, name it in the entry, and reset the file in the worktree; --trace and --judged/--mechanical are recorded with it", usage: "<workstream>/<arc> <E> [--trace \"…\"] [--judged|--mechanical]", run: patch },

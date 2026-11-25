@@ -2,28 +2,28 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/13-providers.md",
-      "seen": "3942a323"
+      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/16-delivery-providers.md",
+      "seen": "5b5a4683"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/13-providers/",
-      "seen": "f51df29d"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/16-delivery-providers/",
+      "seen": "1030d507"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/13-providers/ts/01-design-system.md",
-      "seen": "462133dd"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/16-delivery-providers/02-ts/01-design-system.md",
+      "seen": "f64d2ffe"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "de2ac7e0"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-standards-patterns/",
+      "seen": "80d7bd78"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
-      "seen": "452caa48"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-widgets/",
+      "seen": "e4f213bc"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "ec4b3a10"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-containers/",
+      "seen": "e87bd9db"
     }
   ]
 }
@@ -31,34 +31,34 @@
 
 # Providers — Who Realizes Surface in Code
 
-Source of truth: the foundation's Providers construct (`docs/02-constructs/02-support/01-surface/13-providers.md`), its capability chapters (`docs/04-capabilities/02-support/01-surface/13-providers/`), and the TypeScript provider's own chapter, `13-providers/ts/01-design-system.md`. Providers is the thirteenth and last of the Surface constructs.
+Source of truth: the foundation's Providers construct (`docs/02-constructs/02-support/01-surface/16-delivery-providers.md`), its capability chapters (`docs/04-capabilities/02-support/01-surface/16-delivery-providers/`), and the TypeScript provider's own chapter, `16-delivery-providers/02-ts/01-design-system.md`. Providers is the sixteenth and last of the Surface constructs.
 
-Read this before you ask which stack builds a block, whether Figma counts as one, or how `@saasplane/support-web-ds-ts` realizes the app's two contexts. **The thing to unlearn: the design library is not a provider.** It draws the look; a provider builds code. Figma lives beside this construct, in `delivery-library.md`'s capability, never in this one's.
+Read this before you ask which provider draws or builds a block, which one a repository uses, or how `@saasplane/support-web-ds-ts` realizes the app's two contexts. A provider is named for what it realizes on, as in the Apps and Infra domains, and Surface has three: **Figma**, a design tool, which draws the library; **ts**, the TypeScript stack, which builds the web today; and **native**, later. A provider realizes a platform, Web or Native, and never a surface category: MARKETING, MARKETPLACE, RESOURCES, DASHBOARD and PORTAL are the same on any provider. **The thing to unlearn: Figma and code are one thing.** Figma draws the look and `ts` builds it, and they sit in separate folders of their own. Both follow the book.
 
 ## Terms
 
 | Term | What it means |
 | --- | --- |
-| Provider | a stack that realizes Surface in code, and states no rule. The repository's stack claim picks it |
+| Provider | what realizes Surface on one stack or tool under the book's names, and states no rule of its own: Figma, `ts` or `native`. The repository's stack claim picks the one that builds |
 
 ## What every provider delivers — 🔮
 
-A provider holds one design-system package and one showcase, `ts` today and `native` later.
+A provider holds one library or design-system package and one showcase. Figma draws the library, `ts` builds the web today, and `native` comes later.
 
 - A provider **MUST** realize every block and vocabulary the constructs name, under the book's own names. A renamed block or prop is a second name nobody else reads by. Every vocabulary a provider realizes is a closed set, stated in the construct that names it and declared once in that construct's capability (`RULE.SUPPORT.SURFACE.005` · MUST · skill:spn-surface/design).
-- A provider **MUST** build the showcase that `delivery-showcase.md` lists, in its own stack's tool.
+- A provider **MUST** build or draw the showcase that `delivery-showcase.md` lists, in its own tool.
 - A provider **MUST** say what it does not realize yet. A gap stated in words is a plan; a gap left unstated is a surprise for whoever reaches for it next.
 - A provider **MUST NOT** give a core unit a second name, and **MUST NOT** restate a rule. The name of a core unit and a rule belong to the book, once; a provider that invents either has made a second standard nobody else reads.
-- A unit's name and props are the standard's; what a stack builds the unit from is the stack's own and private. A stack **MAY** replace a primitive under a unit, and no page that uses the unit changes.
+- A unit's name and props are the standard's; what a provider builds the unit from is its own and private. A provider **MAY** replace a primitive under a unit, and no page that uses the unit changes.
 - A provider **MAY** hold units of its own that help build apps, beside the core units (`RULE.SUPPORT.SURFACE.081` · MUST · skill:spn-surface/design). It names them and states them in its own docs, and each one keeps the rules of the book, as `architecture-components.md` states. Its showcase shows them marked as its own. They are no part of what every provider owes.
 
-- **A change to what a surface draws MUST be one change across four layers, and MUST be planned as one** (`RULE.SUPPORT.SURFACE.420` · MUST · skill:spn-surface/design): the book's construct that states the unit, the capability page that says how the stack realizes it, the showcase that shows it, and the code. A change that touches one layer names the others it moves, or says in a sentence why it moves none of them. This holds for every builder's UI library, a partner's own design system and showcase included, so a library never drifts from its book or its showcase from its code. The library's projects are read from each repository's declarations, never named.
+- **A change to what a surface draws MUST be one change across four layers, and MUST be planned as one** (`RULE.SUPPORT.SURFACE.420` · MUST · skill:spn-surface/design): the book's construct that states the unit, the capability page that says how the provider realizes it, the showcase that shows it, and the code. A change that touches one layer names the others it moves, or says in a sentence why it moves none of them. This holds for every builder's UI library, a partner's own design system and showcase included, so a library never drifts from its book or its showcase from its code. The library's projects are read from each repository's declarations, never named.
 
 ## The claim that picks a provider — 🔮
 
-**One claim picks a provider: the stack claim of the repository the code stands in, `config.stack` in its `sprepo.json`** (`RULE.SUPPORT.SURFACE.383` · MUST · skill:spn-surface/design). It is the claim that picks a stack's provider for Apps, so one fact answers both. A repository that claims `TS` builds its surface with the `ts` provider. An agent, a check or a command reads a provider's folder, in the book or in a plugin, only where the claim names that provider's stack, and reads no other folder to decide.
+**One claim picks a provider: the stack claim of the repository the code stands in, `config.stack` in its `sprepo.json`** (`RULE.SUPPORT.SURFACE.383` · MUST · skill:spn-surface/design). It is the same claim the Apps domain reads to pick its provider, so one fact answers both. A repository that claims the `TS` stack builds its surface with the `ts` provider. An agent, a check or a command reads a provider's folder, in the book or in a plugin, only where the claim names its stack, and reads no other folder to decide.
 
-**The kind of surface, `WEB` or `NATIVE`, is what a provider builds, and never what picks it.** A native provider joins as the provider of a stack the claim names, with a folder of its own and no second key. No value of the claim names a native stack today, so nothing reads a native folder yet.
+**The platform, `WEB` or `NATIVE`, is what a provider realizes, and never what picks it.** A native provider joins as the one a claim names, with a folder of its own and no second key. No value of the claim names a native stack today, so nothing reads a native folder yet.
 
 ## The ts provider — ✅ for the two contexts and tokens, 🔮 for the rest
 
@@ -71,13 +71,14 @@ The package carries these names and shapes from support 5.22.0: `DSFeatureGridSe
 | App context | `IDSAppContextProps` — the `app` handle, `IDSAppContextInfo` (permissions, languages, `SPLanguageCodeType`, `SPCountryCodeType`, `SPCurrencyCodeType`, `SPDateFormatType`, `SPNumberFormatType`, `SPTimeFormatType`, timezone, each one required), `translate(key, defaultValue, vars)`, and `handleUnauthenticated` |
 | Design-system context | `IDSContextProps` — `theme`, the whole theme `IDSTheme` with every value, `themeChoice`, the `DSDeepPartialType<IDSTheme>` the app chose, `setTheme`, `device`, `navigate`, `transformImageUrl`, `getImagePlaceholderUrl`, `getImageErrorUrl`. `DSApp` keeps `device` live: the app passes the first value, and the device then follows the window across a screen class and a turn |
 | Theme lifecycle | the app seeds the choice as `theme` in `IDSContextConfigProps`; `DSApp` holds it and lays it over `DS_THEME_DEFAULT`, field by field; `setTheme` takes a new choice from any depth |
+| The category's theme | `IDSContextConfigProps.themes`, an `IDSAppThemes` (`language`, `brand`, `main`, `categories`), is the app's one theme setting, exported as `APP_THEMES`. `DSApp` applies `prepareCategoryTheme(themes, themes.main)` at the root and holds the setting through `DSAppThemesProvider`, which holds an `IDSAppThemes` for the pages below and applies nothing to `<html>`, so a showcase preview or a test shows two categories without a second `DSApp`. Every overlay, a dialog, a sheet, a popover, a menu or a tooltip, opens in the nearest category's overlay container, and at the body outside any category. `DSPageCategory` holds the category of a route group in `DSPageCategoryContext` and renders nothing; `useDSPageCategory` returns it, else the main one. `DSSitePage` and `DSLayout` write the category's values, `data-mode` and `data-surface-category` on their own root, provide its theme to the blocks inside, and hold their own overlay container. `SPSurfaceCategoryType` comes from `@saasplane/support-contract-ts` (`RULE.SUPPORT.SURFACE.602` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.603` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.604` · MUST · skill:spn-surface/design) |
 | Preferences and formatting | format components and helpers read the context's info, and never the browser locale. The app context holds the date format, the number format and the time format as required facts, and no unit falls back to a format of its own. `DSFormatDateTime` and `DSFormatDate` take `type`, a `DSFormatDateType`, and `AGO` writes how long ago in words |
 | Density | `size` is optional on the choice and held on the theme, `SM` by default. `useDSSize` resolves a component rendered without `size`: the nearest box or composite above that sets one, then the theme's `size` |
 | The size and the place | `DSSizeContext` holds only the size a box or a composite set below the root, and `useDSSize` returns it, else the theme's. `DSPageLevelContext` holds the level of the box, the part of it a block stands in and `flush`; every box writes it for each part through `DSPageLevel`, and as a header it lays out a title and its actions. A page writes `size` on the box that holds a region |
 | Overlays | `DSOverlayContext.showComponent` plus `useDSOverlayConfirm` — no screen mounts a dialog into the tree. `showComponent` hands back the function that removes what it showed, and `useDSOverlayRoute` shows an overlay while the match the app's router gives it holds a value |
 | Access to it all | one hook per context, returning it whole: `useDSContext` · `useDSAppContext` · `useDSSize` · `useDSPageLevelContext` · `useDSOverlayContext`. `useDSAppAuthz` checks a permission; `useDSAppTestData` builds the test attributes. `useServiceExecutor` resolves to what the call returns, or to nothing on failure |
 
-The package has an interior the UI taxonomy deliberately does not reach — the taxonomy binds what a package *exposes*; this is what the system is *made of*: `ui/app/` (the App layer: `DSApp`, the context definitions and the roots it mounts, in `boot/`, and the cross-cutting runtime helpers the components share, in `managers/`); `ui/core/` (the vocabularies every component reads); `ui/components/<group>/` (one folder per capability group, composites included); `ui/components/composites/` (the group Composites, with one `interface.ts` for its enums and interfaces: the core composites `DSDataTable`, `DSFilterBar`, `DSComparison` and `DSFeature`, with their private parts in `_data-table/`, `_list-detail/` and `_feature/`, where `_feature/` holds the feature's level map, from the level to its title step, description step, button size and the level of its items; and `DSListDetail`, this stack's own composite, which places a list beside the detail of its chosen row for a page of groups and their items. Its `listWidth` takes `DSListDetailListWidthType`: `WIDE`, the default and 320px, `NARROW`, 256px, and `COMPACT`, 224px. The unit has no stacked form: below a desktop it shows one of the two sides at a time); `ui/containers/` (`DSPanelContainer`, with its private parts in `_panel-container/`, `DSDataTablePanelContainer`, built on it and taking the panel's props as `panel`, `DSSectionContainer`, the section of a page, and `DSFeatureGridSectionContainer`, a section that holds a grid of features under a heading and takes `section`, `heading` and `grid`. One internal frame drawer draws the frame of the panel, the card and the feature); `ui/widgets/` (the widgets, units placed beside others: the core widget is the card widget, `DSCardWidget`); `ui/layouts/` (the layout, `DSLayout`); `ui/hooks/` · `ui/utils/` (context accessors and density resolution, pure helpers); `assets/` (fonts, images, token stylesheets); `_shadcn/` (vendored primitives, never exported, never hand-edited). **`ui/app/boot/` is the design system booting itself, not the application's boot** — two different acts, one word apart.
+The package has an interior the UI taxonomy deliberately does not reach — the taxonomy binds what a package *exposes*; this is what the system is *made of*: `ui/app/` (the App layer: `DSApp`, the context definitions and the roots it mounts, in `boot/`, and the cross-cutting runtime helpers the components share, in `managers/`); `ui/core/` (the vocabularies every component reads); `ui/components/<group>/` (one folder per capability group, composites included); `ui/components/composites/` (the group Composites, with one `interface.ts` for its enums and interfaces: the core composites `DSDataTable`, `DSFilterBar`, `DSFacetGroup`, `DSComparison`, `DSQuote` and `DSFeature`, with their private parts in `_data-table/`, `_feature/` and `_quote/`, where `_feature/` holds the feature's level map, from the level to its title step, description step, button size and the level of its items); `ui/components/page/` (every `DSPage*` unit: `DSPageHead`, with its way back and head row in `_page-head/` and `_page-level/`; `DSPageLevel` and `DSPageCategory`, which the showcase shows in Structure and Page; and the page frames `DSPageFrameListDetail`, `DSPageFrameGroups` and `DSPageFrameAside`, with their columns, fold, slot context and phone way back in `_list-detail/`, and `DSListDetail` a deprecated alias. Their widths take `DSListDetailListWidthType`: `WIDE`, 320px, `NARROW`, 256px, and `COMPACT`, 224px. None has a stacked form: below a desktop each shows one part at a time); `ui/components/data-display/_record/` (the record marks, unread and the accent edge, read by a card in a data table's grid); `ui/containers/` (`DSPanelContainer`, with its private parts in `_panel-container/`, `DSDataTablePanelContainer`, built on it and taking the panel's props as `panel`, `DSSectionContainer`, the section of a page, and `DSFeatureGridSectionContainer`, a section that holds a grid of features under a heading and takes `section`, `heading` and `grid`. One internal frame drawer draws the frame of the panel, the card and the feature); `ui/widgets/` (the widgets, units placed beside others: the core widget is the card widget, `DSCardWidget`); `ui/layouts/` (the layout, `DSLayout`); `ui/hooks/` · `ui/utils/` (context accessors and density resolution, pure helpers); `assets/` (fonts, images, token stylesheets); `_shadcn/` (vendored primitives, never exported, never hand-edited). **`ui/app/boot/` is the design system booting itself, not the application's boot** — two different acts, one word apart.
 
 The tokens sit in tiers, and a component sees only the roles and the scale: Tier 0 the seed (one brand value); Tier 1 the ramps (generated from the seed; neutral and status ramps fixed); Tier 2 the roles (mode-adaptive surface / foreground / accent tokens) and the scale (fixed by the design system); Tier 3 components (`variant` × `color` → role classes). A component consumes role tokens, never ramps and never the seed — reaching past the role layer is what makes dark mode a second component tree instead of a mode flip. Light and dark are one re-pointing of the role layer, not a parallel stylesheet. A component reads the scale through the size maps, never a number of its own.
 
@@ -87,9 +88,9 @@ The tokens sit in tiers, and a component sees only the roles and the scale: Tier
 
 ### What a page writes for each unit
 
-**A pattern asks a few things of a page, and in the ts design system the page passes each one and the unit does the rest.** `architecture-components.md`, `architecture-widgets.md` and `architecture-containers.md` state the rule or the advice behind each row, and the choice table of each unit in those refs gives the values its cases write; this table says what a page on this stack writes for it, and a row that says *nothing* is a thing the unit already does. Where a pattern's row is advice, a partner's own choice stands, and the page writes that choice instead.
+**A page kind or a pattern asks a few things of a page, and in the ts design system the page passes each one and the unit does the rest.** `architecture-components.md`, `architecture-widgets.md` and `architecture-containers.md` state the rule or the advice behind each row, and the choice table of each unit in those refs gives the values its cases write; this table says what a page on this stack writes for it, and a row that says *nothing* is a thing the unit already does. Where a row is advice, a partner's own choice stands, and the page writes that choice instead.
 
-| The pattern asks | What the page writes |
+| The page kind or pattern asks | What the page writes |
 | --- | --- |
 | the `LIST` layout on a phone | the page reads the live device, `useDSContext().device`, and lists `LIST` on a phone. `DSDataTable` reads no device type, and follows the layouts its page lists each time it draws |
 | a line of the `LIST` layout | the page gives each record as an item line, `DSItem`, with its title, its description and its facts. The table's rows carry no padding of their own and answer the pointer, so the page writes no padding and no hover. In a list the row carries the link, the chosen fill and the arrow, and the item line inside it carries none; `DSItem` takes no `selected` |
@@ -102,7 +103,7 @@ The tokens sit in tiers, and a component sees only the roles and the scale: Tier
 | a time shown as how long ago | the page writes `type` as `AGO` on `DSFormatDate` or `DSFormatDateTime`, and no time format where the app's is meant (`RULE.SUPPORT.SURFACE.122` · GUIDE) (`RULE.SUPPORT.SURFACE.123` · MUST · skill:spn-surface/design). A log of what happened shows the date and the time |
 | the paging in the footer of the panel | the page puts an element in `DSPanelContainer.Footer` and gives it to the table as `settings.pagination.footerElement` |
 | a value changed in its cell | the page puts `edit` on one column of the `TABLE` layout, and on the `LIST` layout. The value is text |
-| a way back on the title line | the page gives `DSPanelContainer.Header` the address to go back to, and the header draws the back action before its title, level with the line of the title (`RULE.SUPPORT.SURFACE.108` · MUST · skill:spn-surface/design). No core unit places the two parts of a page of groups and their items (`RULE.SUPPORT.SURFACE.099` · MUST · skill:spn-surface/design). On the web, the stack's own `DSListDetail` places them, and its `listWidth` is the named choice for a narrow part of groups (`RULE.SUPPORT.SURFACE.119` · MUST · skill:spn-surface/design). A page writes no width |
+| a way back above the title line | the page gives `DSPanelContainer.Header` the address to go back to and its words, `backLabel`, and the header draws the way back as a row above its title line, the row of `DSPageHead` (`RULE.SUPPORT.SURFACE.108` · MUST · skill:spn-surface/design). No core unit places the two parts of a page of groups and their items (`RULE.SUPPORT.SURFACE.099` · MUST · skill:spn-surface/design). On the web, the stack's own page frames place them, and their widths are the named choice for a narrow part of groups (`RULE.SUPPORT.SURFACE.119` · MUST · skill:spn-surface/design). A page writes no width |
 | the head of a page that holds several panels | the head stands above the panels, outside any frame, as an item line at the level `PAGE` with its way back. The page gives the title and the address to go back to, and writes no row, no back button and no padding (`RULE.SUPPORT.SURFACE.120` · GUIDE) |
 | tabs in a `flush` part | the page writes no padding for the tabs or for their panel. The tabs place their first tab and their panel by the inset of their place (`RULE.SUPPORT.SURFACE.118` · MUST · skill:spn-surface/design) |
 | the head of a page, or of a part of a page | the title of a header is an item line. A panel that is the whole page says so with `fullPage`, and its header is then the page head (`RULE.SUPPORT.SURFACE.179` · MUST · skill:spn-surface/design); any other box gives the level of its kind: `CONTAINER` for a panel or an overlay, `WIDGET` for a card, `GROUP` for the head of a part of a card widget (`RULE.SUPPORT.SURFACE.107` · MUST · skill:spn-surface/design). The item line takes no `size`, and the heading element follows the level (`RULE.SUPPORT.SURFACE.106` · MUST · skill:spn-surface/design). A page that holds several panels writes `DSPageLevel` with the level `PAGE` and the part `HEADER` for its head (`RULE.SUPPORT.SURFACE.178` · MUST · skill:spn-surface/design). The page writes no type step and no heading element |
@@ -130,13 +131,13 @@ A unit that does not do a thing yet is a gap of the unit, named under *Missing* 
 
 The shadcn CLI emits or copies every file under `_shadcn/`, the hooks and helpers included — the rule covers the whole folder, stated in full in `architecture-app.md`. Make the change a component needs in its `DS*` wrapper. Run the CLI again to refresh a file; re-point the tokens to change a look, because an edited primitive loses the edit at the next regeneration.
 
-## Figma is not a provider — 🔮
+## Figma beside the code — 🔮
 
-Figma is where the library is drawn, and it lives in `delivery-library.md`'s capability, in `02-figma/`. What a stack must prove against lives in `delivery-showcase.md`'s capability. A provider is code; the library is a drawing, and the two are never the same folder.
+The Figma provider draws the library, and it lives in `01-figma/` of this construct's capability. The `ts` provider builds code, in `02-ts/`, and the showcase it must prove against is stated in `delivery-showcase.md`'s capability. The library the Figma provider draws is the book's own standard, `delivery-library.md`, and the drawing is never code: the library and a code provider are never the same folder (`RULE.SUPPORT.SURFACE.006` · MUST · skill:spn-surface/design).
 
 ## Boundary
 
-This ref states who realizes Surface, and what every provider owes and refuses. It stops at the edge of that obligation. It does not state which blocks or vocabularies exist — that is every ref before this one. It does not state how the library draws a block — that is `delivery-library.md`. It does not state what a provider's showcase must show — that is `delivery-showcase.md`. The TypeScript stack's component shape, its naming and its file structure are the stack's own, and the stack's build steps state them.
+This ref states who realizes Surface, and what every provider owes and refuses; the Figma provider's own chapters are restated in `delivery-library.md`. It stops at the edge of that obligation. It does not state which blocks or vocabularies exist — that is every ref before this one. It does not state how the library draws a block — that is `delivery-library.md`. It does not state what a provider's showcase must show — that is `delivery-showcase.md`. The TypeScript stack's component shape, its naming and its file structure are the stack's own, and the stack's build steps state them.
 
 ## Proof
 

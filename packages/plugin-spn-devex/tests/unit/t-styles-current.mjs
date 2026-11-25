@@ -62,8 +62,8 @@ console.log("=== styles on the design system — the docs classes read the produ
     /font-family: DSDefaultText;[^}]*Geist-Variable\.woff2/.test(built) && /font-family: DSDefaultCode;[^}]*GeistMono-Variable\.woff2/.test(built) && !/SDSText|SDSCode/.test(built));
   ok("[MKT.SCRIPTS.589] the page script sets data-mode where a page names none", /setAttribute\('data-mode'/.test(readFileSync(join(STYLES, "docs-page.js"), "utf8")));
   const script = readFileSync(join(STYLES, "docs-page.js"), "utf8");
-  ok("[MKT.SCRIPTS.589] the surface page builds its frame's document from the template named page, with design-system.css and the app's stylesheet linked, and sets the mode on the frame directly",
-    /getElementById\('page'\)/.test(script) && /frame\.srcdoc = pageDocument\(\)/.test(script) && /design-system\.css/.test(script) && /surface-app-css/.test(script)
+  ok("[MKT.SCRIPTS.589] the surface page builds its frame's document from the template named for the mode and the device, with design-system.css and the app's stylesheet linked, and sets the mode on the frame directly",
+    script.includes("'page-' + mode + '-' + device") && /frame\.srcdoc = pageDocument\(want\)/.test(script) && /design-system\.css/.test(script) && /surface-app-css/.test(script)
       && /documentElement\.setAttribute\('data-mode', state\.mode\)/.test(script));
   ok("[MKT.SCRIPTS.589] the surface page sends no message and reads no preview-mode meta: the switches set the frame's own document",
     !/postMessage/.test(script) && !/preview-mode/.test(script) && !/surface-page-preview/.test(script));
@@ -86,8 +86,8 @@ console.log("=== styles on the design system — the docs classes read the produ
   ok("[MKT.SCRIPTS.589] the typed numbers agree with the tokens: the page's query and the page script at the outline's fold, the index's query and the index script at the tree's fold",
     source.includes(`@media (max-width:${token("--sds-outline-fold")}rem){\n    .sds-page, .sds-page[data-frame="page"].sds-has-rail{`) && source.includes(`@media (max-width:${token("--sds-tree-fold")}rem){\n    .sds-index,.sds-index.sds-is-folded{`)
       && script.includes(`matchMedia('(max-width: ${token("--sds-outline-fold")}rem)')`) && index.includes(`matchMedia('(max-width:${token("--sds-tree-fold")}rem)')`));
-  ok("[MKT.SCRIPTS.589] a surface page's note is a sticky note drawn by one class in the frame's document, from the design system's warning tokens",
-    /\.sds-note\{[^}]*border:1px solid var\(--warning\)[^}]*background:var\(--warning-subtle\);color:var\(--on-warning-subtle\)/.test(script) && !/\[data-note\]\{[^}]*background/.test(script));
+  ok("[MKT.SCRIPTS.589] a surface page's notes are drawn in a layer of the docs page above the frame, from the page's JSON list, and the frame's document draws none",
+    /\.sds-surface-notes\s*\{[^}]*position:\s*absolute[^}]*pointer-events:\s*none/.test(source) && script.includes("getElementById('sample-notes')") && !/\.sds-note\{/.test(script) && !/\[data-note\]\{[^}]*background/.test(script));
   ok("[MKT.SCRIPTS.589] running text stops at the reading width, and a page's content column is never narrower than it where the outline stands",
     /p\{margin:0 0 1rem; max-width:var\(--sds-measure\)\}/.test(source) && /\.sds-standfirst\{[^}]*max-width:var\(--sds-measure\)/.test(source) && /\.sds-page > \.sds-rail\{grid-column:2/.test(source));
   ok("[MKT.SCRIPTS.589] the breadcrumb is a small muted line, and the rail's title reads the name over On this page",

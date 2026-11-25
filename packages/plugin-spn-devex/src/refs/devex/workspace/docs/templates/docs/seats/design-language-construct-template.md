@@ -46,23 +46,23 @@
 
 ### Which app follows what
 
-| App | Kind of person | Page kinds | Surface | Language | Layout | Looks (body, navigation, frames, size, motion) |
+| App | Kind of person | Surface categories (main first) | Surface | Language | Layout | Looks (body, navigation, frames, size, motion) |
 | --- | --- | --- | --- | --- | --- | --- |
-| `{{web-www-ts}}` | Visitor | {{SITE}} | {{WEB}} | {{its own: saasplane-site}} | {{the app's layout setting}} | {{body, navigation, frames, size, motion}} |
-| `{{web-account-ts}}` | {{Customer}} | {{APP · SITE}} | {{WEB}} | {{the app's own, with the site look for its public pages}} | {{the app's layout setting}} | {{its looks}} |
-| `{{web-platform-ts}}` | Team | {{APP}} | {{WEB}} | the design system's | {{the app's layout setting}} | {{its looks}} |
+| `{{web-www-ts}}` | Visitor | {{MARKETING · RESOURCES}} | {{WEB}} | {{its own: saasplane-site}} | {{the app's layout setting}} | {{each category's Theme part}} |
+| `{{web-account-ts}}` | {{Individual}} | {{PORTAL · MARKETING}} | {{WEB}} | {{the app's own, with the MARKETING looks for its public pages}} | {{the app's layout setting}} | {{each category's Theme part}} |
+| `{{web-platform-ts}}` | Team | {{DASHBOARD}} | {{WEB}} | the design system's | {{the app's layout setting}} | {{the DASHBOARD Theme part}} |
 
-{{Each app's row lists the kinds of page it serves. `SITE` is a public page, which takes the site look: its sections, its media and the brand. `APP` is a signed-in page, which takes the app layout. An app with both, such as a signed-in console with a few shared public pages, lists both, and its public pages wear the site look under the site layout.}}
+{{Each app's row lists the surface categories its pages serve, the main one first. A page takes the looks of its own category, from the route group the app's router puts it in: a website's MARKETING pages and its RESOURCES docs section, or a console's DASHBOARD pages and a person's own PORTAL pages.}}
 
-Each app's row is also written as one fenced `json` block, keyed by the app's code, which `spnutils apps surface render --app` and `spnutils apps surface theme` read. It holds the theme's own values for the app, the layout as the app's own setting, the kinds of page as one kind or a list, the kind of surface, and the values where the app departs from the language, part by part, in `overrides`. The scaffold writes one theme setting for each kind of page from the row: `src/site-theme.ts` for `SITE` and `src/app-theme.ts` for `APP`. An app follows the language and never forks it. The table above is for the reader, the block for the commands, and the two never differ.
+Each app's row is also written as one fenced `json` block, keyed by the app's code, which `spnutils apps surface render --app` and `spnutils apps surface theme` read. It holds the layout as the app's own setting, the surface categories in `categories` and the main one in `main`, the kind of surface, and the values where the app departs from the language, part by part, in `overrides`. Each category's looks are read from its Theme part and the brand from Shared, so the row holds no theme of its own. The scaffold writes the app's one theme setting from the row, `APP_THEMES` in `src/theme.ts`. An app follows the language and never forks it. The table above is for the reader, the block for the commands, and the two never differ.
 
 ```json
 { "app": "{{www}}",
   "ds": "{{the design system version the app pins}}",
   "language": "{{saasplane-site}}",
-  "theme": { "app": { "primary": "{{#084A75}}" } },
   "layout": { "type": "{{TOPNAV}}", "nav": [] },
-  "page": ["{{SITE}}"],
+  "categories": ["{{MARKETING}}", "{{RESOURCES}}"],
+  "main": "{{MARKETING}}",
   "surface": "{{WEB}}",
   "overrides": {} }
 ```

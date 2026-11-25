@@ -25,6 +25,24 @@ const shown = cli(root, ["workstream", "question", "show", "031/q1", "--in", "no
 ok("and shown on its arc's preview", shown.code === 0 && /Q1 · shown in 1 preview/.test(shown.out), shown.out);
 const records = readQuestions(ws);
 
+console.log("\n=== list — a window lists its own workstreams' cards, and every one only when told");
+{
+  const { bindNamed } = await import("../../../../src/scripts/lib/window.ts");
+  const unbound = cli(root, ["workstream", "question", "list"], { CLAUDE_CODE_SESSION_ID: "lists-none" });
+  ok("a window that owns no workstream lists none, and says so in one line", unbound.code === 0 && unbound.out.trim().split("\n").length === 1
+    && /owns no open workstream.*--every/.test(unbound.out), unbound.out);
+  bindNamed(root, "lists-own", "031-probe", "prompt");
+  const own = cli(root, ["workstream", "question", "list"], { CLAUDE_CODE_SESSION_ID: "lists-own" });
+  ok("a window that owns a workstream lists its open cards: id, arc, title and the day raised", own.code === 0
+    && /^031-probe · 1 open question\(s\)\n {2}Q1 · N001 · .+ · raised \d{4}-\d{2}-\d{2}$/m.test(own.out), own.out);
+  const every = cli(root, ["workstream", "question", "list", "--every"], { CLAUDE_CODE_SESSION_ID: "lists-none" });
+  ok("--every reads every open and backlog workstream", every.code === 0 && /031-probe · 1 open/.test(every.out), every.out);
+  const named = cli(root, ["workstream", "question", "list", "031", "--state", "answered"], { CLAUDE_CODE_SESSION_ID: "lists-none" });
+  ok("a workstream named is read in the state asked for", named.code === 0 && /031-probe · 0 answered question\(s\)/.test(named.out), named.out);
+  const both = cli(root, ["workstream", "question", "list", "031", "--every"]);
+  ok("a workstream and --every together are refused", both.code !== 0 && /never both/.test(both.out), both.out);
+}
+
 console.log("\n=== a card is the markup, not the anchor");
 {
   const text = readFileSync(page, "utf8");

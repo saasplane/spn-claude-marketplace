@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/01-shape.md",
-      "seen": "37e6dca1"
+      "seen": "9f3a8426"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/01-shape/",
-      "seen": "8dfe98b1"
+      "seen": "28003754"
     }
   ]
 }
@@ -209,6 +209,7 @@ Hold a web module to these rules when you write or review one. A rule marked pro
 | The provider finds the signed-in person itself, keeps the answer fresh, and tells its containers when nobody is signed in | `RULE.SUPPORT.APPS.200` | decided |
 | A page, a container and a hook reach a service through that service's client. A second service means a second client | `RULE.SUPPORT.APPS.201` | decided |
 | A web module declares one route name beside its code, and each route says whether it is a page of work or a page of setup. A page of work is at `/<name>/<rest>`, and a page of setup is at `/settings/<name>/<rest>` | `RULE.SUPPORT.APPS.204` | decided |
+| A route names the surface category its page serves, an app may replace it by its key, and the app's router wraps each category's group once in `DSPageCategory` | `RULE.SUPPORT.APPS.270` | decided |
 
 Four choices beside the provider are proposed: it stands outside the design system's app root, it is not handed the service's client, a container shows its denied state when nobody is signed in, and the provider tells the app once that a sign-in is needed. On a page of groups and their items, the swap of the items for the groups changes the address (`RULE.SUPPORT.SURFACE.079` · MUST · skill:spn-surface/design).
 

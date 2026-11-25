@@ -5,6 +5,7 @@
 // one reader, one resolver, one frame. Nothing is read or written here; `face` places the markers.
 
 import { existsSync, readFileSync } from "node:fs";
+import { keyInWords } from "./render.ts";
 import { basename, dirname, join } from "node:path";
 
 /** What a kind is in a language: the contract's `SPSurfaceItemStateType`. */
@@ -308,18 +309,48 @@ function kindLine(kind: Kind): string {
 
 const CATALOG = "```catalog layout=LIST facts=AFTER_DESCRIPTION";
 
+/** A code in words: `CHILD_SECTION_WITH_POINTS` is "child section with points". */
+const inWords = (code: string): string => code.replace(/_/g, " ").toLowerCase();
+
+/**
+ * The rest of a kind's entry in the catalogue, drawn once, in the kind's own place: its units, placement and style as JSON facts (each opens as the tree chip and its
+ * dialog), its default case, level and order in words, and one line for each case with its `when` and, where PLANNED, the unit it needs.
+ */
+function entryLines(kind: Obj): string[] {
+  const out: string[] = [];
+  const empty = (v: Json): boolean => v === undefined || v === null || v === "" || (isObj(v) && !Object.keys(v).length) || (Array.isArray(v) && !v.length);
+  const placement = isObj(kind.placement) ? kind.placement : {};
+  for (const [key, value] of [["Units", kind.units], ["Placement", kind.placement], ["Style", kind.style]] as Array<[string, Json]>) if (!empty(value)) out.push(`  ${key}: \`${compact(value)}\``);
+  if (typeof kind.defaultCase === "string") out.push(`  Default case: ${inWords(kind.defaultCase)}`);
+  else if (Array.isArray(kind.cases) && kind.cases.length) out.push("  Default case: the kind's own arrangement");
+  if (typeof placement.level === "string" || typeof placement.level === "number") out.push(`  At level: ${typeof placement.level === "string" ? inWords(placement.level) : placement.level}`);
+  if (Array.isArray(kind.order) && kind.order.length)
+    out.push(`  Order: ${kind.order.map((e) => (typeof e === "string" ? cap(inWords(e)) : isObj(e) ? `${cap(inWords(String(e.kind)))} (${inWords(String(e.case))})` : "")).join(" → ")}`);
+  for (const c of (Array.isArray(kind.cases) ? kind.cases : []) as Obj[]) {
+    const needs = c.status === "PLANNED" && c.missing ? ` Planned: needs ${clean(c.missing as string)}.` : "";
+    out.push(`  Case: ${cap(inWords(String(c.code)))} | ${clean(c.when ?? "")}${needs}`);
+  }
+  return out;
+}
+
 /** A tab's list of kinds. `resolved` carries a language's states; the catalogue passes none and the rows are the stand-in's. */
-function kindList(part: string, kinds: Array<{ kind: Kind; state?: State; definedIn?: string; change?: string; was?: State }>): string {
+function kindList(part: string, kinds: Array<{ kind: Kind; state?: State; definedIn?: string; change?: string; was?: State }>, anchors?: { category: string; seen: Set<string> }): string {
   const rows = [CATALOG];
   // The keys count across the whole list, one column each (RULE.DEVEX.WORKSPACE.576): where any row carries From or Change, every
   // row's config stands as one Config fact, so the list names three keys at most.
   const anyOwn = kinds.some(({ state, definedIn, change }) => (state === "INHERITED" && definedIn) || change);
   for (const { kind, state, definedIn, change, was } of kinds) {
     const line = kindLine(kind);
-    rows.push(kindName(kind) + (line ? ` | ${line}` : ""));
+    const whole = kind as unknown as Obj;
+    const planned = anchors && whole.status === "PLANNED";
+    const needs = anchors && whole.missing ? ` Planned: needs ${clean(whole.missing as string)}.` : "";
+    rows.push(kindName(kind) + (line || needs ? ` | ${line}${needs}`.replace(/^ \| $/, "") : ""));
+    // The catalogue gives each kind's entry an anchor, `<category>-<kind>` in lower case with hyphens, which a sample's note links to; a kind that stands in a second part of a category keeps the first part's.
+    const anchor = anchors ? `${anchors.category}-${kind.code}`.toLowerCase().replace(/[^a-z0-9]+/g, "-") : "";
+    if (anchor && !anchors!.seen.has(anchor)) { anchors!.seen.add(anchor); rows.push(`  Anchor: ${anchor}`); }
     const facts = configFacts(part, kind);
     // The first fact that is only tags is the row's badge, so the state stands in it beside the code.
-    rows.push(`  ${facts[0][0]}: ${facts[0][1]}${state ? ` [${state}]` : ""}`);
+    rows.push(`  ${facts[0][0]}: ${facts[0][1]}${state ? ` [${state}]` : ""}${planned ? " [PLANNED]" : ""}`);
     // A LIST HOLDS UP TO THREE FACTS BESIDE ITS BADGE (RULE.DEVEX.WORKSPACE.576): with From or Change on the row, the config stands as one fact.
     const own: Array<[string, string]> = [];
     if (state === "INHERITED" && definedIn) own.push(["From", `${definedIn}${was && was !== "PICKED" ? ` (${was.toLowerCase().replace("_", " ")})` : ""}`]);
@@ -328,6 +359,7 @@ function kindList(part: string, kinds: Array<{ kind: Kind; state?: State; define
     const merged: Array<[string, string]> = anyOwn && config.length ? [["Config", config.map(([k, v]) => `${k} ${v}`).join(" · ")]] : config;
     for (const [k, v] of [...own, ...merged]) rows.push(`  ${k}: ${v}`);
     for (const [k, v] of guidanceLines(kind)) rows.push(`  ${k}: ${v}`);
+    if (anchors) rows.push(...entryLines(whole));
   }
   rows.push("```");
   return rows.join("\n");
@@ -346,7 +378,7 @@ const compact = (v: Json): string => (typeof v === "string" ? v : JSON.stringify
 function valueList(values: ResolvedValue[]): string {
   const rows = [CATALOG];
   for (const v of values) {
-    rows.push(v.key);
+    rows.push(keyInWords(v.key));
     rows.push(`  Source: [${v.source}]`);
     if (v.source === "INHERITED") rows.push(`  From: ${v.definedIn}`);
     rows.push(`  Value: \`${clean(compact(v.value))}\``);
@@ -388,11 +420,12 @@ export function renderCatalogue(catalogue: Catalogue, jsonPath: string): string 
   const { outline } = catalogue;
   const out: string[] = [catalogueShared(outline), ""];
   for (const [cat, byPart] of Object.entries(catalogue.categories)) {
+    const seen = new Set<string>();
     out.push(`### ${cat} — ${clean(outline.categories[cat].description.split(", who")[0])}`, "");
     for (const g of outline.groups.filter((g) => g.code !== "SHARED")) {
       const tabs = g.parts.map((p) => {
         const kinds = byPart[p.code];
-        return { label: p.title, body: kinds.length ? kindList(p.code, kinds.map((kind) => ({ kind }))) : emptyList(outline.partNotes[cat]?.[p.code]?.none) };
+        return { label: p.title, body: kinds.length ? kindList(p.code, kinds.map((kind) => ({ kind })), { category: cat, seen }) : emptyList(outline.partNotes[cat]?.[p.code]?.none) };
       });
       out.push(groupPanel(g.title, clean(g.description), tabs) + "\n");
     }
