@@ -42,12 +42,19 @@ const today = repo({ "docs/artifacts/docs/concept-overview.md": "x" });
 ok("[MKT.SCRIPTS.635] a pocket that holds docs directly keeps the earlier layout", tree.artifactsLayout(join(today, "docs")) === "today");
 const split = repo({ "docs/artifacts/public/docs/a.md": "x" });
 ok("[MKT.SCRIPTS.635] a pocket that holds public is split", tree.artifactsLayout(join(split, "docs")) === "split");
+const halfMoved = repo({ "docs/artifacts/docs/concept-overview.md": "x", "docs/artifacts/index.html": "x", "docs/artifacts/public/surface/stone/index.html": "x" });
+ok("[MKT.SCRIPTS.635] public/surface/ alone does not make a pocket split: one that still holds docs/ keeps the earlier layout",
+  tree.artifactsLayout(join(halfMoved, "docs")) === "today");
+const movedIndexLeft = repo({ "docs/artifacts/index.html": "x", "docs/artifacts/public/docs/a.md": "x" });
+ok("[MKT.SCRIPTS.635] a pocket that holds public/docs/ is split, whatever else is left beside it", tree.artifactsLayout(join(movedIndexLeft, "docs")) === "split");
 const dir = (root, f) => tree.slashes(f(join(root, "docs"))).slice(tree.slashes(root).length + 1);
 ok("[MKT.SCRIPTS.635] split: docs and guides sit in public, reports in private, and each half has an index",
   dir(none, tree.artifactDocsDir) === "docs/artifacts/public/docs" && dir(none, tree.guidePagesDir) === "docs/artifacts/public/guides" && dir(none, tree.reportsDir) === "docs/artifacts/private/reports"
   && dir(none, tree.artifactIndex) === "docs/artifacts/public/index.html" && dir(none, tree.privateIndex) === "docs/artifacts/private/index.html" && dir(none, tree.surfacePagesDir) === "docs/artifacts/public/surface");
 ok("[MKT.SCRIPTS.635] earlier layout: the same functions answer where the pages are today",
   dir(today, tree.artifactDocsDir) === "docs/artifacts/docs" && dir(today, tree.reportsDir) === "docs/artifacts/reports" && dir(today, tree.artifactIndex) === "docs/artifacts/index.html");
+ok("[MKT.SCRIPTS.635] a half-moved pocket: docs stays where it is, and surface sits in public, where it always has",
+  dir(halfMoved, tree.artifactDocsDir) === "docs/artifacts/docs" && dir(halfMoved, tree.surfacePagesDir) === "docs/artifacts/public/surface" && dir(halfMoved, tree.artifactIndex) === "docs/artifacts/index.html");
 
 console.log("\n=== a page's place, read from its path in either layout");
 ok("[MKT.SCRIPTS.635] visibilityOf names the half, and null for the earlier layout", tree.visibilityOf("/r/docs/artifacts/public/docs/a.html") === "public" && tree.visibilityOf("/r/docs/artifacts/private/reports/a.html") === "private" && tree.visibilityOf("/r/docs/artifacts/docs/a.html") === null);

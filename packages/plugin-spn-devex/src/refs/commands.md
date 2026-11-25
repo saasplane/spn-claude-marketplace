@@ -80,6 +80,8 @@ spn-devex docs page check <seat…> — report each page that differs from what 
 
 spn-devex docs page write <seat…> — write each construct page from its seat file
 
+spn-devex docs page stamp <overview…> — record in each overview the construct pages it summarises, each with its seat file's seen hash, read from the overview's own doors; run it after the overview is written against them
+
 spn-devex docs page new <kind> <path> [--name <name>] [--workstream <NNN-subject>] [--arc <arc>] — start a hand page from its kind's template: the tool fills what it knows and names the placeholders still to fill
 
 spn-devex docs parity check [<path>…] — the parity findings under the paths, from the seats and the packages of each path's repository
@@ -204,6 +206,8 @@ spn-devex workstream open --file <block.json> --note "<the developer's words>" [
 
 spn-devex workstream progress write <workstream> — regenerate the progress block in the approach page's Plan
 
+spn-devex workstream question list [<workstream>] [--state open|answered|withdrawn|all] [--every] — list the cards of this window's own workstreams, or of the one named, in one state; --every reads every open and backlog workstream
+
 spn-devex workstream question raise <workstream>/<arc> --file card.json (the card holds why, what, viewsLead, views, options, recommended, nearest, signs, others, about, preview and settled) — raise a card: the next number, the record, the card in the approach page's Open
 
 spn-devex workstream question brief <workstream>/Q<n> — print a fresh view's brief from the card: the problem and the constraints first, no options, the proposals to follow
@@ -232,7 +236,7 @@ spn-devex workstream rows show <workstream>[/N<nnn>] [--ready] [--parallel] [--t
 
 spn-devex workstream sheet write <workstream>/<arc> --file <sheet.json> — write the arc's whole sheet from a file, every entry validated and every fact one the arc holds
 
-spn-devex workstream sheet edit <workstream>/<arc> <E> [--what …] [--op …] [--file …] [--decided-by …] [--facts …] [--then …] [--rules …] [--callers …] [--docs …] [--book …] [--tiers unit=ID,ID;contract=ID] [--credits ID,ID|none] [--trace "…"] [--judged|--mechanical] [--kind change|step] [--command "…"] [--proof "…"] — change one entry of the sheet; a missing entry is refused, and `sheet write` is named
+spn-devex workstream sheet edit <workstream>/<arc> <E> [--what …] [--op …] [--file …] [--decided-by …] [--facts …] [--then …] [--rules …] [--callers …] [--docs …] [--book …] [--tiers unit=ID,ID;contract=ID] [--credits ID,ID|none] [--trace "…"] [--judged|--mechanical] [--kind change|step] [--command "…"] [--proof "…"] [--landed <sha,sha>|none] — change one entry of the sheet; a missing entry is refused, and `sheet write` is named
 
 spn-devex workstream sheet drop <workstream>/<arc> <E> --note "…" — take an entry out of the sheet; --note carries why into its one log line
 

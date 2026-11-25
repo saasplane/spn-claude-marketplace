@@ -4,17 +4,20 @@
 // Each construct page, produced from its seat file.
 //
 //   spn-devex docs page check <seat…>   report each page that differs from what its seat file gives
-//   spn-devex docs page write <seat…>   write each page
+//   spn-devex docs page write <seat…>   write each page, and name the overviews it leaves owed
+//   spn-devex docs page stamp <overview…>   record in each overview the construct pages it summarises (RULE.DEVEX.WORKSPACE.581)
 //
 // A SUBJECT WITH TWO ACTIONS, AND A `file` PATH. A path names one seat file, or a folder of them, and
 // the command acts on exactly those. Both actions need a path, because a page is produced from the
 // seat file that is named and from no other.
 
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { type Action, REQUIRED, UsageFault, VALUE, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { bookTemplatesDir, inSeat } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { pageFor, resolveWorkspace, seatPaths } from "./_lib.ts";
+import { overviewPages, pageFor, resolveWorkspace, seatPaths } from "./_lib.ts";
+import { docsRootOf, isOverview, slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { overviewsOwedBy, stampFor, summarisesOf, withSummarises } from "../../lib/overview-stamp.ts";
 import { check as docCheck, unfilledPage } from "../../checks/doc-check.ts";
 import { PAGE_KINDS, writeNewPage } from "../../lib/page-new.ts";
 import { Refusal } from "./_pages.ts";
@@ -69,7 +72,45 @@ function run(args: string[], write: boolean): number {
   const found = seats.flatMap((seat) => pageFor(seat, resolve(workspace), templates, write));
   for (const finding of found)
     console.log(`${finding.grade === "RULE" ? "✗" : "!"} ${finding.grade.padEnd(4)} ${finding.check.padEnd(9)} ${relative(workspace, finding.file)}\n         ${finding.message}`);
+  // A CONSTRUCT PAGE WRITTEN AGAIN LEAVES ITS OVERVIEWS OWED (RULE.DEVEX.WORKSPACE.581): each one whose stamp names it with an older seat is named, so it is rewritten in the same work.
+  if (write) for (const line of owedOverviews(seats, workspace)) console.log(line);
   return missing.length || found.some((finding) => finding.grade === "RULE") ? 1 : 0;
+}
+
+/** The overviews of each seat's docs tree that summarise one of these seats with a hash it no longer has, one line each. */
+function owedOverviews(seats: string[], workspace: string): string[] {
+  const byTree = new Map<string, string[]>();
+  const out: string[] = [];
+  for (const seat of seats.filter((one) => inSeat(one, "constructs"))) {
+    const docs = docsRootOf(slashes(resolve(seat)));
+    if (!docs) continue;
+    if (!byTree.has(docs)) byTree.set(docs, overviewPages(docs));
+    for (const overview of overviewsOwedBy(seat, byTree.get(docs)!))
+      out.push(`owed     ${relative(workspace, overview)}\n         summarises ${relative(workspace, resolve(seat))}, which has moved: rewrite the sections that summarise it, then \`docs page stamp\` (RULE.DEVEX.WORKSPACE.581)`);
+  }
+  return out;
+}
+
+/** `docs page stamp <overview…>`: each overview's `summarises`, written from its own doors to construct pages. */
+function stamp(args: string[]): number {
+  const words = readWords(args);
+  const paths = scopeOf(words.paths, REQUIRED);
+  const workspace = resolveWorkspace();
+  let failed = false;
+  for (const path of paths) {
+    const file = resolve(path);
+    const shown = relative(workspace, file);
+    if (!existsSync(file) || !isOverview(slashes(file))) { console.log(`✗ RULE stamp     ${shown}\n         no overview there: a stamp is written on an \`…-overview.html\` in the artifacts pocket's docs folder`); failed = true; continue; }
+    const text = readFileSync(file, "utf8");
+    const { list, nowhere } = stampFor(file, text);
+    for (const door of nowhere) console.log(`✗ RULE stamp     ${shown}\n         the door to \`${door}\` leads nowhere: no construct page's seat file is there`);
+    if (nowhere.length) { failed = true; continue; }
+    const before = JSON.stringify(summarisesOf(text));
+    if (before === JSON.stringify(list)) { console.log(`current  ${shown} · ${list.length} construct pages`); continue; }
+    writeFileSync(file, withSummarises(text, list));
+    console.log(`stamped  ${shown} · ${list.length} construct pages`);
+  }
+  return failed ? 1 : 0;
 }
 
 /** `docs page new <kind> <path>`: a hand page from its kind's template. */
@@ -98,6 +139,11 @@ export const actions: Record<string, Action> = {
     describe: "write each construct page from its seat file",
     usage: USAGE,
     run: (args) => run(args, true),
+  },
+  stamp: {
+    describe: "record in each overview the construct pages it summarises, each with its seat file's seen hash, read from the overview's own doors; run it after the overview is written against them",
+    usage: "<overview…>",
+    run: stamp,
   },
   new: {
     describe: "start a hand page from its kind's template: the tool fills what it knows and names the placeholders still to fill",

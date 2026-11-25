@@ -1,0 +1,253 @@
+{
+  "$comment": [
+    "RESTATES: spn-foundation docs/02-constructs/02-support/01-surface/12-language-design-language.md § The spec file",
+    "A DESIGN LANGUAGE SPEC, one typed file at docs/specs/design-languages/<language>.spdl.json in the repository that owns the language. It holds only the language's decisions, and its keys are the ones of the catalogue, docs/specs/surface/catalogue.json (03 Surface Catalogue).",
+    "A language depends on no app and names none. An app keeps its own typed theme setting, which names the language and version it was written from.",
+    "shared holds BRAND, DRAWING, MOTION and VOICE. categories holds MARKETING, MARKETPLACE, RESOURCES, DASHBOARD and PORTAL, each with LAYOUTS, PAGES, CONTAINERS and WIDGETS (Structure) and THEME, MEDIA, MOTION and WORDS (Style); a language keeps the categories it states and inherits the rest from its parent. A category of its own is NEW and carries family, person and from.",
+    "A decision is source (OWN, INHERITED or NONE), pick (ALL or the codes), customise, add, notUsed, values and why, which is one or two sentences saying why the language decided this and never repeats a value, a rule's words or the developer's words. customise and add work on the catalogue's kinds and cases and nothing else: a customisation never changes a kind's meaning, an added kind or case is built from units and never reuses a code or changes the kind's reason, an added kind carries for and chooseWhen, a page kind's order may name another case for a section, and the floor is never customised. A page's own departure is stated in the page's tree as departs[] (proposed), never here. values holds the language's own settings, with mtype naming the part.",
+    "A child states only what differs: a part it leaves out is INHERITED, and its values merge with its parent's key by key. A parent never lists the languages that extend it.",
+    "Delete this $comment in the copy."
+  ],
+  "name": "{{language}}",
+  "version": "{{1.0.0}}",
+  "extends": "{{parent@major, or null for the root language}}",
+  "domain": {
+    "product": "{{The product this language draws, in one phrase}}",
+    "records": [
+      "{{The records the product's pages show}}"
+    ],
+    "reads": "{{Who reads pages in this language, in one sentence}}"
+  },
+  "references": [
+    {
+      "id": "{{reference-id}}",
+      "url": "{{The site or construct read}}",
+      "read": "{{YYYY-MM-DD}}",
+      "pages": [
+        "{{The pages read}}"
+      ],
+      "notes": [
+        {
+          "part": "{{The parts it informs}}",
+          "does": "{{What it does there}}",
+          "taken": "{{taken whole | adapted | left out}}",
+          "status": "{{MAPPED | …}}"
+        }
+      ]
+    }
+  ],
+  "shared": {
+    "BRAND": {
+      "source": "{{OWN | INHERITED | NONE}}",
+      "values": {
+        "mtype": "BRAND",
+        "{{a value key of the part}}": "{{The value, in the design system's own names}}"
+      },
+      "why": "{{One or two sentences: why this language decided this, or why it leaves it out. Never the values, which `values` holds; never a rule's words, which its id links; never the developer's words, which the decisions register holds.}}"
+    },
+    "DRAWING": {
+      "source": "{{OWN | INHERITED | NONE}}",
+      "values": {
+        "mtype": "DRAWING",
+        "{{a value key of the part}}": "{{The value, in the design system's own names}}"
+      },
+      "why": "{{One or two sentences: why this language decided this, or why it leaves it out. Never the values, which `values` holds; never a rule's words, which its id links; never the developer's words, which the decisions register holds.}}"
+    },
+    "MOTION": {
+      "source": "{{OWN | INHERITED | NONE}}",
+      "values": {
+        "mtype": "MOTION",
+        "{{a value key of the part}}": "{{The value, in the design system's own names}}"
+      },
+      "why": "{{One or two sentences: why this language decided this, or why it leaves it out. Never the values, which `values` holds; never a rule's words, which its id links; never the developer's words, which the decisions register holds.}}"
+    },
+    "VOICE": {
+      "source": "{{OWN | INHERITED | NONE}}",
+      "values": {
+        "mtype": "VOICE",
+        "{{a value key of the part}}": "{{The value, in the design system's own names}}"
+      },
+      "why": "{{One or two sentences: why this language decided this, or why it leaves it out. Never the values, which `values` holds; never a rule's words, which its id links; never the developer's words, which the decisions register holds.}}"
+    }
+  },
+  "categories": {
+    "{{MARKETING | MARKETPLACE | RESOURCES | DASHBOARD | PORTAL | a category of its own, state NEW, with family, person and from}}": {
+      "LAYOUTS": {
+        "source": "{{OWN | INHERITED | NONE}}",
+        "pick": "{{ALL | [the codes of the catalogue's kinds it uses as they are]}}",
+        "customise": [
+          {
+            "code": "{{A catalogue kind's code}}",
+            "change": "{{How its look changes; its meaning never does}}",
+            "config": {
+              "mtype": "LAYOUTS",
+              "{{a config field of the kind}}": "{{Its new value}}"
+            }
+          }
+        ],
+        "add": [
+          {
+            "code": "{{A new code that no catalogue or parent kind uses}}",
+            "title": "{{Its name}}",
+            "guidance": {
+              "for": {
+                "persons": [
+                  "{{VISITOR | LEARNER | SEEKER | TEAM | INDIVIDUAL}}"
+                ]
+              },
+              "chooseWhen": "{{When to choose it}}"
+            },
+            "config": {
+              "mtype": "LAYOUTS",
+              "unit": "{{A design-system unit}}"
+            }
+          }
+        ],
+        "notUsed": [
+          "{{A kind's code the language leaves out}}"
+        ],
+        "values": {
+          "mtype": "LAYOUTS",
+          "{{a value key of the part}}": "{{The value, in the design system's own names}}"
+        },
+        "why": "{{One or two sentences: why this language decided this, or why it leaves it out. Never the values, which `values` holds; never a rule's words, which its id links; never the developer's words, which the decisions register holds.}}"
+      },
+      "PAGES": {
+        "source": "{{OWN | INHERITED | NONE}}",
+        "pick": "{{ALL | [the codes of the catalogue's kinds it uses as they are]}}",
+        "customise": [
+          {
+            "code": "{{A page kind's code}}",
+            "change": "{{How its order changes; its meaning never does}}",
+            "config": {
+              "mtype": "PAGES",
+              "order": [
+                "{{a section's kind code, or { \"kind\": \"{{code}}\", \"case\": \"{{a case of that kind}}\" }}}"
+              ]
+            }
+          }
+        ],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "PAGES",
+          "{{a value key of the part}}": "{{The value, in the design system's own names}}"
+        },
+        "why": "{{One or two sentences: why this language decided this, or why it leaves it out. Never the values, which `values` holds; never a rule's words, which its id links; never the developer's words, which the decisions register holds.}}"
+      },
+      "CONTAINERS": {
+        "source": "{{OWN | INHERITED | NONE}}",
+        "pick": "{{ALL | [the codes of the catalogue's kinds it uses as they are]}}",
+        "customise": [
+          {
+            "code": "{{A catalogue kind's code}}",
+            "change": "{{How one of its cases changes everywhere}}",
+            "config": {
+              "mtype": "CONTAINERS",
+              "cases": {
+                "{{A case code}}": {
+                  "{{units | placement | style}}": "{{Its new value}}"
+                }
+              }
+            }
+          }
+        ],
+        "add": [
+          {
+            "to": "{{A catalogue kind's code}}",
+            "case": {
+              "code": "{{A new case code the kind does not use}}",
+              "when": "{{When this arrangement is chosen}}",
+              "units": [
+                "{{A design-system unit, or the app's own unit by its own name}}"
+              ],
+              "placement": {},
+              "style": {},
+              "status": "{{BUILT | PLANNED}}"
+            }
+          }
+        ],
+        "notUsed": [],
+        "values": {
+          "mtype": "CONTAINERS",
+          "{{a value key of the part}}": "{{The value, in the design system's own names}}"
+        },
+        "why": "{{One or two sentences: why this language decided this, or why it leaves it out. Never the values, which `values` holds; never a rule's words, which its id links; never the developer's words, which the decisions register holds.}}"
+      },
+      "WIDGETS": {
+        "source": "{{OWN | INHERITED | NONE}}",
+        "pick": "{{ALL | [the codes of the catalogue's kinds it uses as they are]}}",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "WIDGETS",
+          "{{a value key of the part}}": "{{The value, in the design system's own names}}"
+        },
+        "why": "{{One or two sentences: why this language decided this, or why it leaves it out. Never the values, which `values` holds; never a rule's words, which its id links; never the developer's words, which the decisions register holds.}}"
+      },
+      "THEME": {
+        "source": "{{OWN | INHERITED | NONE}}",
+        "pick": "{{ALL | [the codes of the catalogue's kinds it uses as they are]}}",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "THEME",
+          "{{a value key of the part}}": "{{The value, in the design system's own names}}"
+        },
+        "why": "{{One or two sentences: why this language decided this, or why it leaves it out. Never the values, which `values` holds; never a rule's words, which its id links; never the developer's words, which the decisions register holds.}}"
+      },
+      "MEDIA": {
+        "source": "{{OWN | INHERITED | NONE}}",
+        "pick": "{{ALL | [the codes of the catalogue's kinds it uses as they are]}}",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "MEDIA",
+          "{{a value key of the part}}": "{{The value, in the design system's own names}}"
+        },
+        "why": "{{One or two sentences: why this language decided this, or why it leaves it out. Never the values, which `values` holds; never a rule's words, which its id links; never the developer's words, which the decisions register holds.}}"
+      },
+      "MOTION": {
+        "source": "{{OWN | INHERITED | NONE}}",
+        "pick": "{{ALL | [the codes of the catalogue's kinds it uses as they are]}}",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "MOTION",
+          "{{a value key of the part}}": "{{The value, in the design system's own names}}"
+        },
+        "why": "{{One or two sentences: why this language decided this, or why it leaves it out. Never the values, which `values` holds; never a rule's words, which its id links; never the developer's words, which the decisions register holds.}}"
+      },
+      "WORDS": {
+        "source": "{{OWN | INHERITED | NONE}}",
+        "pick": "{{ALL | [the codes of the catalogue's kinds it uses as they are]}}",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "WORDS",
+          "{{a value key of the part}}": "{{The value, in the design system's own names}}"
+        },
+        "why": "{{One or two sentences: why this language decided this, or why it leaves it out. Never the values, which `values` holds; never a rule's words, which its id links; never the developer's words, which the decisions register holds.}}"
+      }
+    }
+  },
+  "gaps": {
+    "notInTheLanguage": {
+      "source": "{{OWN | INHERITED | NONE}}",
+      "why": "{{One or two sentences: why this language decided this, or why it leaves it out. Never the values, which `values` holds; never a rule's words, which its id links; never the developer's words, which the decisions register holds.}}"
+    },
+    "designSystemGaps": {
+      "source": "{{OWN | INHERITED | NONE}}",
+      "why": "{{One or two sentences: why this language decided this, or why it leaves it out. Never the values, which `values` holds; never a rule's words, which its id links; never the developer's words, which the decisions register holds.}}"
+    },
+    "whatTheAgentMustAsk": {
+      "source": "{{OWN | INHERITED | NONE}}",
+      "why": "{{One or two sentences: why this language decided this, or why it leaves it out. Never the values, which `values` holds; never a rule's words, which its id links; never the developer's words, which the decisions register holds.}}"
+    }
+  }
+}

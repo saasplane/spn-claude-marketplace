@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "Numbers",
- "caption": "A DSSectionContainer, color BASE, holds one DSFeature with textAlign START. Its items are STATS, flat, in one row: up to four numbers read from the real system, each its value over its plain label. Under centred words they take CENTER. On a phone two by two. The page that holds this section is wrapped once in DSSiteLayout.",
+ "caption": "A DSSectionContainer, color BASE, holds one DSFeature with textAlign START. Its items are STATS, flat, in one row: up to four numbers read from the real system, each its value over its plain label. Under centred words they take CENTER. On a phone two by two. The page that holds this section is wrapped once in DSSitePage.",
  "layout": {
   "type": "TOPNAV",
   "body": {

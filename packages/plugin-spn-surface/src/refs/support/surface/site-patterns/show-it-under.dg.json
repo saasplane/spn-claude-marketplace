@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "Show it, the picture under",
- "caption": "It stands under a top bar, in the window's full width. The section is a DSSectionContainer, and inside it one DSFeature at MEDIA_BOTTOM: the words at the start, with the head packed as one block (the eyebrow in small capitals over the title, the description under it, and its facts as badges under that), the points across as a GRID, one action, and under them the picture at the section's full width, as mediaNode, for what reads only wide, such as two panes compared or a wide chart. Panes are flat, each as tall as its lines. On a phone the points stand one under the other, and the picture keeps its place under the words. The page that holds this section is wrapped once in DSSiteLayout.",
+ "caption": "It stands under a top bar, in the window's full width. The section is a DSSectionContainer, and inside it one DSFeature at MEDIA_BOTTOM: the words at the start, with the head packed as one block (the eyebrow in small capitals over the title, the description under it, and its facts as badges under that), the points across as a GRID, one action, and under them the picture at the section's full width, as mediaNode, for what reads only wide, such as two panes compared or a wide chart. Panes are flat, each as tall as its lines. On a phone the points stand one under the other, and the picture keeps its place under the words. The page that holds this section is wrapped once in DSSitePage.",
  "layout": {
   "type": "TOPNAV",
   "body": {

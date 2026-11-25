@@ -18,7 +18,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { type Action, OPTIONAL, REQUIRED, VALUE, docsTreeOf, onePath, readWords, repositoryOf, scopeOf, under } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { ARTIFACT, ARTIFACT_INDEX, CONSTRUCT_PAGES, DOCS, VISIBILITY, artifactsLayout, type Visibility, OVERVIEW_PAGE_SUFFIX, POCKET, artifactDocsDir, artifactIndex, artifactsDir, docsOf,
-  domainConstructsDir, guidePagesDir, hubPage, isOverview, isProducedPage, reportsDir,
+  domainConstructsDir, guidePagesDir, hubPage, isOverview, isProducedPage, reportsDir, surfacePagesDir,
   slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { BUNDLED_SUFFIX, INDEX_SCRIPT } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { locationOf, resolveWorkspace, text as plainText } from "./_lib.ts";
@@ -91,7 +91,8 @@ export function entriesOf(node: TreeNode): TreeNode[] {
 export function groupsOf(artifacts: string, half?: Visibility): { groups: TreeNode[]; pages: string[]; notes: Note[] } {
   // `artifacts` is the folder the index lists: the pocket in the earlier layout, and `public/` or `private/` in the split one.
   const docs = half ? dirname(dirname(artifacts)) : dirname(artifacts);
-  const surfaceRoot = join(artifacts, ARTIFACT.surface);
+  // `surface/` sits in `public/` in either layout, so a half-moved pocket's samples homes are found there too.
+  const surfaceRoot = half ? join(artifacts, ARTIFACT.surface) : surfacePagesDir(docs);
   // A design language's samples home is the one page of `surface/` the index lists; the samples behind it open from it.
   const files = pagesUnder(artifacts).filter((file) => file !== join(artifacts, ARTIFACT_INDEX) && file !== artifactIndex(docs)
     && (!file.startsWith(surfaceRoot + sep) || (basename(file) === ARTIFACT_INDEX && dirname(dirname(file)) === surfaceRoot)));
@@ -394,8 +395,10 @@ function run(args: string[], write: boolean): number {
       if (half === VISIBILITY.private && !pages.length) { console.log(`nothing to ${write ? "write" : "check"} — ${slashes(relative(repository, root))} holds no page`); return 0; }
       // The path to the pages is kept once, as `base`. It is empty where the index sits in the folder itself.
       const base = dirname(out) === root ? "" : `${slashes(relative(dirname(out), root))}/`;
-      // The hub is the first page of the tree. Where a repository has no hub, the first page stands for it.
+      // The way back is the repository's hub, the one the audit reads (`hubPage`), so the private index goes back across to
+      // `public/`. Where a repository has no hub, the first page of the tree stands for it.
       const first = groups.flatMap(entriesOf)[0]?.path ?? "";
+      const hubBack = existsSync(hubPage(docs)) ? slashes(relative(dirname(out), hubPage(docs))) : base + first;
       const headed = half ? { tab: `${named === "—" ? basename(repository) : named} ${half === VISIBILITY.public ? "Public" : "Private"}`, id: `${basename(repository)}-artifacts-${half}-index`,
         title: half === VISIBILITY.public ? "Public" : "Private",
         summary: `Every page of this repository's ${slashes(relative(repository, root))}, in one tree, one page open at a time.` } : undefined;
@@ -403,7 +406,7 @@ function run(args: string[], write: boolean): number {
         organisation: "SaaS Plane",
         location: named === "—" ? basename(repository) : named,
         repository,
-        hub: base + first,
+        hub: hubBack,
       }, headed);
       if (write) return say([...place(out, produce(), true, workspace, "index"), ...notes], workspace) ? 1 : 0;
 

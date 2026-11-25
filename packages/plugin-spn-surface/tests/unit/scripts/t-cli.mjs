@@ -40,15 +40,15 @@ console.log("=== cli — help lists the three commands");
   let parsed;
   try { parsed = JSON.parse(out); } catch { parsed = null; }
   ok("--json exits clean and names the plugin", code === 0 && parsed?.plugin === "spn-surface", out);
-  ok("--json lists `check module`, `check page`, `check scan`, `language check`, `language write`, `page copy`, `unit find` and `unit show`, and nothing else",
-    JSON.stringify(parsed?.commands?.map((listed) => listed.command)) === '["check module","check page","check scan","language check","language write","page copy","unit find","unit show"]', out);
+  ok("[MKT.SCRIPTS.672] --json lists `catalogue show`, `check module`, `check page`, `check scan`, `language check`, `language write`, `page copy`, `unit find` and `unit show`, and nothing else",
+    JSON.stringify(parsed?.commands?.map((listed) => listed.command)) === '["catalogue show","check module","check page","check scan","language check","language write","page copy","unit find","unit show"]', out);
 }
 
 console.log("\n=== cli — unknown names, refused by name");
 {
   const { out, code } = run("nope", "nope");
   ok("an unknown group exits 2", code === 2, out);
-  ok("names what was asked for, and the groups there are", out.includes("unknown group `nope`") && out.includes("groups: check · language · page · unit"), out);
+  ok("names what was asked for, and the groups there are", out.includes("unknown group `nope`") && out.includes("groups: catalogue · check · language · page · unit"), out);
 }
 
 console.log("\n=== cli — `check scan` reads Surface code whole, and says what it cannot see");

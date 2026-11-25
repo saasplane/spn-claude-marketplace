@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "Steps, beside a picture",
- "caption": "A DSSectionContainer, color BASE, holds one DSFeature. Its items are numbered, items.numbered true, and a LIST, flat, with a line between each two: four steps in the order a reader follows them, read and never pressed. With a picture, as here, the feature splits as SPLIT_END, the steps beside a diagram drawn flat. A row of steps with no picture is a GRID with items.borderType GRID. On a phone one step under another, then the picture. The page that holds this section is wrapped once in DSSiteLayout.",
+ "caption": "A DSSectionContainer, color BASE, holds one DSFeature. Its items are numbered, items.numbered true, and a LIST, flat, with a line between each two: four steps in the order a reader follows them, read and never pressed. With a picture, as here, the feature splits as SPLIT_END, the steps beside a diagram drawn flat. A row of steps with no picture is a GRID with items.borderType GRID. On a phone one step under another, then the picture. The page that holds this section is wrapped once in DSSitePage.",
  "layout": {
   "type": "TOPNAV",
   "body": {

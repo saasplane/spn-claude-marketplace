@@ -8,30 +8,30 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "1f4085fc"
+      "seen": "9f16ad2b"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/01-common/01-library.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/14-delivery-library/01-common/01-library.md",
       "section": "Each shared state has one picture",
-      "seen": "a410741b"
+      "seen": "6efa5271"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/01-common/01-container.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-containers/01-common/01-container.md",
       "section": "A frame is drawn once",
-      "seen": "cc2e573c"
+      "seen": "7951e694"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-app/01-common/02-settings-and-theme.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-architecture-app/01-common/02-settings-and-theme.md",
       "section": "The theme",
-      "seen": "d7dcc456"
+      "seen": "6f798f67"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/01-task-patterns.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-standards-patterns/01-common/01-task-patterns.md",
       "section": "Interrupt",
-      "seen": "945618f6"
+      "seen": "17c63eb1"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/01-common/01-layout.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-layouts/01-common/01-layout.md",
       "section": "The three parts",
       "seen": "1eb4e639"
     }
@@ -94,14 +94,14 @@ The question it holds: *is every unit the right one, built as the library draws 
 
 - **Core, components and names** — held by the stack's checks, `spnutils apps surface gaps`, and this lens worn.
   - **The look comes from the theme, and never from the page.** A colour, a padding, a margin, a radius or a gap set by hand is the finding; in a design, a colour bound to no variable, or a copy of a block that is no longer an instance (`RULE.SUPPORT.APPS.150` · MUST · skill:spn-apps/implement).
-  - **A site section's look follows the site patterns' tests and the app's design language.** Read the page beside the app's guide and its data: a section that takes two emphases, a highlight on the hero or two in a row, a gradient on a frame, or a picture cropped to its column is a finding, and so is a section with no case line that names each test's answer (`RULE.SUPPORT.SURFACE.438` · GUIDE) (`RULE.SUPPORT.SURFACE.439` · GUIDE) (`RULE.SUPPORT.SURFACE.440` · GUIDE).
+  - **A site section's look follows the site container kinds' tests and the app's design language.** Read the page beside the app's guide and its data: a section that takes two emphases, a highlight on the hero or two in a row, a gradient on a frame, or a picture cropped to its column is a finding, and so is a section with no case line that names each test's answer (`RULE.SUPPORT.SURFACE.438` · GUIDE) (`RULE.SUPPORT.SURFACE.439` · GUIDE) (`RULE.SUPPORT.SURFACE.440` · GUIDE).
   - **A class written on a design-system unit is a gap, never a style.** Where the unit lacks a prop, or the design language lacks a choice, the finding is the missing prop or choice, recorded for the design system, and the class is not kept (`RULE.SUPPORT.SURFACE.442` · GUIDE).
   - **A media drawing carries little text.** Each unit in it is a bare icon from the site's own set and a name, with no mark behind the icon; units in a row stand at one height, and the unit's detail stays on the page the drawing leads to.
   - **The page's fill and padding are the layout's.** The fill is `page-fill`, set by the theme's body colour (`BASE` where the app chose none); the layout keeps one spacing, `--layout-space`, as the page's padding and every gap; the width is the body's, `FULL` to `NARROW`, and a page of edge-to-edge bands takes `CANVAS` or `width: FULL` (`RULE.SUPPORT.APPS.160` · MUST · skill:spn-apps/implement) (`RULE.SUPPORT.SURFACE.200` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.158` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.200` · MUST · skill:spn-surface/design).
   - **A page that opens or closes on a section lets its fill meet the bar and the footer**, with no band of the page between, and a side line the content draws stands within the layout's space, so the words still start where the bar's start; `DOCK` keeps its page space (layout chapter, the page and the content).
   - **The theme styles the layout in three parts — body, navigation, content — in every layout type.** A look a page or one layout type writes is a finding; nothing stands over the content; an entry is drawn by the entry kind its look names; the layouts alone read the theme and hand the look down; a panel of navigation entries takes the navigation's look and a menu of actions does not; the defaults live once, in the default theme (`RULE.SUPPORT.SURFACE.139` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.140` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.155` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.156` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.161` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.200` · MUST · skill:spn-surface/design).
-  - **A theme holds a brand and an app's looks, and no layout type.** The brand is `app.primary`, `app.neutralTemperature` and the typefaces, stated once for the platform in its design language; the looks are `app.mode`, `app.size`, `app.motionSpeed`, `app.radius`, the layout look, and the panel, card and table looks, a row for each app. The layout type is the app's layout setting and is never copied into a look (`RULE.SUPPORT.SURFACE.139` · MUST · skill:spn-surface/design).
-  - **The theme's typefaces are `TEXT`, `DISPLAY` and `CODE`, named by their job, and a page brings no font.** `DISPLAY` is for display steps on a site's page (`DSSiteLayout` sets it), `CODE` for a block that shows code, `TEXT` for everything else; a text naming a font, or a face set for a part of the text, is a finding (`RULE.SUPPORT.SURFACE.196` · MUST · skill:spn-surface/design).
+  - **A theme holds a brand and an app's looks, and no layout type.** The brand is `app.primary`, `app.neutralTemperature` and the typefaces, stated once for the platform in its design language; the looks are `app.mode`, `app.size`, `app.motionSpeed`, `app.radius`, the layout look, and the panel, card and table looks, stated in the Theme part of each surface category the language states. The layout type is the app's layout setting and is never copied into a look (`RULE.SUPPORT.SURFACE.139` · MUST · skill:spn-surface/design).
+  - **The theme's typefaces are `TEXT`, `DISPLAY` and `CODE`, named by their job, and a page brings no font.** `DISPLAY` is for display steps on a site's page (`DSSitePage` sets it), `CODE` for a block that shows code, `TEXT` for everything else; a text naming a font, or a face set for a part of the text, is a finding (`RULE.SUPPORT.SURFACE.196` · MUST · skill:spn-surface/design).
   - **A frame is drawn once.** Two borders round one table is the finding; a `bordered` block in a `flush` part, and a table, list, code block, accordion or empty state drawing its own border in a `flush` part, are findings (`RULE.SUPPORT.APPS.149` · MUST · skill:spn-surface/design).
   - **A line is chosen by what it parts**: `surface-divider` between rows, `surface-border` at the edge of a card, panel, popover or the shell, `surface-border-strong` at the edge of a control. A partner paints one card, card widget or panel with a class that sets the three paint tokens and nothing else, and a block reads only the tokens set on its own root (`RULE.SUPPORT.SURFACE.163` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.192` · MUST · skill:spn-surface/design).
   - **A token has one name, the book's, in small letters with dashes**; a slash spelling is a finding (`RULE.SUPPORT.SURFACE.298` · MUST · skill:spn-surface/design).
@@ -126,7 +126,7 @@ The question it holds: *is every unit the right one, built as the library draws 
   - **A hue, a surface treatment and a word each mean one thing on every page.** `variant` is the surface treatment, `color` the hue, `size` the density step `XS` to `XL` with `SM` the default; `CUSTOM` is the one named way a page owns a colour (names § The three shared names).
   - **A prop that takes a vocabulary carries the book's name and the book's values** (`RULE.SUPPORT.SURFACE.041` · MUST · skill:spn-surface/design).
   - **A new unit names each shared axis it takes, and why it leaves one out, before its preview is approved**: the density (`size`), the place on a page (`pageLevel`), the hue (`color`), the strength (`variant`), the direction (`orientation`), the device read from its context, the task state (`DSTaskStateType`, or the states of its data), and the type step of each part's words, following its size or level. The lens fills that table in on every new unit's preview, a stack's own unit and a partner's included; a prop of the unit's own for a shared axis, a fixed type step, a width the unit measures itself, or a reason that says only "not needed" is a finding (`RULE.SUPPORT.SURFACE.316` · MUST · skill:spn-surface/design).
-  - **A suffix names where a unit is placed**: `App`, `Layout`, `Container`, `Widget`; a component, a composite included, takes none, and a block's own name comes first (`RULE.SUPPORT.SURFACE.229` · MUST · skill:spn-surface/design).
+  - **A suffix names where a unit is placed**: `App`, `Layout`, `Page`, `Container`, `Widget`; a component, a composite included, takes none, and a block's own name comes first (`RULE.SUPPORT.SURFACE.229` · MUST · skill:spn-surface/design).
   - **A pitch is a `DSFeature` sized by its level alone, a section of a website is a `DSSectionContainer`, and a grid of features under a heading is a `DSFeatureGridSectionContainer`, chosen when the data is a set of features that are each a thing of their own.** A type step, gap or class a page wrote for a pitch is a finding, and so is a padding, maximum width or gutter written for a section; the feature gives its items the level that follows its own and sizes its small picture by one box per level (`RULE.SUPPORT.SURFACE.233` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.235` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.243` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.247` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.259` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.274` · MUST · skill:spn-surface/design).
   - **The paint of a frame is one `surface` prop, and the theme holds no look for a unit that frames only where its page asks.** A paint written as five loose props, or a feature look put in the theme, is a finding (`RULE.SUPPORT.SURFACE.261` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.277` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.279` · MUST · skill:spn-surface/design).
   - **An alignment takes the core's vocabulary of its axis**, `DSHorizontalAlignType` or `DSVerticalAlignType`; a vocabulary of a unit's own for one is a finding (`RULE.SUPPORT.SURFACE.249` · MUST · skill:spn-surface/design).
@@ -135,7 +135,7 @@ The question it holds: *is every unit the right one, built as the library draws 
   - **One page holds at each density, theme, device type, language and direction.** A second version of a page, or a block restyled for dark, is a finding.
 - **The design library** — held by the connector's read-back and `spnutils apps surface library`.
   - **Each shared state has one picture.** Error, focus, disabled and selected look the same on every block, and every block that takes the key draws the focus picture (`RULE.SUPPORT.APPS.142` · MUST · skill:spn-surface/design).
-  - **The library draws nothing of a pattern**: core units with their properties and cases, the icons and the places of the layout — no task pattern, app pattern, skeleton or sample page (`RULE.SUPPORT.SURFACE.099` · MUST · skill:spn-surface/design).
+  - **The library draws nothing of a pattern**: core units with their properties and cases, the icons and the places of the layout — no task pattern, app page kind, skeleton or sample page (`RULE.SUPPORT.SURFACE.099` · MUST · skill:spn-surface/design).
 
 ## Gates
 

@@ -781,6 +781,46 @@ console.log("\n=== an entry that names nothing: a blank or placeholder is a find
   ok("[MKT.SCRIPTS.574] each filled, the go write no longer names a placeholder", !/placeholder|unfilled|blank/.test(mended.out), mended.out);
 }
 
+console.log("\n=== landed: a change its commits already carry (MKT.SCRIPTS.662)");
+{
+  const w = await dataWorkspace("sheet-landed");
+  const run = (...args) => cli(w.root, ["workstream", "sheet", ...args]);
+  cli(w.root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  const sheetPath = join(w.ws, "arcs", "N001", "sheet.json");
+  const server = "spn-x:packages/mod/src/app/services/Thing.ts";
+  writeFileSync(sheetPath, JSON.stringify(sheetOf([entry("E1", { file: server, kind: "change", judged: true, trace: "because q1" })]), null, 2));
+  const tree = worktreeOf(w);
+  writeFileSync(join(tree, "a.ts"), "export const a = 2;\n");
+  gitAt(tree, "commit", "-qam", "the change");
+  const sha = gitAt(tree, "rev-parse", "HEAD").trim();
+  writeFileSync(join(w.repo, "a.ts"), "export const a = 3;\n");
+  gitAt(w.repo, "commit", "-qam", "a change on another branch");
+  const elsewhere = gitAt(w.repo, "rev-parse", "HEAD").trim();
+  const before = run("check", "N001");
+  ok("[MKT.SCRIPTS.662] a change with neither a patch nor commits is a finding", before.out.includes("E1 is a change and has no patch"), before.out);
+  const off = run("edit", "N001", "E1", "--landed", elsewhere.slice(0, 9));
+  ok("[MKT.SCRIPTS.662] `--landed` refuses a commit that is not on the worktree's branch, writing nothing", off.code === 1 && off.out.includes("not on spn-x's branch") && json(sheetPath).entries[0].landed === undefined, off.out);
+  const none = run("edit", "N001", "E1", "--landed", "abcdef1234");
+  ok("[MKT.SCRIPTS.662] `--landed` refuses a commit the repository does not hold", none.code === 1 && none.out.includes("no commit in spn-x"), none.out);
+  const marked = run("edit", "N001", "E1", "--landed", sha.slice(0, 9));
+  ok("[MKT.SCRIPTS.662] `--landed <sha>` records the full commit on the entry and logs it", marked.code === 0 && JSON.stringify(json(sheetPath).entries[0].landed) === JSON.stringify({ commits: [sha] }) && lines(join(w.ws, "arcs", "N001", "log.jsonl")).at(-1).note.includes("landed"), marked.out);
+  const after = run("check", "N001");
+  ok("[MKT.SCRIPTS.662] sheet check accepts a landed change and a landed judged change in place of a patch", !after.out.includes("has no patch"), after.out);
+  const kept = json(sheetPath);
+  kept.entries[0].landed = { commits: [elsewhere] };
+  writeFileSync(sheetPath, JSON.stringify(kept, null, 2));
+  const moved = run("check", "N001");
+  ok("[MKT.SCRIPTS.662] sheet check names a landed entry whose commit is not on the branch", moved.code === 1 && moved.out.includes("E1 is landed and names"), moved.out);
+  kept.entries[0].landed = { commits: [] };
+  writeFileSync(sheetPath, JSON.stringify(kept, null, 2));
+  const shape = run("check", "N001");
+  ok("[MKT.SCRIPTS.662] a landed field with no commits is a sheet fault", run("edit", "N001", "E1", "--what", "w2").out.includes("`landed` is not { commits"), shape.out);
+  kept.entries[0].landed = { commits: [sha] };
+  writeFileSync(sheetPath, JSON.stringify(kept, null, 2));
+  const cleared = run("edit", "N001", "E1", "--landed", "none");
+  ok("[MKT.SCRIPTS.662] `--landed none` takes the field away", cleared.code === 0 && json(sheetPath).entries[0].landed === undefined, cleared.out);
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — sheet` : `\n  all ${total} passed — sheet`);
 putBackConfig();
 process.exit(failed ? 1 : 0);

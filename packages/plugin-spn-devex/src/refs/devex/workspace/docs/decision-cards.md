@@ -4,7 +4,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
       "section": "The approach document — a workstream's, never a repository's",
-      "seen": "8afa1ec1"
+      "seen": "42957a09"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -51,6 +51,8 @@ The chapter is explicit, and this is the clause most often missed:
 outstanding is this question.** None is a lighter version of another, and none earns a looser
 answer. Each gets the full shape, every part, for every item, exactly as a document's `Open`
 section does.
+
+**Read the cards with `spn-devex workstream question list`, never by opening `questions.jsonl`.** With no workstream named it lists only the workstreams this window owns, because a window speaks of its own workstreams and no other (`RULE.DEVEX.WORKSPACE.236` · MUST · short). Another workstream's cards are read only when the developer names it, and every workstream's only with `--every`.
 
 The phrasing does not choose the shape; **what the person must do** chooses it:
 

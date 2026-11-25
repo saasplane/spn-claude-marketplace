@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/",
-      "seen": "b774f986"
+      "seen": "8ebd17f5"
     }
   ]
 }
@@ -278,6 +278,7 @@ A page owns one screen and is the only thing a route lands on. It reads the addr
 - **Declare a route once, as data, in the module that owns its page** (`RULE.SUPPORT.APPS.186` · MUST · skill:spn-apps/implement). A route is a key and a path. The key names the screen and carries the module's code. The app's router, a link and the app's menu all read that one declaration. A route holds no place in a menu, no older address and no router, so each app keeps its own router.
 - **A route also says which permissions and enablements it needs. Proposed** (`RULE.SUPPORT.APPS.187` · MUST · skill:spn-apps/implement).
 - **A module ships a default path for each route, and an app may replace a path by its key. Proposed** (`RULE.SUPPORT.APPS.188` · GUIDE).
+- **A route names the surface category its page serves, and an app may replace it by its key** (`RULE.SUPPORT.APPS.270` · MUST · skill:spn-apps/implement). The category follows from the person the page is for, so a module knows it, and an app that mounts the page for another person replaces it, as it replaces a path. A route that names none takes the app's main category. The app's router groups its routes by category and wraps each group once in `DSPageCategory`, so the page itself never names one, and the theme of that category reaches it. `getRouteCategory(routes, url, main)` gives the category of an address, for a part of the app that stands outside the router, such as its head.
 - **Build an address from a route and its values, by one function, and never write one as text** (`RULE.SUPPORT.APPS.189` · MUST · skill:spn-apps/implement). That a missing value is an error, and never an address, is proposed.
 - **The menu is the app's own list, and an entry names a route by its key** (`RULE.SUPPORT.APPS.190` · MUST · skill:spn-apps/implement). Its order, groups, labels and icons are the app's.
 - **The entry in view is the one whose address the current address is at or under** (`RULE.SUPPORT.APPS.191` · MUST · skill:spn-apps/implement). So the page of one record marks the entry of its list. That the longest address wins among several is proposed.

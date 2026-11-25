@@ -2,7 +2,7 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/05-design-languages.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
       "section": "A site's review walks the site",
       "seen": "426eb721"
     }

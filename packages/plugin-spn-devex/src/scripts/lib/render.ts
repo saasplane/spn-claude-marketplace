@@ -341,7 +341,7 @@ const bold = (html: string): string => /^<strong>[\s\S]*<\/strong>$/.test(html) 
  * with nothing to say is left out. The stylesheet tones and spaces the levels, so the cell carries no style.
  */
 function itemCell(title: string, line: string, facts: [string, string][]): string {
-  const said = facts.filter(([, value]) => !isBlank(value)).map(([key, value]) => `<span class="sds-fact-key">${esc(key)}</span><span class="sds-fact-value">${inline(value)}</span>`);
+  const said = facts.filter(([, value]) => !isBlank(value)).map(([key, value]) => `<span class="sds-fact-key">${esc(key)}</span><span class="sds-fact-value">${factHtml(value, key)}</span>`);
   return [
     isBlank(title) ? "" : `<p>${title}</p>`,
     isBlank(line) ? "" : `<p>${inline(line)}</p>`,
@@ -501,6 +501,8 @@ const ICONS: Record<string, string> = {
   "app-window": '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M10 4v4"/><path d="M2 8h20"/><path d="M6 4v4"/>',
   user: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
   circle: '<circle cx="12" cy="12" r="10"/>',
+  // MARKETPLACE's mark: a Seeker finds and chooses among records (041 N017, the developer: 'include MARKETPLACE as category').
+  search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.34-4.34"/>',
 };
 
 /** The drawings a `MEDIA_TOP` item may name: the four layouts' wireframes, and a plain frame for any other name. */
@@ -511,12 +513,16 @@ const WIRES: Record<string, string> = {
   canvas: '<rect class="box" x="50" y="22" width="60" height="52" rx="3"/><rect class="line" x="60" y="32" width="40" height="4" rx="2"/><rect class="line" x="60" y="44" width="40" height="6" rx="2"/><rect class="nav" x="60" y="58" width="40" height="8" rx="2"/>',
 };
 
-type CatalogItem = { name: string; line: string; third: string; facts: [string, string][]; quote?: string; note?: [string, string]; guidance?: [string, string][] };
+type CatalogItem = { name: string; line: string; third: string; anchor?: string; facts: [string, string][]; quote?: string; note?: [string, string]; guidance?: [string, string][]; detail?: [string, string][]; cases?: [string, string][] };
 /** The detail lines of an item that open under its row as one fold, "Guidance" (S77, the developer, 2026-11-24: "a row opens to its guidance"). */
 const GUIDANCE_KEYS = ["For", "Choose when", "Not when", "Rules"];
+/** The lines that say how a kind is laid out, opening in a fold of their own, "Detail" (a page kind's level and order, the default case), and one `Case: Name | when` line for each case, a fold "Cases". */
+const DETAIL_KEYS = ["Default case", "At level", "Order"];
 function guidanceHtml(item: CatalogItem): string {
-  if (!item.guidance?.length) return "";
-  return `<details class="sds-fold sds-guidance"><summary>Guidance</summary>${item.guidance.map(([key, value]) => key === "Rules" ? `<p class="sds-small"><strong>${esc(key)}</strong> <span class="sds-guidance-ids">${value.split(/\s+/).filter(Boolean).map((id) => `<span>${esc(id)}</span>`).join("")}</span></p>` : `<p class="sds-small"><strong>${esc(key)}</strong> ${inline(value)}</p>`).join("")}</details>`;
+  const detail = item.detail?.length ? `<details class="sds-fold sds-guidance"><summary>Detail</summary>${item.detail.map(([key, value]) => `<p class="sds-small"><strong>${esc(key)}</strong> ${inline(value)}</p>`).join("")}</details>` : "";
+  const cases = item.cases?.length ? `<details class="sds-fold sds-guidance"><summary>Cases</summary><ul class="sds-small">${item.cases.map(([name, when]) => `<li><strong>${inline(name)}</strong>${when ? ` ${inline(when)}` : ""}</li>`).join("")}</ul></details>` : "";
+  if (!item.guidance?.length) return detail + cases;
+  return detail + cases + `<details class="sds-fold sds-guidance"><summary>Guidance</summary>${item.guidance.map(([key, value]) => key === "Rules" ? `<p class="sds-small"><strong>${esc(key)}</strong> <span class="sds-guidance-ids">${value.split(/\s+/).filter(Boolean).map((id) => `<span>${esc(id)}</span>`).join("")}</span></p>` : `<p class="sds-small"><strong>${esc(key)}</strong> ${inline(value)}</p>`).join("")}</details>`;
 }
 type CatalogGroup = { name: string | null; items: CatalogItem[] };
 
@@ -549,8 +555,11 @@ function catalogLines(body: string[], findings: Finding[]): CatalogGroup[] {
       if (quote) { item.quote = quote[1].trim(); continue; }
       const note = /^\s+~\s*([^:]+?):\s+(\S.*)$/.exec(raw);
       if (note) { item.note = [note[1].trim(), note[2].trim()]; continue; }
+      if (fact && fact[1].trim() === "Anchor" && /^[a-z0-9][a-z0-9-]*$/.test(fact[2].trim())) { item.anchor = fact[2].trim(); continue; }
       const detail = GUIDANCE_KEYS.find((key) => key !== "For" && fact?.[1].trim() === key);
       if (fact && detail) { (item.guidance ??= []).push([detail, fact[2].trim()]); continue; }
+      if (fact && DETAIL_KEYS.includes(fact[1].trim())) { (item.detail ??= []).push([fact[1].trim(), fact[2].trim()]); continue; }
+      if (fact && fact[1].trim() === "Case") { const [name, ...when] = fact[2].split(/\s+\|\s+/); (item.cases ??= []).push([name.trim(), when.join(" | ").trim()]); continue; }
       // A line of tags alone is a fact with no key, drawn as bare badges; it is allowed only as the item's one fact (S75).
       if (/^\s+(\[[^\]\[]+\]\s*)+$/.test(raw)) { item.facts.push(["", raw.trim()]); continue; }
       if (!fact || fact[1].trim().split(/\s+/).length > 3) { findings.push({ message: `a \`catalog\` fact is \`Key: value\`, with a key of a word or two, never a sentence: "${raw.trim()}"` }); continue; }
@@ -613,10 +622,92 @@ export function sideFactKeys(items: CatalogItem[]): string[] | null {
   return keys.length <= 2 ? keys : null;
 }
 
+/** The value of a fact as JSON when it is an object or a list (a whole value in backticks or bare), else null. A string, a number or an empty one is not. */
+function jsonOf(value: string): unknown | null {
+  const text = value.trim().replace(/^`([^`]+)`$/, "$1").trim();
+  if (!/^[\[{]/.test(text)) return null;
+  try {
+    const parsed = JSON.parse(text);
+    return parsed !== null && typeof parsed === "object" && Object.keys(parsed).length ? parsed : null;
+  } catch { return null; }
+}
+
+/** A key in words: `roomAndLayouts` is "Room and layouts", `MARKETING_SITE` is "Marketing site". */
+export function keyInWords(key: string): string {
+  const spaced = key.replace(/[_-]+/g, " ").replace(/([a-z0-9])([A-Z])/g, "$1 $2").replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2").trim().toLowerCase();
+  return spaced ? spaced[0].toUpperCase() + spaced.slice(1) : key;
+}
+
+let jsonPopovers = 0;
+
+/** One JSON scalar: an enum code in code font, other text as text. */
+function jsonScalar(v: unknown): string {
+  if (typeof v === "string") return /^[A-Z][A-Z0-9_]*$/.test(v) ? `<code>${esc(v)}</code>` : esc(v);
+  return `<code>${esc(String(v))}</code>`;
+}
+
+/** One JSON value in words: a scalar, a list of scalars as small tags, or an indented list of keys (a list of objects is one entry each). */
+function jsonValue(v: unknown): string {
+  if (Array.isArray(v)) {
+    if (v.every((one) => one === null || typeof one !== "object")) return `<ul class="sds-json-tags">${v.map((one) => `<li>${jsonScalar(one)}</li>`).join("")}</ul>`;
+    return `<dl class="sds-json-nest">${v.map((one, i) => `<div><dt>${i + 1}</dt><dd>${jsonValue(one)}</dd></div>`).join("")}</dl>`;
+  }
+  if (v !== null && typeof v === "object") return jsonList(v as Record<string, unknown>, true);
+  return jsonScalar(v);
+}
+
+function jsonList(obj: Record<string, unknown>, nested: boolean): string {
+  return `<dl class="${nested ? "sds-json-nest" : "sds-json-list"}">${Object.entries(obj).map(([key, v]) => `<div><dt>${esc(keyInWords(key))}</dt><dd>${jsonValue(v)}</dd></div>`).join("")}</dl>`;
+}
+
+/** The pretty JSON with quiet colours: a key, a string, a number, and a boolean or null each take their own class. */
+function jsonColoured(pretty: string): string {
+  return esc(pretty).replace(/("(?:[^"\\\n]|\\.)*")(\s*:)?|\b(true|false|null)\b|(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/g,
+    (m, str, colon, word, num) => str ? (colon ? `<span class="sds-jk">${str}</span>${colon}` : `<span class="sds-js">${str}</span>`) : word ? `<span class="sds-jb">${word}</span>` : `<span class="sds-jn">${num}</span>`);
+}
+
+/**
+ * A fact whose value is a JSON object or list (RULE.DEVEX.WORKSPACE.580): a chip with a tree icon, its first keys in words and its count, and a native dialog it
+ * opens (the page script calls showModal). The dialog's head names the fact, with Copy JSON and a close button; its body is two panels,
+ * the value in words and the formatted JSON.
+ */
+function jsonFact(json: unknown, name: string): string {
+  const id = `sds-json-${++jsonPopovers}`;
+  const keys = Array.isArray(json) ? [] : Object.keys(json as object);
+  const title = name.replace(/<[^>]*>/g, "").trim() || (Array.isArray(json) ? "List" : "Values");
+  const label = Array.isArray(json) ? (json.every((one) => one === null || typeof one !== "object") ? json.slice(0, 2).map((one) => keyInWords(String(one))).join(", ") : title) : keys.slice(0, 2).map(keyInWords).join(", ");
+  const body = Array.isArray(json) ? jsonValue(json) : jsonList(json as Record<string, unknown>, false);
+  const pretty = JSON.stringify(json, null, 2);
+  const attr = pretty.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+  // The design system's overlay scale (extent.ts): two panels side by side need XL (720px) or more, so a short value (at most 24 formatted lines, none over 56 characters) takes XL and a longer one FIT (capped at 85vw).
+  const lines = pretty.split("\n");
+  const extent = lines.length <= 24 && Math.max(...lines.map((l) => l.length)) <= 56 ? "XL" : "FIT";
+  const close = `<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><path d="M3.5 3.5l9 9m0-9l-9 9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+  const icon = (cls: string, paths: string) => `<svg class="${cls}" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
+  const copyIcon = icon("sds-json-ico-copy", `<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>`);
+  const checkIcon = icon("sds-json-ico-check", `<path d="M20 6 9 17l-5-5"/>`);
+  const tree = `<svg class="sds-json-mark" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12h-8"/><path d="M21 6H8"/><path d="M21 18h-8"/><path d="M3 6v4c0 1.1.9 2 2 2h3"/><path d="M3 10v6c0 1.1.9 2 2 2h3"/></svg>`;
+  return `<button type="button" class="sds-json-chip" data-json-open="${id}" aria-haspopup="dialog" aria-expanded="false" aria-label="${esc(label)}, JSON value, opens a dialog">${tree}<span class="sds-json-label">${esc(label)}</span></button>`
+    + `<dialog id="${id}" class="sds-json-dialog" data-extent="${extent}" aria-labelledby="${id}-t">`
+    + `<div class="sds-json-head"><div class="sds-json-titles"><div class="sds-json-title" id="${id}-t" role="heading" aria-level="2">${esc(title)}</div></div>`
+    + `<button type="button" class="sds-json-close" aria-label="Close" autofocus>${close}</button></div>`
+    + `<div class="sds-json-body"><section class="sds-json-words" role="region" tabindex="0" aria-label="In words"><div class="sds-json-cap">In words</div>${body}</section>`
+    + `<section class="sds-json-code"><div class="sds-json-caprow"><div class="sds-json-cap">JSON</div>`
+    + `<button type="button" class="sds-json-copy" aria-label="Copy JSON" data-tip="Copy JSON" data-json="${attr}">${copyIcon}${checkIcon}</button></div>`
+    + `<div class="sds-json-scroll" role="region" tabindex="0" aria-label="JSON"><pre><code>${jsonColoured(pretty)}</code></pre></div>`
+    + `<span class="sds-json-live" role="status" aria-live="polite"></span></section></div></dialog>`;
+}
+
+/** A fact's value drawn inline: a JSON object or list as a chip with its dialog (named by the fact's key), anything else as words (`inline`). */
+function factHtml(value: string, key = ""): string {
+  const json = jsonOf(value);
+  return json === null ? inline(value) : jsonFact(json, key);
+}
+
 /** A fact's value: words as written, or tags where the value is only bracketed codes (`[UNIT] [COMPONENT]`), each drawn as a badge, for a value from a closed set. */
-export function factValue(value: string): string {
+export function factValue(value: string, key = ""): string {
   const tags = /^\s*(\[[^\]\[]+\]\s*)+$/.test(value) ? [...value.matchAll(/\[([^\]]+)\]/g)].map((m) => m[1].trim()) : null;
-  return tags ? `<span class="sds-tags">${tags.map((tag) => `<span class="sds-badge">${esc(tag)}</span>`).join(" ")}</span>` : inline(value);
+  return tags ? `<span class="sds-tags">${tags.map((tag) => `<span class="sds-badge">${esc(tag)}</span>`).join(" ")}</span>` : factHtml(value, key);
 }
 
 /** Every fact name a set of items holds, in first-seen order; a keyless fact (tags alone) names none. */
@@ -628,19 +719,22 @@ function factKeys(items: CatalogItem[]): string[] {
 
 /** One fact as a definition: its key over its value, or, with no key, the value's tags alone. */
 function factCell(key: string, value: string): string {
-  return key ? `<div><dt>${inline(key)}</dt><dd>${factValue(value)}</dd></div>` : `<div class="sds-tile-fact-bare"><dt hidden>Tags</dt><dd>${factValue(value)}</dd></div>`;
+  return key ? `<div><dt>${inline(key)}</dt><dd>${factValue(value, key)}</dd></div>` : `<div class="sds-tile-fact-bare"><dt hidden>Tags</dt><dd>${factValue(value)}</dd></div>`;
 }
 
 /** The cards of one set of items, as the fence's layout and media draw them. Without either, and with no facts, the one-line tile of old. */
+/** An item's anchor as the id of its row or tile: an item that holds an `Anchor:` line (S87: the entry a sample's note links to). */
+const anchorAttr = (item: CatalogItem): string => (item.anchor ? ` id="${item.anchor}"` : "");
+
 function catalogHtml(items: CatalogItem[], layout: string | null, media: string | null, findings: Finding[], compact = false, factsAt: string | null = null): string {
-  const hasFacts = items.some((item) => item.facts.length || item.quote || item.note || item.guidance?.length);
+  const hasFacts = items.some((item) => item.facts.length || item.quote || item.note || item.guidance?.length || item.detail?.length || item.cases?.length);
   const words = (text: string): number => text.trim().split(/\s+/).filter(Boolean).length;
   const longForCards = items.some((item) => words(item.name) > 4 || words(item.line ?? "") > 15 || item.facts.length > 3 || item.facts.some(([, value]) => words(value) > 5));
   if (!layout && longForCards) findings.push({ message: "these items are long for cards: layout=LIST (rule 549)" });
   const condition = items.find((item) => readsAsCondition(item.name));
   if (condition) findings.push({ message: `a \`catalog\` item "${condition.name}" reads as a condition: a first column of conditions is a table (rule 549)` });
   if (!layout && !media && !hasFacts) {
-    const tiles = items.map(({ name, line, third }) => `    <div class="sds-tile"><h4>${inline(name)}</h4>${line ? `<p>${inline(line)}</p>` : ""}${third ? `<p class="sds-small"><code>${esc(third.replace(/^`|`$/g, ""))}</code></p>` : ""}</div>`);
+    const tiles = items.map((item) => { const { name, line, third } = item; return `    <div class="sds-tile"${anchorAttr(item)}><h4>${inline(name)}</h4>${line ? `<p>${inline(line)}</p>` : ""}${third ? `<p class="sds-small"><code>${esc(third.replace(/^`|`$/g, ""))}</code></p>` : ""}</div>`; });
     return `  <div class="sds-tiles">\n${tiles.join("\n")}\n  </div>`;
   }
   const kind = layout ?? "GRID";
@@ -657,9 +751,9 @@ function catalogHtml(items: CatalogItem[], layout: string | null, media: string 
   if (inGroup && kind === "LIST" && !media) {
     const rows = items.map((item) => {
       const tags = item.facts.find(([, value]) => /^\s*(\[[^\]\[]+\]\s*)+$/.test(value));
-      const small = item.facts.filter((fact) => fact !== tags).map(([key, value]) => `${key ? `<span class="sds-fact-key">${inline(key)}</span>` : ""}<span class="sds-fact-value">${inline(value)}</span>`);
+      const small = item.facts.filter((fact) => fact !== tags).map(([key, value]) => `${key ? `<span class="sds-fact-key">${inline(key)}</span>` : ""}<span class="sds-fact-value">${factHtml(value, key)}</span>`);
       const badge = tags ? factValue(tags[1]) : "";
-      return `      <tr><td><p><strong>${inline(item.name)}</strong></p>${item.line ? `<p>${inline(item.line)}</p>` : ""}${small.length ? `<span class="sds-small sds-facts">${small.join(" &middot; ")}</span>` : ""}${guidanceHtml(item)}</td>${items.some((one) => one.facts.some(([, value]) => /^\s*(\[[^\]\[]+\]\s*)+$/.test(value))) ? `<td>${badge}</td>` : ""}</tr>`;
+      return `      <tr${anchorAttr(item)}><td><p><strong>${inline(item.name)}</strong></p>${item.line ? `<p>${inline(item.line)}</p>` : ""}${small.length ? `<span class="sds-small sds-facts">${small.join(" &middot; ")}</span>` : ""}${guidanceHtml(item)}</td>${items.some((one) => one.facts.some(([, value]) => /^\s*(\[[^\]\[]+\]\s*)+$/.test(value))) ? `<td>${badge}</td>` : ""}</tr>`;
     });
     return `  <div class="sds-scroll"><table>\n    <tbody>\n${rows.join("\n")}\n    </tbody>\n  </table></div>`;
   }
@@ -706,7 +800,7 @@ function catalogHtml(items: CatalogItem[], layout: string | null, media: string 
     if (kind === "LIST" && side) {
       const cells = side.map((key) => { const found = item.facts.find(([name]) => name === key); return found ? factCell(key, found[1]) : `<div class="sds-tile-fact-none"></div>`; });
       const mediaHtml = kept ? mediaOf(kept, item, findings) : "";
-      return `    <div class="sds-tile"><div class="sds-tile-main">${mediaHtml}<div class="sds-tile-body">${words}</div></div>\n      <dl class="sds-tile-facts">${cells.join("")}</dl></div>`;
+      return `    <div class="sds-tile"${anchorAttr(item)}><div class="sds-tile-main">${mediaHtml}<div class="sds-tile-body">${words}</div></div>\n      <dl class="sds-tile-facts">${cells.join("")}</dl></div>`;
     }
     if (kind === "LIST") {
       const mediaHtml = kept ? mediaOf(kept, item, findings) : "";
@@ -714,11 +808,11 @@ function catalogHtml(items: CatalogItem[], layout: string | null, media: string 
       const shown = below && item.facts.length && !bare
         ? `<dl class="sds-tile-facts" data-columns="${Math.min(below.length, 3)}">${below.map((key) => { const found = item.facts.find(([name]) => name === key); return found ? factCell(key, found[1]) : `<div class="sds-tile-fact-none"></div>`; }).join("")}</dl>`
         : facts;
-      return `    <div class="sds-tile">${mediaHtml}<div class="sds-tile-body">${words}\n      ${shown}${guidanceHtml(item)}</div></div>`;
+      return `    <div class="sds-tile"${anchorAttr(item)}>${mediaHtml}<div class="sds-tile-body">${words}\n      ${shown}${guidanceHtml(item)}</div></div>`;
     }
-    if (kept === "MEDIA_TOP") return `    <div class="sds-tile"${count}>${mediaOf(kept, item, findings)}\n      <div class="sds-tile-head"><div>${words}</div></div>\n      ${facts}</div>`;
-    if (kept) return `    <div class="sds-tile"${count}><div class="sds-tile-head">${mediaOf(kept, item, findings)}<div>${words}</div></div>\n      ${facts}</div>`;
-    return `    <div class="sds-tile"${count}><h4>${inline(item.name)}</h4>${item.line ? `<p class="sds-tile-line">${inline(item.line)}</p>` : ""}${item.third ? `<p class="sds-small"><code>${esc(item.third.replace(/^`|`$/g, ""))}</code></p>` : ""}\n      ${facts}</div>`;
+    if (kept === "MEDIA_TOP") return `    <div class="sds-tile"${anchorAttr(item)}${count}>${mediaOf(kept, item, findings)}\n      <div class="sds-tile-head"><div>${words}</div></div>\n      ${facts}</div>`;
+    if (kept) return `    <div class="sds-tile"${anchorAttr(item)}${count}><div class="sds-tile-head">${mediaOf(kept, item, findings)}<div>${words}</div></div>\n      ${facts}</div>`;
+    return `    <div class="sds-tile"${anchorAttr(item)}${count}><h4>${inline(item.name)}</h4>${item.line ? `<p class="sds-tile-line">${inline(item.line)}</p>` : ""}${item.third ? `<p class="sds-small"><code>${esc(item.third.replace(/^`|`$/g, ""))}</code></p>` : ""}\n      ${facts}</div>`;
   });
   const head = side ? `    <div class="sds-tiles-head" aria-hidden="true"><span>${inline(catalogNoun)}</span>${side.map((key) => `<span>${inline(key)}</span>`).join("")}</div>\n` : "";
   return `  <div class="sds-tiles${compact ? " sds-tiles-compact" : ""}" data-layout="${kind}"${side ? ` data-facts="side" data-columns="${side.length}"` : ""}${kept ? ` data-media="${kept}"` : ""}>\n${head}${tiles.join("\n")}\n  </div>`;
@@ -732,7 +826,7 @@ let inGroup = false;
 /**
  * A `catalog` fence: ```catalog layout=GRID|LIST|TABLE media=ICON|MARK|AVATAR|AVATAR_GROUP|MEDIA_TOP facts=END|AFTER_DESCRIPTION (LIST only). The item line is
  * `Name | one line | third`, and the third cell is the literal (a code line) where the fence has no media, the icon's name with
- * ICON and MARK (`globe`, `file`, `file-x`, `shield`, `key`, `app-window`, `user`), the initials with AVATAR, a comma list of
+ * ICON and MARK (`globe`, `file`, `file-x`, `shield`, `key`, `app-window`, `user`, `circle`, `search`), the initials with AVATAR, a comma list of
  * initials with AVATAR_GROUP, and a drawing's name with MEDIA_TOP (`rail`, `dock`, `topnav`, `canvas`). With two or more
  * `## Group` lines, each group is a panel and a row of links above them jumps to each.
  */
@@ -1175,6 +1269,7 @@ export function renderPage(opts: {
   const previousRewrite = rewriteHref, previousRoot = pageRoot;
   rewriteHref = opts.link ?? ((h) => h);
   pageRoot = opts.root ?? null;
+  jsonPopovers = 0;
   try {
     return renderPageBody(opts);
   } finally {

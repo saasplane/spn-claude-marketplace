@@ -2,9 +2,9 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/06-architecture-components.md",
+      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/07-architecture-components.md",
       "section": "The choice table",
-      "seen": "15f17128"
+      "seen": "5c7c26f4"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/04-plugins.md",
@@ -37,16 +37,16 @@ The one way into this plugin's Surface refs. Find your job below, and read its r
 
 ## 1. Design a page or a flow
 
-Run the `design` skill. It reads these refs in its own order, and states each page as a tree of named blocks.
+Run the `design` skill. It names the surface category first: MARKETING (a Visitor), RESOURCES (a Learner) and MARKETPLACE (a Seeker) are site categories, DASHBOARD (a Team) and PORTAL (an Individual) are app categories, and it reads the design language's row for that category. It reads these refs in its own order, and states each page as a tree of named blocks (JSON, as the book's page render states).
 
 | Order | What it settles | Ref |
 | --- | --- | --- |
-| the person | the kind of person the app is for, what each kind changes, the levels of a page and the rules of content | `standards-core.md` |
+| the person | the person the app is for, what each person changes, the surface categories, the levels of a page and the rules of content | `standards-core.md` |
 | the flow | the flow the page is a step of, its steps and its task states | `flow-patterns.md` |
 | the layout | the navigation, and the content the page gets | `architecture-layouts.md` |
-| the pattern | the app pattern of a screen, its tree by level and its spec; how a skeleton and a flow file are written | `standards-patterns.md`, with the specs in `app-patterns/` |
-| the pattern, on a site | the site pattern of each section, its look and its spec | `site-patterns.md`, with the specs in `site-patterns/` |
-| the design language, on a site or an app | the look every page of it reads before it chooses: its emphasis, its parting, its backdrops and its motion | `design-languages.md`, with the starting list in `design-languages/` |
+| the page kind | the app page kind of a screen, its tree by level and its spec; the task patterns; how a skeleton and a flow file are written | `standards-patterns.md`, with the specs in `app-patterns/` |
+| the page kind and the container kinds, on a site | the site page kind and the order of its sections, then the container kind of each section, its look and its spec | `site-patterns.md`, with the specs in `site-patterns/` |
+| the design language, on a site or an app | the look every page of it reads before it chooses: the category's row of eight parts, Structure and Style, after Shared; a site page's kind is picked from the language's Pages, and an app category's Pages state no kinds | `design-languages.md`, with the starting list in `design-languages/` |
 | the panels | which parts are framed, a panel's parts, the card and the section | `architecture-containers.md` |
 | the tasks | the six parts of a pattern, the task patterns and the six task states | `standards-interaction.md` |
 | the blocks: widgets | the card widget and what a widget holds | `architecture-widgets.md` |

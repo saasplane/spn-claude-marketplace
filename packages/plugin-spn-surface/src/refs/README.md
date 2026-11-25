@@ -16,6 +16,10 @@
 
 **How a block is built in a stack, and where a web module's files sit, are the stack's, and no Surface ref names them.** spn-apps points into this plugin, at its entry ref `support/surface/README.md`, and this plugin names nothing in spn-apps: a pointer runs only toward a plugin the same world always loads, and never back.
 
+## The four categories
+
+**A surface is MARKETING, MARKETPLACE, RESOURCES, DASHBOARD or PORTAL**: the first three are sites, for a Visitor, a Seeker and a Learner, and the last two are apps, for a Team and an Individual. The design language holds each category as a row of eight parts, Structure and Style, after a Shared group.
+
 ## What is copied
 
 **Two folders of specs**: [`support/surface/app-patterns/`](support/surface/app-patterns/) and [`support/surface/site-patterns/`](support/surface/site-patterns/), byte-identical to the book's, each with an index written by `restates files write`. The book owns every file in them.

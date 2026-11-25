@@ -494,6 +494,11 @@ export type SheetEntry = {
   work?: string | null;
   /** The entry's change kept as a diff (`sheet patch`): the file under `patches/` and the commit it was diffed against. */
   patch?: { file: string; base: string } | null;
+  /**
+   * The commits that already carry the change on the arc's branch (`sheet edit --landed`): the entry stands in place of a patch, the go
+   * plans no part for it and applies nothing, and the repository's full run proves it (041 Q72).
+   */
+  landed?: { commits: string[] } | null;
   /** The thinking behind the change, kept with its diff; required on a new entry, and read as "" on a sheet written before it. */
   trace?: string;
   /** Whether the change is a judgment (true) or mechanical (false); required on a new entry, and read as false on a sheet written before it. */
@@ -560,6 +565,11 @@ export function sheetFaults(data: unknown, where = "sheet.json"): string[] {
       const patch = entry.patch;
       if (!isObject(patch) || typeof patch.file !== "string" || !/^patches\/[^\s]+$/.test(patch.file) || typeof patch.base !== "string" || !/^[0-9a-f]{7,40}$/i.test(patch.base))
         out.push(`${label}'s \`patch\` is not { file under patches/, base a commit }`);
+    }
+    if (entry.landed !== undefined && entry.landed !== null) {
+      const landed = entry.landed;
+      if (!isObject(landed) || !Array.isArray(landed.commits) || !landed.commits.length || landed.commits.some((one) => typeof one !== "string" || !/^[0-9a-f]{7,40}$/i.test(one)))
+        out.push(`${label}'s \`landed\` is not { commits: a list of commits }`);
     }
     if (Array.isArray(entry.facts) && !entry.facts.length) out.push(`${label} names no fact`);
     if (entry.tiers === undefined) out.push(`${label} has no \`tiers\``);

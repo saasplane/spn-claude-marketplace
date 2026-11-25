@@ -1,7 +1,7 @@
-// RESTATES: docs/04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md
+// RESTATES: docs/04-capabilities/02-support/01-surface/07-architecture-components/01-common/01-components.md
 // § Actions, § The badge, § The choice table of `DSBadge` and § The choice table of `DSButton`;
-// docs/04-capabilities/02-support/01-surface/08-architecture-containers/01-common/01-container.md;
-// docs/04-capabilities/02-support/01-surface/10-architecture-app/01-common/02-settings-and-theme.md;
+// docs/04-capabilities/02-support/01-surface/09-architecture-containers/01-common/01-container.md;
+// docs/04-capabilities/02-support/01-surface/11-architecture-app/01-common/02-settings-and-theme.md;
 // RULE.SUPPORT.SURFACE.368, .369, .370, .374, .378, .382, .384, .385, .390, .263 and RULE.SUPPORT.APPS.147, .150.
 //
 // The notes of the Surface check, each a soft note to the agent naming its book row and the fix

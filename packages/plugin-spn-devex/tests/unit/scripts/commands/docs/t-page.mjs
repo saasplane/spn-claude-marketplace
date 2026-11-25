@@ -310,6 +310,7 @@ const exitIn = (cwd, args) => {
 };
 const USAGE = "usage: spn-devex docs page check <seat…>\n" +
               "       spn-devex docs page write <seat…>\n" +
+              "       spn-devex docs page stamp <overview…>\n" +
               "       spn-devex docs page new <kind> <path> [--name <name>] [--workstream <NNN-subject>] [--arc <arc>]\n";
 
 console.log("\n=== `docs page` needs its action as a word, and both actions need a seat file");
@@ -400,6 +401,24 @@ console.log("\n=== `docs page` needs its action as a word, and both actions need
   one("a run that read no construct seat says so rather than printing nothing",
     run(root, ["page", "check", bare]), (got) => got.includes("no construct seat file under that path"));
   one("and exits 1", exitOfRun(["page", "check", bare]), 1);
+}
+
+{
+  // The surface page's stylesheet and script (N017, S87): the bar pads by the docs page's pad, the frame is the stage's full width scaled to fit, the
+  // notes are a layer above it, the markup is swapped by device and mode, and a #anchor reaches the frame.
+  const css = readFileSync(resolve(PLUGIN, "src", "styles", "docs-language.src.css"), "utf8");
+  const js = readFileSync(resolve(PLUGIN, "src", "styles", "docs-page.js"), "utf8");
+  const block = (name) => new RegExp(`\\.${name}\\s*\\{([^}]*)\\}`).exec(css)?.[1] ?? "";
+  one("the surface bar pads its sides by --sds-page-pad as the docs page bar does, 16px under 40rem, and keeps one line on a desktop",
+    /padding:[^;]*var\(--sds-page-pad\)/.test(block("sds-surface-bar")) && /flex-wrap:\s*nowrap/.test(block("sds-surface-bar")) && /@media \(max-width: 40rem\) \{ \.sds-surface-bar \{[^}]*padding-inline: 16px/.test(css), true, () => block("sds-surface-bar"));
+  one("the frame takes the stage's full width, scaled to fit and never above 1, centred so the right is never cropped",
+    /Math\.min\(1, room \/ w\)/.test(js) && /stage\.clientWidth/.test(js) && /marginLeft = left/.test(js) && /desktop: 1440, tablet: 768, phone: 390/.test(js), true);
+  one("the notes are drawn in a layer above the frame from the JSON list, a numbered label for each top-level section, and nothing when Notes is off",
+    /\.sds-surface-notes\s*\{[^}]*position:\s*absolute[^}]*pointer-events:\s*none/.test(css) && js.includes("getElementById('sample-notes')") && js.includes("layer.hidden = !state.notes") && js.includes("[data-slot=section-container]") && js.includes("note.n | 0"), true);
+  one("the switches pick the template for the device and mode and swap the frame's markup, and restyle only where none was rendered",
+    js.includes("'page-' + mode + '-' + device") && js.includes("frame.srcdoc = pageDocument(want)") && js.includes("else set()") && js.includes("setAttribute('data-mode', state.mode)"), true);
+  one("a #id in the page's address scrolls the frame to that element, and follows hash changes",
+    js.includes("addEventListener('hashchange', anchor)") && js.includes("doc.getElementById(id)") && js.includes("notes[i].kind === id") && js.includes("scrollIntoView"), true);
 }
 
 console.log(failed ? `\n  ${failed} of ${n} FAILED` : `\n  all ${n} passed`);

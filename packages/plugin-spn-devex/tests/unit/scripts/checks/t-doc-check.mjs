@@ -1163,5 +1163,17 @@ console.log("\n=== doc-check — every page from a template, a shown command, an
   say("[MKT.HOOKS.532] every hint the hook adds stays advisory: the note is no refusal", written?.deny === undefined && catalog?.deny === undefined);
 }
 
+{
+  console.log("\n=== doc-check — a surface page: markup per device and mode, notes outside (N017, S87)");
+  const { surfacePageShape } = await import("../../../../src/scripts/checks/doc-check.ts");
+  const page = (inside, notes = "[]") => `<!-- spn:doc\n{"id": "surface-page-x", "variant": "surface-page", "title": "X"}\n-->\n<meta name="surface-ds" content="11.21.0"><meta name="surface-app-css" content="">\n` +
+    '<div class="sds-surface"><header class="sds-surface-bar"><h1 class="sds-surface-title">X</h1><button data-surface="width"></button><button data-surface="mode"></button><button data-surface="notes"></button></header>' +
+    `<main class="sds-surface-stage"><iframe class="sds-surface-frame"></iframe><div class="sds-surface-notes" hidden></div></main></div>\n<script type="application/json" id="sample-notes">${notes}</script>\n${inside}\n`;
+  const sayit = (label, okay) => { n += 1; if (!okay) failed += 1; console.log(`  ${okay ? "PASS" : "FAIL"}  ${label}`); };
+  sayit("[MKT.HOOKS.522] green: a template for a device and mode with the notes list outside draws nothing", surfacePageShape(page('<template id="page-DARK-PHONE"><section>a</section></template>', '[{"n":1}]')).length === 0);
+  sayit("[MKT.HOOKS.522] red: a section wrapper or a note aside inside the markup is refused", surfacePageShape(page('<template id="page-LIGHT-DESKTOP"><div data-section="1"><aside class="sds-note">x</aside></div></template>')).length === 1);
+  sayit("[MKT.HOOKS.522] red: a notes list that is no JSON list is refused", surfacePageShape(page('<template id="page-LIGHT-DESKTOP"></template>', "{nope")).length === 1);
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

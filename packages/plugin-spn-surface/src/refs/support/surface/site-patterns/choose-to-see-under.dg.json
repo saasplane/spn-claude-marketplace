@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "Choose to see, under",
- "caption": "A DSSectionContainer, color BASE, holds one DSFeature at MEDIA_BOTTOM. Its mediaNode is a DSTabs at pageLevel CONTAINER with type PILL, grouped on its track, its names one or two words. The tabs only choose which panel is open, and the open tab's panel is the page's own node: the tab's line, one description that says what only this part says, then its picture at the feature's full width, every panel's picture one shape. On a phone the words, then the pills, which keep one row and scroll sideways, then the open tab's line, its description and its picture, which scrolls sideways in its own frame. The page that holds this section is wrapped once in DSSiteLayout.",
+ "caption": "A DSSectionContainer, color BASE, holds one DSFeature at MEDIA_BOTTOM. Its mediaNode is a DSTabs at pageLevel CONTAINER with type PILL, grouped on its track, its names one or two words. The tabs only choose which panel is open, and the open tab's panel is the page's own node: the tab's line, one description that says what only this part says, then its picture at the feature's full width, every panel's picture one shape. On a phone the words, then the pills, which keep one row and scroll sideways, then the open tab's line, its description and its picture, which scrolls sideways in its own frame. The page that holds this section is wrapped once in DSSitePage.",
  "layout": {
   "type": "TOPNAV",
   "body": {
