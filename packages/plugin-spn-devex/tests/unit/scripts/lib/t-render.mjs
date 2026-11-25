@@ -412,6 +412,8 @@ console.log("\n=== the page renderer — a catalog in three layouts, with media 
   ok("[MKT.SCRIPTS.614] media=MARK draws the icon in a mark, and an icon that is not named is a finding with a plain circle",
     made(fence("catalog media=MARK", "Site | a site | globe\n  For: a Visitor")).html.includes('data-media="MARK"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5')
       && made(fence("catalog media=MARK", "Site | a site | nonesuch\n  For: a Visitor")).findings.some((f) => f.message.includes("nonesuch")));
+  ok("[MKT.SCRIPTS.667] media=MARK draws MARKETPLACE's search icon, a lens and its handle, with no finding",
+    ((one) => one.html.includes('data-media="MARK"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.34-4.34"/>') && !one.findings.length)(made(fence("catalog media=MARK", "MARKETPLACE | a site for a Seeker | search\n  Person: Seeker"))));
   ok("[MKT.SCRIPTS.614] media=AVATAR draws initials, the name's first letter or the third cell",
     made(fence("catalog media=AVATAR", "Team | who work\n  Often: daily")).html.includes('data-media="AVATAR">T</span>') && made(fence("catalog media=AVATAR", "Team | who work | ab\n  Often: daily")).html.includes('data-media="AVATAR">AB</span>'));
   ok("[MKT.SCRIPTS.614] media=AVATAR_GROUP draws several overlapping initials",

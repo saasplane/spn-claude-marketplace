@@ -429,6 +429,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.664 | Builder | run only the plugin suites whose inputs changed | the full run reuses a package's last green run while its files, the root scripts, manifest and lockfile, the book chapters it restates and the packages it imports are as they were; the release's version field and a rebuilt `dist/` change no input | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.665 | Builder | never reuse a red run | a package whose suite went red, or whose record was taken on other inputs, runs; `--all` runs every package | NEGATIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.666 | Builder | read in the release commit which suites ran | `release:plugins prepare` names the suites that ran and each reused one with the run it came from | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.667 | Editor | mark MARKETPLACE with its own icon | a `catalog` item names `search`, and the page draws a lens and its handle with no finding | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

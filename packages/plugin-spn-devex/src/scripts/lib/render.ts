@@ -501,6 +501,8 @@ const ICONS: Record<string, string> = {
   "app-window": '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M10 4v4"/><path d="M2 8h20"/><path d="M6 4v4"/>',
   user: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
   circle: '<circle cx="12" cy="12" r="10"/>',
+  // MARKETPLACE's mark: a Seeker finds and chooses among records (041 N017, the developer: 'include MARKETPLACE as category').
+  search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.34-4.34"/>',
 };
 
 /** The drawings a `MEDIA_TOP` item may name: the four layouts' wireframes, and a plain frame for any other name. */
@@ -824,7 +826,7 @@ let inGroup = false;
 /**
  * A `catalog` fence: ```catalog layout=GRID|LIST|TABLE media=ICON|MARK|AVATAR|AVATAR_GROUP|MEDIA_TOP facts=END|AFTER_DESCRIPTION (LIST only). The item line is
  * `Name | one line | third`, and the third cell is the literal (a code line) where the fence has no media, the icon's name with
- * ICON and MARK (`globe`, `file`, `file-x`, `shield`, `key`, `app-window`, `user`), the initials with AVATAR, a comma list of
+ * ICON and MARK (`globe`, `file`, `file-x`, `shield`, `key`, `app-window`, `user`, `circle`, `search`), the initials with AVATAR, a comma list of
  * initials with AVATAR_GROUP, and a drawing's name with MEDIA_TOP (`rail`, `dock`, `topnav`, `canvas`). With two or more
  * `## Group` lines, each group is a panel and a row of links above them jumps to each.
  */
