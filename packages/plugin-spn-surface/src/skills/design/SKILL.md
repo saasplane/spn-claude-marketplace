@@ -15,7 +15,7 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "3ddb0036"
+      "seen": "c994eda0"
     }
   ]
 }
@@ -404,7 +404,7 @@ A tree is complete with no drawing. Draw it where the window holds the Figma con
 
 The page is a use case, composed from the published library in a file that is not a library file. It is never put into a library file. Where the drawing needs a block or a value the library lacks, that is a change of the library, and the connector makes it (`refs/support/surface/delivery-library.md`, under "A developer's hands are two, and you change the library through the connector"; before a connector write, read its heading "The connector's facts"). Read `skills/design/steps/change-library.md` and follow its walk, which is the record path: the plan from the snapshot, `spnutils apps surface record`, the drawing from the records by the plugin's code through the connector, `spnutils apps surface gaps` and its fixes in the drawing, and the read-back of each page. Name the developer's next step, and show the result. A child agent that sends `use_figma` cannot read the connector's own skill, so give a writer of one page `skills/design/steps/writer-brief.md` with its order, and any other child `skills/design/steps/connector-rules.md`. Never ask a developer to draw, rebind or confirm anything in Figma: a developer's hands are two, saving a named version before the connector's first change in a library file, which the connector cannot save, and publishing a file. Nothing else is asked.
 
-**Of units, the library draws the core units only** (`RULE.SUPPORT.SURFACE.082` · MUST · skill:spn-surface/design). The book does not name a unit that a stack provides on its own, so the library holds no published component for one, and the order of a change does not bind it. Surface's core composites are `DSDataTable`, `DSFilterBar`, `DSComparison` and `DSFeature`, and its core widget is `DSCardWidget`. The unit that places a list beside the detail of its chosen row is the web stack's own, `DSListDetail`, so the library holds none for it (`RULE.SUPPORT.SURFACE.099` · MUST · skill:spn-surface/design).
+**Of units, the library draws the core units only** (`RULE.SUPPORT.SURFACE.082` · MUST · skill:spn-surface/design). The book does not name a unit that a stack provides on its own, so the library holds no published component for one, and the order of a change does not bind it. Surface's core composites are `DSDataTable`, `DSFilterBar`, `DSFacetGroup`, `DSComparison`, `DSQuote` and `DSFeature`, and its core widget is `DSCardWidget`. The unit that places a list beside the detail of its chosen row is the web stack's own, `DSListDetail`, so the library holds none for it (`RULE.SUPPORT.SURFACE.099` · MUST · skill:spn-surface/design).
 
 **The library draws nothing of a pattern** (`RULE.SUPPORT.SURFACE.099` · MUST · skill:spn-surface/design). It holds the core units with their properties and their cases, the icons, and the places of the layout. It holds no task pattern, no app page kind, no skeleton and no sample page: a page or a pattern is composed from the published units on request. A stack's own unit that every stack should build joins the book first, and the library draws it then.
 

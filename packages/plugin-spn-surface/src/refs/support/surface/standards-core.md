@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/01-surface-types.md",
-      "seen": "e4a4dd1a"
+      "seen": "ab8db7f6"
     }
   ]
 }
@@ -147,7 +147,7 @@ A **person** is who an app is for, named by how they use it. It is never a busin
 
 ### How the person is read
 
-The person is read once for the app, from what the partner has already written: the personas whose rows land in the app, each behaviour row's *Who* and *Does*, and the industry brief where there is one. Then ask of each persona: do they use the app as their job? Do they use it for themselves? Are they still deciding? Did they come to learn? Write the person as the app's first fact, with where you read it.
+The person is read once for the app, from what the partner has already written: the personas whose rows land in the app, each behaviour row's *Who* and *Does*, and the industry brief where there is one. Then ask of each persona: do they use the app as their job? Do they use it for themselves? Are they still deciding? Did they come to learn? Did they come to find and choose one record among many? Write the person as the app's first fact, with where you read it.
 
 - **Where the personas and the rows do not say, the person MUST be asked, and never guessed** (`RULE.SUPPORT.SURFACE.330` · MUST · skill:spn-surface/design). A guessed person looks the same as a read one, so nobody would know to correct it.
 - **The person MUST NOT be read from the platform's tier** (`RULE.SUPPORT.SURFACE.330` · MUST · skill:spn-surface/design). An app on a consumer tier is for Individual, but a member business on an enterprise account is a Team, and a one-person account in a product sold to the public is an Individual.

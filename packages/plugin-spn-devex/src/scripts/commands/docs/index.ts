@@ -395,8 +395,10 @@ function run(args: string[], write: boolean): number {
       if (half === VISIBILITY.private && !pages.length) { console.log(`nothing to ${write ? "write" : "check"} — ${slashes(relative(repository, root))} holds no page`); return 0; }
       // The path to the pages is kept once, as `base`. It is empty where the index sits in the folder itself.
       const base = dirname(out) === root ? "" : `${slashes(relative(dirname(out), root))}/`;
-      // The hub is the first page of the tree. Where a repository has no hub, the first page stands for it.
+      // The way back is the repository's hub, the one the audit reads (`hubPage`), so the private index goes back across to
+      // `public/`. Where a repository has no hub, the first page of the tree stands for it.
       const first = groups.flatMap(entriesOf)[0]?.path ?? "";
+      const hubBack = existsSync(hubPage(docs)) ? slashes(relative(dirname(out), hubPage(docs))) : base + first;
       const headed = half ? { tab: `${named === "—" ? basename(repository) : named} ${half === VISIBILITY.public ? "Public" : "Private"}`, id: `${basename(repository)}-artifacts-${half}-index`,
         title: half === VISIBILITY.public ? "Public" : "Private",
         summary: `Every page of this repository's ${slashes(relative(repository, root))}, in one tree, one page open at a time.` } : undefined;
@@ -404,7 +406,7 @@ function run(args: string[], write: boolean): number {
         organisation: "SaaS Plane",
         location: named === "—" ? basename(repository) : named,
         repository,
-        hub: base + first,
+        hub: hubBack,
       }, headed);
       if (write) return say([...place(out, produce(), true, workspace, "index"), ...notes], workspace) ? 1 : 0;
 

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-widgets/",
-      "seen": "dae38f66"
+      "seen": "d077c231"
     }
   ]
 }
@@ -31,7 +31,7 @@ A widget's task states are the task state of `standards-interaction.md`, and thi
 
 A widget is built for one purpose. It is not a set of components a page composes one at a time; it is one piece, and the widget itself places and wires the parts inside it. A widget takes one size, from its own prop or from the block above it, and **its size sets its own spacing, never the size of what it holds** — a page sets one size for the whole widget, and never dresses its parts separately.
 
-**Surface's core widget is the card widget `DSCardWidget`** (`RULE.SUPPORT.SURFACE.127` · MUST · skill:spn-surface/design). Every stack builds it, and the design library draws it. The data table, the filter bar and the comparison are not widgets: each is a composite, a component of its own group (`RULE.SUPPORT.SURFACE.230` · MUST · skill:spn-surface/design). A stack may provide further widgets of its own, as `architecture-components.md` states under the core units and a stack's own. This ref does not name them, and the library does not draw them.
+**Surface's core widget is the card widget `DSCardWidget`** (`RULE.SUPPORT.SURFACE.127` · MUST · skill:spn-surface/design). Every stack builds it, and the design library draws it. The data table, the filter bar, the facet group, the comparison and the quote are not widgets: each is a composite, a component of its own group (`RULE.SUPPORT.SURFACE.230` · MUST · skill:spn-surface/design). A stack may provide further widgets of its own, as `architecture-components.md` states under the core units and a stack's own. This ref does not name them, and the library does not draw them.
 
 **A name ends in `Widget` only for a unit placed beside others** (`RULE.SUPPORT.SURFACE.229` · MUST · skill:spn-surface/design), with no letter for its layer before the name (`RULE.SUPPORT.SURFACE.098` · MUST · skill:spn-surface/design). `architecture-names.md` states the rule for the layers, and the names that belong to a widget.
 

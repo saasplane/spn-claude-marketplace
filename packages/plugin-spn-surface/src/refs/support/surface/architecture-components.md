@@ -820,7 +820,7 @@ The web builds the navigation units in place of `DSNavigationMenu` and the lists
 
 ## Composites — 🔮
 
-A composite is a block built from components that carries one task end to end, and a page places it whole: a data table finds and shows records, a filter bar narrows them, a facet group narrows a marketplace's results by many facets, a comparison sets subjects side by side, a quote sets a person's words beside who said them, a feature pitches a thing and asks the reader to act. A page does not reach inside one to rearrange its parts (`RULE.SUPPORT.SURFACE.230` · MUST · skill:spn-surface/design).
+A composite is a block built from components that carries one task end to end, and a page places it whole: a data table finds and shows records, a filter bar narrows them, a facet group narrows a marketplace's results by many facets, a comparison sets subjects side by side, a quote sets a person's or a company's words beside who said them, a feature pitches a thing and asks the reader to act. A page does not reach inside one to rearrange its parts (`RULE.SUPPORT.SURFACE.230` · MUST · skill:spn-surface/design).
 
 **A composite carries one task end to end, and no other component is built from it.** A component that others are built from stays in its group, however many parts it has: the item line, the list, the table and the card stay in Data display, because the rows of a list, the records of a data table, `DSCardWidget` and the header of a panel are built from them.
 
@@ -841,7 +841,7 @@ A composite owns its inner wiring and its size. It takes one size, from its own 
 | `DSQuote` | How does a site show a person's or a company's words and who said them, as a testimonial, a story or a review? |
 | `DSFeature` | How does a page make a claim at any level and ask the reader to act, from data alone? |
 
-**Surface's core composites are the data table, the filter bar, the comparison and the feature** (`RULE.SUPPORT.SURFACE.230` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.181` · MUST · skill:spn-surface/design). Every stack builds each of them, and the design library draws each of them. A stack may provide further composites of its own, as the core units above state. The web stack has one, `DSListDetail`, which places a list beside the detail of its chosen row. It is not a core unit (`RULE.SUPPORT.SURFACE.099` · MUST · skill:spn-surface/design), and the book states no rule for it: `architecture-containers.md` states what a person sees on such a page.
+**Surface's core composites are the data table, the filter bar, the facet group, the comparison, the quote and the feature** (`RULE.SUPPORT.SURFACE.230` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.181` · MUST · skill:spn-surface/design). Every stack builds each of them, and the design library draws each of them. A stack may provide further composites of its own, as the core units above state. The web stack has one, `DSListDetail`, which places a list beside the detail of its chosen row. It is not a core unit (`RULE.SUPPORT.SURFACE.099` · MUST · skill:spn-surface/design), and the book states no rule for it: `architecture-containers.md` states what a person sees on such a page.
 
 ### DSDataTable
 
@@ -3121,7 +3121,7 @@ This ref states which components exist, in which group, and what every one must 
 | `RULE.SUPPORT.SURFACE.228` | superseded: a vertical item line spaces its description and its facts by its level; the words are now set alike in either orientation (`RULE.SUPPORT.SURFACE.272` · MUST · skill:spn-surface/design) |
 | `RULE.SUPPORT.SURFACE.224` | `DSTabs` at the level `PAGE` draw `PILL` where no `type` is named, grouped on its track and not raised; `LINE` stays at `CONTAINER` and `WIDGET` and `SWITCH` at the other levels |
 | `RULE.SUPPORT.SURFACE.187` | a default mark draws its icon muted and a ringed mark its ring in the icon's colour, and a `PAGE` item's description is `CONTENT_LG`, 16px |
-| `RULE.SUPPORT.SURFACE.230` | a block built from components for one task is a component of the group Composites; the data table, the filter bar, the comparison and the feature are core composites, and the unit for a list beside its detail is not a core unit |
+| `RULE.SUPPORT.SURFACE.230` | a block built from components for one task is a component of the group Composites; the data table, the filter bar, the facet group, the comparison, the quote and the feature are core composites, and the unit for a list beside its detail is not a core unit |
 | `RULE.SUPPORT.SURFACE.233` | a feature is sized by its level alone, placed by its type, and draws the default of its level for a type the level does not allow |
 | `RULE.SUPPORT.SURFACE.234` | a feature's actions are data and take their size from its level, with at most one solid primary |
 | `RULE.SUPPORT.SURFACE.235` | a feature draws its items as item lines at a level it gives them by its own, the gap between two items following its level, the feature and each item taking the heading element of their level, the statistics keeping their sizes one level below the feature's, and the feature giving the items' orientation |

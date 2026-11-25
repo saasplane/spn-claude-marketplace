@@ -15,7 +15,7 @@ description: Prove SaaS Plane TS work is sound by running gates. Use when the as
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/",
-      "seen": "5e83dd3b"
+      "seen": "4de2a899"
     }
   ]
 }
