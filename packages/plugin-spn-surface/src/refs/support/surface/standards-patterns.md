@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/03-app-page-kinds.md",
-      "seen": "6c0b72d2"
+      "seen": "556d6ba1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/02-web/01-app-page-kinds.md",

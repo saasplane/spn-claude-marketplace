@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/07-architecture-components.md",
-      "seen": "91003ce6"
+      "seen": "58aa310b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-components/",
-      "seen": "fc3f0156"
+      "seen": "63436bf2"
     }
   ]
 }
@@ -1021,20 +1021,22 @@ A row states its kind in `mtype`, which takes `DSComparisonRowType`: `FIELD` giv
 
 ### DSFacetGroup
 
-`DSFacetGroup` holds the facets a marketplace narrows its results by, where there are more than four filters; with four or fewer, `DSFilterBar` stays above the results (Q64 A). Each facet is a title that folds open and shut over its choices: checkboxes for a choice of many, radios for a choice of one such as a rating, or a two-thumb slider for a range such as a price. A facet of choices shows its first six, then Show more. The group is controlled and fetches nothing: the chosen values come in through `value`, every change goes out through `onChange`, and the page holds the counts and the results.
+`DSFacetGroup` holds the facets a marketplace narrows its results by, where there are more than four filters; with four or fewer, `DSFilterBar` stays above the results (Q64 A). It is wired as `DSFilterBar` is: each facet is a field written as data, its kind, key, label and choices, with its own `valueLink` into the page's filter state, and the group calls `onApply` once a change lands and `onClear` once Clear all has emptied every link (Q83 A). The kinds take the bar's names. `SELECT_MULTI` is checkboxes with their counts, `SELECT` radios with their counts, such as a rating's "4 and up", `NUMBER_RANGE` a slider with two thumbs, such as a price, and `BOOLEAN` one switch for a thing a record has or has not, such as In stock. Every choice shows: a long list takes a search over it and scrolls inside its facet on the rail. The group holds no value and fetches nothing, so the page holds the filter, the counts and the results.
 
 | Prop | The page gives | What the composite does with it |
 | --- | --- | --- |
-| `facets` | each an `mtype` of `DSFacetGroupFacetType` (`MANY` · `ONE` · `RANGE`), a `key`, a `title`, `expanded` (open at first by default), and `options` with their `count` and a `limit` (6 by default) for a choice, or `min`, `max` and `step` (1 by default) for a range | one facet each, in order |
-| `value` · `onChange` | the chosen values by facet key: a list of keys for `MANY`, one key for `ONE`, a `[from, to]` pair for `RANGE`; null, an empty list or a missing key chooses nothing | hands out every change on the rail, and the draft the sheet's button applies, as the whole new value |
-| `placement` | `DSFacetGroupPlacementType`: `RAIL` on a desktop and `SHEET` on a tablet and a phone by default | a column about 16rem wide at the start of the results, or a *Filters (n)* button that opens a sheet |
+| `facets` | each an `mtype` of `DSFacetGroupFacetType` (`SELECT_MULTI` · `SELECT` · `NUMBER_RANGE` · `BOOLEAN`), a `key` (as a `DSFilterBar` field's), a `label`, `valueLink` (`string[]` · `string \| null` · `[number, number] \| null` · `boolean \| null`, by kind in that order; a `BOOLEAN` writes `true` when on and `null` when off), `expanded` (open at first by default), `info` (a note drawn as the form field's info mark), `disabled`, `options` with their `count` for a choice (a choice whose count is 0 cannot be pressed unless chosen) and `searchFrom` (10 by default), `min`, `max`, `step` (1 by default), `prefix`, `suffix` and `presets` (steps between the bounds: a Min and a Max select under the slider) for `NUMBER_RANGE`, and `labelTrue` and `count` for `BOOLEAN` | one facet each, in order |
+| `onApply` · `onClear` | called once a change is applied, at once on the rail and on the sheet's button, each facet's link holding its value by then; called once Clear all has emptied every link | the page keeps one filter object and hands each field the link of its own key, so a listing with a bar and facets writes its filter once |
+| `placement` | `DSFacetGroupPlacementType`: unset, it follows the page frame the group stands in, a `RAIL` while the frame stands its parts side by side and a `SHEET` once it folds, whatever the device; outside a frame, `RAIL` on a desktop and `SHEET` on a tablet and a phone | a column about 16rem wide at the start of the results, or a *Filters (n)* button that opens a sheet |
 | `title` · `applyLabel` · `icon` | the words over the rail and the sheet (Filters), the sheet's apply button (Show results, or the page's own such as *Show 128 results*), and the trigger's glyph (the funnel) | |
-| `onDraftChange` · `open` · `onOpenChange` | the sheet's draft on each change, and the value again when it closes unapplied, so the page can count again; the sheet's open state where the page holds it | |
+| `onDraftChange` · `open` · `onOpenChange` | the sheet's draft on each change, and the values again when it closes unapplied, so the page can count again; the sheet's open state where the page holds it | |
 | `size` · `testData` | the size step, the place's by default, and the test hook | |
 
-- **On the rail each change is handed out at once; in the sheet the changes are a draft until its button applies them.** The rail shows Clear all once something is chosen, and the trigger counts the choices made.
-- **A choice's count is the option's own `count`,** drawn quietly after its label in the person's number format. The group's words, Filters, Show more, Show less, Clear all and Show results, come through `translate`.
-- **The facets stand where the marketplace's page kinds put them** (`site-patterns.md`, *The kinds of page of a marketplace*), and the look is proved in the showcase under *Composites › DSFacetGroup* once its samples are drawn.
+- **On the rail each change is applied at once; in the sheet the changes are a draft until its button applies them.** The rail shows Clear all once something is chosen, and the trigger counts the choices made.
+- **Every choice shows; a long list takes a search and scrolls in place.** From `searchFrom` choices a search narrows the list and keeps a chosen choice in view. On the rail the list scrolls inside its facet, about nine rows tall; in the sheet the sheet scrolls, never a list inside it. There is no Show more.
+- **A choice's count is the option's own `count`,** drawn quietly after its label in the person's number format. The group's words, Filters, Search, No matches, Min, Max, Clear all and Show results, come through `translate`.
+- **The facets stand where the marketplace's page kinds put them** (`site-patterns.md`, *The kinds of page of a marketplace*): in the aside of a `DSPageFrameAside` at `asidePlacement` `START`. The look is proved in the showcase under *Composites › DSFacetGroup* once its samples are drawn.
+- The kinds `MANY`, `ONE` and `RANGE`, a facet's `title` and `limit`, and the group's `value` and `onChange` are the wiring of 11.25.0. They still work, deprecated for one major version, and are not drawn in the library.
 
 ### DSQuote
 
@@ -1272,9 +1274,9 @@ The Page group holds the units that work across a page's content (`RULE.SUPPORT.
 
 ### The page frames
 
-A page frame places a page's parts in slots, folds them by screen class, and draws no box and no navigation. `DSPageFrameListDetail` places a list beside the detail of its chosen row, and `DSListDetail` is its deprecated alias for one major version. `DSPageFrameGroups` places the groups, the list and the detail. `DSPageFrameAside` places a main part beside an aside of small facts about the record. A page gives each frame its parts and the addresses they go back by; the frame holds no data and does not know which row is chosen.
+A page frame places a page's parts in slots, folds them by its own width, and draws no box and no navigation. `DSPageFrameListDetail` places a list beside the detail of its chosen row, and `DSListDetail` is its deprecated alias for one major version. `DSPageFrameGroups` places the groups, the list and the detail. `DSPageFrameAside` places a main part beside an aside: small facts about the record, at the end, or the facets of the main part's records, at the start. A page gives each frame its parts and the addresses they go back by; the frame holds no data and does not know which row is chosen.
 
-- **A page frame MUST place its parts and give them nothing else** (`RULE.SUPPORT.SURFACE.623` · MUST · skill:spn-surface/design). It gives no padding and no size to what fills a slot. `fullHeight` makes each part as tall as the frame, the layout's content, with a panel in it scrolling its own content and keeping its header and footer in view. `attached` joins panels at a desktop into one surface: they touch, square the corners they touch and draw the line between them once. A slot of cards is never attached, and where one part shows alone `attached` changes nothing.
+- **A page frame MUST place its parts and give them nothing else** (`RULE.SUPPORT.SURFACE.623` · MUST · skill:spn-surface/design). It gives no padding and no size to what fills a slot. `fullHeight` makes each part as tall as the frame, the layout's content, with a panel in it scrolling its own content and keeping its header and footer in view. `attached` joins panels at a desktop into one surface: they touch, square the corners they touch and draw the line between them once. A slot of cards is never attached, and where one part shows alone `attached` changes nothing. A frame folds by its own width, never by the device alone: it stands its parts side by side only where they fit in the width its layout leaves it, a column and at least 480 px for the main part, and for `DSPageFrameGroups` two columns and 480 px, else the groups fold into the menu above the list. A frame never stands wider than the device allows, so a phone stays one part at a time. A frame then reads the same in a layout with a side bar as in one without, and the page never narrows a column to make room.
 - **What fills a slot follows the part's job, never its size** (`RULE.SUPPORT.SURFACE.625` · MUST · skill:spn-surface/design), as `architecture-containers.md` states: navigation drawn flat, a container a person works in, widgets for small facts.
 
 | The parts are | `fullHeight` | `attached` |
@@ -1286,13 +1288,13 @@ A page frame places a page's parts in slots, folds them by screen class, and dra
 | Frame | Its slots | Its other props |
 | --- | --- | --- |
 | `DSPageFrameListDetail` | `list`, `detail`, `emptyDetail` | `backAnchor` (required), `backLabel`, `listWidth`, `fullHeight`, `attached` |
-| `DSPageFrameGroups` | `groups`, `list`, `detail`, `emptyDetail` | `groupsLabel`, `groupsAnchor` (required), `groupsWidth` (`COMPACT` when unset), `backAnchor` (required), `backLabel`, `listWidth`, `fullHeight`, `attached` |
-| `DSPageFrameAside` | `main`, `aside` | `asideWidth`, `fullHeight`, `attached` |
+| `DSPageFrameGroups` | `groups`, `list`, `detail`, `emptyDetail` | `groupsLabel`, `groupsAnchor` (required), `groupsBackLabel`, `groupsWidth` (`COMPACT` when unset), `backAnchor` (required), `backLabel`, `listWidth`, `fullHeight`, `attached` |
+| `DSPageFrameAside` | `main`, `aside` | `asideWidth`, `asidePlacement` (`START` · `END`, `END` when unset: `END` after the main part, for a record's facts; `START` before it, at the start and first where the frame folds, for a listing's facets), `fullHeight`, `attached` |
 
 Every width takes `DSListDetailListWidthType`: `WIDE`, 320 px and the default but for the groups, `NARROW`, 256 px, and `COMPACT`, 224 px.
 
 - **A frame never navigates itself, and it reads the chosen row from nothing.** The page reads the address and passes `detail` or not. Below a desktop it shows the detail alone where there is one, else the list alone.
-- **`DSPageFrameGroups` folds its three parts by screen class** (`RULE.SUPPORT.SURFACE.610` · GUIDE): groups, list and detail at a desktop; the groups as a menu above the list, named by `groupsLabel`, on a tablet; one part at a time on a phone, the list going back to the groups by `groupsAnchor` and the detail to the list by `backAnchor`. The groups are navigation, a `DSNavList` with counts.
+- **`DSPageFrameGroups` folds its three parts by the room it has** (`RULE.SUPPORT.SURFACE.610` · GUIDE): groups, list and detail where the three fit; the groups as a menu above the list, named by `groupsLabel`, where two fit; one part at a time on a phone, the list going back to the groups by `groupsAnchor`, its words `groupsBackLabel`, and the detail to the list by `backAnchor`, its words `backLabel`. A frame in a narrow place takes the next form down, whatever the screen. The groups are navigation, a `DSNavList` with counts.
 - **`DSPageFrameListDetail` is the two-column form, and a chat is that form with `emptyDetail`** (`RULE.SUPPORT.SURFACE.611` · GUIDE), with `fullHeight` and `attached`, so the conversations and the thread each scroll in one surface.
 
 #### The choice table of `DSPageFrameListDetail`
@@ -3282,7 +3284,7 @@ This ref states which components exist, in which group, and what every one must 
 | `RULE.SUPPORT.SURFACE.607` | an unread row shows a notch just inside its start edge and a heavier title, and never a tint of the whole row |
 | `RULE.SUPPORT.SURFACE.608` | on a phone a record with more than four facts a person still needs keeps them as label and value pairs under its lead |
 | `RULE.SUPPORT.SURFACE.609` | a person's column set is kept with the saved view |
-| `RULE.SUPPORT.SURFACE.610` | `DSPageFrameGroups` folds its three parts by screen class: groups, list and detail at a desktop, the groups as a menu above the list on a tablet, one part at a time on a phone |
+| `RULE.SUPPORT.SURFACE.610` | `DSPageFrameGroups` folds its three parts by the room it has: groups, list and detail where the three fit, the groups as a menu above the list where two fit, one part at a time on a phone |
 | `RULE.SUPPORT.SURFACE.611` | `DSPageFrameListDetail` is the two-column form, and a chat is that form with `emptyDetail` |
 | `RULE.SUPPORT.SURFACE.614` | only the lead cell of a row takes two lines, and every other cell one |
 | `RULE.SUPPORT.SURFACE.615` | a listing shows a picture only where it tells one record from another, an avatar, a logo, a mark or an image, in the place its layout gives it |
@@ -3291,7 +3293,7 @@ This ref states which components exist, in which group, and what every one must 
 | `RULE.SUPPORT.SURFACE.620` | unread and the accent edge are marks of the record's box, the row, the card or the table row, and the item line inside reads the unread mark from its box and never draws one of its own |
 | `RULE.SUPPORT.SURFACE.621` | a record's box takes at most one accent edge, a 3 px line at its start in one colour that says the record's state or kind, and the unread notch stands 6 px inside the start edge so the two never touch |
 | `RULE.SUPPORT.SURFACE.622` | a page whose head stands in no box opens with `DSPageHead`, and every way back, of a page head, a panel header or a page frame on a phone, is one row above the title line: a link with an arrow and the words of where it leads, Back where none are given |
-| `RULE.SUPPORT.SURFACE.623` | a page frame places its parts and nothing else: it gives no padding and no size to what fills a slot, `fullHeight` makes each part as tall as the frame with a panel scrolling its own content, and `attached` joins panels into one surface and is never given where a slot holds cards |
+| `RULE.SUPPORT.SURFACE.623` | a page frame places its parts and nothing else: it gives no padding and no size to what fills a slot, `fullHeight` makes each part as tall as the frame with a panel scrolling its own content, `attached` joins panels into one surface and is never given where a slot holds cards, and a frame folds by its own width, never by the device alone |
 | `RULE.SUPPORT.SURFACE.624` | `DSItem` is an item line and knows nothing of navigation: the way back is the head's, never the item's |
 | `RULE.SUPPORT.SURFACE.626` | `DSPageLevel` gives a level, a part and `flush` to what it holds and lays out nothing, as `DSSurface` gives a surface; a head is laid out by `DSPageHead` or by its box's own head, and the `HEADER` layout stays one major version, deprecated |
 

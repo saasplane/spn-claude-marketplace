@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/",
-      "seen": "a8dfa41b"
+      "seen": "b78a1e0e"
     }
   ]
 }

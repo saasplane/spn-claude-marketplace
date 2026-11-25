@@ -122,7 +122,7 @@ Its keys are the five parts' ids, and each part holds its subsections by id in c
 
 {{The five parts in reading order: page templates, section style, media style, interaction style and density. The language holds no samples: its hero samples and its section samples are two pages beside it, built from the app's own media files, and each subsection links the samples that show it. Every sample draws each drawing in a frame that scales it whole and carries this app's own tokens (RULE.SUPPORT.SURFACE.591).}}
 
-{{No part holds a pointer in place of its rule (RULE.SUPPORT.SURFACE.590). A part the language sets holds the choice; a part it leaves to the design system has the status `DEFAULT` and names, in one line, the default it follows; a part it does not use has the status `NONE` and says so. A line such as "Decided in 041 N008." is refused by `spn-surface language check`.}}
+{{No part holds a pointer in place of its rule (RULE.SUPPORT.SURFACE.590). A part the language sets holds the choice; a part it leaves to the design system has the status `DEFAULT` and names, in one line, the default it follows; a part it does not use has the status `NONE` and says so. A line such as "Decided in the hiring arc." is refused by `spn-surface language check`.}}
 
 | I am drawing | Read |
 | --- | --- |

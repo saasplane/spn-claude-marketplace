@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/02-site-page-kinds.md",
-      "seen": "3420aa04"
+      "seen": "536835db"
     }
   ]
 }
@@ -77,6 +77,7 @@ The order matters. A grid of things that each open a page is a Feature grid and 
 - **A resources site's Home is a hub only where it holds several sets, and a small product makes its one set the whole site** (`RULE.SUPPORT.SURFACE.617` · GUIDE): `HUB`, one search across every set, a door to each set with its count, what is new, and *Still need help?*; `ONE_SET`, the set's own Group home at the first level. A set's Group home takes the case of its purpose, `HELP`, `DOCS` or `GUIDES`, and a resources site keeps no blog of its own: the Blog is `MARKETING`'s.
 - **A site holds the floor's Server error and Maintenance beside Not found** (`RULE.SUPPORT.SURFACE.605` · MUST · skill:spn-surface/design). Server error stands in the site's layout where it can still be drawn, and Maintenance on `CANVAS`.
 - **A Listing narrowed from a category, a brand or a shared link is the same page, the case `NARROWED`**, because the filters chosen are the page's address; there is no Results kind.
+- **A Listing's facets, where there are more than four filters, stand in a rail at the start of a desktop**: the aside of a `DSPageFrameAside` at `asidePlacement` `START` and `asideWidth` `NARROW`, 256 px, with the records in the main part, so the page writes no row of its own and the rail folds by its place as every frame does. On a tablet and a phone a Filters button opens the same facets in a sheet.
 - **A help centre always draws `DSBreadcrumb` under the bar, one link for each level above the page and the page itself unlinked, and so does any site whose bar does not list its groups or that runs deeper than three levels** (`RULE.SUPPORT.SURFACE.598` · MUST · skill:spn-surface/design). Any other site may draw none.
 
 ## The kinds of page of a marketplace — 🔮

@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "dbe1e12c"
+      "seen": "8395bf79"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -42,7 +42,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An arc carries its specification, or names the note that holds it",
-      "seen": "f93723e5"
+      "seen": "f8f718a3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -61,7 +61,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
-      "seen": "0fb0d490"
+      "seen": "657762de"
     }
   ]
 }
@@ -290,7 +290,7 @@ developer as soon as the batch lands.
 
 **Ideation writes a patch only in the workstream's worktree, and only on a file an entry of the sheet names** (`RULE.DEVEX.WORKSPACE.501` · MUST · check:pretooluse). The worktree is one set for the workstream, shared by its arcs: a kept patch resets its file, so arcs do not collide, and an arc ideating waits while another arc's go runs in the same repository. Before a go, the guard reads a path in `.worktrees/<workstream>/<repository>/` as `<repository>:<file>`, not as a write into a repository named `.worktrees`, and lets it through when an entry of an arc of this window's workstreams names that file. The documents-first gate lets the same write through while no go part of the arc has started. A write in a main checkout, or on a file no entry names, is refused until the go. **The alternative is a guard that lets a patch through only because some other arc holds a go,** which left a workstream with none, such as 037 at its close, refused on the patches its own sheet asked for.
 
-**An entry is a change or a step, and the go refuses one of either kind that is incomplete** (`RULE.DEVEX.WORKSPACE.502` · MUST · check:split-plan). `go write` prints `Refused: E7 is a change with no patch` or `Refused: E9 is a step with no command or no proof` and writes nothing, and `arc edit --status DECIDED` is refused on the same findings. The refusal covers every hand-written file: the book and docs, config and env files, migrations, contract, server, web and tests. A change marked judged is one whose patch ideation wrote with judgment, and it still carries its patch. In N001 of this workstream no patch existed at the go and 11 were written after it, and 774 of the 816 lines the go added matched the preview, which is the cost of code typed twice. In 040's N012 about 500 changes went to the go as prose, and the work had to be reconciled against the code to know what was left. That is the evidence that settled it, so no warning stands in place of the refusal.
+**An entry is a change or a step, and the go refuses one of either kind that is incomplete** (`RULE.DEVEX.WORKSPACE.502` · MUST · check:split-plan). `go write` prints `Refused: E7 is a change with no patch` or `Refused: E9 is a step with no command or no proof` and writes nothing, and `arc edit --status DECIDED` is refused on the same findings. The refusal covers every hand-written file: the book and docs, config and env files, migrations, contract, server, web and tests. A change marked judged is one whose patch ideation wrote with judgment, and it still carries its patch. In one arc no patch existed at the go and 11 were written after it, and 774 of the 816 lines the go added matched the preview, which is the cost of code typed twice. In another arc about 500 changes went to the go as prose, and the work had to be reconciled against the code to know what was left. That is the evidence that settled it, so no warning stands in place of the refusal.
 
 **The go applies the patches in passes and runs every tier once** (`RULE.DEVEX.WORKSPACE.507` · MUST · check:split-plan). Each repository's patches are applied as one pass, in release order. A helper is briefed only to re-cut a patch that no longer applies, and it edits and type-checks and never runs a test tier. Between passes nothing runs but what a repository's commit or push hook refuses without, and every tier runs once, in the full run. The developer decided it on 2026-11-14: the go on a preview prepares the batches, and the patches are applied in phases, with no escape. **The alternative is a helper that writes a change from its prose and runs a spec between passes,** which typed the code twice and ran a tier at every step.
 
@@ -855,7 +855,7 @@ notes.
 
 | What the window did | Tie |
 | --- | --- |
-| Sent a first prompt that names exactly one workstream folder, or a handover | **owns** the one folder the prompt names, or the workstream the handover's `continue:` line opens with. A line that opens with no workstream, as *N008's run*, owns none, whatever it names later. A handover also owns each other workstream its line gives work to: one joined to the one before by *and*, or named with an arc of its own. A workstream the line only waits on or cites, as in *raised by 032-hiring-demo*, is visited, and a bare number after the first, as in *waits for 035*, is a mention and binds nothing |
+| Sent a first prompt that names exactly one workstream folder, or a handover | **owns** the one folder the prompt names, or the workstream the handover's `continue:` line opens with. A line that opens with no workstream, as *the arc's run*, owns none, whatever it names later. A handover also owns each other workstream its line gives work to: one joined to the one before by *and*, or named with an arc of its own. A workstream the line only waits on or cites, as in *raised by the hiring demo*, is visited, and a bare number after the first, as in *waits for a later one*, is a mention and binds nothing |
 | Wrote a file inside a workstream folder, or ran a `workstream` command that writes an arc's data there, in its own turn or in a child's call, owning none yet and nothing having named one | **owns** it: the first one it writes inside |
 | Wrote a file inside a workstream folder when it already owns another | **visits** it; a visit never becomes ownership by itself |
 | Read a file, wrote text that only names another workstream, or sent a prompt naming two workstreams with no handover | nothing |
@@ -897,7 +897,7 @@ MUST · check:stop). Every fact the block needs is read, and the arc's log line 
 block is given. A line found after that goes into the one block, never into a second. A block in an
 earlier message of the turn counts as given, and a second block is named as extra.
 
-**The block is written by `workstream handover` from the data, and the agent adds only the lines the data cannot say** (`RULE.DEVEX.WORKSPACE.473` · MUST · check:stop). `spn-devex workstream handover <workstream>` reads the rows, the cards, the live orders and the pins, writes the block into the arc's log and prints it. The agent pastes it and adds `continue:` and `do not touch:`. The `continue:` line opens with the workstream and its arc, as `040-hiring-demo-ready/N008`, because the next window is bound to the workstream it opens with, and the stop check sends back a block whose line opens on neither. A block typed by hand is checked for its nine labels and rewritten when one is missing, which is the cost this rule removes. The command prints the block as aligned lines in a fence, each value wrapped under its label, and the log keeps the one line.
+**The block is written by `workstream handover` from the data, and the agent adds only the lines the data cannot say** (`RULE.DEVEX.WORKSPACE.473` · MUST · check:stop). `spn-devex workstream handover <workstream>` reads the rows, the cards, the live orders and the pins, writes the block into the arc's log and prints it. The agent pastes it and adds `continue:` and `do not touch:`. The `continue:` line opens with the workstream and its arc, as `<NNN>-<subject>/N<nnn>`, because the next window is bound to the workstream it opens with, and the stop check sends back a block whose line opens on neither. A block typed by hand is checked for its nine labels and rewritten when one is missing, which is the cost this rule removes. The command prints the block as aligned lines in a fence, each value wrapped under its label, and the log keeps the one line.
 
 **The reply that hands over is a shape**, which the agent's table of closing moments states. It opens on `## ✈️ Handing over <arc> (<title>)`, then a `&nbsp;` line, the fenced block, a `&nbsp;` line, and one short paragraph that says where the next window picks up, says thanks, and says this window can be retired.
 
