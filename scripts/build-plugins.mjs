@@ -233,6 +233,26 @@ function copyTemplates(book) {
   return { written, pluginOnly: filesUnder(PLUGIN_TEMPLATES).filter((file) => !held.has(file)) };
 }
 
+/** The book's surface catalogue, and where spn-surface carries its copy (RULE.SUPPORT.SURFACE.601). */
+const BOOK_CATALOGUE = join("docs", "specs", "surface", "catalogue.json");
+const PLUGIN_CATALOGUE = join(PACKAGES, "plugin-spn-surface", "src", "refs", "support", "surface", "catalogue.json");
+
+/**
+ * THE CATALOGUE IS COPIED HERE, byte for byte, from the same book as the rules and the templates, so
+ * `spn-surface catalogue show` reads the release's own catalogue and nothing else. Returns whether it
+ * was written, or null where there is no book beside the checkout.
+ */
+function copyCatalogue(book) {
+  if (book === null) return null;
+  const from = join(book, BOOK_CATALOGUE);
+  if (!isFile(from)) return null;
+  const source = readFileSync(from);
+  if (isFile(PLUGIN_CATALOGUE) && readFileSync(PLUGIN_CATALOGUE).equals(source)) return false;
+  mkdirSync(dirname(PLUGIN_CATALOGUE), { recursive: true });
+  writeFileSync(PLUGIN_CATALOGUE, source);
+  return true;
+}
+
 /** `dist/` rebuilt from nothing every time, so a renamed or removed source leaves no orphan bundle. */
 function cleanDist(outdir) {
   if (existsSync(outdir)) rmSync(outdir, { recursive: true, force: true });
@@ -276,6 +296,9 @@ async function buildOnce() {
     for (const file of copied.written) console.log(`          ${file}`);
     for (const file of copied.pluginOnly) console.log(`  note  ${file} is only in the plugin's templates, so it is kept`);
   }
+  const catalogue = copyCatalogue(rules?.book ?? null);
+  if (catalogue === null) console.log("  keep  plugin-spn-surface refs/support/surface/catalogue.json — no book catalogue beside this checkout");
+  else console.log(`  ok    catalogue  (${catalogue ? "copied from the book" : "unchanged"})`);
   return builtAny;
 }
 
