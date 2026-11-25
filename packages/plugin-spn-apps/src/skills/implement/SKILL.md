@@ -330,3 +330,4 @@ Three more that decide whether a symbol appears at all:
 - **A module's shared list and record page take the app's own additions: columns on a list, sections on a record page** (`RULE.SUPPORT.APPS.265` · MUST · skill:spn-apps/implement)
 - **The API entry honours `x-spn-simulate-at` only where the deployment is non-production and trusts it** (`RULE.SUPPORT.APPS.268` · MUST · skill:spn-apps/implement)
 - **A public page of a web app carries a complete head: the shell holds the default set, and each page sets its own through the stack's one head hook when it loads** (`RULE.SUPPORT.APPS.269` · MUST · skill:spn-apps/implement)
+- **A route names the surface category its page serves, and an app may replace it by its key** (`RULE.SUPPORT.APPS.270` · MUST · skill:spn-apps/implement)

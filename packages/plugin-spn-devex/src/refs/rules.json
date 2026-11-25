@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "e3aa62fc"
+    "commit": "6655077f"
   },
   "rules": [
     {
@@ -21474,6 +21474,45 @@
       ]
     },
     {
+      "id": "RULE.SUPPORT.APPS.270",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A route names the surface category its page serves, and an app may replace it by its key",
+      "chapter": "04-capabilities/02-support/02-apps/03-module/02-web/03-entry/01-pages.md",
+      "heading": "A route is declared once, as data",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/module/README.md",
+          "heading": "A page, its route and its address"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/providers/ts/08-web.md",
+          "heading": "Routes, overlays and the session a container reads"
+        },
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "design — a page, from its layout down to its blocks"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "Rounds"
+        }
+      ]
+    },
+    {
       "id": "RULE.SUPPORT.INFRA.001",
       "level": "MUST",
       "params": {
@@ -38298,6 +38337,11 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "One source for the platform's look — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "One source for the platform's look — 🔮"
         }
       ]
     },
@@ -38308,7 +38352,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "A theme is layered in one order: the defaults, then the brand, then the app's looks, then an account's branding",
+      "sentence": "A theme is layered in one order: the defaults, then the brand, then the looks of the page's surface category, then an account's branding",
       "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
       "heading": "One source for the platform's look",
       "decision": null,
@@ -38545,7 +38589,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "An app keeps one theme setting for each family it has, `SITE` for public pages, which take the site look, and `APP` for signed-in pages, which take the app layout, each naming its language and version, and the scaffold writes them: `src/site-theme.ts` exporting `SITE_THEME`, and `src/app-theme.ts` exporting `APP_THEME`",
+      "sentence": "An app keeps one theme setting, `APP_THEMES` in `src/theme.ts`, holding its language and version, the brand once, the looks of each surface category it serves and `main`, the category of a page whose route group names none; the scaffold writes it from the app's row",
       "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
       "heading": "One source for the platform's look",
       "decision": null,
@@ -38877,6 +38921,93 @@
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
           "heading": "design — a page, from its layout down to its blocks"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.602",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "`DSApp` takes the app's theme setting as `dsContext.themes`, applies the main category's theme at the root, and holds the setting for the pages below",
+      "chapter": "04-capabilities/02-support/01-surface/11-architecture-app/01-common/02-settings-and-theme.md",
+      "heading": "The category's theme",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-app.md",
+          "heading": "The theme — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/providers.md",
+          "heading": "The ts provider — ✅ for the two contexts and tokens, 🔮 for the rest"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.603",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "`DSPageCategory` gives a surface category to what it holds, and renders nothing",
+      "chapter": "04-capabilities/02-support/01-surface/11-architecture-app/01-common/02-settings-and-theme.md",
+      "heading": "The category's theme",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-app.md",
+          "heading": "The theme — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/providers.md",
+          "heading": "The ts provider — ✅ for the two contexts and tokens, 🔮 for the rest"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.604",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "`DSSitePage` and `DSLayout` apply the category on the root they already render",
+      "chapter": "04-capabilities/02-support/01-surface/11-architecture-app/01-common/02-settings-and-theme.md",
+      "heading": "The category's theme",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-app.md",
+          "heading": "The theme — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/providers.md",
+          "heading": "The ts provider — ✅ for the two contexts and tokens, 🔮 for the rest"
         },
         {
           "plugin": "spn-surface",

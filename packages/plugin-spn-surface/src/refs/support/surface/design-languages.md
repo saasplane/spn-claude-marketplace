@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
-      "seen": "8c4dd605"
+      "seen": "fc1513a6"
     }
   ]
 }
@@ -136,7 +136,7 @@ A design language is kept as the platform's construct, and each app's capability
 - **Intake records what the partner shares**: each reference by address and date, each brand file, and each media kind.
 - **Each round shows options on real pages**, the running app or its worktree in the partner's brand values, and records its pick.
 - **A language records each media kind it uses**: line drawings, illustration, product views (drawn or captured), photography, icons and marks, data and numbers, motion and video, 3D. For each, where it comes from (made, supplied, licensed, captured), its treatment, the tokens it reads, where it goes, its tablet and phone forms, its files, and its rights and alt text.
-- **Each platform keeps one brand, and each of its apps keeps its own design language.** An app changes only its looks over the brand, and an account's own branding comes last, at run time. The order: the design system's defaults, the platform's brand, the app's looks, the account's branding.
+- **Each platform keeps one brand, and each of its apps keeps its own design language.** An app changes only its looks over the brand, and an account's own branding comes last, at run time. The order: the design system's defaults, the platform's brand, the looks of the page's surface category, the account's branding.
 
 ## The media kinds, by the scale — 🔮
 
@@ -220,7 +220,7 @@ Before any page work on an app, the design skill reads the repository's design l
 | What | Where | Who reads it |
 | --- | --- | --- |
 | **The design language**, the brand once and the decisions of each surface category | a spec file in the repository's own docs, drawn as a construct page | a person, to know why an app looks as it does, and the agent, before it draws |
-| **The app's theme**, the same choices as values, naming its language and version | one exported typed setting in the app's code | the app's pages |
+| **The app's theme**, the same choices as values: the brand once and the looks of each surface category the app serves, naming its language and version | one exported typed setting in the app's code | the app's pages, each through the category of its route group |
 | **The app's own stylesheet**, where the app gives one | the app's code, never written from the design language in this release | a page that shows the render's HTML, beside the design system's stylesheet and the render's theme config |
 
 The design language holds the brand once: the primary colour, the greys and the typefaces. It holds the decisions of each surface category: the layouts the category picks from the catalogue, as pointers to the app's layout setting, and its looks: mode, size, motion, radius, body, navigation, frames, card and table. The layout stays the app's own setting and is never copied into a look.
@@ -229,11 +229,11 @@ The design language holds the brand once: the primary colour, the greys and the 
 - **Each app keeps its theme as one exported typed setting in its code, and the agent writes it from the book in the same arc as any change to the design language** (`RULE.SUPPORT.SURFACE.572` · MUST · skill:spn-surface/design). The page is the source and the setting is its copy, so the two move together in one arc and never apart.
 - **An app's theme and the language it names agree** (`RULE.SUPPORT.SURFACE.573` · GUIDE). The check that refuses an app out of step is the one the next rule states.
 - **An app with its theme in code keeps it until it adopts the design language** (`RULE.SUPPORT.SURFACE.574` · GUIDE). The platform's apps move one at a time, and no app is changed only to match.
-- **A theme is layered in one order: the defaults, then the brand, then the app's looks, then an account's branding** (`RULE.SUPPORT.SURFACE.575` · MUST · skill:spn-surface/design). Each layer sets only what it holds, so an account's branding changes colours and never the looks of the app.
+- **A theme is layered in one order: the defaults, then the brand, then the looks of the page's surface category, then an account's branding** (`RULE.SUPPORT.SURFACE.575` · MUST · skill:spn-surface/design). Each layer sets only what it holds, so an account's branding changes colours and never the looks of a category, and a page whose route group names no category takes the looks of the app's main one.
 - **A design language stands beside the theme: it holds a platform's looks and never the brand of another platform** (`RULE.SUPPORT.SURFACE.576` · GUIDE). A partner's brand is the partner's design language, and an app that serves two platforms names a language for each in its theme settings.
-- **`spnutils apps surface theme <app>` refuses an app whose theme setting is out of step with the language it names** (`RULE.SUPPORT.SURFACE.577` · MUST · skill:spn-surface/design). It resolves the language and version the setting names, reads the brand and the surface category's decisions from it and the app's exported setting from its code, names each value that differs, the app's and the language's side by side, writes no file, and refuses a setting that names no language or no version the repository holds.
+- **`spnutils apps surface theme <app>` refuses an app whose theme setting is out of step with the language it names** (`RULE.SUPPORT.SURFACE.577` · MUST · skill:spn-surface/design). It resolves the language and version the setting names, reads the brand and the Theme part of each surface category the setting holds from it, and the app's exported setting from its code, names each value that differs, the app's and the language's side by side, category by category, refuses a category the setting holds and the app's row does not list, and a row's category the setting leaves out, writes no file, and refuses a setting that names no language or no version the repository holds.
 - **A language is written as one spec file, and its page draws the whole spec as one generated section** (`RULE.SUPPORT.SURFACE.578` · MUST · skill:spn-surface/design). The file holds the brand in Shared and each surface category's values, so the people who read the page, the theme check and the page render all read one answer. The page is written from the file and never by hand, and the spec template shows the form.
-- **An app keeps one theme setting for each family it has, `SITE` for public pages, which take the site look, and `APP` for signed-in pages, which take the app layout, each naming its language and version, and the scaffold writes them: `src/site-theme.ts` exporting `SITE_THEME`, and `src/app-theme.ts` exporting `APP_THEME`** (`RULE.SUPPORT.SURFACE.586` · MUST · skill:spn-surface/design). An app with both families keeps both settings, and the theme check reads each. A setting's `page` is one family or a list of them, and a setting without one is `APP`. A partner's design language starts on day 0 from the blank template, its brand asked in the foundation workstream's surface round.
+- **An app keeps one theme setting, `APP_THEMES` in `src/theme.ts`, holding its language and version, the brand once, the looks of each surface category it serves and `main`, the category of a page whose route group names none; the scaffold writes it from the app's row** (`RULE.SUPPORT.SURFACE.586` · MUST · skill:spn-surface/design). An app's pages are grouped by surface category, and one app may serve several: saasplane.ai serves `MARKETING` pages and a `RESOURCES` docs section, and a console serves `DASHBOARD` pages and a person's own `PORTAL` pages. The app's row in the language lists them in `categories` and names `main`, and each category's looks are read from its Theme part, so a row carries no theme of its own. A category's family follows from the category, so no setting names a family. An app written before this rule keeps its `SITE_THEME` and `APP_THEME` until it adopts the language (`RULE.SUPPORT.SURFACE.574` · GUIDE), and the theme check reads that shape for one release. A partner's design language starts on day 0 from the blank template, its brand asked in the foundation workstream's surface round.
 - **A page that shows a render links the design system's stylesheet and the theme config generated from a resolved language, and an app's own stylesheet only where the app gives one** (`RULE.SUPPORT.SURFACE.595` · MUST · skill:spn-surface/design). A page showing a render links `design-system.css`; the language's look reaches it through the generated theme config, and the app's through its own stylesheet and its theme file, written from the language its setting names. Nothing writes a stylesheet from the design language in this release, so a language never adds a token and a page never carries a third copy of the app's values.
 - **Layout type is the app's layout setting and never a theme value** (`RULE.SUPPORT.SURFACE.139` · MUST · skill:spn-surface/design). A language's Layouts part points at the app's layout setting and never copies it into a look.
 
@@ -312,11 +312,11 @@ This ref states what a design language is, its parts by surface category, how a 
 | `RULE.SUPPORT.SURFACE.572` | each app keeps its theme as one exported typed setting, written by the agent in the same arc as a language change |
 | `RULE.SUPPORT.SURFACE.573` | an app's theme and the language it names agree; the theme check refuses one out of step |
 | `RULE.SUPPORT.SURFACE.574` | an app with its theme in code keeps it until it adopts the design language |
-| `RULE.SUPPORT.SURFACE.575` | a theme is layered: defaults, brand, the app's looks, an account's branding |
+| `RULE.SUPPORT.SURFACE.575` | a theme is layered: defaults, brand, the looks of the page's surface category, an account's branding |
 | `RULE.SUPPORT.SURFACE.576` | a design language holds a platform's looks and never the brand of another platform |
 | `RULE.SUPPORT.SURFACE.577` | `spnutils apps surface theme <app>` refuses an app whose theme setting is out of step with the language it names |
 | `RULE.SUPPORT.SURFACE.578` | a language is one spec file, and its page draws the whole spec as one generated section |
-| `RULE.SUPPORT.SURFACE.586` | an app keeps one theme setting for each family it has, `SITE` and `APP`, each naming its language and version, and the scaffold writes them |
+| `RULE.SUPPORT.SURFACE.586` | an app keeps one theme setting, `APP_THEMES`, with its language and version, the brand once, the looks of each surface category it serves and the main one, and the scaffold writes it from the app's row |
 | `RULE.SUPPORT.SURFACE.595` | a page that shows a render links the design system's stylesheet and the theme config generated from a resolved language, and an app's own stylesheet only where the app gives one |
 | `RULE.SUPPORT.SURFACE.139` | layout type is the app's layout setting and never a theme value |
 

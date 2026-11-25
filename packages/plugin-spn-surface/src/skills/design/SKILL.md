@@ -15,7 +15,7 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "da18d3ff"
+      "seen": "6cfbce5f"
     }
   ]
 }
@@ -47,7 +47,7 @@ Take the scope from the argument: one page, or a flow of pages. A flow is severa
 
 **Where the ask brings a design of the page, or points at a page to follow, read `skills/design/steps/given-design.md` before step 1, and run the steps below through it.** It is the same skill and the same tree: the facts come first, the design is read once, each of steps 1 to 5 checks the partner's version instead of starting from nothing, and the reply ends on two lists and a stop before any code. It is guidance: the cases guide, and the partner's choice stands wherever they keep it.
 
-**Before a page is drawn, read the app's design language, and where it is being made, run `skills/design/steps/design-language.md`.** Read the repository's design language, the construct that holds the brand once and the app's row, and the app's capability chapter; a page the agent draws without them reads as another hand's. After a change to the design language, the agent writes each app's theme setting from the brand and the app's row in the same arc. The step holds intake, which records each reference, brand file and media kind a partner shares; the options, shown on the running app or its worktree in the partner's brand values; and the rounds, each recording its pick. Run `spn-surface check page <spec.json> --app <app root>` on every write of a spec, and `spn-surface check module <module folder>` on a module's folders: they refuse a raw colour in a drawing, a class on a unit, an icon outside the app's lucide set, a hero form its media does not call for, two emphases in one section, media on the wrong level, a drawing under the words narrower than its section's content, and a folder outside the module's taxonomy.
+**Before a page is drawn, read the app's design language, and where it is being made, run `skills/design/steps/design-language.md`.** Read the repository's design language, the construct that holds the brand once and the app's row, and the app's capability chapter; a page the agent draws without them reads as another hand's. After a change to the design language, the agent writes each app's one theme setting, `APP_THEMES` in `src/theme.ts`, from the brand and the app's row in the same arc. A page takes the looks of its own surface category from the route group the app's router puts it in, and never names a category itself, so a new page joins the route group of its category, and the route names that category (`RULE.SUPPORT.APPS.270` · MUST · skill:spn-apps/implement). The step holds intake, which records each reference, brand file and media kind a partner shares; the options, shown on the running app or its worktree in the partner's brand values; and the rounds, each recording its pick. Run `spn-surface check page <spec.json> --app <app root>` on every write of a spec, and `spn-surface check module <module folder>` on a module's folders: they refuse a raw colour in a drawing, a class on a unit, an icon outside the app's lucide set, a hero form its media does not call for, two emphases in one section, media on the wrong level, a drawing under the words narrower than its section's content, and a folder outside the module's taxonomy.
 
 **A page of the work, a hand page or a mock's index, is written by the devex runbook:** a page the developer will open is written by `refs/devex/workspace/docs/writing-a-page.md` of `spn-devex`: pick the template, start it, fill every slot and section, check, look, hand on (RULE.DEVEX.WORKSPACE.560).
 
@@ -690,3 +690,6 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **The render returns markup only, and a page that shows a copy builds the page around it** (`RULE.SUPPORT.SURFACE.597` · MUST · skill:spn-surface/design)
 - **A help centre always draws `DSBreadcrumb` under the bar, one link for each level above the page and the page itself unlinked, and so does any site whose bar does not list its groups or that runs deeper than three levels** (`RULE.SUPPORT.SURFACE.598` · MUST · skill:spn-surface/design)
 - **spn-surface carries the catalogue too, and the design skill reads it one slice at a time** (`RULE.SUPPORT.SURFACE.601` · MUST · skill:spn-surface/design)
+- **`DSApp` takes the app's theme setting as `dsContext.themes`, applies the main category's theme at the root, and holds the setting for the pages below** (`RULE.SUPPORT.SURFACE.602` · MUST · skill:spn-surface/design)
+- **`DSPageCategory` gives a surface category to what it holds, and renders nothing** (`RULE.SUPPORT.SURFACE.603` · MUST · skill:spn-surface/design)
+- **`DSSitePage` and `DSLayout` apply the category on the root they already render** (`RULE.SUPPORT.SURFACE.604` · MUST · skill:spn-surface/design)

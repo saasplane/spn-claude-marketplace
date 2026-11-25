@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "da18d3ff"
+      "seen": "6cfbce5f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/14-delivery-library/01-common/01-library.md",
@@ -23,7 +23,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-architecture-app/01-common/02-settings-and-theme.md",
       "section": "The theme",
-      "seen": "8b1b9e36"
+      "seen": "6f798f67"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-standards-patterns/01-common/01-task-patterns.md",
@@ -100,7 +100,7 @@ The question it holds: *is every unit the right one, built as the library draws 
   - **The page's fill and padding are the layout's.** The fill is `page-fill`, set by the theme's body colour (`BASE` where the app chose none); the layout keeps one spacing, `--layout-space`, as the page's padding and every gap; the width is the body's, `FULL` to `NARROW`, and a page of edge-to-edge bands takes `CANVAS` or `width: FULL` (`RULE.SUPPORT.APPS.160` · MUST · skill:spn-apps/implement) (`RULE.SUPPORT.SURFACE.200` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.158` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.200` · MUST · skill:spn-surface/design).
   - **A page that opens or closes on a section lets its fill meet the bar and the footer**, with no band of the page between, and a side line the content draws stands within the layout's space, so the words still start where the bar's start; `DOCK` keeps its page space (layout chapter, the page and the content).
   - **The theme styles the layout in three parts — body, navigation, content — in every layout type.** A look a page or one layout type writes is a finding; nothing stands over the content; an entry is drawn by the entry kind its look names; the layouts alone read the theme and hand the look down; a panel of navigation entries takes the navigation's look and a menu of actions does not; the defaults live once, in the default theme (`RULE.SUPPORT.SURFACE.139` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.140` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.155` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.156` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.161` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.200` · MUST · skill:spn-surface/design).
-  - **A theme holds a brand and an app's looks, and no layout type.** The brand is `app.primary`, `app.neutralTemperature` and the typefaces, stated once for the platform in its design language; the looks are `app.mode`, `app.size`, `app.motionSpeed`, `app.radius`, the layout look, and the panel, card and table looks, a row for each app. The layout type is the app's layout setting and is never copied into a look (`RULE.SUPPORT.SURFACE.139` · MUST · skill:spn-surface/design).
+  - **A theme holds a brand and an app's looks, and no layout type.** The brand is `app.primary`, `app.neutralTemperature` and the typefaces, stated once for the platform in its design language; the looks are `app.mode`, `app.size`, `app.motionSpeed`, `app.radius`, the layout look, and the panel, card and table looks, stated in the Theme part of each surface category the language states. The layout type is the app's layout setting and is never copied into a look (`RULE.SUPPORT.SURFACE.139` · MUST · skill:spn-surface/design).
   - **The theme's typefaces are `TEXT`, `DISPLAY` and `CODE`, named by their job, and a page brings no font.** `DISPLAY` is for display steps on a site's page (`DSSitePage` sets it), `CODE` for a block that shows code, `TEXT` for everything else; a text naming a font, or a face set for a part of the text, is a finding (`RULE.SUPPORT.SURFACE.196` · MUST · skill:spn-surface/design).
   - **A frame is drawn once.** Two borders round one table is the finding; a `bordered` block in a `flush` part, and a table, list, code block, accordion or empty state drawing its own border in a `flush` part, are findings (`RULE.SUPPORT.APPS.149` · MUST · skill:spn-surface/design).
   - **A line is chosen by what it parts**: `surface-divider` between rows, `surface-border` at the edge of a card, panel, popover or the shell, `surface-border-strong` at the edge of a control. A partner paints one card, card widget or panel with a class that sets the three paint tokens and nothing else, and a block reads only the tokens set on its own root (`RULE.SUPPORT.SURFACE.163` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.192` · MUST · skill:spn-surface/design).
