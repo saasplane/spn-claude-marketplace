@@ -60,6 +60,7 @@ const ARC_PART = ARC_ID.source.slice(1, -1);
 import { blockFit, fitKind, templateFrameFindings } from "../lib/block-fit.ts";
 import { shownCommandFindings } from "./shown-commands.ts";
 import { tableHintsOf } from "../commands/docs/blocks.ts";
+import { stampFindings } from "../lib/overview-stamp.ts";
 import { findPartnerWords } from "./partner-words.ts";
 import { titleFindingsOnDisk } from "./page-title.ts";
 import { whereTreeFindings } from "./where-tree.ts";
@@ -1579,6 +1580,8 @@ export function check(path: string, text: string, fragment = false): Finding[] {
   // Every page that carries a rail owes it the shared script, a preview and a samples index as much
   // as an approach page: a page rewritten whole and short of that line shows an empty outline.
   if (isHtml && !fragment) out.push(...pageFurniture(text));
+  // AN OVERVIEW MOVES WITH THE CONSTRUCT PAGES IT SUMMARISES (RULE.DEVEX.WORKSPACE.581): its stamp is read against their seat files as they are now.
+  if (isHtml && !fragment) out.push(...stampFindings(path, text));
 
   if ((isApproach || isOverview) && !fragment) {
     if (!/who this is for|audience/i.test(text))

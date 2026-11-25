@@ -430,6 +430,10 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.665 | Builder | never reuse a red run | a package whose suite went red, or whose record was taken on other inputs, runs; `--all` runs every package | NEGATIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.666 | Builder | read in the release commit which suites ran | `release:plugins prepare` names the suites that ran and each reused one with the run it came from | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.667 | Editor | mark MARKETPLACE with its own icon | a `catalog` item names `search`, and the page draws a lens and its handle with no finding | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.668 | Editor | record which construct pages an overview summarises | `docs page stamp <overview>` writes `summarises` in the overview's block, one `{ page, seen }` for each door to a construct page outside a generated region, the seen hash of its seat file, keeping every other key of the block; a second stamp changes nothing | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.669 | Editor | be told an overview has fallen behind its constructs | `docs page check <overview>` reports a stamped page whose seat file changed, one that leads nowhere and a door `summarises` does not name, and tells an overview with no stamp to run it | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.670 | Editor | know which overviews a construct page leaves owed | `docs page write <seat>` names each overview whose stamp records the seat's page with an older hash | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.671 | Editor | not stamp an overview whose door leads nowhere | `docs page stamp` refuses an overview with a door to a construct page whose seat file is not there, names the door and writes nothing | NEGATIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

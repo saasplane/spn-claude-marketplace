@@ -310,6 +310,7 @@ const exitIn = (cwd, args) => {
 };
 const USAGE = "usage: spn-devex docs page check <seat…>\n" +
               "       spn-devex docs page write <seat…>\n" +
+              "       spn-devex docs page stamp <overview…>\n" +
               "       spn-devex docs page new <kind> <path> [--name <name>] [--workstream <NNN-subject>] [--arc <arc>]\n";
 
 console.log("\n=== `docs page` needs its action as a word, and both actions need a seat file");
