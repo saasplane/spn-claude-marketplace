@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-components/",
-      "seen": "bc1aabbd"
+      "seen": "553a65ae"
     }
   ]
 }
@@ -1048,7 +1048,7 @@ A row states its kind in `mtype`, which takes `DSComparisonRowType`: `FIELD` giv
 | `surface` | a card frame, as a feature's is; a key left out takes the quote's own, `BASE`, `SUBTLE`, rounded, with no border and no shadow | none: the words stand on the page |
 | `className` · `testData` | the figure's classes and the test hook | none |
 
-- **The words are one step above a feature's description at the same level:** 24, 20, 18, 16, 14 and 13px from `PAGE` to `INLINE`, and the heading step the level names where they stand beside the speaker or centred at `PAGE` and `CONTAINER`. The speaker's name and line are `DSItem`'s parts at the same level and carry no heading.
+- **The words are sized by the level, wherever the speaker stands:** at `PAGE` and `CONTAINER` the quote is the section's message, `HEADING_XL`, 40px, and `HEADING_LG`, 34px, in the display face, 32 and 30px on a phone; from `WIDGET` down a card in a row, one step above a feature's description, 18, 16, 14 and 13px to `INLINE`. The speaker's name and line are `DSItem`'s parts at the same level and carry no heading.
 - **One quote across a section stands its speaker beside the words; quotes in a row, a grid or a carousel stand it under them** (the developer, 2026-11-25). With `START` or `END` the speaker takes a column a third of the quote wide from the tablet up, a `CUSTOM` portrait filling its width at its own ratio and an avatar's photo drawn large and cut to 4:5; on a phone it folds under the words and its picture is drawn as `DSItem` draws it. `BOTTOM` and `TOP` draw the small box beside the name, as `DSItem` does.
 - **A quote's stars are its own for now**, read only; `DSRatingView` is the unit for every other rating.
 
