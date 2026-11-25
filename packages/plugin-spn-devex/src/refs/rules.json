@@ -36939,6 +36939,11 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/site-patterns.md",
           "heading": "What holds across — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
