@@ -4,7 +4,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
       "section": "A site's review walks the site",
-      "seen": "426eb721"
+      "seen": "bb7fc835"
     }
   ]
 }
@@ -12,7 +12,7 @@
 
 # A site's review walks the site
 
-Read this when the developer asks to review a site that is running, and at an arc's final re-check of one. A copy shows what a section was meant to be, and only the page shows what a visitor gets. N008 reviewed copies and never the live site after the carry, so a band's second feature shipped at the card's level and 32 of 109 media broke their sizes.
+Read this when the developer asks to review a site that is running, and at an arc's final re-check of one. A copy shows what a section was meant to be, and only the page shows what a visitor gets. One review read copies and never the live site after the carry, so a band's second feature shipped at the card's level and 32 of 109 media broke their sizes.
 
 ## The walk
 

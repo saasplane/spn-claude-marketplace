@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "670c6ed1"
+    "commit": "51961a77"
   },
   "rules": [
     {
@@ -21320,9 +21320,9 @@
         "skill": "spn-apps/implement"
       },
       "class": "stated in a skill",
-      "sentence": "A module's shared list and record page take the app's own additions: columns on a list, sections on a record page",
-      "chapter": "04-capabilities/02-support/02-apps/03-module/02-web/03-entry/02-components.md",
-      "heading": "A shared screen takes the app's additions",
+      "sentence": null,
+      "chapter": "02-constructs/03-platform/01-core/02-identity.md",
+      "heading": "Console follows rights",
       "decision": null,
       "restated": [
         {
@@ -21334,11 +21334,6 @@
           "plugin": "spn-apps",
           "path": "refs/support/apps/module/README.md",
           "heading": "The web module — the same layers, a person as the transport"
-        },
-        {
-          "plugin": "spn-apps",
-          "path": "skills/implement/SKILL.md",
-          "heading": "The rules this step holds"
         }
       ]
     },
@@ -25668,9 +25663,9 @@
       "level": "GUIDE",
       "params": {},
       "class": "guidance",
-      "sentence": null,
+      "sentence": "An app page kind fixes the arrangement, and never which block fills a part",
       "chapter": "04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/03-app-page-kinds.md",
-      "heading": "How each section is read",
+      "heading": "The app page kinds, by name",
       "decision": null,
       "restated": [
         {
@@ -25856,9 +25851,9 @@
       "level": "GUIDE",
       "params": {},
       "class": "guidance",
-      "sentence": "A listing page whose query takes a page, a text or a filter stays a data table, also where its set is small today",
+      "sentence": "The contract decides first",
       "chapter": "04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/03-app-page-kinds.md",
-      "heading": "The listing pages",
+      "heading": "Step 2: what shows a part",
       "decision": null,
       "restated": [
         {
@@ -39140,7 +39135,7 @@
       "level": "GUIDE",
       "params": {},
       "class": "guidance",
-      "sentence": "`DSPageFrameGroups` folds its three parts by the screen class, and each part has its way back",
+      "sentence": "`DSPageFrameGroups` folds its three parts by the room it has, and each part has its way back",
       "chapter": "04-capabilities/02-support/01-surface/07-architecture-components/01-common/01-components.md",
       "heading": "DSPageFrameGroups",
       "decision": null,
