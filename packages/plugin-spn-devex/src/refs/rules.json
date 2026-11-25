@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "47c5e120"
+    "commit": "fd62e319"
   },
   "rules": [
     {
@@ -34076,7 +34076,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "The persons are one closed set: Team, Individual, Visitor and Learner, each with its answers beside it",
+      "sentence": "The persons are one closed set: Team, Individual, Visitor, Learner and Seeker, each with its answers beside it",
       "chapter": "04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/01-surface-types.md",
       "heading": "Who an app is for",
       "decision": null,

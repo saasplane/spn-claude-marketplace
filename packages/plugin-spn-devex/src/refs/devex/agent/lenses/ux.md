@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "b0b9bf14"
+      "seen": "a6a775f1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-layouts/01-common/01-layout.md",
@@ -88,7 +88,7 @@ The question it holds: *can this person finish what they came to do, and do they
 Read the page itself, never a description of it — the frame, the preview, the running screen (`spn-devex docs look <page>`) or the tree the `design` skill wrote — from the top down: the page, the layout, each panel, then each widget. Name each task in one verb and hold it against the pattern of its intent. A planned chapter is the standard a page is held to. A picture shows a state, never the keys that reach it, so close by naming what the page could not show.
 
 - **Standards and patterns** — held by the `design` skill's order of decisions, and by this lens worn.
-  - **Who the app is for comes first, then the flow the page is a step of.** The person — Team, Individual, Visitor or Learner, each with its answers beside it — is read once for the app from the personas whose rows land in it, written as its first fact with where it was read, and asked where they do not say, never guessed and never read from the tier (standards § Who an app is for · `RULE.SUPPORT.SURFACE.330`, `.331`). Then the flow says which step of a person's path the page is (flow patterns · `RULE.SUPPORT.SURFACE.360`).
+  - **Who the app is for comes first, then the flow the page is a step of.** The person — Team, Individual, Visitor, Learner or Seeker, each with its answers beside it — is read once for the app from the personas whose rows land in it, written as its first fact with where it was read, and asked where they do not say, never guessed and never read from the tier (standards § Who an app is for · `RULE.SUPPORT.SURFACE.330`, `.331`). Then the flow says which step of a person's path the page is (flow patterns · `RULE.SUPPORT.SURFACE.360`).
   - **A page another person reaches takes that person, and where two meet the less forgiving decides**; where two page kinds fit the data, the person chooses. A person changes only what the app already sets and the lines its page kinds carry, never a second version of a page (`RULE.SUPPORT.SURFACE.333` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.334` · MUST · skill:spn-surface/design).
   - **The page has one purpose and one main action.** An answer that needs *and* is two pages (standards § A page has one purpose).
   - **Each level owns its own thing.** The layout draws the navigation and hands the page the content (standards § The levels · `RULE.SUPPORT.APPS.146`).

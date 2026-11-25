@@ -3,7 +3,7 @@
     "RESTATES: spn-foundation docs/02-constructs/02-support/01-surface/12-language-design-language.md § The spec file",
     "A DESIGN LANGUAGE SPEC, one typed file at docs/specs/design-languages/<language>.spdl.json in the repository that owns the language. It holds only the language's decisions, and its keys are the ones of the catalogue, docs/specs/surface/catalogue.json (03 Surface Catalogue).",
     "A language depends on no app and names none. An app keeps its own typed theme setting, which names the language and version it was written from.",
-    "shared holds BRAND, DRAWING, MOTION and VOICE. categories holds MARKETING, RESOURCES, DASHBOARD and PORTAL, each with LAYOUTS, PAGES, CONTAINERS and WIDGETS (Structure) and THEME, MEDIA, MOTION and WORDS (Style); a language keeps the categories it states and inherits the rest from its parent. A category of its own is NEW and carries family, person and from.",
+    "shared holds BRAND, DRAWING, MOTION and VOICE. categories holds MARKETING, RESOURCES, MARKETPLACE, DASHBOARD and PORTAL, each with LAYOUTS, PAGES, CONTAINERS and WIDGETS (Structure) and THEME, MEDIA, MOTION and WORDS (Style); a language keeps the categories it states and inherits the rest from its parent. A category of its own is NEW and carries family, person and from.",
     "A decision is source (OWN, INHERITED or NONE), pick (ALL or the codes), customise, add, notUsed, values and why, which is one or two sentences saying why the language decided this and never repeats a value, a rule's words or the developer's words. customise and add work on the catalogue's kinds and cases and nothing else: a customisation never changes a kind's meaning, an added kind or case is built from units and never reuses a code or changes the kind's reason, an added kind carries for and chooseWhen, a page kind's order may name another case for a section, and the floor is never customised. A page's own departure is stated in the page's tree as departs[] (proposed), never here. values holds the language's own settings, with mtype naming the part.",
     "A child states only what differs: a part it leaves out is INHERITED, and its values merge with its parent's key by key. A parent never lists the languages that extend it.",
     "Delete this $comment in the copy."
@@ -71,7 +71,7 @@
     }
   },
   "categories": {
-    "{{MARKETING | RESOURCES | DASHBOARD | PORTAL | a category of its own, state NEW, with family, person and from}}": {
+    "{{MARKETING | RESOURCES | MARKETPLACE | DASHBOARD | PORTAL | a category of its own, state NEW, with family, person and from}}": {
       "LAYOUTS": {
         "source": "{{OWN | INHERITED | NONE}}",
         "pick": "{{ALL | [the codes of the catalogue's kinds it uses as they are]}}",
@@ -92,7 +92,7 @@
             "guidance": {
               "for": {
                 "persons": [
-                  "{{VISITOR | LEARNER | TEAM | INDIVIDUAL}}"
+                  "{{VISITOR | LEARNER | SEEKER | TEAM | INDIVIDUAL}}"
                 ]
               },
               "chooseWhen": "{{When to choose it}}"

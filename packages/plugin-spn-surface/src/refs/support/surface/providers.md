@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/16-delivery-providers.md",
-      "seen": "429632e3"
+      "seen": "f76839b8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/16-delivery-providers/",
-      "seen": "69881e2f"
+      "seen": "161d987e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/16-delivery-providers/02-ts/01-design-system.md",

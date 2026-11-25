@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/10-architecture-layouts.md",
-      "seen": "8f5f7e00"
+      "seen": "078a2767"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-layouts/",
@@ -43,10 +43,10 @@ Read this before you choose a layout for an app, or before you build or draw a l
 | --- | --- | --- |
 | `RAIL` | a sidebar at the side, with a fixed head and foot, which a person opens and shuts to icons | an app a person works in, with many sections: an admin console, the platform; a RESOURCES site whose pages run in groups of several levels |
 | `DOCK` | a bar across the top, and the entries in a column beside one page | one person's or one thing's settings: a profile, an account, set inside another frame; used by DASHBOARD and PORTAL |
-| `TOPNAV` | a bar across the top, with the content below it | a website, with the few entries that fit on one line: MARKETING, a shallow RESOURCES site, or PORTAL |
+| `TOPNAV` | a bar across the top, with the content below it | a website, with the few entries that fit on one line: MARKETING, a shallow RESOURCES site, a MARKETPLACE, or PORTAL |
 | `CANVAS` | none: the body alone | a landing page, a sign-in, an app that cannot start, or a tool that fills the window |
 
-Which layouts each surface category may use is the Layouts part of its category in the Surface Catalogue, and a design language picks among them: `RAIL` and `DOCK` serve DASHBOARD or RESOURCES and DASHBOARD or PORTAL, `TOPNAV` serves MARKETING, RESOURCES and PORTAL, and `CANVAS` serves MARKETING, DASHBOARD and PORTAL.
+Which layouts each surface category may use is the Layouts part of its category in the Surface Catalogue, and a design language picks among them: `RAIL` and `DOCK` serve DASHBOARD or RESOURCES and DASHBOARD or PORTAL, `TOPNAV` serves MARKETING, RESOURCES, MARKETPLACE and PORTAL, and `CANVAS` serves MARKETING, DASHBOARD and PORTAL.
 
 **The library draws `DSLayout`** from its props table and its samples block (`architecture-components.md`, *The page model*). Its showcase layout is Full screen, so each cell is a whole screen at the width of a device. As its usage it draws a workspace's dashboard in the type `RAIL`, on a desktop window. A layout has no page of its own for a sizing: it has Overview, Main, Playground, one page for each value of `config.mtype` (`RAIL`, `DOCK`, `TOPNAV`, `CANVAS`), each holding Main's sections with that type fixed and its tabs from the unit's `types` list, and Screens. The one state it lists is Open, `open`, on the rail, which is shut at rest. On the web a type page adds a row of controls so a developer can try a look on every tab; the library draws none. `DSSiteLayout` is the layout's second unit, a wrapper that draws nothing of its own, with the pages Overview, Main and Playground.
 

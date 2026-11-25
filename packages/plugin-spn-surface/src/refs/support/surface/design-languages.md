@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
-      "seen": "c0db254f"
+      "seen": "b1e0a3a9"
     }
   ]
 }
@@ -29,13 +29,13 @@ Read this before you build or review a page of a site, and before you make a des
 
 A site or an app follows one design language, and every page reads it before it makes a choice of its own (`RULE.SUPPORT.SURFACE.440` · GUIDE). The theme says which colours and corners; the design language says how the pages are built and how they look and move, so any theme recolours it.
 
-- **One language states a decision for each surface category, because the surfaces of one repository serve different people.** A hiring product's site is a MARKETING category, its job portal a PORTAL and its company app a DASHBOARD, each for its own person, and the language names none of the apps.
+- **One language states a decision for each surface category, because the surfaces of one repository serve different people.** A hiring product's site is a MARKETING category, its careers pages of open jobs a MARKETPLACE, its job portal a PORTAL and its company app a DASHBOARD, each for its own person, and the language names none of the apps.
 - **Support ships design languages as choices, and never as finished pages.** `architecture-app.md` states why.
 - **One that sets a choice changes the look, and one that sets none leaves the site as the container kinds state it.** An app that adopts none keeps its look.
 
 ## The parts — 🔮
 
-A design language is described for each surface category it states, in the same eight parts, in the groups Structure and Style, beside one Shared group. The surface categories are `MARKETING` and `RESOURCES` for a site, and `DASHBOARD` and `PORTAL` for an app. Shared holds four parts, Structure holds four and Style holds four, as the Surface Catalogue states, and every choice in the language names a unit or a token of the design system.
+A design language is described for each surface category it states, in the same eight parts, in the groups Structure and Style, beside one Shared group. The surface categories are `MARKETING`, `RESOURCES` and `MARKETPLACE` for a site, and `DASHBOARD` and `PORTAL` for an app. Shared holds four parts, Structure holds four and Style holds four, as the Surface Catalogue states, and every choice in the language names a unit or a token of the design system.
 
 | Part | The choices it holds |
 | --- | --- |

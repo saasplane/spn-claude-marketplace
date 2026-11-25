@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/05-standards-names.md",
-      "seen": "c0362df1"
+      "seen": "76d5379c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/05-standards-names/",
@@ -262,9 +262,9 @@ The surface domain sets ten names of its own, and each is built under the same r
 
 | Name | What it says | Values |
 | --- | --- | --- |
-| `SPSurfaceCategoryType` | which surface a thing is, by what it is for and who it is for | `MARKETING` · `RESOURCES` · `DASHBOARD` · `PORTAL` |
-| `SPSurfaceFamilyType` | whether a person reads the surface or works in it | `SITE` (`MARKETING`, `RESOURCES`) · `APP` (`DASHBOARD`, `PORTAL`) |
-| `SPSurfacePersonType` | who a category is for | `VISITOR` · `LEARNER` · `TEAM` · `INDIVIDUAL` |
+| `SPSurfaceCategoryType` | which surface a thing is, by what it is for and who it is for | `MARKETING` · `RESOURCES` · `MARKETPLACE` · `DASHBOARD` · `PORTAL` |
+| `SPSurfaceFamilyType` | whether a person reads the surface or works in it | `SITE` (`MARKETING`, `RESOURCES`, `MARKETPLACE`) · `APP` (`DASHBOARD`, `PORTAL`) |
+| `SPSurfacePersonType` | who a category is for | `VISITOR` · `LEARNER` · `SEEKER` · `TEAM` · `INDIVIDUAL` |
 | `SPSurfaceGroupType` | the three groups the parts of a category stand in | `SHARED` · `STRUCTURE` · `STYLE` |
 | `SPSurfacePartType` | one of the twelve parts, read as its group and its code, because `MOTION` stands in two groups | Shared: `BRAND` · `DRAWING` · `MOTION` · `VOICE`. Structure: `LAYOUTS` · `PAGES` · `CONTAINERS` · `WIDGETS`. Style: `THEME` · `MEDIA` · `MOTION` · `WORDS` |
 | `SPSurfaceSourceType` | who fills a part in a design language | `OWN` · `INHERITED` · `NONE` |

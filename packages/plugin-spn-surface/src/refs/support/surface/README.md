@@ -37,7 +37,7 @@ The one way into this plugin's Surface refs. Find your job below, and read its r
 
 ## 1. Design a page or a flow
 
-Run the `design` skill. It names the surface category first: MARKETING (a Visitor) and RESOURCES (a Learner) are site categories, DASHBOARD (a Team) and PORTAL (an Individual) are app categories, and it reads the design language's row for that category. It reads these refs in its own order, and states each page as a tree of named blocks (JSON, as the book's page render states).
+Run the `design` skill. It names the surface category first: MARKETING (a Visitor), RESOURCES (a Learner) and MARKETPLACE (a Seeker) are site categories, DASHBOARD (a Team) and PORTAL (an Individual) are app categories, and it reads the design language's row for that category. It reads these refs in its own order, and states each page as a tree of named blocks (JSON, as the book's page render states).
 
 | Order | What it settles | Ref |
 | --- | --- | --- |

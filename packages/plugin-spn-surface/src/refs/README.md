@@ -18,7 +18,7 @@
 
 ## The four categories
 
-**A surface is MARKETING, RESOURCES, DASHBOARD or PORTAL**: the first two are sites, for a Visitor and a Learner, and the last two are apps, for a Team and an Individual. The design language holds each category as a row of eight parts, Structure and Style, after a Shared group.
+**A surface is MARKETING, RESOURCES, MARKETPLACE, DASHBOARD or PORTAL**: the first three are sites, for a Visitor, a Learner and a Seeker, and the last two are apps, for a Team and an Individual. The design language holds each category as a row of eight parts, Structure and Style, after a Shared group.
 
 ## What is copied
 

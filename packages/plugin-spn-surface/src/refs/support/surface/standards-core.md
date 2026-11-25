@@ -8,6 +8,10 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/",
       "seen": "97d89fe8"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/01-surface-types.md",
+      "seen": "39e7b1f6"
     }
   ]
 }
@@ -109,17 +113,19 @@ Never write a second version of a page for a density, a theme, a device type or 
 
 ## The surface categories — 🔮
 
-A surface is a **site**, which people read, or an **app**, which people work in. Each family holds two categories, and each category is tied to one person. The Surface Catalogue states them; the design skill names the category first.
+A surface is a **site**, which people read, or an **app**, which people work in. The site family holds three categories and the app family two, and each category is tied to one person. The Surface Catalogue states them, in its chapter of the surface categories (`03-standards-surface-catalogue/01-common/01-surface-types.md`); the design skill names the category first.
 
 | Category | Family | Person |
 | --- | --- | --- |
 | **MARKETING** | SITE | Visitor |
 | **RESOURCES** | SITE | Learner |
+| **MARKETPLACE** | SITE | Seeker |
 | **DASHBOARD** | APP | Team |
 | **PORTAL** | APP | Individual |
 
 - **A surface has one category, named before a layout, a page kind or a design language is chosen.** The category follows from the person the surface is for, as the next section reads it.
 - **An admin or console app is a DASHBOARD.** A team works in it, and the word admin names a job inside it.
+- **A public site of records is a MARKETPLACE.** A shop, a site of cars, a job board and a matrimony site are each one: a Seeker comes to find one record among many and choose it.
 - **Web and Native are a separate axis.** A native app is a DASHBOARD or a PORTAL on Native; the category does not change with the platform.
 
 ## Who an app is for — 🔮
@@ -134,9 +140,10 @@ A **person** is who an app is for, named by how they use it. It is never a busin
 | **Individual** | many people who use the app for themselves: a shopper, a traveller, a patient, a policyholder, a daily news reader | rarely, or now and then; every day for what they read | never | often a phone, by touch, sometimes on a poor connection | a confusing step, an error they cannot fix, or a form that asks too much |
 | **Visitor** | a person not signed in, deciding whether a product is for them | once, or a few times while they decide | never | any; often a phone, from a link | a first screen that hides what it is, or a made-up claim |
 | **Learner** | a person reading to learn or to get a thing working: a developer in the docs, a person in a help article | in bursts, when they need it | in their own trade, and new to this product | a desktop, beside their work | a missing or wrong step, or a sample that does not run |
+| **Seeker** | a person finding and choosing one record among many: a shopper in a shop, a buyer looking at cars, a job seeker, a person looking for a match | again and again while they look, then rarely once they have chosen | never | often a phone, from a search or a link | a search that finds nothing, a filter that loses their place, or a record that turns out to be gone |
 
 - **An app MUST name the person it is for before any page kind is chosen** (`RULE.SUPPORT.SURFACE.330` · MUST · skill:spn-surface/design).
-- **The persons MUST be one closed set: Team, Individual, Visitor and Learner, each with its answers beside it** (`RULE.SUPPORT.SURFACE.331` · MUST · skill:spn-surface/design). *Individual* is not the platform's user record, which is an identity, and it is not the platform's consumer tier.
+- **The persons MUST be one closed set: Team, Individual, Visitor, Learner and Seeker, each with its answers beside it** (`RULE.SUPPORT.SURFACE.331` · MUST · skill:spn-surface/design). *Individual* is not the platform's user record, which is an identity, and it is not the platform's consumer tier.
 
 ### How the person is read
 
@@ -154,15 +161,15 @@ The register page is where a Visitor becomes a Team or Individual: the Visitor r
 
 The book's rules hold for every person as they stand. A person changes only a setting the app already owns, or a line a page kind already carries.
 
-| What changes | Team | Individual | Visitor | Learner |
-| --- | --- | --- | --- | --- |
-| **The layout's job** | `RAIL` for the app; `DOCK` for a person's own settings; `CANVAS` to sign in | `TOPNAV` with the few entries that fit on one line, or `DOCK` for their own account; never a `RAIL` of many sections | `TOPNAV` for a site; `CANVAS` for one landing | `TOPNAV` for a few pages; the doc's sections at the side where it has many |
-| **Density** | the theme's app size; tables keep every column a person compares | one size step up; fewer facts on a line; item lines before a table where the set is small | the site's sizes by a section's role, as today | the reading measure; code at its own size |
-| **The page kind, where two fit** | the one that keeps the person in place and fast: Find in a list as a table, Change in place, An entry over the page | the one that asks one thing at a time: the data table's `LIST` layout, an entry in steps, a record read before it is changed | words before a picture: Points before a Feature grid, Show it before a Real sample, except for a builder | the one that teaches: Steps, Real sample, Show it with a diagram, Questions |
-| **An entry** | many fields at once, up to about 12 in a sheet; keyboard first; actions on many records; defaults filled | about 5 fields a screen and one decision; every format a person might type accepted; nothing they entered lost; undo before confirm | one ask, the fewest fields, and no account before value | a command to copy, and the line that says it worked |
-| **A failure, and empty** | a failure names what went wrong and the reference support can use; empty says what to create, in the trade's words | a failure says what happened and what to do next in everyday words, never a code alone, with a way to ask for help; empty says what will appear and how to start | a form's failure keeps what was typed; media that does not load leaves its words | a step's failure names the likely error and its fix |
-| **The words** | an app screen's rules, below, in the product's words, which may be the trade's | the same, with everyday words only, and a description one step shorter | the marketing page's rules, below, and its budget by level | the doc's rules: why before how, a term explained where it is first met |
-| **A phone** | desktop first; on a phone a person checks, approves and reads, and those tasks finish there | phone first: every task finishes with one hand, the main action in reach at the foot, an entry a full screen or a sheet from the bottom | the first screen says what it is and for whom; words, then the picture | code scrolls sideways and never wraps; steps stand one under another |
+| What changes | Team | Individual | Visitor | Learner | Seeker |
+| --- | --- | --- | --- | --- | --- |
+| **The layout's job** | `RAIL` for the app; `DOCK` for a person's own settings; `CANVAS` to sign in | `TOPNAV` with the few entries that fit on one line, or `DOCK` for their own account; never a `RAIL` of many sections | `TOPNAV` for a site; `CANVAS` for one landing | `TOPNAV` for a few pages; the doc's sections at the side where it has many | `TOPNAV` with a search in the bar and the categories in its menu |
+| **Density** | the theme's app size; tables keep every column a person compares | one size step up; fewer facts on a line; item lines before a table where the set is small | the site's sizes by a section's role, as today | the reading measure; code at its own size | the site's sizes; a record card keeps its picture and the two or three facts that decide |
+| **The page kind, where two fit** | the one that keeps the person in place and fast: Find in a list as a table, Change in place, An entry over the page | the one that asks one thing at a time: the data table's `LIST` layout, an entry in steps, a record read before it is changed | words before a picture: Points before a Feature grid, Show it before a Real sample, except for a builder | the one that teaches: Steps, Real sample, Show it with a diagram, Questions | the one that keeps them looking: a category before every record, filters before a long scroll, a compare before two pages opened side by side |
+| **An entry** | many fields at once, up to about 12 in a sheet; keyboard first; actions on many records; defaults filled | about 5 fields a screen and one decision; every format a person might type accepted; nothing they entered lost; undo before confirm | one ask, the fewest fields, and no account before value | a command to copy, and the line that says it worked | a search and filters, never a form; the filters chosen stay in the page's address |
+| **A failure, and empty** | a failure names what went wrong and the reference support can use; empty says what to create, in the trade's words | a failure says what happened and what to do next in everyday words, never a code alone, with a way to ask for help; empty says what will appear and how to start | a form's failure keeps what was typed; media that does not load leaves its words | a step's failure names the likely error and its fix | a search that finds nothing says so and offers to widen it; a record that is gone says so and shows others like it |
+| **The words** | an app screen's rules, below, in the product's words, which may be the trade's | the same, with everyday words only, and a description one step shorter | the marketing page's rules, below, and its budget by level | the doc's rules: why before how, a term explained where it is first met | the record's own facts, named the same on every card, with no persuasion over them |
+| **A phone** | desktop first; on a phone a person checks, approves and reads, and those tasks finish there | phone first: every task finishes with one hand, the main action in reach at the foot, an entry a full screen or a sheet from the bottom | the first screen says what it is and for whom; words, then the picture | code scrolls sideways and never wraps; steps stand one under another | phone first: the search in reach, filters in a sheet, one card across, and a record kept with one press |
 
 - **A person MUST change only what an app already sets, such as its density, and the lines its page kinds carry** (`RULE.SUPPORT.SURFACE.334` · MUST · skill:spn-surface/design). It **MUST NOT** bring a second version of a page, or a unit of its own.
 - **Every pattern MUST name the persons it serves, and one line says how it runs differently for one** (`RULE.SUPPORT.SURFACE.332` · MUST · skill:spn-surface/design). Every pattern of every group carries it as a *For* line: `standards-patterns.md`, `site-patterns.md` and `flow-patterns.md`. A page no page kind fits is derived from the page kinds whose person and data fit it, and it never waits for a page kind; `standards-patterns.md` says when a page shape earns a page kind of its own.
@@ -292,7 +299,7 @@ This ref states what a surface is built in, what one page is for, and what a pag
 | `RULE.SUPPORT.SURFACE.063` | a line stands between each two lines of a list |
 | `RULE.SUPPORT.SURFACE.201` | the surface moves by one set of tokens: a clamped duration for each place, three shared eases, a role for each kind of unit, and one rule for reduced motion |
 | `RULE.SUPPORT.SURFACE.330` | an app names the person it is for before any page kind is chosen, read from its personas and rows, asked where they do not say, and never read from the tier |
-| `RULE.SUPPORT.SURFACE.331` | the persons are one closed set, Team, Individual, Visitor and Learner, each named by how a person uses a product |
+| `RULE.SUPPORT.SURFACE.331` | the persons are one closed set, Team, Individual, Visitor, Learner and Seeker, each named by how a person uses a product |
 | `RULE.SUPPORT.SURFACE.333` | the person decides between two page kinds that fit, a page another person reaches takes that person, and the less forgiving decides where two meet |
 | `RULE.SUPPORT.SURFACE.334` | a person changes only what an app already sets and the lines its page kinds carry, and never brings a second version of a page or a unit |
 | `RULE.SUPPORT.SURFACE.208` | the words of a page follow what it is for, a doc, an app's screen or a marketing page, decided before a word is written |

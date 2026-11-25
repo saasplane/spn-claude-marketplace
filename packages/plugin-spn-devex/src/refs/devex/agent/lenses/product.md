@@ -17,7 +17,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/01-surface-types.md",
       "section": "Who an app is for",
-      "seen": "874db39c"
+      "seen": "8013b2b3"
     }
   ]
 }
@@ -78,7 +78,7 @@ A product manager may never open the book: asks arrive loose, not as specs in pl
   - **Acceptance is written at plan time** in the row's `Sees` cell — what is true when it works — never empty, each case testable, in the consumer's language.
   - **The consumer vocabulary is real.** Every product word appears in its domain's glossary as a `Term`, with a contract term beside it. A product word with no code behind it is a defect; a term no consumer speaks takes a deliberate dash, never an invented word.
   - **The journey holds.** A new behaviour lands inside a journey a consumer can complete — entry point, steps, what they see.
-  - **The personas and the rows are what the person is read from.** Who an app is for — Team, Individual, Visitor or Learner — is read once for the app from the personas whose rows land in it, each row's `Who` and `Does`, and the industry brief where there is one, by asking of each persona: do they use the app as their job, use it for themselves, are they still deciding, or did they come to learn? Where the personas and the rows do not say, the person is asked, never guessed, and never read from the platform's tier (surface categories § Who an app is for · `RULE.SUPPORT.SURFACE.330`).
+  - **The personas and the rows are what the person is read from.** Who an app is for — Team, Individual, Visitor, Learner or Seeker — is read once for the app from the personas whose rows land in it, each row's `Who` and `Does`, and the industry brief where there is one, by asking of each persona: do they use the app as their job, use it for themselves, are they still deciding, or did they come to learn? Where the personas and the rows do not say, the person is asked, never guessed, and never read from the platform's tier (surface categories § Who an app is for · `RULE.SUPPORT.SURFACE.330`).
   - **Product outcomes over code delivery.** A change is measured by the consumer outcome it ships, never by the volume of code.
   - Rows stay in product terms, never implementation words, so every function can read every row.
 
