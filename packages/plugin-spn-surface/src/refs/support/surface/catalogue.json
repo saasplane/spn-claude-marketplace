@@ -1304,7 +1304,9 @@
        },
        "QUESTIONS",
        "CLOSING_CALL"
-      ]
+      ],
+      "reassurance": "one line under the plans, WORDS NOTE FINE_PRINT, such as 14-day trial, no card, cancel any time",
+      "compareRows": "COMPARE PLANS holds values and ticks in one table, a value where the plans differ by an amount and a tick where by having it"
      },
      "style": {
       "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
@@ -1454,7 +1456,10 @@
        ],
        "reading": "Hero, Show it, Feature grid, Doors"
       },
-      "topics": "RECORDS DATED_FEED narrowed by a tab for each topic, each tab with its count, where the blog has several topics"
+      "topics": "RECORDS DATED_FEED narrowed by a tab for each topic, each tab with its count, where the blog has several topics",
+      "head": "the title and line, with a search of the posts at the end where the blog holds many; topics as pills in one row, All first, a count optional",
+      "led": "the led piece is the one picked, else the newest; it leaves when a topic or a search narrows the list, which then shows a count line, and a message with the way back where nothing is found; choosing a topic clears the search",
+      "postCard": "a post's card: its cover, its topic, its title, a line, its author with the avatar, and its reading time"
      },
      "style": {
       "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
@@ -1517,7 +1522,9 @@
       "languageOrder": {
        "reading": "Hero, the reading, Doors"
       },
-      "whereNext": "DOORS NEXT_TOPIC first, more from this topic, then the related pieces"
+      "whereNext": "DOORS NEXT_TOPIC first, more from this topic, then the related pieces",
+      "head": "the breadcrumb; the cover above the title at the reading column's width, never across the page; the topic as the eyebrow, the title, the lead, and the byline with the avatar, the date and the reading time; no view count",
+      "end": "after the reading: the author's box, the avatar, Written by, the name, the role and a line; More from <topic>, two or three post cards; then where to follow"
      },
      "style": {
       "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
@@ -4768,6 +4775,35 @@
       }
      ],
      "status": "BUILT"
+    },
+    {
+     "code": "COUNTDOWN",
+     "title": "Countdown",
+     "description": "How long until something begins.",
+     "guidance": {
+      "for": {
+       "persons": [
+        "VISITOR"
+       ]
+      },
+      "chooseWhen": "a date the page is about, such as a launch or the end of an offer: the days, hours and minutes left, and what happens then",
+      "notWhen": [
+       {
+        "condition": "A date that has passed or is far off",
+        "instead": "the date in words"
+       }
+      ],
+      "rules": []
+     },
+     "config": {
+      "mtype": "WIDGETS"
+     },
+     "units": "DSText; a countdown is planned in the design system",
+     "placement": {
+      "standsIn": "a hero or a closing call"
+     },
+     "style": {},
+     "status": "PLANNED"
     }
    ],
    "THEME": [
@@ -6094,7 +6130,8 @@
      "placement": {
       "level": "2 OR DEEPER",
       "pageGroup": "FIND",
-      "records": "RECORDS FILTERED"
+      "records": "RECORDS FILTERED",
+      "facets": "DSPageFrameAside with asidePlacement START and asideWidth NARROW: the facets (DSFacetGroup) in the aside at the start, the records in the main part; four filters or fewer stand in a bar above the records instead and the page needs no frame (Q82 A)"
      },
      "style": {
       "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
@@ -6244,7 +6281,8 @@
      },
      "placement": {
       "level": 2,
-      "pageGroup": "FIND"
+      "pageGroup": "FIND",
+      "facets": "DSPageFrameAside with asidePlacement START and asideWidth NARROW: the facets (DSFacetGroup) in the aside at the start, the records in the main part; four filters or fewer stand in a bar above the records instead and the page needs no frame (Q82 A)"
      },
      "style": {
       "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
@@ -6345,7 +6383,8 @@
      },
      "placement": {
       "level": 2,
-      "pageGroup": "FIND"
+      "pageGroup": "FIND",
+      "facets": "DSPageFrameAside with asidePlacement START and asideWidth NARROW: the facets (DSFacetGroup) in the aside at the start, the records in the main part; four filters or fewer stand in a bar above the records instead and the page needs no frame (Q82 A)"
      },
      "style": {
       "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
@@ -10842,7 +10881,8 @@
       "level": 2,
       "languageOrder": {
        "reading": "Hero, Feature grid, Doors"
-      }
+      },
+      "inApp": "a help centre may stand inside an app: a RESOURCES route group under the app's layout, wrapped in DSPageCategory RESOURCES; its pages keep their kinds and the layout stays the app's; Contact support leads to the site's CONTACT"
      },
      "style": {
       "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
@@ -11065,7 +11105,11 @@
       "shelves": "RECORDS, case BY_SHELF, in DSFeatureGridSectionContainer: two shelves across on a desktop and a tablet, one on a phone; each shelf one cell, a DSFeature at WIDGET holding a group of links: the smaller group's name as its title, its first five topics as a DSList of DSLink, each with the topic's mark as its startIcon, and View all N, a DSLink, under them; the shape of DOORS' LINK_GROUPS, a group of plain links, and never DSNavList, which marks the open page and belongs to the side list",
       "whyGroupOfLinks": "the developer, 2026-11-25: 'feels like section of widget with some kind of nav group?'",
       "whyShelves": "the developer, 2026-11-25, on support.freshdesk.com/support/solutions/45923: 'it feels like support pages like freshdesk are using sectons mostly with grid section features containers?'",
-      "ownRecords": "the group's own topics, one a row with when each was updated, paged"
+      "ownRecords": "the group's own topics, one a row with when each was updated, paged",
+      "depth": "at most three levels of group homes under a set's home; a set that needs more is two sets",
+      "holds": "only smaller groups, only its own topics, or both, the smaller groups first; each smaller group a LINK_GROUP GRID_CELL with its own links, its first five or its most read, and View all N, which opens that group's home",
+      "featured": "a picked topic's row carries a Featured fact; the head carries the group's mark, title, line, count and the way back to all groups",
+      "helpGroups": "on a help centre's home the groups stand as shelves where each holds about five topics or more, and as DOORS DOOR_CARDS, each its mark, name, line and count, where they hold fewer"
      },
      "style": {
       "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
@@ -11217,7 +11261,8 @@
       "feedback": "FEEDBACK at the end of the reading column",
       "languageOrder": {
        "reading": "Hero, the reading, Doors, Closing call"
-      }
+      },
+      "aside": "a DSPageFrameAside at END on a desktop: ON_THIS_PAGE for a long topic, else LINK_GROUP SIDE_LIST More in <group>, each its title and reading time, and all groups with their counts; under the topic on a phone"
      },
      "style": {
       "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
@@ -11332,7 +11377,8 @@
      },
      "placement": {
       "level": 2,
-      "rows": "RECORDS PAGED_LIST, each row a RECORD_CARD LIST_ROW; the search keeps the query at the top and a tab for each kind of result"
+      "rows": "RECORDS PAGED_LIST, each row a RECORD_CARD LIST_ROW; the search keeps the query at the top and a tab for each kind of result",
+      "states": "a count line, such as 1 result for plan, each row its group and reading time over its title; before a query, Enter a search term to find articles; with none found, what to try and the way to ask"
      },
      "style": {
       "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
@@ -11617,6 +11663,41 @@
       },
       "DOORS"
      ]
+    },
+    {
+     "code": "ROADMAP",
+     "title": "Roadmap",
+     "description": "what the product will do next, by horizon",
+     "guidance": {
+      "for": {
+       "persons": [
+        "LEARNER"
+       ]
+      },
+      "chooseWhen": "the public plan of a product: what is being built now, next and later, each a short record with its state, and the way to ask for one",
+      "notWhen": [
+       {
+        "condition": "What has shipped, version by version",
+        "instead": "CHANGELOG"
+       },
+       {
+        "condition": "A piece read for its own sake",
+        "instead": "ARTICLE"
+       }
+      ]
+     },
+     "config": {
+      "mtype": "PAGES"
+     },
+     "units": {
+      "layoutKinds": "the category layouts"
+     },
+     "placement": {
+      "level": 2,
+      "records": "RECORDS BY_HORIZON"
+     },
+     "style": {},
+     "status": "PLANNED"
     }
    ],
    "CONTAINERS": [
@@ -13115,6 +13196,18 @@
        "status": "BUILT",
        "seenOn": "support.freshdesk.com (a folder's articles, the search results)",
        "why": "the developer, 2026-11-25: 'yes go for both 1 and 2' (2: RESOURCES, from the Freshdesk help-centre analysis)"
+      },
+      {
+       "code": "BY_HORIZON",
+       "when": "records by when they come: Now, Next and Later side by side on a desktop, one under another on a phone, each record its title, a line and its state",
+       "units": [
+        "DSFeatureGridSectionContainer",
+        "DSFeature"
+       ],
+       "placement": {},
+       "style": {},
+       "status": "PLANNED",
+       "why": "the Apex reads, 2026-11-26 (notes/N017/work/apex-help-blog-pricing-1126.md); the developer: 'all approved'"
       }
      ]
     },
@@ -14836,7 +14929,20 @@
       "look": "THEME.LAYOUT_LOOK",
       "body": "read from the theme's layout look; the layout fixes none"
      },
-     "status": "BUILT"
+     "status": "BUILT",
+     "cases": [
+      {
+       "code": "GROUPED_ENTRIES",
+       "when": "more than about eight settings: the entry column holds them under headings, such as Account, Workspace and Billing",
+       "units": [
+        "DSNavList"
+       ],
+       "placement": {},
+       "style": {},
+       "status": "PLANNED",
+       "why": "the Apex reads, 2026-11-26 (notes/N017/work/apex-help-blog-pricing-1126.md); the developer: 'all approved'"
+      }
+     ]
     },
     {
      "code": "CANVAS",
@@ -15011,7 +15117,15 @@
          "PLANS_TO_MOVE_TO",
          "PAYMENT_AND_INVOICES",
          "END_THE_PLAN"
-        ]
+        ],
+        "moving": {
+         "periodSwitch": "a Monthly and Yearly switch above the plans to move to, with the saving, where the plans price both",
+         "effectLine": "under the title, when a change takes effect, such as at the start of the next cycle",
+         "cardActions": "the plan in force says Current plan and has no action; every other card says Switch to <plan>; a plan priced on request says Contact sales",
+         "beforeEnding": "the confirm that ends or lowers the plan says what the person loses and when, before its button",
+         "help": "Need help choosing? Get in touch, closing the plans",
+         "ownPage": "the plans stay on the billing page; they take a page of their own, ENTRY_AS_A_PAGE, past four plans or where they are compared row by row"
+        }
        },
        "style": {},
        "status": "BUILT",
@@ -15504,7 +15618,22 @@
      },
      "placement": {},
      "style": {},
-     "status": "BUILT"
+     "status": "BUILT",
+     "cases": [
+      {
+       "code": "DONE",
+       "when": "the entry is sent and its record made: what happened in one sentence, the record's name as a link, and the two next steps, such as Add another and Back to the list",
+       "units": [
+        "DSPanelContainer",
+        "DSEmpty",
+        "DSButton"
+       ],
+       "placement": {},
+       "style": {},
+       "status": "PLANNED",
+       "why": "the Apex reads, 2026-11-26 (notes/N017/work/apex-help-blog-pricing-1126.md); the developer: 'all approved'"
+      }
+     ]
     },
     {
      "code": "CHANGE_IN_PLACE",
@@ -15766,6 +15895,42 @@
        "why": "the developer, 2026-11-25: 'check https://flux.dashboardpack.com/feature-flags https://flux.dashboardpack.com/deployments https://flux.dashboardpack.com/activity to uderstand list view for datatble or list with items and more'"
       }
      ]
+    },
+    {
+     "code": "LOCK_SCREEN",
+     "title": "Lock screen",
+     "description": "the page for a session paused while the person was away",
+     "guidance": {
+      "for": {
+       "persons": [
+        "TEAM"
+       ]
+      },
+      "chooseWhen": "a session the app paused after a time without use: who is signed in, the one field that resumes it, and the way to sign in as someone else; nothing of the app shows behind it",
+      "notWhen": [
+       {
+        "condition": "The person may not see what they asked for",
+        "instead": "NO_ACCESS"
+       },
+       {
+        "condition": "The session has ended and the person signs in again",
+        "instead": "the sign-in of the identity host"
+       }
+      ]
+     },
+     "config": {
+      "mtype": "PAGES"
+     },
+     "units": {
+      "layoutKinds": "CANVAS"
+     },
+     "placement": {
+      "level": "LAST",
+      "floor": true
+     },
+     "style": {},
+     "status": "PLANNED",
+     "level": "LAST"
     }
    ],
    "CONTAINERS": [
@@ -15930,6 +16095,29 @@
        "style": {},
        "status": "PLANNED",
        "missing": "sort is one pair of keys: a second sort is not stated"
+      },
+      {
+       "code": "ROW_VERB",
+       "when": "a table narrowed by a state tab, such as Pending: each row ends in the one action that state asks for, as words, such as Approve; the rest stand in the row's menu",
+       "units": [
+        "DSDataTable",
+        "DSButton"
+       ],
+       "placement": {},
+       "style": {},
+       "status": "PLANNED",
+       "why": "the Apex reads, 2026-11-26 (notes/N017/work/apex-help-blog-pricing-1126.md); the developer: 'all approved'"
+      },
+      {
+       "code": "DENSITY_BY_READING",
+       "when": "the rows' height follows how they are read: a log of many events compact, a table of money or of people comfortable",
+       "units": [
+        "DSDataTable"
+       ],
+       "placement": {},
+       "style": {},
+       "status": "PLANNED",
+       "why": "the Apex reads, 2026-11-26 (notes/N017/work/apex-help-blog-pricing-1126.md); the developer: 'all approved'"
       }
      ]
     },
@@ -16050,6 +16238,43 @@
      "style": {},
      "status": "PLANNED",
      "missing": "a board: columns of cards moved by drag"
+    },
+    {
+     "code": "CALENDAR",
+     "title": "Calendar",
+     "description": "Records placed on the days they fall on, a month or a week at a time.",
+     "guidance": {
+      "for": {
+       "persons": [
+        "TEAM"
+       ]
+      },
+      "chooseWhen": "records whose date is what a person reads them by, such as bookings or shifts: a month grid or a week of hours, each record a short line on its day, the day opening its records",
+      "notWhen": [
+       {
+        "condition": "Events read as a story, newest first",
+        "instead": "ACTIVITY_FEED"
+       },
+       {
+        "condition": "Records found and filtered",
+        "instead": "DATA_TABLE_PANEL"
+       },
+       {
+        "condition": "Records moved between states",
+        "instead": "BOARD"
+       }
+      ],
+      "rules": []
+     },
+     "config": {
+      "mtype": "CONTAINERS"
+     },
+     "units": "DSPanelContainer; a calendar grid is planned in the design system",
+     "placement": {
+      "standsIn": "the content of a page"
+     },
+     "style": {},
+     "status": "PLANNED"
     }
    ],
    "WIDGETS": [
@@ -16220,6 +16445,19 @@
        "style": {},
        "status": "BUILT",
        "why": "Q77 A, 2026-11-25 (RULE.SUPPORT.SURFACE.607)"
+      },
+      {
+       "code": "ACTOR_LED",
+       "when": "an event row: it leads with who did it, a person's avatar, or the kind's mark where the system did it, then what happened and when",
+       "units": [
+        "DSItem",
+        "DSAvatar",
+        "DSMark"
+       ],
+       "placement": {},
+       "style": {},
+       "status": "PLANNED",
+       "why": "the Apex reads, 2026-11-26 (notes/N017/work/apex-help-blog-pricing-1126.md); the developer: 'all approved'"
       }
      ],
      "defaultCase": "LIST_ROW"
@@ -16561,6 +16799,18 @@
        "placement": {},
        "style": {},
        "status": "BUILT"
+      },
+      {
+       "code": "CONNECTION_LOST",
+       "when": "the part could not reach the service: what failed in one sentence and Try again, never a blank part",
+       "units": [
+        "DSEmpty",
+        "DSButton"
+       ],
+       "placement": {},
+       "style": {},
+       "status": "PLANNED",
+       "why": "the Apex reads, 2026-11-26 (notes/N017/work/apex-help-blog-pricing-1126.md); the developer: 'all approved'"
       }
      ]
     },
@@ -17860,7 +18110,20 @@
       "look": "THEME.LAYOUT_LOOK",
       "body": "read from the theme's layout look; the layout fixes none"
      },
-     "status": "BUILT"
+     "status": "BUILT",
+     "cases": [
+      {
+       "code": "GROUPED_ENTRIES",
+       "when": "more than about eight settings: the entry column holds them under headings, such as Account, Workspace and Billing",
+       "units": [
+        "DSNavList"
+       ],
+       "placement": {},
+       "style": {},
+       "status": "PLANNED",
+       "why": "the Apex reads, 2026-11-26 (notes/N017/work/apex-help-blog-pricing-1126.md); the developer: 'all approved'"
+      }
+     ]
     },
     {
      "code": "CANVAS",
@@ -18021,7 +18284,15 @@
          "PLANS_TO_MOVE_TO",
          "PAYMENT_AND_INVOICES",
          "END_THE_PLAN"
-        ]
+        ],
+        "moving": {
+         "periodSwitch": "a Monthly and Yearly switch above the plans to move to, with the saving, where the plans price both",
+         "effectLine": "under the title, when a change takes effect, such as at the start of the next cycle",
+         "cardActions": "the plan in force says Current plan and has no action; every other card says Switch to <plan>; a plan priced on request says Contact sales",
+         "beforeEnding": "the confirm that ends or lowers the plan says what the person loses and when, before its button",
+         "help": "Need help choosing? Get in touch, closing the plans",
+         "ownPage": "the plans stay on the billing page; they take a page of their own, ENTRY_AS_A_PAGE, past four plans or where they are compared row by row"
+        }
        },
        "style": {},
        "status": "BUILT",
@@ -18205,7 +18476,22 @@
      },
      "placement": {},
      "style": {},
-     "status": "BUILT"
+     "status": "BUILT",
+     "cases": [
+      {
+       "code": "DONE",
+       "when": "the entry is sent and its record made: what happened in one sentence, the record's name as a link, and the two next steps, such as Add another and Back to the list",
+       "units": [
+        "DSPanelContainer",
+        "DSEmpty",
+        "DSButton"
+       ],
+       "placement": {},
+       "style": {},
+       "status": "PLANNED",
+       "why": "the Apex reads, 2026-11-26 (notes/N017/work/apex-help-blog-pricing-1126.md); the developer: 'all approved'"
+      }
+     ]
     },
     {
      "code": "NOT_FOUND",
@@ -18475,6 +18761,42 @@
        "why": "the developer, 2026-11-25: 'check https://flux.dashboardpack.com/feature-flags https://flux.dashboardpack.com/deployments https://flux.dashboardpack.com/activity to uderstand list view for datatble or list with items and more'"
       }
      ]
+    },
+    {
+     "code": "LOCK_SCREEN",
+     "title": "Lock screen",
+     "description": "the page for a session paused while the person was away",
+     "guidance": {
+      "for": {
+       "persons": [
+        "INDIVIDUAL"
+       ]
+      },
+      "chooseWhen": "a session the app paused after a time without use: who is signed in, the one field that resumes it, and the way to sign in as someone else; nothing of the app shows behind it",
+      "notWhen": [
+       {
+        "condition": "The person may not see what they asked for",
+        "instead": "NO_ACCESS"
+       },
+       {
+        "condition": "The session has ended and the person signs in again",
+        "instead": "the sign-in of the identity host"
+       }
+      ]
+     },
+     "config": {
+      "mtype": "PAGES"
+     },
+     "units": {
+      "layoutKinds": "CANVAS"
+     },
+     "placement": {
+      "level": "LAST",
+      "floor": true
+     },
+     "style": {},
+     "status": "PLANNED",
+     "level": "LAST"
     }
    ],
    "CONTAINERS": [
@@ -18639,6 +18961,29 @@
        "style": {},
        "status": "PLANNED",
        "missing": "sort is one pair of keys: a second sort is not stated"
+      },
+      {
+       "code": "ROW_VERB",
+       "when": "a table narrowed by a state tab, such as Pending: each row ends in the one action that state asks for, as words, such as Approve; the rest stand in the row's menu",
+       "units": [
+        "DSDataTable",
+        "DSButton"
+       ],
+       "placement": {},
+       "style": {},
+       "status": "PLANNED",
+       "why": "the Apex reads, 2026-11-26 (notes/N017/work/apex-help-blog-pricing-1126.md); the developer: 'all approved'"
+      },
+      {
+       "code": "DENSITY_BY_READING",
+       "when": "the rows' height follows how they are read: a log of many events compact, a table of money or of people comfortable",
+       "units": [
+        "DSDataTable"
+       ],
+       "placement": {},
+       "style": {},
+       "status": "PLANNED",
+       "why": "the Apex reads, 2026-11-26 (notes/N017/work/apex-help-blog-pricing-1126.md); the developer: 'all approved'"
       }
      ]
     },
@@ -18728,6 +19073,43 @@
       "look": "THEME.PANEL_LOOK"
      },
      "status": "BUILT"
+    },
+    {
+     "code": "CALENDAR",
+     "title": "Calendar",
+     "description": "Records placed on the days they fall on, a month or a week at a time.",
+     "guidance": {
+      "for": {
+       "persons": [
+        "INDIVIDUAL"
+       ]
+      },
+      "chooseWhen": "records whose date is what a person reads them by, such as bookings or shifts: a month grid or a week of hours, each record a short line on its day, the day opening its records",
+      "notWhen": [
+       {
+        "condition": "Events read as a story, newest first",
+        "instead": "ACTIVITY_FEED"
+       },
+       {
+        "condition": "Records found and filtered",
+        "instead": "DATA_TABLE_PANEL"
+       },
+       {
+        "condition": "Records moved between states",
+        "instead": "BOARD"
+       }
+      ],
+      "rules": []
+     },
+     "config": {
+      "mtype": "CONTAINERS"
+     },
+     "units": "DSPanelContainer; a calendar grid is planned in the design system",
+     "placement": {
+      "standsIn": "the content of a page"
+     },
+     "style": {},
+     "status": "PLANNED"
     }
    ],
    "WIDGETS": [
@@ -18898,6 +19280,19 @@
        "style": {},
        "status": "BUILT",
        "why": "Q77 A, 2026-11-25 (RULE.SUPPORT.SURFACE.607)"
+      },
+      {
+       "code": "ACTOR_LED",
+       "when": "an event row: it leads with who did it, a person's avatar, or the kind's mark where the system did it, then what happened and when",
+       "units": [
+        "DSItem",
+        "DSAvatar",
+        "DSMark"
+       ],
+       "placement": {},
+       "style": {},
+       "status": "PLANNED",
+       "why": "the Apex reads, 2026-11-26 (notes/N017/work/apex-help-blog-pricing-1126.md); the developer: 'all approved'"
       }
      ],
      "defaultCase": "LIST_ROW"
@@ -19239,6 +19634,18 @@
        "placement": {},
        "style": {},
        "status": "BUILT"
+      },
+      {
+       "code": "CONNECTION_LOST",
+       "when": "the part could not reach the service: what failed in one sentence and Try again, never a blank part",
+       "units": [
+        "DSEmpty",
+        "DSButton"
+       ],
+       "placement": {},
+       "style": {},
+       "status": "PLANNED",
+       "why": "the Apex reads, 2026-11-26 (notes/N017/work/apex-help-blog-pricing-1126.md); the developer: 'all approved'"
       }
      ]
     },

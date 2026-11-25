@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
-      "seen": "0fb0d490"
+      "seen": "657762de"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
@@ -425,7 +425,7 @@ grows** (`RULE.DEVEX.WORKSPACE.205` · MUST · check:doc-check). Read the kind's
 example and the poor ones for that kind, run the check below, and name the change to the developer in
 one line. Do not ask them to approve one. A Subtitle that exists today moves into place only if it
 already passes the plain rule; otherwise write it again. A preview page's Title is the preview's name,
-and its Subtitle says what the developer is asked to decide from the page. **A numbered thing's name is its number, then its words, with no separator**: `041 Improvements`, `N018 Docs tooling`, `03 Surface Types`. The number is drawn plainly, never muted, and ` · ` separates levels only. The approach page and an arc's page carry that name in the tab, the outline's title and the `<h1>`, and their sentence stays in the subtitle; their eyebrow chains the levels, `SaaS Plane · 041 Improvements` and `SaaS Plane · 041 Improvements · N018 Docs tooling`. The ideate and follow-ups arcs have no number, so their name is their words. **A section heading may be written `Name — tagline`**: the page shows the whole heading, and the outline shows only the name before the dash.
+and its Subtitle says what the developer is asked to decide from the page. **A numbered thing's name is its number, then its words, with no separator**: `<NNN> Improvements`, `N<nnn> Docs tooling`, `03 Surface Types`. The number is drawn plainly, never muted, and ` · ` separates levels only. The approach page and an arc's page carry that name in the tab, the outline's title and the `<h1>`, and their sentence stays in the subtitle; their eyebrow chains the levels, `SaaS Plane · <NNN> Improvements` and `SaaS Plane · <NNN> Improvements · N<nnn> Docs tooling`. The ideate and follow-ups arcs have no number, so their name is their words. **A section heading may be written `Name — tagline`**: the page shows the whole heading, and the outline shows only the name before the dash.
 
 **A short name is at most three words, and never a sentence** (`RULE.DEVEX.WORKSPACE.517` · MUST · check:doc-check):
 *Enablement*, never *Enablement — What a Category of Organization Is Offered*. A fourth word is kept only for one

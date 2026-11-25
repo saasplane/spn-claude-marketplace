@@ -9,12 +9,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "It opens on the welcome and one status line, never a status dump",
-      "seen": "4d9acefa"
+      "seen": "c3da2405"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape",
-      "seen": "2ff63e36"
+      "seen": "19e7c97b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -24,7 +24,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "Every prompt is read before anything moves",
-      "seen": "1ec50179"
+      "seen": "f4036240"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -34,7 +34,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The front desk stays open while work runs",
-      "seen": "0f25c6f3"
+      "seen": "722c381e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -255,7 +255,7 @@ the size of their title.
 The rules each one keeps:
 
 - **The moment is read only from the result of the command that makes it, and a quoted sample is not the moment.** A shape shown because the developer asked to see it is a sample, and the stop check does not read it as a handover or a close.
-- **An arc and a card keep their number beside their title**, such as `N011 (Agent improvements)` and `S71 (the handover as a block)`. **A row and a part are named by what they do and never by number**, such as *the support code's full run*.
+- **An arc and a card keep their number beside their title**, such as `N<nnn> (Agent improvements)` and `S<n> (the handover as a block)`. **A row and a part are named by what they do and never by number**, such as *the support code's full run*.
 - **Numbers sit inside sentences, and there is no table and no commit hash** in any of the six.
 - **An open point is written as the question with the options named** (`RULE.DEVEX.AGENT.086` · MUST · short).
 

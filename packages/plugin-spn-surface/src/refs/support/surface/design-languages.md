@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
-      "seen": "fc1513a6"
+      "seen": "8f63789d"
     }
   ]
 }
@@ -59,7 +59,7 @@ The groups and parts are the language's outline and the outline of its samples. 
 - **An app uses the language and never forks it.** Its capability chapter says how that app fills a part, by the part's id, and holds only the values where it differs, part by part. The brand is never changed by an app.
 - **The language's values are one versioned spec file, keyed by the parts' ids, and its page draws them.** The page's generated section is written from that file and never by hand, so the words and the values cannot drift apart.
 - **A language's own samples stand beside it, and generated site samples are another thing.** A language's own samples show each of its choices, one specimen for each kind of each part of each surface category, built from the app's own media files. A sample page's title never ends in "Design Language", which the reader of a language's theme refuses.
-- **No part holds a pointer in place of its rule, and a part with nothing of the app's own names the design system's default it follows** (`RULE.SUPPORT.SURFACE.590` · MUST · skill:spn-surface/design). A part the language sets holds the choice; one it leaves to the design system has the status `DEFAULT` and names the default; one it does not use has `NONE`. `spn-surface language check` refuses a part whose words are a pointer alone, such as *Decided in 041 N008.*
+- **No part holds a pointer in place of its rule, and a part with nothing of the app's own names the design system's default it follows** (`RULE.SUPPORT.SURFACE.590` · MUST · skill:spn-surface/design). A part the language sets holds the choice; one it leaves to the design system has the status `DEFAULT` and names the default; one it does not use has `NONE`. `spn-surface language check` refuses a part whose words are a pointer alone, such as *Decided in the hiring arc.*
 - **A sample page draws each drawing in a frame that scales it whole and carries the app's own tokens** (`RULE.SUPPORT.SURFACE.591` · MUST · skill:spn-surface/design). A drawing placed at a width of its own making with no token map draws black fills and overlapping units.
 - **A review of a site, and an arc's final re-check of one, walks every page of the live site at a phone, a tablet and a desktop width, in light and dark, by computed values** (`RULE.SUPPORT.SURFACE.592` · MUST · skill:spn-surface/design), with `skills/design/scripts/site-walk.mjs`.
 - **A reference site is read into the same parts.** One reference read for each site, written from the reference template, records part by part what the site does, the values measured from it, our choice, and whether that choice is MAPPED, a GAP in the design system or NOT_TAKEN. The construct's references compare each site with the language part by part.

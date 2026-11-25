@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
-      "seen": "0fb0d490"
+      "seen": "657762de"
     }
   ]
 }
