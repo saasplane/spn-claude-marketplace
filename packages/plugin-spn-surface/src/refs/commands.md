@@ -12,6 +12,8 @@ spn-surface check scan [<path>…] — Scan Surface code for every note the Surf
 
 spn-surface language check <app> [--construct <construct.md>] — Refuse a design-language construct whose filled tables differ from the `language` block they are filled from
 
+spn-surface language samples write <language> [--out <dir>] [--book <folder>] [--spec <file>] [--catalogue <file>] [--template <file>] [--assets <folder>] [--ds <version>] [--app <code>] [--only <text>] — Draw a design language's samples: each layout, page kind, container case and widget form of each surface category it serves, in the surface page template
+
 spn-surface language write <app> [--construct <construct.md>] — Fill a design-language construct's figures (drawing style, characters and building blocks, grounds, drawing kinds) from the `language` block of its own construct
 
 spn-surface page copy <url> <folder> [--notes <notes.json>] [--name <name>] [--ds <version>] [--app-css <path>] [--template <file>] — Copy one running page into a folder as a surface page: the surface page template holding the copy's markup, with a hidden note for each section
