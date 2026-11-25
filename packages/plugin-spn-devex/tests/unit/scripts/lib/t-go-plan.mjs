@@ -9,7 +9,7 @@ import { join, resolve } from "node:path";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 
 const lib = resolve(PLUGIN, "src", "scripts", "lib");
-const { deriveGo, workflowOf, releaseCircles, tangledParts, fullRunMinutes, readyParts, clearWaiting, markDropped, markWaiting, ratesOf, boundOf, testFilesOf, entryHash, changedEntries, staleEntries, proposeScopes, workspaceMapOf, newCasesOf } = await import(join(lib, "go-plan.ts"));
+const { deriveGo, unheldEntries, workflowOf, releaseCircles, tangledParts, fullRunMinutes, readyParts, clearWaiting, markDropped, markWaiting, ratesOf, boundOf, testFilesOf, entryHash, changedEntries, staleEntries, proposeScopes, workspaceMapOf, newCasesOf } = await import(join(lib, "go-plan.ts"));
 const { goFaults, entryWork } = await import(join(lib, "workstream-schema.ts"));
 
 let total = 0, failed = 0;
@@ -121,6 +121,14 @@ same("[MKT.SCRIPTS.384] a PROOF row owed after a landed full run derives proof-<
 same("[MKT.SCRIPTS.384] no proof is owed, no proof part", derive([allLanded], { previous: landedAll }).parts.some((p) => p.id.startsWith("proof-")), false);
 const proofLanded = { ...owedProof, parts: owedProof.parts.map((p) => (p.id === "proof-lib-repo" ? { ...p, state: "landed" } : p)) };
 same("[MKT.SCRIPTS.384] a landed proof part is kept as it was and made once", derive([{ ...allLanded, proofs: ["lib-repo"] }], { previous: proofLanded }).parts.filter((p) => p.id === "proof-lib-repo").map((p) => p.state), ["landed"]);
+// A change its commits already carry (041 Q72): no part plans it, nothing applies it, and its repository's full run proves it.
+const committed = (over = {}) => ({ ...entry("E2", "lib-repo:src/b.ts"), landed: { commits: ["abcdef1234"] }, ...over });
+const byCommit = derive([{ arc: "N009", sheet: sheet([entry("E1", "app-repo:src/a.ts"), committed({ kind: "change", patch: { file: "patches/E2.diff", base: "abcdef1" } }), entry("E3", "lib-repo:docs/c.md")]) }]);
+same("[MKT.SCRIPTS.663] an entry its commits carry is in no part, and no apply part, though it kept a patch", byCommit.parts.filter((p) => p.entries.includes("N009/E2")).map((p) => p.id), []);
+same("[MKT.SCRIPTS.663] its repository gets a full run and no baseline", ["full-lib-repo", "baseline-lib-repo"].map((id) => byCommit.parts.some((p) => p.id === id)), [true, false]);
+same("[MKT.SCRIPTS.663] it is held for go check and the close gate", unheldEntries(byCommit, [{ arc: "N009", sheet: sheet([entry("E1", "app-repo:src/a.ts"), committed(), entry("E3", "lib-repo:docs/c.md")]) }]), []);
+const docsByCommit = derive([{ arc: "N009", sheet: sheet([{ ...entry("E3", "lib-repo:docs/c.md"), landed: { commits: ["abcdef1234"] } }]) }]);
+same("[MKT.SCRIPTS.663] a book or docs entry its commits carry plans no full run", docsByCommit.parts.filter((p) => p.work !== "RELEASE").map((p) => p.id), []);
 const without = [{ arc: "N009", sheet: sheet([entry("E1", "app-repo:src/a.ts"), entry("E3", "lib-repo:docs/c.md")]), dropped: ["E2"] }];
 same("[MKT.SCRIPTS.384] a landed part holding an entry later dropped from the sheet is not stale", staleEntries(landedAll.parts.find((p) => p.id === "code-lib-repo-1"), landedAll, without), []);
 same("[MKT.SCRIPTS.384] and one whose entry was edited still is", staleEntries(landedAll.parts.find((p) => p.id === "code-lib-repo-1"), landedAll, changed), ["N009/E2"]);

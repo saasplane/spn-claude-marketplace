@@ -234,7 +234,7 @@ spn-devex workstream rows show <workstream>[/N<nnn>] [--ready] [--parallel] [--t
 
 spn-devex workstream sheet write <workstream>/<arc> --file <sheet.json> — write the arc's whole sheet from a file, every entry validated and every fact one the arc holds
 
-spn-devex workstream sheet edit <workstream>/<arc> <E> [--what …] [--op …] [--file …] [--decided-by …] [--facts …] [--then …] [--rules …] [--callers …] [--docs …] [--book …] [--tiers unit=ID,ID;contract=ID] [--credits ID,ID|none] [--trace "…"] [--judged|--mechanical] [--kind change|step] [--command "…"] [--proof "…"] — change one entry of the sheet; a missing entry is refused, and `sheet write` is named
+spn-devex workstream sheet edit <workstream>/<arc> <E> [--what …] [--op …] [--file …] [--decided-by …] [--facts …] [--then …] [--rules …] [--callers …] [--docs …] [--book …] [--tiers unit=ID,ID;contract=ID] [--credits ID,ID|none] [--trace "…"] [--judged|--mechanical] [--kind change|step] [--command "…"] [--proof "…"] [--landed <sha,sha>|none] — change one entry of the sheet; a missing entry is refused, and `sheet write` is named
 
 spn-devex workstream sheet drop <workstream>/<arc> <E> --note "…" — take an entry out of the sheet; --note carries why into its one log line
 

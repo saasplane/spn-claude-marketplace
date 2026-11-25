@@ -424,6 +424,11 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.639 | Editor | draw a group of a construct as a panel holding a catalog | `docs page write` draws a `group <name>` fence holding a `catalog` as one panel with its item count and no jump row | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.640 | Editor | jump between the groups that follow one another | `docs page write` draws one row of links above groups that follow one another, each with its count | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.641 | Editor | be stopped by a group that is not closed or holds no block | `docs page write` stops a `group` fence never closed with `~~~`, and one holding neither a `tabs` nor a `catalog` fence | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.662 | Builder | record a change its commits already carry in place of a patch | `sheet edit --landed <sha,sha>` records each full commit once it is on the worktree's branch, refuses one that is not there or no commit, `--landed none` takes it away, and `sheet check` accepts a landed change and names one whose commit left the branch | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.663 | Builder | have the go skip a change already committed | `go write` plans no part and no apply for an entry its commits carry, gives its repository a full run and no baseline, and counts it held | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.664 | Builder | run only the plugin suites whose inputs changed | the full run reuses a package's last green run while its files, the root scripts, manifest and lockfile, the book chapters it restates and the packages it imports are as they were; the release's version field and a rebuilt `dist/` change no input | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.665 | Builder | never reuse a red run | a package whose suite went red, or whose record was taken on other inputs, runs; `--all` runs every package | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.666 | Builder | read in the release commit which suites ran | `release:plugins prepare` names the suites that ran and each reused one with the run it came from | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

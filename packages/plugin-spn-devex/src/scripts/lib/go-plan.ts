@@ -191,7 +191,11 @@ export const landedEntries = (data: ArcData): string[] => data.rows.filter((row)
 
 /** The entries a landed row of the scope holds, by ref: work already done, which no part plans again. */
 export const landedRefs = (scope: readonly ScopeSheet[]): Set<string> =>
-  new Set(scope.flatMap(({ arc, landed }) => (landed ?? []).map((id) => `${arc}/${id}`)));
+  new Set(scope.flatMap(({ arc, sheet, landed }) => [...(landed ?? []), ...committedIds(sheet)].map((id) => `${arc}/${id}`)));
+
+/** The ids of a sheet's entries that name the commits already carrying them (`sheet edit --landed`): no part plans or applies them (041 Q72). */
+export const committedIds = (sheet: Sheet): string[] =>
+  (Array.isArray(sheet.entries) ? sheet.entries : []).filter((entry) => Array.isArray(entry.landed?.commits) && entry.landed!.commits.length).map((entry) => entry.id);
 
 /** The ids of the entries `sheet drop` took out of an arc's sheet, read from the log lines it wrote: `E12 dropped · why`. */
 export function droppedEntries(ws: string, arc: string): string[] {
@@ -665,6 +669,18 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
       groups.set(`${repo}|${pass}`, group);
     }
   }
+  // A CHANGE ALREADY COMMITTED is proved by its repository's full run: no baseline, as its code is already in the tree (041 Q72).
+  const committedCode = new Set<string>();
+  for (const { arc, sheet } of scope) for (const id of committedIds(sheet)) {
+    const ref = `${arc}/${id}`;
+    if (keptRefs.has(ref) || moved.has(ref)) continue;
+    const entry = sheet.entries.find((one) => one.id === id)!;
+    const repo = repoOf(entry);
+    if (unplacedAll.has(repo) || isStep(entry)) continue;
+    if (workOf(passOf(entry, passesOf(repo), nodeKindsOf(repo)).pass, repo) !== "CODE") continue;
+    committedCode.add(repo);
+    if (!repos.includes(repo)) repos.push(repo);
+  }
   for (const part of kept) if (!repos.includes(part.repo) && !isReleasePart(part) && !unplacedAll.has(part.repo)) repos.push(part.repo);
   const owed = new Set(scope.flatMap(({ proofs }) => proofs ?? []).filter((repo) => !unplacedAll.has(repo)));
   for (const repo of owed) if (!repos.includes(repo)) repos.push(repo);
@@ -761,7 +777,7 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
         if (provedLater.repos.has(repo) && !owed.has(repo)) continue;
         let id = `${pass}-${repo}`;
         // A proof still owed needs the repository's full run once its code has landed; a baseline needs code to compare.
-        let runs = (hasCode && !(options.followUp && pass === "baseline")) || (pass === "full" && owed.has(repo));
+        let runs = (hasCode && !(options.followUp && pass === "baseline")) || (pass === "full" && (owed.has(repo) || committedCode.has(repo)));
         if (pass === "full") {
           // A new code part in a repository whose full run has landed opens the next full run, full-<repo>-2.
           const fulls = kept.filter((one) => one.repo === repo && isFullPart(one));

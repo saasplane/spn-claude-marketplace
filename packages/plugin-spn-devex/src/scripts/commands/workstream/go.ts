@@ -514,7 +514,8 @@ function startApply(ws: string, arc: string, plan: GoPlan, part: GoPart, refuse:
   });
   const missing = entries.filter((one) => !one.entry).map((one) => one.ref);
   if (missing.length) return refuse(`${part.id} holds ${missing.join(", ")}, which no sheet holds`);
-  const patched = entries.filter((one) => one.entry!.patch);
+  // AN ENTRY ITS COMMITS ALREADY CARRY applies nothing: its patch, if it kept one, is history, and the full run proves it (041 Q72).
+  const patched = entries.filter((one) => one.entry!.patch && !one.entry!.landed?.commits?.length);
   for (const one of patched) {
     if (patchStale(dir, one.entry!)) {
       const path = one.entry!.file.slice(one.entry!.file.indexOf(":") + 1);
