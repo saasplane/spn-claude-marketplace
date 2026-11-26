@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "195321b2"
+    "commit": "46c71541"
   },
   "rules": [
     {
@@ -25676,7 +25676,7 @@
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-containers.md",
-          "heading": "Groups and their items"
+          "heading": "RECORD_HOME with its GROUPS case"
         },
         {
           "plugin": "spn-surface",
@@ -25755,6 +25755,11 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/standards-patterns.md",
           "heading": "The app page kinds — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "Choose in four steps, with a block last"
         },
         {
           "plugin": "spn-surface",
@@ -26301,7 +26306,7 @@
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-containers.md",
-          "heading": "Groups and their items"
+          "heading": "RECORD_HOME with its GROUPS case"
         },
         {
           "plugin": "spn-surface",
@@ -26505,7 +26510,7 @@
       "class": "guidance",
       "sentence": "A page chooses what an entry opens as by its size, from the table",
       "chapter": "04-capabilities/02-support/01-surface/09-architecture-containers/01-common/01-container.md",
-      "heading": "An entry over the page",
+      "heading": "RECORD_ENTRY over the page",
       "decision": null,
       "restated": [
         {
@@ -26526,7 +26531,7 @@
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-containers.md",
-          "heading": "An entry over the page"
+          "heading": "RECORD_ENTRY over the page"
         },
         {
           "plugin": "spn-surface",
@@ -26549,7 +26554,7 @@
       "class": "stated in a skill",
       "sentence": "A dialog on a phone becomes a sheet from the bottom",
       "chapter": "04-capabilities/02-support/01-surface/09-architecture-containers/01-common/01-container.md",
-      "heading": "An entry over the page",
+      "heading": "RECORD_ENTRY over the page",
       "decision": null,
       "restated": [
         {
@@ -26565,7 +26570,7 @@
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-containers.md",
-          "heading": "An entry over the page"
+          "heading": "RECORD_ENTRY over the page"
         },
         {
           "plugin": "spn-surface",
@@ -26581,7 +26586,7 @@
       "class": "guidance",
       "sentence": "An entry is one panel, placed inside the dialog or the sheet",
       "chapter": "04-capabilities/02-support/01-surface/09-architecture-containers/01-common/01-container.md",
-      "heading": "An entry over the page",
+      "heading": "RECORD_ENTRY over the page",
       "decision": null,
       "restated": [
         {
@@ -26592,7 +26597,7 @@
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-containers.md",
-          "heading": "An entry over the page"
+          "heading": "RECORD_ENTRY over the page"
         },
         {
           "plugin": "spn-surface",
@@ -26637,7 +26642,7 @@
       "class": "stated in a skill",
       "sentence": "Both parts are in view at a desktop only",
       "chapter": "04-capabilities/02-support/01-surface/09-architecture-containers/01-common/01-container.md",
-      "heading": "Groups and their items",
+      "heading": "RECORD_HOME with its GROUPS case",
       "decision": null,
       "restated": [
         {
@@ -26658,7 +26663,7 @@
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-containers.md",
-          "heading": "Groups and their items"
+          "heading": "RECORD_HOME with its GROUPS case"
         },
         {
           "plugin": "spn-surface",
@@ -26695,7 +26700,7 @@
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-containers.md",
-          "heading": "Groups and their items"
+          "heading": "RECORD_HOME with its GROUPS case"
         },
         {
           "plugin": "spn-surface",
@@ -27287,7 +27292,7 @@
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-containers.md",
-          "heading": "Groups and their items"
+          "heading": "RECORD_HOME with its GROUPS case"
         },
         {
           "plugin": "spn-surface",
@@ -27986,15 +27991,15 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "On a page of groups and their items, the part that holds the groups can be narrow, and a named choice says so",
+      "sentence": "On a `RECORD_HOME` page with its `GROUPS` case, the part that holds the groups can be narrow, and a named choice says so",
       "chapter": "04-capabilities/02-support/01-surface/09-architecture-containers/01-common/01-container.md",
-      "heading": "Groups and their items",
+      "heading": "RECORD_HOME with its GROUPS case",
       "decision": "DEC.SUPPORT.SURFACE.119",
       "restated": [
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-containers.md",
-          "heading": "Groups and their items"
+          "heading": "RECORD_HOME with its GROUPS case"
         },
         {
           "plugin": "spn-surface",
@@ -30812,7 +30817,7 @@
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/site-patterns.md",
-          "heading": "Choose to see"
+          "heading": "EXPLAIN_SHOWCASE, tabs or a carousel"
         },
         {
           "plugin": "spn-surface",
@@ -33405,17 +33410,17 @@
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/site-patterns.md",
-          "heading": "Points"
+          "heading": "EXPLAIN_FEATURES"
         },
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/site-patterns.md",
-          "heading": "Show it"
+          "heading": "EXPLAIN_SHOWCASE, one picture"
         },
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/site-patterns.md",
-          "heading": "Doors"
+          "heading": "EXPLAIN_DOORS"
         },
         {
           "plugin": "spn-surface",
@@ -34748,6 +34753,11 @@
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
           "heading": "Choose in four steps, with a block last"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/given-design.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -34949,7 +34959,7 @@
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/site-patterns.md",
-          "heading": "Hero"
+          "heading": "INTRO_HERO"
         },
         {
           "plugin": "spn-surface",
@@ -34981,7 +34991,7 @@
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/site-patterns.md",
-          "heading": "Feature grid"
+          "heading": "EXPLAIN_CATEGORIES"
         },
         {
           "plugin": "spn-surface",
@@ -35013,7 +35023,7 @@
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/site-patterns.md",
-          "heading": "Feature grid"
+          "heading": "EXPLAIN_CATEGORIES"
         },
         {
           "plugin": "spn-surface",
@@ -37248,7 +37258,7 @@
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/site-patterns.md",
-          "heading": "Feature grid"
+          "heading": "EXPLAIN_CATEGORIES"
         },
         {
           "plugin": "spn-surface",
