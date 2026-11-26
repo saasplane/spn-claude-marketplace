@@ -19,8 +19,9 @@
 - **An app page kind is built from units that exist** (`RULE.SUPPORT.SURFACE.048` · MUST · skill:spn-surface/design)
 - **An app page kind does not depend on a count** (`RULE.SUPPORT.SURFACE.050` · MUST · skill:spn-surface/design)
 - **The levels are the surface's own: the layout, the page level, the containers, the widgets and cards, and the components** (`RULE.SUPPORT.SURFACE.202` · MUST · skill:spn-surface/design)
+- **On the web an entry in a dialog or a sheet is an address** (`RULE.SUPPORT.SURFACE.366` · MUST · skill:spn-surface/design)
 - **A page is shaped from how people use it and from the nature of its data, through the UX lens, before it is built** (`RULE.SUPPORT.SURFACE.396` · MUST · skill:spn-surface/design)
-- **The floor holds Server error and Maintenance, beside Not found and No access, for every surface category** (`RULE.SUPPORT.SURFACE.605` · MUST · skill:spn-surface/design)
+- **The floor holds `COMMON_SERVER_ERROR` and `COMMON_MAINTENANCE`, beside `COMMON_NOT_FOUND` and `COMMON_NO_ACCESS`, for every surface category** (`RULE.SUPPORT.SURFACE.605` · MUST · skill:spn-surface/design)
 
 Read this step when an ask brings a design of the page or points at a page to follow. **It is the same skill, with the same steps and the same tree.** The mode adds one read and two lists, and each of steps 1 to 5 starts from the partner's version instead of from nothing. With nothing brought, the skill runs as written and proposes from the cases.
 

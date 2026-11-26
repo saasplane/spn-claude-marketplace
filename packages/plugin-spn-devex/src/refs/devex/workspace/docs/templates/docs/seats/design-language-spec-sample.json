@@ -43,9 +43,18 @@
   "MARKETING": {
    "CONTAINERS": {
     "source": "OWN",
+    "pick": [
+     "INTRO_HERO.UNDER",
+     "INTRO_HERO.BESIDE",
+     "INTRO_STATEMENT",
+     "EXPLAIN_DOORS",
+     "EXPLAIN_SHOWCASE",
+     "EXPLAIN_FEATURES",
+     "ACTION_CLOSING"
+    ],
     "customise": [
      {
-      "code": "HERO",
+      "code": "INTRO_HERO",
       "change": "always the extra-large size",
       "config": {
        "mtype": "CONTAINERS",
@@ -73,7 +82,7 @@
        "notWhen": [
         {
          "condition": "there is one form",
-         "instead": "POINTS"
+         "instead": "EXPLAIN_FEATURES"
         }
        ],
        "rules": []
@@ -81,7 +90,7 @@
      }
     ],
     "notUsed": [
-     "NUMBERS"
+     "PROOF_CLAIM"
     ],
     "values": {
      "mtype": "CONTAINERS",
@@ -96,19 +105,19 @@
     "pick": "ALL",
     "customise": [
      {
-      "code": "GROUP_HOME",
+      "code": "MAIN_GROUP",
       "change": "its hero has the picture under the words",
       "config": {
        "mtype": "PAGES",
        "order": [
         {
-         "kind": "HERO",
+         "kind": "INTRO_HERO",
          "case": "UNDER"
         },
-        "STATEMENT",
-        "DOORS",
-        "SHOW_IT",
-        "CLOSING_CALL"
+        "INTRO_STATEMENT",
+        "EXPLAIN_DOORS",
+        "EXPLAIN_SHOWCASE",
+        "ACTION_CLOSING"
        ]
       }
      }

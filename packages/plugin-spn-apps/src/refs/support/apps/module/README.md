@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/",
-      "seen": "8ebd17f5"
+      "seen": "8ef44739"
     }
   ]
 }
@@ -290,7 +290,7 @@ A page owns one screen and is the only thing a route lands on. It reads the addr
 - **A Home is the app's own page, and a module takes no part in it beyond the reads it exports as hooks.** The app draws the page from them.
 - **The first word of an address is the module's, and an address does not carry its place in the menu** (`RULE.SUPPORT.APPS.192` · MUST · skill:spn-apps/implement). An entry of the menu names a route by its key, so it may stand in any group. A menu can then be arranged again, and no address changes.
 - **An address that changes answers with a redirect** (`RULE.SUPPORT.APPS.193` · MUST · skill:spn-apps/implement). The redirect is the app's own, in the router of the app that had the address.
-- **On a page of groups and their items, the swap of the items for the groups changes the address** (`RULE.SUPPORT.SURFACE.079` · MUST · skill:spn-surface/design).
+- **On a `RECORD_HOME` page with its `GROUPS` case, the swap of the items for the groups changes the address** (`RULE.SUPPORT.SURFACE.079` · MUST · skill:spn-surface/design).
 - **An address has two parts** (`RULE.SUPPORT.APPS.194` · MUST · skill:spn-apps/implement). The path names the page. The part after `#` names an overlay any page can have, so a link to it works from every page. That part is never sent to a server.
 - **The app's navigation seam changes only the part after `#` where an address begins with `#`. Proposed** (`RULE.SUPPORT.APPS.197` · MUST · skill:spn-apps/implement).
 - **How a screen is shown is the choice of whoever builds the page, and nothing is configured for it** (`RULE.SUPPORT.APPS.198` · MUST · skill:spn-apps/implement). A page places a container on itself, or in a dialog or a sheet.

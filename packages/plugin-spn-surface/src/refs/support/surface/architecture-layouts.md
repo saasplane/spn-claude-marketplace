@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/10-architecture-layouts.md",
-      "seen": "59dca294"
+      "seen": "58891ced"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-layouts/",
@@ -149,7 +149,7 @@ A place has a short form for where its room is short: `startNodeCollapsed`, `act
 - **A top bar and a dock MUST stand one size step above the app's size where the config gives none** (`RULE.SUPPORT.SURFACE.418` · MUST · skill:spn-surface/design). `XS` takes `SM`, `SM` takes `MD`, `MD` takes `LG`, and `LG` and `XL` take `XL`, so their entries read above the page's text; a rail keeps the app's size. The config's `size` wins.
 - **The notice MUST stand flush in its place** (`RULE.SUPPORT.SURFACE.419` · MUST · skill:spn-surface/design). No padding above it and no inset; it is square, attached to the window in `RAIL` and `CANVAS` and under the bar in `TOPNAV` and `DOCK`, and the bar casts its own shadow onto it.
 - **The bar of a dock is drawn only when it holds `startNode`, `actionsNode` or `endNode`;** on a phone a bar is still drawn. A top nav always draws its bar.
-- **Not found and No access MUST keep the layout of the surface they belong to.** Only the page is missing or closed, so the navigation stays and the person goes on from it; `CANVAS` is for an app that cannot start, where no navigation can be drawn.
+- **`COMMON_NOT_FOUND` and `COMMON_NO_ACCESS` MUST keep the layout of the surface they belong to.** Only the page is missing or closed, so the navigation stays and the person goes on from it; `CANVAS` is for an app that cannot start, where no navigation can be drawn.
 - **A rail MUST stay open where its entries carry no icon.** Shut, such a rail would show nothing, so its config sets `collapsible` to false and the rail draws no trigger. The rail of a RESOURCES site, whose entries are the titles of its pages, is one.
 - **`CANVAS` gives the page the height the window leaves, so a tool can fill the window.** A drawing board or an editor is one block that takes that height and keeps the page from scrolling; only the board inside it pans and zooms, and the tool's panels are the page's own blocks over it.
 - **A RESOURCES site MUST take `RAIL` where its pages run several levels deep, and `TOPNAV` where it is a help centre started from a search, of any depth.** Guides and API docs take the rail. A help centre draws the breadcrumb under its bar, and its group and topic pages take the top nav's case `SIDE_LIST`, which is planned.

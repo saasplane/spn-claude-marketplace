@@ -71,13 +71,13 @@ function sample(part: string, kind: CatKind): Tree[] {
   }
   if (part === "MEDIA") {
     switch (code) {
-      case "ICONS_AND_MARKS": case "ICONS": return [grid([["KEY", "A mark: a thing of its own"], ["USERS", "A bare icon: a line a person reads"], ["SHIELD", "An icon inside a control"]].map(([icon, text], at) => item(text, null, "CONTENT", undefined, { media: at === 0 ? { mtype: "MARK", icon } : { mtype: "ICON", node: icon } })), 3, 1, 1)];
-      case "AVATARS": return [row([item("Dana Lee", "Owner", "CONTENT", undefined, { media: { mtype: "AVATAR", title: "Dana Lee" } }), item("Mei Tan", "Editor", "CONTENT", undefined, { media: { mtype: "AVATAR", title: "Mei Tan" } })], "XL")];
-      case "CODE_VIEWS": case "CODE_AND_DATA_VIEWS": return [U("DSCodeBlockView", { filename: "role-grant.json", language: "JSON", showLineNumbers: true, bordered: true, code: "{\n  \"member\": \"dana.lee@example.com\",\n  \"role\": \"Editor\"\n}" })];
-      case "PRODUCT_VIEWS": case "FILES_AND_IMAGES": return [feat({ type: "MEDIA_BOTTOM", pageLevel: "CONTAINER", title: "The member list", description: "A product view stands framed and raised.", frames: ["MEDIA"], surface: { raised: true, elevation: "MD" }, mediaNode: slot("The member list in the admin console", "16:8") })];
-      case "PHOTOGRAPHY": return [feat({ type: "MEDIA_BOTTOM", pageLevel: "CONTAINER", title: "A team at work", description: "A photograph stands flush and rounded.", mediaNode: slot("The Pune team at a shared desk", "16:8") })];
-      case "LINE_DRAWINGS": case "ILLUSTRATION": return [slot(`${kind.title}: a drawing of how a role reaches every app`, "16:6")];
-      case "MAPS": case "EMBEDS": return [slot(`${kind.title}: three offices pinned on one map`, "16:6")];
+      case "ICON_MARK": case "ICON_UI": return [grid([["KEY", "A mark: a thing of its own"], ["USERS", "A bare icon: a line a person reads"], ["SHIELD", "An icon inside a control"]].map(([icon, text], at) => item(text, null, "CONTENT", undefined, { media: at === 0 ? { mtype: "MARK", icon } : { mtype: "ICON", node: icon } })), 3, 1, 1)];
+      case "ICON_AVATAR": return [row([item("Dana Lee", "Owner", "CONTENT", undefined, { media: { mtype: "AVATAR", title: "Dana Lee" } }), item("Mei Tan", "Editor", "CONTENT", undefined, { media: { mtype: "AVATAR", title: "Mei Tan" } })], "XL")];
+      case "VIEW_CODE": return [U("DSCodeBlockView", { filename: "role-grant.json", language: "JSON", showLineNumbers: true, bordered: true, code: "{\n  \"member\": \"dana.lee@example.com\",\n  \"role\": \"Editor\"\n}" })];
+      case "VIEW_PRODUCT": case "FILE_ATTACHED": return [feat({ type: "MEDIA_BOTTOM", pageLevel: "CONTAINER", title: "The member list", description: "A product view stands framed and raised.", frames: ["MEDIA"], surface: { raised: true, elevation: "MD" }, mediaNode: slot("The member list in the admin console", "16:8") })];
+      case "ART_PHOTO": return [feat({ type: "MEDIA_BOTTOM", pageLevel: "CONTAINER", title: "A team at work", description: "A photograph stands flush and rounded.", mediaNode: slot("The Pune team at a shared desk", "16:8") })];
+      case "ART_DRAWING": case "ART_ILLUSTRATION": return [slot(`${kind.title}: a drawing of how a role reaches every app`, "16:6")];
+      case "PLACE_MAP": case "VIEW_EMBED": return [slot(`${kind.title}: three offices pinned on one map`, "16:6")];
       default: return [];
     }
   }
