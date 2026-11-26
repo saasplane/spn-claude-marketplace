@@ -79,7 +79,7 @@ function kindLines(kind: Kind, cases: "codes" | Case[]): string[] {
 export function run(args: string[]): number {
   const words = readWords(args, { json: FLAG, case: VALUE });
   const [categoryWord, partWord, kindWord, ...more] = words.paths;
-  if (!categoryWord || more.length) throw new UsageFault("takes a category, and then a part and a kind if you want them: `catalogue show MARKETPLACE WIDGETS DS_CARD_WIDGET`.");
+  if (!categoryWord || more.length) throw new UsageFault("takes a category, and then a part and a kind if you want them: `catalogue show MARKETPLACE WIDGETS CARD_LIST`.");
   const caseWord = words.value("case");
   if (caseWord && !kindWord) throw new UsageFault("`--case` narrows one kind: name the category, the part and the kind first.");
 
