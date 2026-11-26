@@ -15,7 +15,7 @@ description: THE requirement router for SaaS Plane TS repos. Use whenever the us
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/",
-      "seen": "94bbd832"
+      "seen": "c1b2a1ae"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-widgets/",
@@ -23,7 +23,7 @@ description: THE requirement router for SaaS Plane TS repos. Use whenever the us
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-containers/",
-      "seen": "e87bd9db"
+      "seen": "8f6996e2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/07-comments/01-intent.md",
@@ -91,7 +91,7 @@ The `ui` step follows this section for every page a change adds or rearranges. *
 - **Start from the tree the `design` skill wrote.** It names the kind of person the app is for, the flow the page is a step of, the facts, the app page kind (or each section's site container kind) and every block by level, with the case each block follows. Where a page has no tree, run the `design` skill first, and show its result before any code. Never arrange a page while you write it, and never build it from a picture: a design the partner brings goes through the given-design mode into the tree first.
 - **Build a kept line as kept.** Where the partner answered *keep yours*, the tree marks the line with the rule, their words and the date. Build it as they chose, and carry the reason into the code as one comment on that line. A review raises nothing on a kept line, and where the Surface check notes one, answer from the comment and leave the code as it is.
 - **Build each line of the tree with the unit it names.** An app page kind is built from units that exist, and it is never a block of its own (`RULE.SUPPORT.SURFACE.048` · MUST · skill:spn-surface/design). So you write no component for a page kind, and no component named after one. The page composes the panels, the widgets and the components the design system already has.
-- **Use one panel for each thing a person reads or saves as a whole** (`RULE.SUPPORT.SURFACE.116` · GUIDE), as the tree has it. Its sections are content parts, each under its own title, and never panels of their own. Two things that are read or saved apart are two panels. An editor with its preview is one panel, with each thing written beside what it becomes and the actions at the start of the footer (`RULE.SUPPORT.SURFACE.115` · GUIDE).
+- **Use one panel for each thing a person reads or saves as a whole** (`RULE.SUPPORT.SURFACE.116` · GUIDE), as the tree has it. Its sections are content parts, each under its own title, and never panels of their own. Two things that are read or saved apart are two panels. An entry with a preview is one panel, with each thing written beside what it becomes and the actions at the start of the footer (`RULE.SUPPORT.SURFACE.115` · GUIDE).
 - **Give the page that reads a record and the page that changes it the same parts in the same order** (`RULE.SUPPORT.SURFACE.117` · GUIDE). A reading becomes a field, a block of source becomes an editor, and the footer with the actions is added. Nothing else moves.
 - **Read the spec of the page kind for each screen class.** It shows where the parts sit at a desktop, at a tablet and on a phone. Its values are samples, and the page's own data takes their place.
 - **Keep the choice the tree made for each part.** A part whose query takes a page, a text or a filter is `DSDataTable`, in the layout the tree names. Send its search and its filters to the server, in the read the table asks for (`RULE.SUPPORT.SURFACE.070` · MUST · skill:spn-surface/design). Never filter in the page over the records already loaded.

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "267a64ad"
+    "commit": "195321b2"
   },
   "rules": [
     {
@@ -25890,13 +25890,13 @@
       "class": "guidance",
       "sentence": "A heading is not made up for choices whose data names no group",
       "chapter": "04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/03-app-page-kinds.md",
-      "heading": "Choose many",
+      "heading": "Case CHOOSE: many things to tick",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/standards-patterns.md",
-          "heading": "Choose many"
+          "heading": "RECORD_HOME, case CHOOSE"
         }
       ]
     },
@@ -26306,7 +26306,7 @@
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/standards-patterns.md",
-          "heading": "Groups and their items"
+          "heading": "RECORD_HOME, frame GROUPS"
         }
       ]
     },
@@ -26663,7 +26663,7 @@
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/standards-patterns.md",
-          "heading": "Groups and their items"
+          "heading": "RECORD_HOME, frame GROUPS"
         },
         {
           "plugin": "spn-surface",
@@ -26684,7 +26684,7 @@
       "class": "guidance",
       "sentence": "A set of groups that can be added to is not a row of tabs",
       "chapter": "04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/03-app-page-kinds.md",
-      "heading": "Groups and their items",
+      "heading": "Cases GROUPS and STACK: the groups of a set, and their items",
       "decision": null,
       "restated": [
         {
@@ -26700,7 +26700,7 @@
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/standards-patterns.md",
-          "heading": "Groups and their items"
+          "heading": "RECORD_HOME, frame GROUPS"
         },
         {
           "plugin": "spn-surface",
@@ -27834,9 +27834,9 @@
       "level": "GUIDE",
       "params": {},
       "class": "guidance",
-      "sentence": "An editor with its preview is one panel, and each thing a person writes stands beside its own result",
+      "sentence": "An entry with a preview is one panel, and each thing a person writes stands beside its own result",
       "chapter": "04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/03-app-page-kinds.md",
-      "heading": "An editor with its preview",
+      "heading": "The case WITH_PREVIEW",
       "decision": "DEC.SUPPORT.SURFACE.115",
       "restated": [
         {
@@ -27857,7 +27857,7 @@
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/standards-patterns.md",
-          "heading": "An editor with its preview"
+          "heading": "RECORD_ENTRY, case WITH_PREVIEW"
         },
         {
           "plugin": "spn-surface",
@@ -30659,7 +30659,7 @@
       "class": "stated in a skill",
       "sentence": null,
       "chapter": "04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/03-app-page-kinds.md",
-      "heading": "The sign-in page",
+      "heading": "AUTH_FLOW",
       "decision": null,
       "restated": [
         {
@@ -34683,20 +34683,20 @@
       "level": "GUIDE",
       "params": {},
       "class": "guidance",
-      "sentence": "A page beside a sign-in takes the sign-in's panel",
+      "sentence": "A case beside `SIGN_IN` takes the sign-in's panel",
       "chapter": "04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/03-app-page-kinds.md",
-      "heading": "The pages beside a sign-in",
+      "heading": "The cases beside SIGN_IN",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/standards-patterns.md",
-          "heading": "The pages beside a sign-in"
+          "heading": "The cases beside SIGN_IN"
         },
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/standards-patterns.md",
-          "heading": "The pages beside a sign-in"
+          "heading": "The cases beside SIGN_IN"
         },
         {
           "plugin": "spn-surface",
@@ -34710,20 +34710,20 @@
       "level": "GUIDE",
       "params": {},
       "class": "guidance",
-      "sentence": "While the place holds nothing, an overview says what it shows before anything is counted",
+      "sentence": "While the place holds nothing, the page says what it shows before anything is counted",
       "chapter": "04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/03-app-page-kinds.md",
-      "heading": "An overview",
+      "heading": "HOME_APP",
       "decision": null,
       "restated": [
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/standards-patterns.md",
-          "heading": "An overview"
+          "heading": "HOME_APP"
         },
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/standards-patterns.md",
-          "heading": "An overview"
+          "heading": "HOME_APP"
         }
       ]
     },
@@ -34734,9 +34734,9 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": null,
+      "sentence": "On the web an entry in a dialog or a sheet is an address",
       "chapter": "04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/03-app-page-kinds.md",
-      "heading": "An entry over the page",
+      "heading": "RECORD_ENTRY",
       "decision": null,
       "restated": [
         {
@@ -34933,7 +34933,7 @@
       "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/04-site-container-kinds.md",
-      "heading": "Hero",
+      "heading": "INTRO_HERO",
       "decision": null,
       "restated": [
         {
@@ -34965,7 +34965,7 @@
       "class": "guidance",
       "sentence": "A cell's eyebrow is its group or kind as text, the overline the feature draws, and a badge only when it says a state, in that state's hue",
       "chapter": "04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/04-site-container-kinds.md",
-      "heading": "Feature grid",
+      "heading": "EXPLAIN_CATEGORIES",
       "decision": null,
       "restated": [
         {
@@ -34997,7 +34997,7 @@
       "class": "guidance",
       "sentence": null,
       "chapter": "04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/04-site-container-kinds.md",
-      "heading": "Feature grid",
+      "heading": "EXPLAIN_CATEGORIES",
       "decision": null,
       "restated": [
         {
@@ -39057,9 +39057,9 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "The floor holds Server error and Maintenance, beside Not found and No access, for every surface category",
+      "sentence": "The floor holds `COMMON_SERVER_ERROR` and `COMMON_MAINTENANCE`, beside `COMMON_NOT_FOUND` and `COMMON_NO_ACCESS`, for every surface category",
       "chapter": "04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/03-app-page-kinds.md",
-      "heading": "The pages for a failure that is not the person's",
+      "heading": "The floor pages",
       "decision": null,
       "restated": [
         {
@@ -39269,7 +39269,7 @@
       "class": "guidance",
       "sentence": "A resources site's Home is a hub only where it holds several sets, and a small product makes its one set the whole site",
       "chapter": "04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/02-site-page-kinds.md",
-      "heading": "Home",
+      "heading": "Resources home",
       "decision": null,
       "restated": [
         {
@@ -39284,9 +39284,9 @@
       "level": "GUIDE",
       "params": {},
       "class": "guidance",
-      "sentence": "A page of measures over time sets one range and one period compared for every part of the page",
+      "sentence": "A page of this kind sets one range and one period compared for every part of the page",
       "chapter": "04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/03-app-page-kinds.md",
-      "heading": "Measures over time",
+      "heading": "ANALYTICS_HOME",
       "decision": null,
       "restated": [
         {
@@ -39496,7 +39496,7 @@
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/standards-patterns.md",
-          "heading": "Groups and their items"
+          "heading": "RECORD_HOME, frame GROUPS"
         },
         {
           "plugin": "spn-surface",

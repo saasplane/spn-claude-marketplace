@@ -19,12 +19,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/02-site-page-kinds.md",
       "section": "The kinds of page, by level",
-      "seen": "f923349c"
+      "seen": "5a34d463"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/04-site-container-kinds.md",
       "section": "What holds across",
-      "seen": "593bcad9"
+      "seen": "fdb16e19"
     },
     {
       "path": "spn-foundation/docs/01-purpose/02-what.md",
@@ -96,9 +96,9 @@
   - **A number stands in one card**: the number first, then its plain label, then what it gives the reader. A number apart from its label, a label with no benefit, and a count of how the system is built are findings.
   - **Every number MUST be read from the real system**, and a made-up number MUST NOT appear. A true claim keeps its MUST while the rest of a page's words are advice.
 - **The site page kinds and container kinds** — held by this lens worn, beside `UX`, who names each section's container kind.
-  - **A kind of page is named by its job and its level, never by its subject**: site home → group home → topic, three levels by default, with a contact page beside a group home, and a set's group home taking the case of its purpose, a help centre, docs or guides, and an audience page, a guide and a values page beside a topic (site page kinds § The kinds of page, by level). A marketplace's kinds stand in levels of their own, Find, Choose and Act, and a help centre's group homes hold shelves and paged topics; each category's kinds are `spn-surface catalogue show <CATEGORY> PAGES`.
+  - **A kind of page is named by its job and its level, never by its subject**: `MAIN_HOME` → `MAIN_GROUP` → `MAIN_TOPIC`, three levels by default, and a group home serves any level between the home and the topics. Every other kind stands beside the page that usually stands there, in a set that shares a prefix: `MAIN_` (with `MAIN_PRICING`, `MAIN_AUDIENCE` and `MAIN_LANDING`), `COMPANY_` (about, contact and values), `BLOG_` and `CAREER_` are MARKETING's, `RESOURCES_`, `DOCS_`, `GUIDE_`, `HELP_`, `CHANGELOG_` and `ROADMAP_` are RESOURCES', and `COMMON_` is every site's (site page kinds § The kinds of page, by level). A marketplace's kinds stand in levels of their own, Find, Choose and Act, and a help centre's `HELP_HOME` holds its search band and `HELP_CATEGORY` its smaller categories; each category's kinds are `spn-surface catalogue show <CATEGORY> PAGES`.
   - **A help centre always draws the breadcrumb under its bar, one link a level and the page itself unlinked, and so does any site whose bar does not list its groups or that runs deeper than three levels** (`RULE.SUPPORT.SURFACE.598` · MUST · skill:spn-surface/design).
-  - **Its sections run in the order its reader asks their questions, and are never counted**; a page skips a question its reader does not ask. A site home asks what is it → what does today's way cost me → what do I get → is it real → where does each part live → what does it cost → what will I ask → how do I start (`RULE.SUPPORT.SURFACE.340` · MUST · skill:spn-surface/design).
+  - **Its sections run in the order its reader asks their questions, and are never counted**; a page skips a question its reader does not ask. A site home, `MAIN_HOME`, asks what is it, and who is it for → who trusts it → what does today's way cost me → where does each part live → what do I get, and is it real → what do others say → how far has it come → what does it cost → what will I ask → how do I start → where is everything else (`RULE.SUPPORT.SURFACE.340` · MUST · skill:spn-surface/design).
   - **This lens calls which one or two sections take the page's emphasis.** Those sections take size `LG`, a hero `XL`, and a product picture in them is raised `LG` (site container kinds § What holds across).
   - **The fill follows the reading, never the turn.** A section is `BASE`, and takes `DEFAULT` only where the kind of reading changes from its neighbours: a statement read whole, code read closely, offers compared. `PRIMARY` is the closing call's alone, and a hero takes no fill (`RULE.SUPPORT.SURFACE.341` · GUIDE).
   - **The highlight sits on the claim that leads.** This lens names the one claim the page leans on, and the Highlight test puts the raised frame there, once besides the closing call, never on the hero and never two in a row; the gradient is the hero's and the closing call's alone (`RULE.SUPPORT.SURFACE.438` · GUIDE).

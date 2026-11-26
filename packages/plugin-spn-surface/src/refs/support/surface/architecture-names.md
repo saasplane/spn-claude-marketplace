@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/05-standards-names.md",
-      "seen": "20628665"
+      "seen": "0ebd5808"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/05-standards-names/",
-      "seen": "93508da5"
+      "seen": "4fcc8795"
     }
   ]
 }
@@ -274,7 +274,7 @@ The surface domain sets ten names of its own, and each is built under the same r
 | `SPSurfaceCatalogue` | the kinds the foundation defines and a language can extend: a version, and for each category and each part its kinds | no vocabulary: a structure, drawn in the Surface Catalogue |
 | `SPDesignLanguageSpec` | a design language, holding only its own decisions | no vocabulary: a structure, stated in the Design Language |
 
-**A page kind's code is the name a reader sees in a site's navigation, in capitals, with no `PAGE` suffix.** Home is `HOME`, and a Topic is `TOPIC`. The suffixed names, such as `SITE_HOME` and `CONTACT_PAGE`, are not used. A name of two words keeps an underscore, as `GROUP_HOME` does. A title in a site's navigation, such as Privacy or Terms, names a page of a kind and never a kind. `site-patterns.md` lists each kind with its code.
+**A page kind's code is the name a reader sees in a site's navigation, in capitals, with no `PAGE` suffix.** A code opens with the set the page belongs to, such as `MAIN_`, `BLOG_` or `MARKET_`. The home is `MAIN_HOME`, and a topic is `MAIN_TOPIC`. The suffixed names, such as `SITE_HOME` and `CONTACT_PAGE`, are not used. A name of two words keeps an underscore, as `MAIN_GROUP` does. A title in a site's navigation, such as Privacy or Terms, names a page of a kind and never a kind. `site-patterns.md` lists each kind with its code.
 
 ## Marking each property — ✅
 

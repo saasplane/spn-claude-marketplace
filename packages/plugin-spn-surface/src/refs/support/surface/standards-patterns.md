@@ -7,15 +7,15 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-standards-patterns/",
-      "seen": "80d7bd78"
+      "seen": "b33b65fd"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/03-app-page-kinds.md",
-      "seen": "556d6ba1"
+      "seen": "ddd211f7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/02-web/01-app-page-kinds.md",
-      "seen": "7b3dc3a3"
+      "seen": "c7b021b4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/07-figures.md",
@@ -59,7 +59,7 @@ Read this to build a page from patterns a person already knows, or to review a p
 
 A whole page is a page kind, and a section of a site's page is a container kind. The Surface Catalogue holds both: this ref restates the app page kinds, and `site-patterns.md` the container kinds of a site.
 
-Task and flow patterns hold on every surface category. A page kind is chosen by the category, as the book already chooses a layout by an app's job: an app's screens take app page kinds, and a site's pages take site page kinds, with each section of a site's page taking a container kind. A page follows one page kind, and each task on that page follows its task pattern. A listing page follows the app page kind Find in a list, and the search inside it runs by the task pattern Find. **These patterns are never customised by a language:** a design language picks, customises or adds kinds, and it leaves the way a task runs and the way a flow goes as they are.
+Task and flow patterns hold on every surface category. A page kind is chosen by the category, as the book already chooses a layout by an app's job: an app's screens take app page kinds, and a site's pages take site page kinds, with each section of a site's page taking a container kind. A page follows one page kind, and each task on that page follows its task pattern. A listing page follows the app page kind `RECORD_HOME`, and the search inside it runs by the task pattern Find. **These patterns are never customised by a language:** a design language picks, customises or adds kinds, and it leaves the way a task runs and the way a flow goes as they are.
 
 **A rule about how a page is designed and uses a unit is guidance, and it says its reason** (`RULE.SUPPORT.SURFACE.394` · MUST · skill:spn-surface/design). So the rules here read as advice wherever they say which pattern or unit a page picks, where a part stands, which value, variant, colour or size a page writes, how many of a thing a view shows, and the words a page uses. MUST is kept for four things: what the design system and a stack must build, the floor a person is owed whatever the design, the process of the library and the showcase, and true claims. A true claim is a number on a marketing page, read from the real system and never made up. A bold rule below with no MUST is advice, and a partner's choice against it stands.
 
@@ -133,7 +133,7 @@ A page invents no pattern of its own for an intent the list already holds.
 
 ## A page no page kind fits — 🔮
 
-Adding an intent checks that a new task is not an old one under another name. A page shape is checked the same way. **A page shape earns a page kind of its own only when no existing page kind fits its person and its data.** Until then, **a page no page kind fits is derived from the page kinds whose person and data fit it, and it never waits for a page kind** (`RULE.SUPPORT.SURFACE.051` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.332` · MUST · skill:spn-surface/design): a board is derived from Groups and their items, and a cart from Change in place, in a list. Counting the kinds of product that need a shape is not the test, because the book lists no kinds of product; the person and the data can be read for any page.
+Adding an intent checks that a new task is not an old one under another name. A page shape is checked the same way. **A page shape earns a page kind of its own only when no existing page kind fits its person and its data.** Until then, **a page no page kind fits is derived from the page kinds whose person and data fit it, and it never waits for a page kind** (`RULE.SUPPORT.SURFACE.051` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.332` · MUST · skill:spn-surface/design): a board is derived from `RECORD_HOME` with the frame `GROUPS`, and a cart from `RECORD_HOME` with the case `EDIT_IN_PLACE`. Counting the kinds of product that need a shape is not the test, because the book lists no kinds of product; the person and the data can be read for any page.
 
 ## The data and the person decide — 🔮
 
@@ -225,10 +225,10 @@ Where a person comes mostly to read, and a change has weight, the page shows the
 
 | The entry | At a desktop | On a phone | App page kind |
 | --- | --- | --- | --- |
-| small: up to about 5 fields in one group | a dialog over the page | a sheet from the bottom of the screen | An entry over the page |
-| medium: one column with a few groups, up to about 12 fields | a sheet at the side, with the page still in view | the full screen | An entry over the page |
-| large: sections, steps, or records of its own inside it | a page | a page | An entry that is a page |
-| one value among many of one kind | in its row | in its line | Change in place, in a list |
+| small: up to about 5 fields in one group | a dialog over the page | a sheet from the bottom of the screen | `RECORD_ENTRY`, case `DIALOG` |
+| medium: one column with a few groups, up to about 12 fields | a sheet at the side, with the page still in view | the full screen | `RECORD_ENTRY`, case `SHEET` |
+| large: sections, steps, or records of its own inside it | a page | a page | `RECORD_ENTRY`, case `PAGE` |
+| one value among many of one kind | in its row | in its line | `RECORD_HOME`, case `EDIT_IN_PLACE` |
 | a thing that is only on or off | in place, as a switch | the same | the pattern of the page it stands on |
 
 The two numbers of a small and a medium entry are proposed (`RULE.SUPPORT.SURFACE.075` · GUIDE), stated in `architecture-containers.md`.
@@ -236,7 +236,7 @@ The two numbers of a small and a medium entry are proposed (`RULE.SUPPORT.SURFAC
 ### What holds for every row of a list
 
 - **A press on a row opens the record**, where the record has a page or a look. A person then needs no second target to aim at.
-- **A row ends with its actions** (`RULE.SUPPORT.SURFACE.071` · MUST · skill:spn-surface/design). `DSDataTable` shows them as icons, `ICONS`, or behind one action. One action stands on the row itself, and two or more go behind one action, so a row keeps its width for its facts.
+- **A row ends with its actions** (`RULE.SUPPORT.SURFACE.071` · MUST · skill:spn-surface/design). `DSDataTable` shows them as icons, `ICON_UI`, or behind one action. One action stands on the row itself, and two or more go behind one action, so a row keeps its width for its facts.
 - **A state that is normal shows no badge** (`RULE.SUPPORT.SURFACE.058` · GUIDE). A badge on every row says nothing, and the row that differs is then hard to find.
 - **A group shows a count of its items only where the server gives it with the groups.**
 
@@ -245,15 +245,15 @@ The two numbers of a small and a medium entry are proposed (`RULE.SUPPORT.SURFAC
 Some records are switched off and on again, such as an organization's directories, its integrations and its message templates. A switched-off record stays in its own list, so a person who comes to switch it back on finds it where the others are, with the same look, on every screen (`RULE.SUPPORT.SURFACE.363` · GUIDE).
 
 - **A record that is switched off carries a badge, *Inactive*, wherever its row stands** (`RULE.SUPPORT.SURFACE.363` · GUIDE). It is a state that is not normal, so a person reads it from the row and never from where the row was put.
-- **In a data table, the switched-off rows are found by the filter.** The state filter stands on *Active*, as Find in a list keeps the filter people use most switched on, and nothing is folded.
-- **In a set shown whole, a list in a panel, a part or a card, the switched-off rows stand at the end of their own list, folded under one row that counts them.** The active rows stand first. The last row says how many, such as *2 inactive*, and opens the switched-off rows in place under it, each with its badge: a `DSCollapsible` in the `DSList`, and a `DSBadge` on each row. It is the fold of Disclose. The count always shows, so nothing is hidden without a word. Where every row is switched off, nothing is folded.
+- **In a data table, the switched-off rows are found by the filter.** The state filter stands on *Active*, as `RECORD_HOME` keeps the filter people use most switched on, and nothing is folded.
+- **In a set shown whole, a list in a panel, a part or a card, the switched-off rows stand at the end of their own list, folded under one row that counts them.** The active rows stand first. The last row says how many, such as *2 inactive*, which is the case `FOLD_INACTIVE` of `LISTING_GROUPS`, and opens the switched-off rows in place under it, each with its badge: a `DSCollapsible` in the `DSList`, and a `DSBadge` on each row. It is the fold of Disclose. The count always shows, so nothing is hidden without a word. Where every row is switched off, nothing is folded.
 - **A list holds its rows in the page, not in a popover.** A popover holds an addition beside the block that asked for it, not records a person reads and opens.
 
 The rule adds no unit and no prop. A card that opens its fold grows taller, and its neighbours in the row keep their height.
 
 ## The specs a screen starts from — 🔮
 
-**This plugin carries one or more specs for each app page kind, in `refs/support/surface/app-patterns/`.** A spec is a skeleton: a file that shows where the parts of a page sit, and nothing about how they look. The folder holds 22 specs. 21 are for the fourteen app page kinds, and one is for a rule of content. Its `README.md` lists them. The specs of the site container kinds are a second folder beside it, `refs/support/surface/site-patterns/`, which `site-patterns.md` names. A flow is drawn as the skeletons of its pages, each started from the spec of the pattern it follows, and a flow file that puts them in order.
+**This plugin carries one or more specs for each app page kind, in `refs/support/surface/app-patterns/`.** A spec is a skeleton: a file that shows where the parts of a page sit, and nothing about how they look. The folder holds 23 specs: 22 for the app page kinds of a dashboard and a portal, and one for a rule of content. `ANALYTICS_HOME`, `ANALYTICS_REPORT`, the floor pages and `AUTH_FLOW` have no spec yet. Its `README.md` lists them. The specs of the site container kinds are a second folder beside it, `refs/support/surface/site-patterns/`, which `site-patterns.md` names. A flow is drawn as the skeletons of its pages, each started from the spec of the pattern it follows, and a flow file that puts them in order.
 
 - **A page starts from the spec of its page kind.** Copy the spec, and change the sample values to the page's own. Never start a page from an empty file.
 - **The values in a spec are samples.** They show what kind of data a part holds: a title and a line under it, a picture, a state, an action at the end. Which unit shows that data on a real page is the choice of step 2.
@@ -296,25 +296,25 @@ A panel whose content is only cards lets them stand flush; any other content sit
 
 Each app page kind's tree by level is its catalogue kind's units and cases: `spn-surface catalogue show <CATEGORY> PAGES <KIND>`. Under each name below stand only the rules that kind carries.
 
-The levels are the layout, the page level, the containers, the widgets and cards, and the components (`RULE.SUPPORT.SURFACE.202` · MUST · skill:spn-surface/design). Every app page kind fills the content of the app's layout. It names no layout of its own: its spec draws it in the layout of its live page, as the sketch's setting. The page level is the head of the page: `DSPageLevel` at `PAGE` above the containers, or the header of the one container that is the page, with `fullPage`. A card stands at the level of a widget. The units named below are the ones the pattern is drawn with. Which unit shows a part that holds many of one thing is still the choice of step 2. Each section opens with its **For** line (`RULE.SUPPORT.SURFACE.332` · MUST · skill:spn-surface/design).
+The levels are the layout, the page level, the containers, the widgets and cards, and the components (`RULE.SUPPORT.SURFACE.202` · MUST · skill:spn-surface/design). Every app page kind fills the content of the app's layout. It names no layout of its own: its spec draws it in the layout of its live page, as the sketch's setting. The page level is the head of the page: `DSPageHead` above the containers, or the header of the one container that is the page, with `fullPage`. A card stands at the level of a widget. The units named below are the ones the pattern is drawn with. Which unit shows a part that holds many of one thing is still the choice of step 2. Each section opens with its **For** line (`RULE.SUPPORT.SURFACE.332` · MUST · skill:spn-surface/design).
 
-### Choose many
+### `RECORD_HOME`, case `CHOOSE`
 
 - **A heading is not made up for choices whose data names no group** (`RULE.SUPPORT.SURFACE.055` · GUIDE). A made-up heading puts a choice where a person does not look for it.
 
-### An editor with its preview
+### `RECORD_ENTRY`, case `WITH_PREVIEW`
 
-- **An editor with its preview is one panel, and each thing a person writes stands beside its own result** (`RULE.SUPPORT.SURFACE.115` · GUIDE). The page is an entry that is a page. Its content has a part for the details that have no preview, and then one part for each thing a person writes, under the title of that thing.
+- **An entry with a preview is one panel, and each thing a person writes stands beside its own result** (`RULE.SUPPORT.SURFACE.115` · GUIDE). The page is a `RECORD_ENTRY` in the case `PAGE`. Its content has a part for the details that have no preview, and then one part for each thing a person writes, under the title of that thing.
 
-### Groups and their items
+### `RECORD_HOME`, frame `GROUPS`
 
 - **A set of groups that can be added to is a list, and not a row of tabs** (`RULE.SUPPORT.SURFACE.080` · GUIDE). A row of tabs has the width of the page and no more.
 - **Both parts are in view at a desktop only** (`RULE.SUPPORT.SURFACE.079` · MUST · skill:spn-surface/design). On a tablet and on a phone the items of the chosen group take the place of the groups, with the way back above their title. Where the items are a list beside a detail, the page is three parts, the groups drawn flat as navigation, and `DSPageFrameGroups` places them, so no more than two containers stand side by side (`RULE.SUPPORT.SURFACE.625` · MUST · skill:spn-surface/design). On the web the swap also changes the address: see *On the web: the address of a screen* below.
 - **Many groups a person searches fit the `LIST` layout of `DSDataTable`, and not its `TABLE` layout** (`RULE.SUPPORT.SURFACE.069` · GUIDE). The part is narrow, and a person picks one group by its name.
 
-### An overview
+### `HOME_APP`
 
-- **Before anything is counted.** A new place holds nothing yet, and a row of zeros tells a person nothing about what to do. **While the place holds nothing, an overview says what it shows before anything is counted** (`RULE.SUPPORT.SURFACE.365` · GUIDE): the welcome, once, and one card that names the first step with its action, in place of the row of numbers. The numbers appear once there is something to count.
+- **Before anything is counted.** A new place holds nothing yet, and a row of zeros tells a person nothing about what to do. **While the place holds nothing, the page says what it shows before anything is counted** (`RULE.SUPPORT.SURFACE.365` · GUIDE): the welcome, once, and one card that names the first step with its action, in place of the row of numbers. The numbers appear once there is something to count.
 - **Each number loads and fails by itself, with Try again** (`RULE.SUPPORT.SURFACE.365` · GUIDE). A number the person may not see is not drawn. First run, in `flow-patterns.md`, is the flow that starts here.
 
 ## How many panels a page uses — 🔮
@@ -337,7 +337,7 @@ The reason is the theme. The parts of a panel are the places the look of the app
 
 ## The listing pages — 🔮
 
-A listing page is a page whose whole content is the records of one kind. It follows Find in a list. `DSDataTable` has three layouts, and a listing page is that one widget in one of the three. It keeps its search, its filters and its paging in each.
+A listing page is a page whose whole content is the records of one kind. It follows `RECORD_HOME`. `DSDataTable` has three layouts, and a listing page is that one widget in one of the three. It keeps its search, its filters and its paging in each.
 
 | One record holds | At a desktop | At a tablet | On a phone |
 | --- | --- | --- | --- |
@@ -349,18 +349,18 @@ A listing page is a page whose whole content is the records of one kind. It foll
 Which picture each layout leads with, and which field fills it, are stated with the data table in `architecture-components.md` (`RULE.SUPPORT.SURFACE.606` · GUIDE) (`RULE.SUPPORT.SURFACE.614` · GUIDE) (`RULE.SUPPORT.SURFACE.615` · GUIDE) (`RULE.SUPPORT.SURFACE.616` · MUST · skill:spn-surface/design).
 
 - **A listing page whose query takes a page, a text or a filter stays a data table, also where its set is small today** (`RULE.SUPPORT.SURFACE.054` · GUIDE). Its search and its paging are sent to the server. A plain table or a list would do neither.
-- **A list of groups and the list of their items are one page.** The two follow Groups and their items, and neither is a listing page of its own.
+- **A list of groups and the list of their items are one page.** The two follow the frames `GROUPS` and `STACK` of `RECORD_HOME`, and neither is a listing page of its own.
 
 ## The pages for a failure that is not the person's — 🔮
 
-- **The floor MUST hold Server error and Maintenance, beside Not found and No access, for every surface category** (`RULE.SUPPORT.SURFACE.605` · MUST · skill:spn-surface/design). Each is one `DSEmpty`: Server error (`ServerCrash`, *Something went wrong on our side*, **Try again** and **Go back**) stands in the layout of its surface where it can still be drawn, and Maintenance (`Wrench`, *We'll be back soon*, until a time) stands on `CANVAS`. No language customises them.
-- **A page of measures over time sets one range and one period compared for every part of the page** (`RULE.SUPPORT.SURFACE.618` · GUIDE). A figure and a chart that read two ranges cannot be compared. The kind is planned in the design system until a chart unit is built.
+- **The floor holds `COMMON_SERVER_ERROR` and `COMMON_MAINTENANCE`, beside `COMMON_NOT_FOUND` and `COMMON_NO_ACCESS`, for every surface category** (`RULE.SUPPORT.SURFACE.605` · MUST · skill:spn-surface/design). Each is one `DSEmpty`: `COMMON_SERVER_ERROR` (`ServerCrash`, *Something went wrong on our side*, **Try again** and **Go back**) stands in the layout of its surface where it can still be drawn, and `COMMON_MAINTENANCE` (`Wrench`, *We'll be back soon*, until a time) stands on `CANVAS`. No language customises them.
+- **A page of the kind `ANALYTICS_HOME` sets one range and one period compared for every part of the page** (`RULE.SUPPORT.SURFACE.618` · GUIDE). A figure and a chart that read two ranges cannot be compared. The kind is planned in the design system until a chart unit is built.
 
 ## The sign-in page — 🔮
 
-**For** Team · Individual · Visitor. For an Individual, the providers and a code by email lead; for a Team, company sign-on stands as an equal; for a Visitor, the sign-up page beside it, with one ask and no account before value.
+**For** Team · Individual · Visitor. For an Individual, the providers and a code by email lead; for a Team, company sign-on stands as an equal; for a Visitor, the sign-up case beside it, with one ask and no account before value.
 
-A sign-in is not one of the fifteen page kinds: it is the page a person passes before any of them, and every app has one, so its shape is stated once (`RULE.SUPPORT.SURFACE.205` · MUST · skill:spn-surface/design).
+`AUTH_FLOW` is the page a person passes before any other page kind, and every app has one, so its shape is stated once (`RULE.SUPPORT.SURFACE.205` · MUST · skill:spn-surface/design).
 
 | Level | The sign-in |
 | --- | --- |
@@ -374,12 +374,12 @@ A sign-in is not one of the fifteen page kinds: it is the page a person passes b
 - **The providers are icons alone, one row, centred, each its own size with one gap between them**, not a column of wide buttons.
 - **An alternative stands as an equal of the others, and opens its own step in place.** A one-time code or single sign-on changes the header's title and the content's fields, with a way back to the password, and the page does not move.
 
-### The pages beside a sign-in
+### The cases beside `SIGN_IN`
 
-A person meets other pages beside the sign-in: the page that creates an account, the reset of a password, an invitation, and the return from a provider or a company. They belong to the same door, so they take its shape.
+A person meets other cases beside the sign-in: the case that creates an account, the reset of a password, an invitation, and the return from a provider or a company. They belong to the same door, so they take its shape.
 
-- **A page beside a sign-in takes the sign-in's panel** (`RULE.SUPPORT.SURFACE.364` · GUIDE). It is the same `CANVAS`, the same one `DSPanelContainer` at `SM` and the same header, with its own step's title in it. Its steps change in place, as an alternative of the sign-in does, and each step after the first has its own way back to the one before.
-- **The sign-up page's second content offers the sign-in** (`RULE.SUPPORT.SURFACE.364` · GUIDE): *Already have an account? Sign in*, on every step. The sign-in offers the sign-up in turn, as every flow asks (`flow-patterns.md`).
+- **A case beside `SIGN_IN` takes the sign-in's panel** (`RULE.SUPPORT.SURFACE.364` · GUIDE). It is the same `CANVAS`, the same one `DSPanelContainer` at `SM` and the same header, with its own step's title in it. Its steps change in place, as an alternative of the sign-in does, and each step after the first has its own way back to the one before.
+- **The second content of `SIGN_UP` offers the sign-in** (`RULE.SUPPORT.SURFACE.364` · GUIDE): *Already have an account? Sign in*, on every step. `SIGN_IN` offers the sign-up in turn, as every flow asks (`flow-patterns.md`).
 
 | The page | Its steps, in the sign-in's panel | The flow it belongs to |
 | --- | --- | --- |
@@ -406,8 +406,8 @@ Every spec draws a part of a page the same way, whichever page kind it belongs t
 
 A browser gives every screen an address. A person goes back with the browser's Back, reloads, and sends a link, and each of them lands by the address alone. These lines are the web's alone; how an address is built and what it names is the web module's, and the stack's build steps state it.
 
-- **Groups and their items: the swap MUST change the address**, although it happens in place. The browser's Back then does the same as the back action, a reload stays on the chosen group, and a link to one group opens it on any screen.
-- **An entry over the page MUST be an address, although it opens in place** (`RULE.SUPPORT.SURFACE.366` · MUST · skill:spn-surface/design). The browser's Back then closes the entry and never leaves the page under it, a reload opens it again, and a link opens it over its page. What was typed is lost on a reload.
+- **`RECORD_HOME`, frame `GROUPS`: the swap MUST change the address**, although it happens in place. The browser's Back then does the same as the back action, a reload stays on the chosen group, and a link to one group opens it on any screen.
+- **On the web an entry in a dialog or a sheet MUST be an address, although it opens in place** (`RULE.SUPPORT.SURFACE.366` · MUST · skill:spn-surface/design). The browser's Back then closes the entry and never leaves the page under it, a reload opens it again, and a link opens it over its page. What was typed is lost on a reload.
 - **A confirmation, and proving it is you again, are not addresses.** Each interrupts a task, as Interrupt states, so a reload drops it, and the act is tried again.
 
 The flow patterns take these rules as they are, in each flow that opens an entry (`flow-patterns.md`).
@@ -440,7 +440,7 @@ This ref states the four groups of the surface patterns, which task pattern cove
 | `RULE.SUPPORT.SURFACE.053` | a spec in the plugin equals the spec of the same name in the book |
 | `RULE.SUPPORT.SURFACE.054` | a listing page whose query takes a page, a text or a filter stays a data table. It is advice |
 | `RULE.SUPPORT.SURFACE.055` | no heading is made up for choices whose data names no group. It is advice |
-| `RULE.SUPPORT.SURFACE.115` | an editor with its preview is one panel, and each thing a person writes stands beside its own result. It is advice |
+| `RULE.SUPPORT.SURFACE.115` | an entry with a preview is one panel, and each thing a person writes stands beside its own result. It is advice |
 | `RULE.SUPPORT.SURFACE.116` | a page uses one panel for each thing a person reads or saves as a whole, and a section of one thing is not a panel of its own. It is advice |
 | `RULE.SUPPORT.SURFACE.117` | the page that reads a record and the page that changes it hold the same parts in the same order. It is advice |
 | `RULE.SUPPORT.SURFACE.202` | an app page kind states its units by level, its page level and its cards among them, and names no layout of its own |
@@ -450,9 +450,9 @@ This ref states the four groups of the surface patterns, which task pattern cove
 | `RULE.SUPPORT.SURFACE.598` | that a help centre, and any site whose bar does not list its groups or that runs deeper than three levels, draws the breadcrumb under the bar, one link a level and the page unlinked |
 | `RULE.SUPPORT.SURFACE.333` | where two page kinds fit a page's data, the person decides between them |
 | `RULE.SUPPORT.SURFACE.363` | switched-off rows stay in their own list, each with the badge *Inactive*. It is advice |
-| `RULE.SUPPORT.SURFACE.364` | the pages beside a sign-in take the sign-in's panel. It is advice |
-| `RULE.SUPPORT.SURFACE.365` | an overview says what it shows before anything is counted. It is advice |
-| `RULE.SUPPORT.SURFACE.366` | on the web an entry over the page is an address |
+| `RULE.SUPPORT.SURFACE.364` | a case beside `SIGN_IN` takes the sign-in's panel. It is advice |
+| `RULE.SUPPORT.SURFACE.365` | `HOME_APP` says what it shows before anything is counted. It is advice |
+| `RULE.SUPPORT.SURFACE.366` | on the web an entry in a dialog or a sheet is an address |
 | `RULE.SUPPORT.SURFACE.221` | a card that shows its own info is a `DSCard`, and a `DSCardWidget` is a card with a head |
 | `RULE.SUPPORT.SURFACE.371` | a hero's state is a `PRIMARY` badge eyebrow, and its stack is `OUTLINE` `DEFAULT` badge facts, as `site-patterns.md` states. It is advice |
 | `RULE.SUPPORT.SURFACE.372` | a grid cell's eyebrow is its group or kind as text, and a badge only when it says a state. It is advice |

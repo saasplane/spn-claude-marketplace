@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
-      "seen": "8f63789d"
+      "seen": "9beff057"
     }
   ]
 }
@@ -52,7 +52,7 @@ A design language is described for each surface category it states, in the same 
 The groups and parts are the language's outline and the outline of its samples. A part or a category the language does not use says so in one line, and is never left out.
 
 - **A language is described for each surface category it states, in the same eight parts, in the groups Structure and Style, beside one Shared group.** An agent finds a choice at the same heading in every language, a partner's included. A category is described under `categories`, in one decision for each part, in the spec format of the blank template a partner starts from.
-- **A language works on each part's kinds with three verbs: pick, customise and add.** Customising never changes a kind's meaning, an added kind or case is built from units and never reuses a code or changes the kind's reason, and the floor is never customised: the standard pages, and the task and flow patterns. A language gives a page kind another case with a customised `order`, and adds a case to a catalogue kind with `{ "to": …, "case": … }`. The spec mirrors the catalogue key for key, so a script can check a spec against the catalogue.
+- **A language works on each part's kinds with three verbs: pick, customise and add.** Customising never changes a kind's meaning, an added kind or case is built from units and never reuses a code or changes the kind's reason, and the floor is never customised: the standard pages, and the task and flow patterns. A language gives a page kind another case with a customised `order`, and adds a case to a catalogue kind with `{ "to": …, "case": … }`. A `pick` is `ALL`, a list of `KIND` and `KIND.CASE` codes, or an object of kinds each with a list of cases or `ALL`, and `customise` and `notUsed` may name a `KIND.CASE`. A kind named with no case takes the cases the language it extends picked. The spec mirrors the catalogue key for key, so a script can check a spec against the catalogue.
 - **A child language states only what it sets differently.** It names its parent, `extends: surface@1`, and keys what it sets by surface category. Every part it does not state is INHERITED, and a parent never lists its children.
 - **Each part carries a fixed id and its source.** The id, such as `categories.MARKETING.THEME`, stays when a heading's words change, so a tool or an agent finds the part by its id. The source, OWN, INHERITED or NONE, says whether the language set the choice, took it from its parent or the design system, or uses none, so a blank is never read as a decision.
 - **One language covers every surface category of the platform, and it depends on no app and names none.** An app keeps its own typed theme setting, which names the language and the version it was written from, and its platform, Web or Native, is a separate axis, so a native app is one more setting written from the same language under the same brand.

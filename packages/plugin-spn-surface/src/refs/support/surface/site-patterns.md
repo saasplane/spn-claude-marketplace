@@ -3,15 +3,15 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/04-site-container-kinds.md",
-      "seen": "c76bfde0"
+      "seen": "b7bf4510"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/02-web/02-site-container-kinds.md",
-      "seen": "e36e6c76"
+      "seen": "f8ed505b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/02-site-page-kinds.md",
-      "seen": "536835db"
+      "seen": "aa72bfb3"
     }
   ]
 }
@@ -32,8 +32,8 @@ Read this before you design or review a page of a site. A site's page is a run o
 | Container kind | the shape of a section of a site's page, chosen by what the section holds |
 | Section | one part of a site's page: a `DSSectionContainer` with its fill and its room, holding one `DSFeature` or a `DSFeatureGridSectionContainer` |
 | Highlight | the one section of a page whose whole feature stands in one raised frame, in the form the design language sets |
-| Content signals | the twelve questions asked of a section, in order, whose first yes names its container kind |
-| Site page kind | a page's job at its level of the site, such as a Home or a Topic, which sets the order of its sections |
+| Content signals | the thirteen questions asked of a section, in order, whose first yes names its container kind |
+| Site page kind | a page's job at its level of the site, such as `MAIN_HOME` or `MAIN_TOPIC`, which sets the order of its sections |
 | The head across | a form of `DSFeature` for long words beside a picture that draws the items: the head across the full width, the split under it |
 
 ## A container kind — 🔮
@@ -53,20 +53,21 @@ Then ask these questions of each section, in this order, and stop at the first y
 
 | # | The question | Yes means |
 | --- | --- | --- |
-| 1 | Does the section say what the page is, as its first words? | Hero |
-| 2 | Is it the page's last call to act, and nothing else? | Closing call |
-| 3 | Is it words alone, read whole? | Statement |
-| 4 | Is it real code the reader reads line by line? | Real sample |
-| 5 | Does the reader's press change what is shown? | Choose to see |
-| 6 | Is each item a thing of its own, with more than a title and a line: its own picture, mark, facts or page? | Feature grid: a set, shown features, a directory, plans or quotes |
-| 7 | Does each item open another page? | Doors |
-| 8 | Do the items run in an order the reader follows? | Steps |
-| 9 | Are they numbers read from the real system? | Numbers |
-| 10 | Are they questions with answers? | Questions |
-| 11 | Is there one picture the words introduce? | Show it |
-| 12 | None of these | Points |
+| 1 | Does the section say what the page is, as its first words? | `INTRO_HERO` |
+| 2 | Is it the page's last call to act, and nothing else? | `ACTION_CLOSING` |
+| 3 | Is it words alone, read whole? | `INTRO_STATEMENT`, or `INTRO_PROBLEM` where it is the problem the page ends |
+| 4 | Is it real code the reader reads line by line? | `EXPLAIN_SAMPLE` |
+| 5 | Does the reader's press change what is shown? | `EXPLAIN_SHOWCASE`, as tabs or a carousel |
+| 6 | Is it what others say of the product: a quote with who said it, their marks, a story or a review? | `PROOF_TESTIMONIALS`, or `PROOF_LOGOS` for marks and the press, or `PROOF_REVIEWS` for ratings |
+| 7 | Is each item a thing of its own, with more than a title and a line: its own picture, mark, facts or page? | `EXPLAIN_CATEGORIES`: a set or a directory; plans are `PRICE_PLANS` and shown features `EXPLAIN_FEATURES` |
+| 8 | Does each item open another page? | `EXPLAIN_DOORS` |
+| 9 | Do the items run in an order the reader follows? | `EXPLAIN_STEPS` |
+| 10 | Are they numbers read from the real system? | `PROOF_CLAIM` |
+| 11 | Are they questions with answers? | `COMMON_FAQ` |
+| 12 | Is there one picture the words introduce? | `EXPLAIN_SHOWCASE`, as one picture |
+| 13 | None of these | `EXPLAIN_FEATURES` |
 
-The order matters. A grid of things that each open a page is a Feature grid and not Doors, because question 6 comes first. A row of numbers in the order a reader follows is Steps, because question 8 comes before question 9. Once the pattern is named, the section answers the questions of its look, in the order *What holds across* gives: the fill, the size, the highlight, the gradient, the media, the shape, the alignment and the columns. The footer is the exception: it ends every site's page, so no question chooses it.
+The order matters. A grid of things that each open a page is `EXPLAIN_CATEGORIES` and not `EXPLAIN_DOORS`, because question 7 comes first. A row of numbers in the order a reader follows is `EXPLAIN_STEPS`, because question 9 comes before question 10. A row of quotes is `PROOF_TESTIMONIALS` and not `EXPLAIN_CATEGORIES`, because question 6 comes before question 7. Once the kind is named, the section answers the questions of its look, in the order *What holds across* gives: the fill, the size, the highlight, the gradient, the media, the shape, the alignment and the columns. The footer is the exception: it ends every site's page, so no question chooses it.
 
 ## The kinds of page, by level — 🔮
 
@@ -74,10 +75,10 @@ The order matters. A grid of things that each open a page is a Feature grid and 
 
 - **A kind of page orders its sections as its reader asks their questions, and does not count them** (`RULE.SUPPORT.SURFACE.340` · MUST · skill:spn-surface/design). A page skips a question its reader does not ask. A count of sections would make a page add a section with nothing to say, or cut one a reader needs.
 
-- **A resources site's Home is a hub only where it holds several sets, and a small product makes its one set the whole site** (`RULE.SUPPORT.SURFACE.617` · GUIDE): `HUB`, one search across every set, a door to each set with its count, what is new, and *Still need help?*; `ONE_SET`, the set's own Group home at the first level. A set's Group home takes the case of its purpose, `HELP`, `DOCS` or `GUIDES`, and a resources site keeps no blog of its own: the Blog is `MARKETING`'s.
-- **A site holds the floor's Server error and Maintenance beside Not found** (`RULE.SUPPORT.SURFACE.605` · MUST · skill:spn-surface/design). Server error stands in the site's layout where it can still be drawn, and Maintenance on `CANVAS`.
-- **A Listing narrowed from a category, a brand or a shared link is the same page, the case `NARROWED`**, because the filters chosen are the page's address; there is no Results kind.
-- **A Listing's facets, where there are more than four filters, stand in a rail at the start of a desktop**: the aside of a `DSPageFrameAside` at `asidePlacement` `START` and `asideWidth` `NARROW`, 256 px, with the records in the main part, so the page writes no row of its own and the rail folds by its place as every frame does. On a tablet and a phone a Filters button opens the same facets in a sheet.
+- **A resources site's Home is a hub only where it holds several sets, and a small product makes its one set the whole site** (`RULE.SUPPORT.SURFACE.617` · GUIDE): `RESOURCES_HOME` takes the case `HUB`, one search across every set with a tab for each set, a card for each set with how many pieces it holds, what is new across them, and *Still need help?*; or the case `ONE_SET`, the set's own home at the first level: `DOCS_HOME`, `GUIDE_HOME` or `HELP_HOME`. A resources site keeps no blog of its own: the Blog and its Articles are `MARKETING`'s.
+- **A site holds the floor's `COMMON_SERVER_ERROR` and `COMMON_MAINTENANCE` beside `COMMON_NOT_FOUND`** (`RULE.SUPPORT.SURFACE.605` · MUST · skill:spn-surface/design). `COMMON_SERVER_ERROR` stands in the site's layout where it can still be drawn, and `COMMON_MAINTENANCE` on `CANVAS`.
+- **A category is the page of its records, at any depth, and a search is the page of its results.** `MARKET_CATEGORY` and `MARKET_SEARCH` each end on the results section, `BROWSE_RESULTS`, so neither takes a separate Listing page.
+- **A results section's facets, where there are more than four filters, stand in a rail at the start of a desktop**: the aside of a `DSPageFrameAside` at `asidePlacement` `START` and `asideWidth` `NARROW`, 256 px, with the records in the main part, so the page writes no row of its own and the rail folds by its place as every frame does. On a tablet and a phone a Filters button opens the same facets in a sheet.
 - **A help centre always draws `DSBreadcrumb` under the bar, one link for each level above the page and the page itself unlinked, and so does any site whose bar does not list its groups or that runs deeper than three levels** (`RULE.SUPPORT.SURFACE.598` · MUST · skill:spn-surface/design). Any other site may draw none.
 
 ## The kinds of page of a marketplace — 🔮
@@ -90,30 +91,30 @@ A marketplace's page kinds, in the groups Find, Choose and Act, are `spn-surface
 
 - **Features that each answer their own question stand in sections of their own; one section holds several features only when they answer one question** (`RULE.SUPPORT.SURFACE.593` · MUST · skill:spn-surface/design). On the same fill the sections share one background, and `parting` `HAIRLINE` marks where each ends. The closing call is the one exception: it may hold the page's highlight above its call.
 
-### Hero
+### INTRO_HERO
 
 - **Look.** `DSSectionContainer` `size` `LG`, or `XL` where the hero is the page's emphasis, `color` `BASE`. Inside it, a `DSFeature` at `pageLevel` `PAGE`. The media keeps the frame of its kind: a product is `frames` `MEDIA` with `surface` raised, `elevation` `LG`; a diagram is flat; a mood picture is `type` `BACKDROP`. Use `type` `SPLIT_END` for one picture the title names, and `MEDIA_BOTTOM` for two panes or a wide picture. Centre the words, `textAlign` `CENTER`, only when nothing stands beside or under them. A state such as Alpha is a `BADGE` `eyebrow` in `PRIMARY`, at the level's `variant`. The stack names kinds, so it goes in up to four `BADGE` `facts`, each `OUTLINE` in `DEFAULT` (`RULE.SUPPORT.SURFACE.371` · GUIDE). The actions are the page's one `SOLID` primary, then one `OUTLINE`. With items, use `actionsPlacement` `BEFORE_ITEMS`. A hero takes no `reveal`.
 
-### Points
+### EXPLAIN_FEATURES
 
-- **Before and after.** The old way against the new is Points, and never a table. Each point is a question the reader asks: its line is the new way's answer, and the old way is a text fact labelled *Today*. A data table is an app's reading unit and never draws a site's section (`RULE.SUPPORT.SURFACE.293` · MUST · skill:spn-surface/design).
+- **Before and after.** The old way against the new is `EXPLAIN_FEATURES`, and never a table. Each point is a question the reader asks: its line is the new way's answer, and the old way is a text fact labelled *Today*. A data table is an app's reading unit and never draws a site's section (`RULE.SUPPORT.SURFACE.293` · MUST · skill:spn-surface/design).
 
-### Show it
+### EXPLAIN_SHOWCASE, one picture
 
 - **Look.** A `DSFeature` with `mediaNode`. The frame follows the kind of the media (`RULE.SUPPORT.SURFACE.293` · MUST · skill:spn-surface/design): a product is `frames` `MEDIA`, `surface` raised, `elevation` `MD`, or `LG` in the page's emphasis; an illustration or a diagram is flat on the section; a photo is flush and rounded; code panes are flat, each as tall as its lines. Use `type` `SPLIT_END` when the picture is one thing the title names and reads at half width, about 630px at 1440; `MEDIA_BOTTOM` for two or more panes compared, a wide table or chart, or four thumbnails. Points go beside the picture as a `LIST`, or across above it as a `GRID`. Where the picture and the words differ in height, `verticalAlign` stands the shorter against the taller: a picture shorter than its words takes `CENTER`, the default, or `BOTTOM` where it draws the points and its foot meets the last of them; a picture taller than its words takes `TOP`. Where the words run long and the picture draws the points, use the head across. `reveal`: `text` `RISE`, `media` `FADE`, `items` `RISE`. The fill is `BASE`; `DEFAULT` only where the neighbours hold another kind of reading.
 
-### Choose to see
+### EXPLAIN_SHOWCASE, tabs or a carousel
 
 - **Under.** `type` `MEDIA_BOTTOM`, and the `mediaNode` is a `DSTabs` at `pageLevel` `CONTAINER` with `type` `PILL`, the look of a website's pages (`RULE.SUPPORT.SURFACE.209` · GUIDE); the level gives its size, and it stands grouped on its track. Tab names are short, one or two words. The tabs only choose which panel is open, and the open tab's panel is the page's own node: the tab's line, one description that says what only this part says, then its picture at the feature's full width. The line and the description are the page's words at the title and description steps of `WIDGET`, so no tab and no `DSFeature` prop is needed. Every panel's picture is one shape, so the section does not jump as the tabs change, and each has its own alt.
 
-### Doors
+### EXPLAIN_DOORS
 
-- **Look.** The items are boxed and raised `MD` on the fill that stands off the section: `items.surface` `color` `DEFAULT`, raised, `elevation` `MD`, on a `BASE` section (`RULE.SUPPORT.SURFACE.293` · MUST · skill:spn-surface/design). Each item has an `anchor`. A door stands for a page of its own, so where it has a picture, the picture is a mark, `media` `MARK`. Each may end on an `endNode`: `ARROW_UP_RIGHT` when it leaves the site, `ARROW_RIGHT` inside it. `GRID` columns follow the count, as for Points. Use a `LIST` when each door names a person or carries a long line. A door does not stand on a filled section. A button beside the doors opens a different place, such as the group's overview, not a page a door already opens.
+- **Look.** The items are boxed and raised `MD` on the fill that stands off the section: `items.surface` `color` `DEFAULT`, raised, `elevation` `MD`, on a `BASE` section (`RULE.SUPPORT.SURFACE.293` · MUST · skill:spn-surface/design). Each item has an `anchor`. A door stands for a page of its own, so where it has a picture, the picture is a mark, `media` `MARK`. Each may end on an `endNode`: `ARROW_UP_RIGHT` when it leaves the site, `ARROW_RIGHT` inside it. `GRID` columns follow the count, as for `EXPLAIN_FEATURES`. Use a `LIST` when each door names a person or carries a long line. A door does not stand on a filled section. A button beside the doors opens a different place, such as the group's overview, not a page a door already opens.
 
-### Feature grid
+### EXPLAIN_CATEGORIES
 
 - **Look.** `DSFeatureGridSectionContainer` with `section` (`BASE`, `MD`), `heading` (its actions stand under it) and `grid` by count. Each cell is a `DSFeature` at `pageLevel` `GROUP`, with `media` `MARK`: a short point under the heading. A cell with a picture of its own, or a plan, is at `WIDGET`. Give cells an `eyebrow` when they share a family, and `facts` for the count. **A cell's eyebrow is its group or kind as text, the overline the feature draws, and a badge only when it says a state, in that state's hue** (`RULE.SUPPORT.SURFACE.372` · GUIDE). A cell with an `anchor` is a door: `frames` `TEXT` and `MEDIA`, `surface` raised, `elevation` `MD`, on `DEFAULT`, so its mark stands inside the one box that lights. A cell that opens nothing is boxed and flat: `frames` `TEXT` and `MEDIA`, `surface` bordered. The cells of a row stand at one height (`RULE.SUPPORT.SURFACE.530` · MUST · skill:spn-surface/design).
-- **Plans.** The section is `DEFAULT`, because comparing offers is another kind of reading. Each plan holds one eyebrow, its name; a second word such as Most popular is the plan's highlight, a `BADGE` fact in `PRIMARY` at the level's `variant`, not a second eyebrow (`RULE.SUPPORT.SURFACE.373` · GUIDE). Its `items` is a `LIST` of what it holds, each with a check icon, and it has one action. The recommended plan is raised `MD` and carries that highlight. A row-by-row comparison under the plans is `DSComparison`.
+- **Plans.** The kind for plans is `PRICE_PLANS`, and its section is drawn so. The section is `DEFAULT`, because comparing offers is another kind of reading. Each plan holds one eyebrow, its name; a second word such as Most popular is the plan's highlight, a `BADGE` fact in `PRIMARY` at the level's `variant`, not a second eyebrow (`RULE.SUPPORT.SURFACE.373` · GUIDE). Its `items` is a `LIST` of what it holds, each with a check icon, and it has one action. The recommended plan is raised `MD` and carries that highlight. A row-by-row comparison under the plans is `DSComparison`.
 
 ## What holds across — 🔮
 
@@ -127,7 +128,7 @@ Every container kind answers the same questions about its look, in this order (`
 | Gradient | Is this the hero or the closing call? Its band takes the design language's emphasis, at most once besides the hero, and never on a frame, with one exception: the highlight standing in the closing call's band takes a light tint of the brand that softens across its frame, so the frame reads as part of the band's sweep. A highlight on a band of its own stays flat |
 | Media | The frame follows the media's kind, and the place follows its width and how many panes it has. A picture beside the words is `SPLIT_END`; a picture beside the items, the words across above both, is `ITEMS_SPLIT_END`, and a site never rearranges a split with its own CSS. On a phone, the words come first |
 | Shape | A picture keeps the shape it is made in and is never cropped to a column; `verticalAlign` stands the shorter column |
-| Alignment | `textAlign` `CENTER` centres the head alone. The split's words stand at the start. `verticalAlign` stands the items' column and the media at the `TOP`, the `CENTER` or the `BOTTOM` of their row; `BOTTOM` brings the foot of a picture shorter than its items level with the last item |
+| Alignment | Centre the words only when they stand alone with nothing to scan: `INTRO_STATEMENT`, `ACTION_CLOSING`, an `INTRO_HERO` with no picture. `textAlign` `CENTER` centres the head alone. The split's words stand at the start. `verticalAlign` stands the items' column and the media at the `TOP`, the `CENTER` or the `BOTTOM` of their row; `BOTTOM` brings the foot of a picture shorter than its items level with the last item |
 | Columns | The count of items sets them, four at most. Lines that stand side by side are one sentence each, of about one length |
 
 - **A site's page MUST be a sequence of sections, and each MUST own its room and its fill** (`RULE.SUPPORT.SURFACE.414` · MUST · skill:spn-surface/design). The layout's box gives the side room, so the words of every section and the bar's items share one edge at every width; what a section holds adds no room unless it is framed, and a frame insets its own words. A footer's list of links keeps its words on the column's edge, with rows that are not pressed whole, each holding a link that marks itself under the pointer. A menu's panel is as wide as what it holds: a few short entries stand as a compact list, and a wide panel is for entries that carry content of their own.
@@ -138,12 +139,12 @@ Every container kind answers the same questions about its look, in this order (`
 - **For each section the agent writes one line, its case** (`RULE.SUPPORT.SURFACE.439` · GUIDE): each answer, the test that decided it, and what the other answer would cost. A reviewer then corrects a test's answer, and the section follows from it.
 - **A section is `BASE`, and takes `DEFAULT` only where the kind of reading changes from its neighbours** (`RULE.SUPPORT.SURFACE.341` · GUIDE). A statement read whole, code read closely and offers compared are such readings. Sections do not alternate their fills by turn. `PRIMARY` is the closing call's alone, and a hero takes no fill.
 - **Words stand on their section, not in a frame**, but for a highlighted section, whose whole feature is framed (`RULE.SUPPORT.SURFACE.293` · MUST · skill:spn-surface/design). A statement, a hero's words and a closing call stand on their section, and only a picture or an item takes a frame.
-- **Media is framed by its kind** (`RULE.SUPPORT.SURFACE.293` · MUST · skill:spn-surface/design): the product framed and raised, an illustration or a diagram flat, a photo flush and rounded, code in its code frame and flat.
+- **Media is framed by its kind** (`RULE.SUPPORT.SURFACE.293` · MUST · skill:spn-surface/design): the product (`VIEW_PRODUCT`) framed and raised, an illustration or a diagram (`ART_ILLUSTRATION`, `ART_DRAWING`) flat, a photo (`ART_PHOTO`) flush and rounded, code (`VIEW_CODE`) in its code frame and flat.
 - **Points stand flat, and doors stand boxed and raised** (`RULE.SUPPORT.SURFACE.293` · MUST · skill:spn-surface/design). A point is read and a door is pressed, so the look says which before a reader tries.
 - **A grid section is for items that are each a thing of their own** (`RULE.SUPPORT.SURFACE.259` · MUST · skill:spn-surface/design). The parts or points of one subject are a feature's items, because the data decides which, and media alone decides neither.
-- **Every section with items stands at the start, and words are centred only where there is nothing to scan** (`RULE.SUPPORT.SURFACE.346` · GUIDE). A Statement, a Closing call and a hero with no picture are centred. Points, Steps, Doors, a Feature grid and Questions stand at `START`, also where they state the problem the page ends: the fill already says so.
+- **Every section with items stands at the start, and words are centred only where there is nothing to scan** (`RULE.SUPPORT.SURFACE.346` · GUIDE). `INTRO_STATEMENT`, `ACTION_CLOSING` and an `INTRO_HERO` with no picture are centred. `EXPLAIN_FEATURES`, `EXPLAIN_STEPS`, `EXPLAIN_DOORS`, `EXPLAIN_CATEGORIES` and `COMMON_FAQ` stand at `START`, also where they state the problem the page ends: the fill already says so.
 - **A site's bands follow the design system's three screen classes and no widths of their own** (`RULE.SUPPORT.SURFACE.588` · MUST · skill:spn-surface/design). A phone is under 768 px, a tablet from 768 to 1023 px, and a section stands side by side from 1024 px; under 1024 px every band stacks, the words first. A drawing beside the words stays legible at its column at 1024 px (`RULE.SUPPORT.SURFACE.589` · MUST · skill:spn-surface/design).
-- **Lines that stand side by side are one sentence each, of about one length** (`RULE.SUPPORT.SURFACE.342` · GUIDE). The items of a grid, the cells of a grid section and the options of Choose to see are read across. The budget of each line is the length of the words by level, in `standards-core.md`.
+- **Lines that stand side by side are one sentence each, of about one length** (`RULE.SUPPORT.SURFACE.342` · GUIDE). The items of a grid, the cells of a grid section and the options of `EXPLAIN_SHOWCASE` are read across. The budget of each line is the length of the words by level, in `standards-core.md`.
 
 ### Icon or mark
 
@@ -151,7 +152,7 @@ An item's picture is chosen by what the item stands for and by its form, not by 
 
 | The item | Its picture |
 | --- | --- |
-| stands for a thing of its own, and introduces it with a title and a line: a door, a cell of a Feature grid, an entry of a site's menu | a mark, `media` `MARK` |
+| stands for a thing of its own, and introduces it with a title and a line: a door, a cell of an `EXPLAIN_CATEGORIES` grid, an entry of a site's menu | a mark, `media` `MARK` |
 | is a line you read: a point, a step, an option's line | a bare icon, `media` `ICON`, as a cue |
 | is a one-line entry of a navigation list | a bare icon |
 | is an action | the icon inside the control, which keeps the control's square (`RULE.SUPPORT.SURFACE.067` · MUST · skill:spn-surface/design) |
@@ -172,7 +173,7 @@ No entry and no section's item names `pageLevel`: each takes the level of the pl
 
 ### The head across
 
-Some sections have long words, and a picture that draws their items rather than their claim. In a split, the words, the items and the actions share one column beside the picture, so the items fall below the picture's foot. The head across is a form of `DSFeature` for these, `type` `ITEMS_SPLIT_END` or `ITEMS_SPLIT_START` (`RULE.SUPPORT.SURFACE.248` · MUST · skill:spn-surface/design): a form of Show it, Steps and Points when their words run long, not a container kind of its own.
+Some sections have long words, and a picture that draws their items rather than their claim. In a split, the words, the items and the actions share one column beside the picture, so the items fall below the picture's foot. The head across is a form of `DSFeature` for these, `type` `ITEMS_SPLIT_END` or `ITEMS_SPLIT_START` (`RULE.SUPPORT.SURFACE.248` · MUST · skill:spn-surface/design): a form of `EXPLAIN_SHOWCASE`, `EXPLAIN_STEPS` and `EXPLAIN_FEATURES` when their words run long, not a container kind of its own.
 
 | | The head across |
 | --- | --- |
@@ -186,14 +187,14 @@ Some sections have long words, and a picture that draws their items rather than 
 
 A phone has no pointer that rests, so a section reads the same without hover; on the web, hover only adds.
 
-- **A door, and a cell of a Feature grid that opens a page, MUST be lit as one target under the pointer** (`RULE.SUPPORT.SURFACE.236` · GUIDE). The whole item takes the `anchor` and is pressed whole, so the page's hover lights the whole frame. A Directory's cell is lit the same way, and draws no look of its own on hover, such as marks at its corners.
+- **A door, and a cell of an `EXPLAIN_CATEGORIES` grid that opens a page, MUST be lit as one target under the pointer** (`RULE.SUPPORT.SURFACE.236` · GUIDE). The whole item takes the `anchor` and is pressed whole, so the page's hover lights the whole frame. A directory's cell is lit the same way, and draws no look of its own on hover, such as marks at its corners.
 - **An arrow MUST move only while its door or its button is hovered or pressed** (`RULE.SUPPORT.SURFACE.287` · MUST · skill:spn-surface/design). At rest the arrow stands still.
 
 A door already reads as a door at rest, because it is boxed and raised and its picture is a mark, and a point reads as a point, because it is flat (`RULE.SUPPORT.SURFACE.293` · MUST · skill:spn-surface/design). So a person with no pointer tells them apart before anything is lit.
 
 ## The specs a section starts from — 🔮
 
-**This plugin carries 25 specs of the site container kinds, in `refs/support/surface/site-patterns/`**: one for each of the nineteen container kinds that draw a section, a second for Hero, Show it, Real sample and Choose to see (`-under`) and for Closing call (`-beside`), and a third for Show it, highlighted (`show-it-highlight.dg.json`), the section the Highlight test names. The hero and the closing call specs say in their captions where the emphasis band stands. Each is a skeleton of one section in the design system's units, with a view for a desktop, a tablet and a phone. Its `README.md` lists them.
+**This plugin carries 25 specs of the site container kinds, in `refs/support/surface/site-patterns/`**, each named by the code of its kind in lower-kebab form, with a second for a kind whose section names two forms. `EXPLAIN_SHOWCASE` holds the specs of its two readings, one picture and tabs or a carousel. A kind or a case no unit draws yet, planned in the catalogue, or a kind that is new in the round and not drawn yet, has none. Shown features and a directory are uses of `EXPLAIN_CATEGORIES` and take its spec. The hero and the closing call specs say in their captions where the emphasis band stands. Each is a skeleton of one section in the design system's units, with a view for a desktop, a tablet and a phone. Its `README.md` lists them.
 
 - **A section starts from the spec of its container kind.** Copy it and put the page's own words in its places; the words in a spec are placeholders that say what a heading or a point is for. Never start a section from an empty file.
 - **A spec is strict JSON.** Draw one with `spn-devex docs figure draw <spec>`.

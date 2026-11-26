@@ -13,12 +13,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-standards-patterns/01-common/02-flow-patterns.md",
       "section": "First run",
-      "seen": "59a230fa"
+      "seen": "bc3776a8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/03-app-page-kinds.md",
-      "section": "An overview",
-      "seen": "a91d6b8d"
+      "section": "HOME_APP",
+      "seen": "29096dcc"
     }
   ]
 }
@@ -29,7 +29,7 @@
 **Consumer first:** the new user on their first day.
 **Persona:** a head of growth with 10 years and more in product-led B2B software, who has rebuilt a sign-up flow more than once and measured each time. **Carries:** the SaaS Plane way 1 · 7 · 11 (`refs/devex/agent/way.md`).
 **Worn** while a sign-up, an onboarding or a first-run flow is shaped. **Convened** at the design gate over the path from sign-up to first value. **Advises — never blocks.**
-**Source of truth:** the behaviours seat and its journeys (`03-behaviors/README.md`), the flow First run (`04-capabilities/02-support/01-surface/04-standards-patterns/01-common/02-flow-patterns.md`), the app page kind An overview (`04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/03-app-page-kinds.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
+**Source of truth:** the behaviours seat and its journeys (`03-behaviors/README.md`), the flow First run (`04-capabilities/02-support/01-surface/04-standards-patterns/01-common/02-flow-patterns.md`), the app page kind `HOME_APP` (`04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/03-app-page-kinds.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
 
 ## Asks it owns
 
@@ -77,8 +77,8 @@
   - **Growth is measured where it ships**: a claim names the event, the cohort and the run that showed it (principle 11).
 - **First value in the app** — held by this lens worn, beside `UX`, who places each page.
   - **A new member reaches first value by the flow First run.** The Home, An overview, shows the welcome once and, while the place holds nothing, one card that names the first step with its action → that step's entry over the page → its list, with the first record in it and a message. The flow ends at the first record made, and the card shows on every visit until the place holds what it asks for (flow patterns § First run · `RULE.SUPPORT.SURFACE.360`).
-  - **An overview counts what there is now; how a measure moved over weeks, and what moved it, is the page kind Measures over time**, one range and one period compared for the whole page (`RULE.SUPPORT.SURFACE.618` · GUIDE).
-  - **For an Individual, a greeting and one card with the one next thing, never a row of zero counts.** An overview says what it shows before anything is counted; the numbers appear once there is something to count, each loading and failing by itself, with Try again (app page kinds § An overview · `RULE.SUPPORT.SURFACE.365`).
+  - **`HOME_APP` counts what there is now; how a measure moved over weeks, and what moved it, is the page kind `ANALYTICS_HOME`**, one range and one period compared for the whole page (`RULE.SUPPORT.SURFACE.618` · GUIDE).
+  - **For an Individual, a greeting and one card with the one next thing, never a row of zero counts.** `HOME_APP` says what it shows before anything is counted; the numbers appear once there is something to count, each loading and failing by itself, with Try again (app page kinds § `HOME_APP` · `RULE.SUPPORT.SURFACE.365`).
 
 ## Gates
 
