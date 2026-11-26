@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "45682faf"
+    "commit": "3cceda8f"
   },
   "rules": [
     {
@@ -12326,7 +12326,13 @@
       "chapter": "04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "heading": "An order is one delegated execution, and every order follows the same rules",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/workstream.md",
+          "heading": "An order is one delegated execution, and every order follows the same rules"
+        }
+      ]
     },
     {
       "id": "RULE.DEVEX.WORKSPACE.479",
@@ -33627,6 +33633,11 @@
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/architecture-components.md",
+          "heading": "DSSearchBar"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
           "heading": "Data entry · The value of a control"
         },
         {
@@ -39604,6 +39615,31 @@
       "heading": "A new unit weighs every axis the surface offers",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/agent/lenses/ui.md",
+          "heading": "Produces to"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "A new unit weighs every axis the surface offers"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "DSChatMessage, one message of a conversation"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/architecture-components.md",
+          "heading": "DSInputNumberGroup, a set of number fields held as one record"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "5. Then the blocks"
+        },
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",

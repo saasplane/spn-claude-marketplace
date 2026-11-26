@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/07-architecture-components.md",
-      "seen": "8eccea5a"
+      "seen": "4e713a8d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-components/",
-      "seen": "ab27a74a"
+      "seen": "33915c82"
     }
   ]
 }
@@ -49,11 +49,11 @@ Thirteen groups, each answering one need of a surface. The list holds the core u
 | Group | Answers | Blocks |
 | --- | --- | --- |
 | Actions | the ways a person asks for something | `DSButton` · `DSButtonGroup` · `DSToolbar` |
-| Data display | how records and values are shown | `DSAccordion` · `DSAccordionGroup` · `DSActorView` · `DSAddressView` · `DSAvatar` · `DSAvatarGroup` · `DSBadge` · `DSCard` · `DSCarousel` · `DSCodeBlockView` · `DSColorView` · `DSDataFieldView` · `DSDataUnit` · `DSDataUnitGroup` · `DSItem` · `DSItemCard` · `DSItemFacts` · `DSJSONView` · `DSList` · `DSRatingView` · `DSStatusActiveView` · `DSTable` |
-| Data entry · Fields | every input a form is built from | `DSInput` · `DSInputNumber` · `DSInputOTP` · `DSInputPhone` · `DSTextarea` · `DSLabel` · `DSCheckbox` · `DSCheckboxGroup` · `DSRadio` · `DSRadioGroup` · `DSSwitch` · `DSToggle` · `DSToggleGroup` · `DSToggleGroupMulti` · `DSSlider` · `DSSliderRange` · `DSTagGroup` |
+| Data display | how records and values are shown | `DSAccordion` · `DSAccordionGroup` · `DSActorView` · `DSAddressView` · `DSAvatar` · `DSAvatarGroup` · `DSBadge` · `DSCard` · `DSCarousel` · `DSChatMessage` · `DSCodeBlockView` · `DSColorView` · `DSChatMessage` · `DSDataFieldView` · `DSDataUnit` · `DSDataUnitGroup` · `DSItem` · `DSItemCard` · `DSItemFacts` · `DSJSONView` · `DSList` · `DSRatingView` · `DSStatusActiveView` · `DSTable` |
+| Data entry · Fields | every input a form is built from | `DSInput` · `DSInputNumber` · `DSInputNumberGroup` · `DSInputOTP` · `DSInputPhone` · `DSTextarea` · `DSLabel` · `DSCheckbox` · `DSCheckboxGroup` · `DSRadio` · `DSRadioGroup` · `DSSwitch` · `DSToggle` · `DSToggleGroup` · `DSToggleGroupMulti` · `DSSlider` · `DSSliderRange` · `DSTagGroup` |
 | Data entry · Pickers | choosing from a set, a date or a time | `DSSelect` · `DSSelectMulti` · `DSAutocomplete` · `DSAutocompleteMulti` · `DSCommand` · `DSCommandPalette` · `DSDatePicker` · `DSDateRangePicker` · `DSTimePicker` · `DSDateTimePicker` · `DSCalendar` · `DSColorPicker` |
 | Data entry · Compound fields | the form frame, and inputs built from other inputs | `DSForm` · `DSAddressForm` · `DSAttachment` · `DSAttachmentMulti` · `DSJSONControl` · `DSDataFieldForm` · `DSDataFieldBuilder` · `DSImagePicker` · `DSThemeForm` |
-| Composites | blocks built from components that carry one task end to end and that no other component is built from | `DSDataTable` · `DSFilterBar` · `DSFilterFacets` · `DSComparison` · `DSQuote` · `DSFeature` |
+| Composites | blocks built from components that carry one task end to end and that no other component is built from | `DSDataTable` · `DSFilterBar` · `DSSearchBar` · `DSFilterFacets` · `DSComparison` · `DSQuote` · `DSFeature` |
 | Feedback | what a surface says while it works, and when it fails | `DSAlert` · `DSSpinner` · `DSToast` · `DSProgress` · `DSProgressCircle` · `DSSkeleton` · `DSEmpty` |
 | Structure | the small blocks that divide, scroll or fold a part of a page, or stand it on a fill | `DSCollapsible` · `DSHScroll` · `DSScrollArea` · `DSSeparator` · `DSSurface` · `DSPageLevel` |
 | Page | the units that work across a page's content: the head of a page that stands in no box, a page setting, and the page frames, which place a page's parts in slots | `DSPageHead` · `DSPageCategory` · `DSPageFrameListDetail` · `DSPageFrameGroups` · `DSPageFrameAside` |
@@ -113,6 +113,10 @@ The surface already answers most of what a new unit must decide: how dense it is
   | Task state | `DSTaskStateType`, or the states of the block's data | the unit is drawn from data, or shows where a task stands |
   | The words of each part | the type step its `size` or `pageLevel` gives | the unit has a title, a label or a description; each part's step follows the unit's size or level, never a fixed step |
 
+A unit's props are not invented from the need alone. The surface already has units that stand beside it, and each has props that were weighed once: an item line's title, description and picture, a quote's speaker, a choice group's options. A new unit that names the same thing in other words gives two names to one idea.
+
+- **A new unit's props start from its nearest units' props: a field a neighbour already has is reused whole, with its name, its type and its meaning, and a proposal lists the neighbours it read and names each new field it could not reuse** (`RULE.SUPPORT.SURFACE.627` · MUST · skill:spn-surface/design). `DSQuote`'s `speaker` is `DSItem`'s `title`, `description` and `media` and nothing more. A field left out of a neighbour's shape is said to be left out, with its reason, and a field a neighbour has under another name is a defect of the proposal. A unit with no neighbour says so.
+
 ## A unit's choice table — 🔮
 
 A unit's props, what the library draws of it and its usage say what the unit can do. They never say which value a page writes, or when: a badge offers seven variants and seven colours, and a page that meets it with no reason picks by guessing. **So a unit with a closed prop has a choice table, which gives every value of each closed prop its cases** (`RULE.SUPPORT.SURFACE.375` · MUST · skill:spn-surface/design). A value is chosen from two facts at once, what the value is and where it stands, and those two facts set the variant, the colour and the size together. So a table never gives one prop alone.
@@ -149,9 +153,9 @@ Every core unit with a closed prop has its table in this ref, under its unit whe
 | Group | The units |
 | --- | --- |
 | Data entry · Compound fields | `DSForm` · `DSDataFieldForm` · `DSAddressForm` · `DSAttachment` · `DSAttachmentMulti` |
-| Data display | `DSList` · `DSDataUnit` · `DSDataUnitGroup` · `DSActorView` · `DSDataFieldView` · `DSTable` |
+| Data display | `DSList` · `DSChatMessage` · `DSDataUnit` · `DSDataUnitGroup` · `DSActorView` · `DSDataFieldView` · `DSTable` |
 | Feedback | `DSEmpty` |
-| Data entry · Fields | `DSInputNumber` · `DSSwitch` · `DSTextarea` · `DSInputPhone` · `DSCheckbox` · `DSCheckboxGroup` · `DSLabel` · `DSSlider` · `DSSliderRange` · `DSTagGroup` |
+| Data entry · Fields | `DSInputNumber` · `DSInputNumberGroup` · `DSSwitch` · `DSTextarea` · `DSInputPhone` · `DSCheckbox` · `DSCheckboxGroup` · `DSLabel` · `DSSlider` · `DSSliderRange` · `DSTagGroup` |
 | Data entry · Pickers | `DSSelect` · `DSAutocomplete` · `DSSelectMulti` · `DSAutocompleteMulti` · `DSColorPicker` · `DSCommand` · `DSCommandPalette` |
 | Navigation | `DSPagination` · `DSNavList` · `DSNavMenu` · `DSNavBarTop` · `DSNavEntry` |
 | Composites | `DSComparison` · `DSFilterBar` |
@@ -674,6 +678,7 @@ An entry is opened in an overlay by how much room it asks for, and the room is t
   | `MD` | 13px in a row of 32px | 14px in a row of 36px | 16px in a row of 40px | 18px in a row of 44px | 18px in a row of 44px |
   | `LG` | 14px in a row of 36px | 16px in a row of 40px | 18px in a row of 44px | 18px in a row of 44px | 18px in a row of 44px |
   | `XL` | 16px in a row of 40px | 18px in a row of 44px | 18px in a row of 44px | 18px in a row of 44px | 18px in a row of 44px |
+- **A tab's picture is `media`, the one shape of `DSItem`, and it takes the place of the icon.** `media` takes `ICON`, `MARK`, `AVATAR`, `AVATAR_GROUP` or `CUSTOM`, and stands where the icon goes in `LINE`, `SWITCH` and `PILL`; when it is set `startIcon` is not drawn. Nothing new stands at a tab's end: `count` and `endIcon` stay where they were.
 - **Tabs that say no level and no type draw the switch.** The tabs of the parts of a panel or of a card say `CONTAINER` or `WIDGET`, and the tabs that lead to the sub-pages of a whole page say `PAGE`.
 - **In a `flush` part, the tabs MUST place their first tab and their panel by the inset of their place** (`RULE.SUPPORT.SURFACE.118` · MUST · skill:spn-surface/design). The label of the first tab starts at that inset, so it starts where the text under it starts. The line of the tabs still runs from edge to edge. The panel takes the same inset at its sides, and what it holds stands in a padded place. So a title in the panel takes no inset of its own, and a code view or a table in the panel keeps its border.
 - **A page writes no padding for the tabs or for their panel.** The part says that it is `flush`, and the tabs do the rest.
@@ -843,7 +848,7 @@ A composite is a block built from components that carries one task end to end, a
 | Unit | Others built from it | Group |
 | --- | --- | --- |
 | `DSItem`, `DSList`, `DSTable`, `DSCard` | yes: a list's row, `DSItemCard`, `DSItemFacts`, a data table's records, `DSCardWidget`, the header of a panel | Data display |
-| `DSDataTable`, `DSFilterBar`, `DSFilterFacets`, `DSComparison`, `DSQuote` | no: only containers and pages use them | Composites |
+| `DSDataTable`, `DSFilterBar`, `DSSearchBar`, `DSFilterFacets`, `DSComparison`, `DSQuote` | no: only containers and pages use them | Composites |
 | `DSFeature` | no | Composites |
 
 A composite owns its inner wiring and its size. It takes one size, from its own prop or from the block above it, and **passes that size to every part inside it**, so a page sets one size for the whole composite and never dresses its parts separately. A composite adds no states of its own: the states its records can be in are the task state of `standards-interaction.md`, and this ref carries no second definition of them.
@@ -852,6 +857,7 @@ A composite owns its inner wiring and its size. It takes one size, from its own 
 | --- | --- |
 | `DSDataTable` | How does a page show many records as one block, with its own search, sort and paging? |
 | `DSFilterBar` | How does a page let a person narrow those records, and see what is narrowed? |
+| `DSSearchBar` | How does a page let a person start a search by words, a few fields and, where there are verticals, scopes? |
 | `DSFilterFacets` | How does a marketplace narrow its results by more filters than a bar holds, and say how many each choice leaves? |
 | `DSComparison` | How does a page set a few subjects side by side across the same settings, from data alone? |
 | `DSQuote` | How does a site show a person's or a company's words and who said them, as a testimonial, a story or a review? |
@@ -1015,6 +1021,28 @@ The bar has one form, read from its start to its end. A person who has used one 
 
 **What the composite does.** `DSFilterBar` draws the fields, the action that shows the hidden ones, the line, and the search and clear actions in this order. Its fields share the width equally. It draws the filter icon in a round shape, as tall as the fields beside it. It keeps in view the fields a page marks `primary`, and beside them a number of the others: up to `moreLimit` at a desktop, three unless the page sets it, and up to `moreLimitTablet` at a tablet, one unless the page sets it. So the bar holds fewer fields at a tablet by itself. On a phone it is the one button: the button opens the fields in a drawer from the bottom of the screen, with the extent `FIT`, so the drawer is as tall as its fields and scrolls only when the window runs out (`RULE.SUPPORT.SURFACE.246` · MUST · skill:spn-surface/design). The size of the bar sets only how dense its controls are, and never how far the drawer reaches. The drawer stands the title, the fields and the actions in its own `Header`, `Content` and `Footer`, so it pads once (16 px), as `DSFilterFacets`' drawer does. With no filter on, the button reads *Filters* and the clear action is not shown.
 
+
+### DSSearchBar
+
+`DSSearchBar` is the control a person finds by: one or more fields, a Search button, and, where the search has verticals, tabs that say what is searched. It stands beside `DSFilterBar` and in its grammar: its fields are data, each holds its own `valueLink`, `onSearch` is its `onApply`, and on a phone its fields open in a sheet as the filter bar's open in a drawer. A filter bar narrows records already on the page, and a search bar starts the finding.
+
+| Prop | The page gives | What the composite does with it |
+| --- | --- | --- |
+| `fields` | each an `mtype` of `DSSearchBarFieldType` (`TEXT` · `AUTOCOMPLETE` · `SELECT` · `DATE_RANGE` · `COUNT`), a `key`, a `label`, a `placeholder`, `options` (for `SELECT`, and the rows of a `COUNT`), `dataSource` (for `AUTOCOMPLETE`, which the stack gives and a set never writes), `limits`, `gridColumns` and `valueText` (on a `COUNT`), and the `valueLink` it holds | one field for each thing a person gives; one is a plain search, several a structured one. The first four kinds are `DSFilterBar`'s of the same names, and `COUNT` is `DSInputNumberGroup` in a popover |
+| `scopes` | `options`, `DSTabs`' options without `anchor` and with one more key, `fields`, the keys of the fields shown while that scope is open; `valueLink`, the key of the open scope, never empty; `type` (`LINE` · `SWITCH` · `PILL`, `LINE` by default) | the tabs over the bar that say what is searched, drawn by `DSTabs`; left out, the bar has no tabs and shows every field. A field two scopes share keeps its value when the tab changes |
+| `folded` | a yes-or-no, no by default | the bar as one line that says what was searched, such as *Paris · 12 to 14 Mar · 2 guests*, opening to the fields when pressed; a results page's head is folded |
+| `radius` | `DSRadiusType`: `SQUARE` · `SMALL` · `MEDIUM` · `LARGE` · `FULL`; `FULL`, or `SQUARE` under a `SQUARE` theme, by default | the corner of the bar, of its Search button and of the folded line; at `FULL` the button is a circle with its icon alone, and at any other radius it carries the word |
+| `size` · `onSearch` · `onClear` · `testData` | the size step, the place's by default; what runs on Search or on the key that submits a form in a text field; what runs when every field is cleared; the test hook | |
+
+- **A field that is a search is `DSAutocomplete`, and the bar is its frame.** `DSAutocomplete` finds and draws results of any kind; the bar adds the segments around it, the scopes over it and the Search button after it.
+- **A scope's tabs are `DSTabs`, and the open scope is never empty.** A field the bar shows is a field of the open scope; a field no open scope names is not drawn, and its value is kept for when its scope opens again.
+- **On a phone the bar is one button, and its fields open in a sheet with its own `Header`, `Content` and `Footer`,** as the filter bar's drawer does, so it pads once. The sheet's extent is `FIT`.
+- **The radius is the bar's, and the bar's alone.** A popover of a field keeps the theme's popover radius, so a `FULL` bar opens panels with the corners of every other panel.
+- **One search bar stands in a view, and the search of one list is a `DSFilterBar`, not this unit** (`RULE.SUPPORT.SURFACE.299` · MUST · skill:spn-surface/design). The search of a site stands in the band at the top of a page at the unit's radius; the head of a page of results is the same fields folded.
+
+#### `DSRadiusType`
+
+`DSRadiusType` names a corner: `SQUARE`, `SMALL`, `MEDIUM` and `LARGE`, the theme's steps, and `FULL`, a corner as round as the box is high. `FULL` is a value of this vocabulary only, and the theme's own radius does not take it. A unit that offers a full corner takes `radius` as `DSRadiusType`, and a unit that offers none keeps the theme's steps.
 
 ### DSComparison
 
@@ -1874,6 +1902,12 @@ A toolbar is chosen by the controls it holds for one surface, such as an editor,
 
 ### Data display
 
+#### `DSChatMessage`, one message of a conversation
+
+`DSChatMessage` is one message of a conversation: who sent it, the words, and when. A message of the person who reads stands at the end of the line, and a message of anyone else at its start. Another's message stands in the inset surface and the reader's own in the primary subtle tint, and the message takes no `surface`. Its sender line is a `DSItem` at `INLINE`, so its props are `DSItem`'s as they are (`RULE.SUPPORT.SURFACE.627` · MUST · skill:spn-surface/design): `title` (the sender's name, required), `description` and `media`; the unit's own are `message` (the words, required), `time`, `own` (the reader's own message, `false` by default) and `showSender` (`true` by default), with `size` and `testData`.
+
+- **A message is drawn from data, and the reader's own stands at the end.** The page gives `own`, and the message never reads who is signed in. The sender line is not drawn when `own`, and the page sets `showSender` `false` on the second message of a run from one sender.
+
 #### The choice table of `DSCard`
 
 A card is chosen by what it holds. Its size is the size of its place, and it is opaque unless the page behind it is meant to show through.
@@ -2094,6 +2128,13 @@ A line of facts is chosen by the row it stands in, and it takes that row's level
 | `pageLevel` | `PAGE` · `CONTAINER` · `WIDGET` · `GROUP` · `INLINE` | the level of the row or the unit it stands in |
 
 ### Data entry · Fields
+
+#### `DSInputNumberGroup`, a set of number fields held as one record
+
+`DSInputNumberGroup` is a set of number fields, one for each option, held as one record of numbers: the guests of a booking, adults, children and infants, or the seats of a plan by kind. Its `valueLink` holds a number for each option key; a row never holds `null`, so an empty group is `{}`, and a row left out of the record reads as its `min`, else zero. It takes its options and `gridColumns` from `DSCheckboxGroup` and a row's bounds from `DSInputNumber` (`RULE.SUPPORT.SURFACE.627` · MUST · skill:spn-surface/design): `options` (each a `key`, a `label`, and where it needs them a `description`, icons, a `count` badge and `disabled`), `limits` (the `min`, `max` and `step` of each row by option key), `gridColumns`, `size`, `validationType`, `disabled`, `onBlur`, `ariaLabel` and `testData`.
+
+- **The group holds no total.** A cap across rows, such as most nine guests in all, is the page's, written into the `limits` of its rows, so the group stays a set of numbers and never a rule about them.
+- **A row steps by its two buttons and by typing, as `DSInputNumber` does,** and stops at its `min` and its `max`.
 
 #### The choice table of `DSInput`
 
@@ -3323,6 +3364,7 @@ This ref states which components exist, in which group, and what every one must 
 | `RULE.SUPPORT.SURFACE.623` | a page frame places its parts and nothing else: it gives no padding and no size to what fills a slot, `fullHeight` makes each part as tall as the frame with a panel scrolling its own content, `attached` joins panels into one surface and is never given where a slot holds cards, and a frame folds by its own width, never by the device alone |
 | `RULE.SUPPORT.SURFACE.624` | `DSItem` is an item line and knows nothing of navigation: the way back is the head's, never the item's |
 | `RULE.SUPPORT.SURFACE.626` | `DSPageLevel` gives a level, a part and `flush` to what it holds and lays out nothing, as `DSSurface` gives a surface; a head is laid out by `DSPageHead` or by its box's own head, and the `HEADER` layout stays one major version, deprecated |
+| `RULE.SUPPORT.SURFACE.627` | a new unit's props start from its nearest units' props: a field a neighbour has is reused whole, and a proposal lists the neighbours it read and names each new field it could not reuse |
 
 ## Proof
 
