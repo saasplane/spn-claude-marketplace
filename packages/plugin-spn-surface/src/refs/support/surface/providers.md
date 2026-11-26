@@ -7,15 +7,15 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/16-delivery-providers/",
-      "seen": "82ff99c3"
+      "seen": "6efb21f4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/16-delivery-providers/02-ts/01-design-system.md",
-      "seen": "bfed6962"
+      "seen": "87ab1be7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-standards-patterns/",
-      "seen": "b33b65fd"
+      "seen": "14201d2d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-widgets/",
@@ -23,7 +23,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-containers/",
-      "seen": "8f6996e2"
+      "seen": "fc758fe6"
     }
   ]
 }
@@ -103,7 +103,7 @@ The tokens sit in tiers, and a component sees only the roles and the scale: Tier
 | a time shown as how long ago | the page writes `type` as `AGO` on `DSFormatDate` or `DSFormatDateTime`, and no time format where the app's is meant (`RULE.SUPPORT.SURFACE.122` · GUIDE) (`RULE.SUPPORT.SURFACE.123` · MUST · skill:spn-surface/design). A log of what happened shows the date and the time |
 | the paging in the footer of the panel | the page puts an element in `DSPanelContainer.Footer` and gives it to the table as `settings.pagination.footerElement` |
 | a value changed in its cell | the page puts `edit` on one column of the `TABLE` layout, and on the `LIST` layout. The value is text |
-| a way back above the title line | the page gives `DSPanelContainer.Header` the address to go back to and its words, `backLabel`, and the header draws the way back as a row above its title line, the row of `DSPageHead` (`RULE.SUPPORT.SURFACE.108` · MUST · skill:spn-surface/design). No core unit places the two parts of a page of groups and their items (`RULE.SUPPORT.SURFACE.099` · MUST · skill:spn-surface/design). On the web, the stack's own page frames place them, and their widths are the named choice for a narrow part of groups (`RULE.SUPPORT.SURFACE.119` · MUST · skill:spn-surface/design). A page writes no width |
+| a way back above the title line | the page gives `DSPanelContainer.Header` the address to go back to and its words, `backLabel`, and the header draws the way back as a row above its title line, the row of `DSPageHead` (`RULE.SUPPORT.SURFACE.108` · MUST · skill:spn-surface/design). No core unit places the two parts of a `RECORD_HOME` page with its `GROUPS` case (`RULE.SUPPORT.SURFACE.099` · MUST · skill:spn-surface/design). On the web, the stack's own page frames place them, and their widths are the named choice for a narrow part of groups (`RULE.SUPPORT.SURFACE.119` · MUST · skill:spn-surface/design). A page writes no width |
 | the head of a page that holds several panels | the head stands above the panels, outside any frame, as an item line at the level `PAGE` with its way back. The page gives the title and the address to go back to, and writes no row, no back button and no padding (`RULE.SUPPORT.SURFACE.120` · GUIDE) |
 | tabs in a `flush` part | the page writes no padding for the tabs or for their panel. The tabs place their first tab and their panel by the inset of their place (`RULE.SUPPORT.SURFACE.118` · MUST · skill:spn-surface/design) |
 | the head of a page, or of a part of a page | the title of a header is an item line. A panel that is the whole page says so with `fullPage`, and its header is then the page head (`RULE.SUPPORT.SURFACE.179` · MUST · skill:spn-surface/design); any other box gives the level of its kind: `CONTAINER` for a panel or an overlay, `WIDGET` for a card, `GROUP` for the head of a part of a card widget (`RULE.SUPPORT.SURFACE.107` · MUST · skill:spn-surface/design). The item line takes no `size`, and the heading element follows the level (`RULE.SUPPORT.SURFACE.106` · MUST · skill:spn-surface/design). A page that holds several panels writes `DSPageLevel` with the level `PAGE` and the part `HEADER` for its head (`RULE.SUPPORT.SURFACE.178` · MUST · skill:spn-surface/design). The page writes no type step and no heading element |

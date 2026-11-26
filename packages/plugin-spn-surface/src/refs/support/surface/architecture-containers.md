@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/09-architecture-containers.md",
-      "seen": "9bdd1e85"
+      "seen": "876c0fa8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-containers/",
-      "seen": "8f6996e2"
+      "seen": "fc758fe6"
     }
   ]
 }
@@ -338,7 +338,7 @@ A block with `bordered` in a `flush` part keeps its border, because its own prop
 
 The three parts below are a panel in use. Each says how the same header, content and footer carry one of the app page kinds, the Pages of DASHBOARD and PORTAL in the Surface Catalogue. None adds a prop or a part to the panel.
 
-### An entry over the page
+### `RECORD_ENTRY` over the page
 
 An entry is a form a person fills in to add or change something. A small or a medium entry opens over the page it belongs to. The person then keeps their place and sees what the entry is about. How much there is to enter decides what it opens as.
 
@@ -364,7 +364,7 @@ An entry is a form a person fills in to add or change something. A small or a me
 - **A list of the sections does not stand beside the form.** The app already has its navigation at the side, and a form of a few sections is read from top to bottom.
 - **Fields that are short and belong together may share a row at a desktop, and each takes a row of its own on a phone.** Each field keeps its title above its control, as the rules of content of `standards-core.md` state.
 
-### Groups and their items
+### `RECORD_HOME` with its `GROUPS` case
 
 Some pages hold things in groups: the fields of each record type, or the actions of each group of notifications. Such a page has two parts, the groups and the items of the chosen group, and each part is a panel.
 
@@ -446,7 +446,7 @@ This ref states what frames a part of a page, what that frame looks like, and wh
 | `RULE.SUPPORT.SURFACE.076` | a dialog on a phone becomes a sheet from the bottom |
 | `RULE.SUPPORT.SURFACE.077` | an entry is one panel, placed inside the dialog or the sheet. That its actions stand in the footer is proposed. It is advice |
 | `RULE.SUPPORT.SURFACE.078` | a large form is a page of its own and one panel, with no panel for each section. It is advice |
-| `RULE.SUPPORT.SURFACE.079` | groups and their items are both in view at a desktop only, and the items take the place of the groups on a tablet and a phone. It is advice |
+| `RULE.SUPPORT.SURFACE.079` | the parts of `RECORD_HOME` with its `GROUPS` case are both in view at a desktop only, and the items take the place of the groups on a tablet and a phone. It is advice |
 | `RULE.SUPPORT.SURFACE.313` | `flush` on a section means it draws no room of its own on any side, as it means on a card part, a panel part and a list |
 | `RULE.SUPPORT.SURFACE.080` | a set of groups that can be added to is a list, and not a row of tabs. It is advice |
 | `RULE.SUPPORT.SURFACE.049` | each part of a page is shown by what its own data asks for. It is advice |

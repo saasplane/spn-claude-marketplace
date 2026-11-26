@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
-      "seen": "9beff057"
+      "seen": "180df091"
     }
   ]
 }
@@ -135,7 +135,7 @@ A design language is kept as the platform's construct, and each app's capability
 - **An agent reads the platform's design language construct and the app's capability chapter before it draws a page or a picture** (`RULE.SUPPORT.SURFACE.525` · MUST · skill:spn-surface/design). It reads the language's page, which draws the whole spec, and the app's chapter, because the page holds the brand and each surface category's decisions and the chapter holds how the app fills them.
 - **Intake records what the partner shares**: each reference by address and date, each brand file, and each media kind.
 - **Each round shows options on real pages**, the running app or its worktree in the partner's brand values, and records its pick.
-- **A language records each media kind it uses**: line drawings, illustration, product views (drawn or captured), photography, icons and marks, data and numbers, motion and video, 3D. For each, where it comes from (made, supplied, licensed, captured), its treatment, the tokens it reads, where it goes, its tablet and phone forms, its files, and its rights and alt text.
+- **A language records each media kind it uses**: line drawings (`ART_DRAWING`), illustration, product views (`VIEW_PRODUCT`, drawn or captured), photography, icons and marks (`ICON_MARK`), data and numbers (`DATA_CHART`), motion and video (`MOTION_VIDEO`), 3D. For each, where it comes from (made, supplied, licensed, captured), its treatment, the tokens it reads, where it goes, its tablet and phone forms, its files, and its rights and alt text.
 - **Each platform keeps one brand, and each of its apps keeps its own design language.** An app changes only its looks over the brand, and an account's own branding comes last, at run time. The order: the design system's defaults, the platform's brand, the looks of the page's surface category, the account's branding.
 
 ## The media kinds, by the scale — 🔮

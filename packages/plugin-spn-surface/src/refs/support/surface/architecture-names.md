@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/05-standards-names/",
-      "seen": "4fcc8795"
+      "seen": "ca230e58"
     }
   ]
 }

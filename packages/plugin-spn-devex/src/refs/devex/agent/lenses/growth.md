@@ -13,7 +13,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-standards-patterns/01-common/02-flow-patterns.md",
       "section": "First run",
-      "seen": "bc3776a8"
+      "seen": "2e12bede"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/03-app-page-kinds.md",
@@ -76,7 +76,7 @@
   - **Defaults are filled values**, so a person starts without configuring.
   - **Growth is measured where it ships**: a claim names the event, the cohort and the run that showed it (principle 11).
 - **First value in the app** — held by this lens worn, beside `UX`, who places each page.
-  - **A new member reaches first value by the flow First run.** The Home, An overview, shows the welcome once and, while the place holds nothing, one card that names the first step with its action → that step's entry over the page → its list, with the first record in it and a message. The flow ends at the first record made, and the card shows on every visit until the place holds what it asks for (flow patterns § First run · `RULE.SUPPORT.SURFACE.360`).
+  - **A new member reaches first value by the flow First run.** The Home, `HOME_APP`, shows the welcome once and, while the place holds nothing, one card that names the first step with its action → that step's `RECORD_ENTRY` → its list, with the first record in it and a message. The flow ends at the first record made, and the card shows on every visit until the place holds what it asks for (flow patterns § First run · `RULE.SUPPORT.SURFACE.360`).
   - **`HOME_APP` counts what there is now; how a measure moved over weeks, and what moved it, is the page kind `ANALYTICS_HOME`**, one range and one period compared for the whole page (`RULE.SUPPORT.SURFACE.618` · GUIDE).
   - **For an Individual, a greeting and one card with the one next thing, never a row of zero counts.** `HOME_APP` says what it shows before anything is counted; the numbers appear once there is something to count, each loading and failing by itself, with Try again (app page kinds § `HOME_APP` · `RULE.SUPPORT.SURFACE.365`).
 

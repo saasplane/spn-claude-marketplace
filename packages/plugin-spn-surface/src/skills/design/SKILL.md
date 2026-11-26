@@ -15,7 +15,7 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "f157db64"
+      "seen": "38ba388c"
     }
   ]
 }
@@ -156,7 +156,7 @@ A page is decided in four steps, in this order (`RULE.SUPPORT.SURFACE.052` · MU
 
 - **Thirteen app page kinds are named for `DASHBOARD`, and eleven for `PORTAL`** (`RULE.SUPPORT.SURFACE.051` · MUST · skill:spn-surface/design). Eight are the pages a person works in, and five are the pages of the floor. A kind has cases: a frame, such as `ASIDE`, or a form, such as `DIALOG`. A case is not a kind of its own. `RECORD_ENTRY` is how a person enters or changes something, and it opens from one of the pages a person arrives at.
 - **Cite the pattern's *For* line in the result, and follow its line for the kind.** For an Individual, `RECORD_HOME` is the `LIST` layout on every screen with a search box and two or three filters in view, `HOME_APP` in the case `INDIVIDUAL` is a greeting and one card with no row of counts, and `RECORD_ENTRY` is a `DIALOG` for a small entry, a larger one becoming a `PAGE` in `STEPS` with `DSStepper`, the place saved (`RESUMABLE`).
-- **Where the data fits two patterns, the kind of person decides between them** (`RULE.SUPPORT.SURFACE.333` · MUST · skill:spn-surface/design). A Team takes the one that keeps the person in place and fast: Find in a list as a table, Change in place, An entry over the page. An Individual takes the one that asks one thing at a time: the data table's `LIST` layout, an entry in steps, a record read before it is changed. Where the kind does not settle it, say so and ask.
+- **Where the data fits two patterns, the kind of person decides between them** (`RULE.SUPPORT.SURFACE.333` · MUST · skill:spn-surface/design). A Team takes the one that keeps the person in place and fast: `RECORD_HOME` as a table, Change in place, `RECORD_ENTRY` over the page. An Individual takes the one that asks one thing at a time: the data table's `LIST` layout, an entry in steps, a record read before it is changed. Where the kind does not settle it, say so and ask.
 - **A sign-in has a shape of its own** (`RULE.SUPPORT.SURFACE.205` · MUST · skill:spn-surface/design). `AUTH_FLOW` is the page a person passes before any other page kind: start from *The sign-in page* in `standards-patterns.md`, and for the sign-up case, a reset and an invitation from *The cases beside `SIGN_IN`* (`RULE.SUPPORT.SURFACE.364` · GUIDE).
 - **A page no pattern fits is derived, and it never waits** (`RULE.SUPPORT.SURFACE.051` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.332` · MUST · skill:spn-surface/design). Derive it from the patterns whose person and data fit it, as a board is derived from `RECORD_HOME` with the frame `GROUPS` and a cart from `RECORD_HOME` with the case `EDIT_IN_PLACE`, and name in the result which patterns it is derived from. A page shape earns a pattern of its own only when no pattern fits its person and its data, and that pattern joins the book first.
 
@@ -501,7 +501,7 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **A block that draws itself by its place on a page takes `pageLevel` for that place, with the vocabulary `DSPageLevelType`** (`RULE.SUPPORT.SURFACE.113` · MUST · skill:spn-surface/design)
 - **A card's size sets its own spacing and reaches no block it holds** (`RULE.SUPPORT.SURFACE.114` · MUST · skill:spn-surface/design)
 - **In a `flush` part, the tabs place their first tab and their panel by the inset of their place** (`RULE.SUPPORT.SURFACE.118` · MUST · skill:spn-surface/design)
-- **On a page of groups and their items, the part that holds the groups can be narrow, and a named choice says so** (`RULE.SUPPORT.SURFACE.119` · MUST · skill:spn-surface/design)
+- **On a `RECORD_HOME` page with its `GROUPS` case, the part that holds the groups can be narrow, and a named choice says so** (`RULE.SUPPORT.SURFACE.119` · MUST · skill:spn-surface/design)
 - **A drawer announces its title once** (`RULE.SUPPORT.SURFACE.121` · MUST · skill:spn-surface/design)
 - **A mark takes `variant` with the shared vocabulary, `DSVariantType`** (`RULE.SUPPORT.SURFACE.124` · MUST · skill:spn-surface/design)
 - **A table takes `striped` and `hoverable` from its own prop where the prop is given, else from the theme's `component.table`** (`RULE.SUPPORT.SURFACE.126` · MUST · skill:spn-surface/design)

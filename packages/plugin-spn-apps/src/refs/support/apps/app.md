@@ -12,7 +12,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/02-web/03-entry/01-pages.md",
       "section": "The address of a screen",
-      "seen": "add8774a"
+      "seen": "2e85e346"
     }
   ]
 }
