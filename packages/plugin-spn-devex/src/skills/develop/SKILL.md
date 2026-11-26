@@ -170,3 +170,4 @@ A change is not done when it compiles. It is done when three things hold. The do
 - **The managing ratio is printed at each landing and at the close** (`RULE.DEVEX.WORKSPACE.477` · MUST · skill:spn-devex/develop)
 - **The plugins keep a copy of the contract's telemetry values beside the writer, in the contract's structure, and `toolchain-ts` holds it to the contract enum for enum** (`RULE.DEVEX.WORKSPACE.482` · MUST · skill:spn-devex/develop)
 - **`spndesk/` at the workspace root is that place, with one folder for each app that takes a file, and the first command that writes into it makes it** (`RULE.DEVEX.WORKSPACE.506` · MUST · skill:spn-devex/develop)
+- **A domain with several reading paths names, in its face's block, the one overview that carries its generated glossary** (`RULE.DEVEX.WORKSPACE.582` · MUST · skill:spn-devex/develop)

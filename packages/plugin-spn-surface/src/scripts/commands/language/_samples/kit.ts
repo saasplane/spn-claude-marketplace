@@ -1,3 +1,6 @@
+import { existsSync, readFileSync } from "node:fs";
+import { homedir } from "node:os";
+import { join } from "node:path";
 // The tree vocabulary the sample recipes write in: a node is `{ unit, props, children }` as `spnutils apps surface render` reads it, and a placement
 // is `{ place, … }`. Nothing here draws; a recipe builds a tree and the render draws it.
 import type { Tree } from "./types.ts";
@@ -93,3 +96,30 @@ export const quote = (words: string, name: string, role: string, card = false, l
 
 /** A keyboard key combination. */
 export const kbd = (keys: string[]): Tree => U("DSKbd", { keys });
+
+/** A picture's place with no caption drawn in it: a neutral fill at the slot's shape (a ratio) or its height in pixels, for where words stand over or beside it. */
+export const bare = (name: string, ratio?: string, height?: number, width?: number): Tree => ({ slot: name, label: "", ...(ratio ? { ratio } : {}), ...(height ? { height } : {}), ...(width ? { width } : {}) });
+
+
+// ---- what the design system draws: a recipe that uses a unit newer than the released design system asks `dsHas` first and falls back to today's drawing.
+let dsVersion = "";
+const dsNames = new Map<string, string>();
+/** The design system version the samples draw against; set once by the draw. */
+export const setDs = (version: string): void => { dsVersion = version; };
+/** Whether the design system the samples draw against exports a unit: read from the installed package's declarations, or from SPN_SURFACE_DS_UNITS (a list with a comma between) where a test names them. */
+export function dsHas(unit: string): boolean {
+  if (process.env.SPN_SURFACE_DS_UNITS !== undefined) return process.env.SPN_SURFACE_DS_UNITS.split(",").includes(unit);
+  if (!dsNames.has(dsVersion)) {
+    const file = join(homedir(), ".saasplane", "cache", "design-system", dsVersion, "node_modules", "@saasplane", "support-web-ds-ts", "index.d.ts");
+    dsNames.set(dsVersion, existsSync(file) ? readFileSync(file, "utf8") : "");
+  }
+  return new RegExp(`\\b${unit}\\b`).test(dsNames.get(dsVersion) ?? "");
+}
+
+/** Whether the design system the samples draw against is at least a version: for a prop of a unit the drawing may use only from that version on, where `dsHas` names units. */
+export function dsAtLeast(version: string): boolean {
+  const n = (v: string): number[] => v.split(".").map((x) => Number.parseInt(x, 10) || 0);
+  const [a, b] = [n(dsVersion), n(version)];
+  for (let i = 0; i < 3; i++) { if ((a[i] ?? 0) !== (b[i] ?? 0)) return (a[i] ?? 0) > (b[i] ?? 0); }
+  return true;
+}

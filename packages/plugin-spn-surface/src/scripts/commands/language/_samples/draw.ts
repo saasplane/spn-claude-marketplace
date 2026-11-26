@@ -6,7 +6,7 @@ import { appPages } from "./draw-app.ts";
 import { type Folders, sitePages, wrapSite } from "./draw-site.ts";
 import { categoryValuePages, sharedPages } from "./values.ts";
 import { type PageOptions, indexHtml, pageHtml, treeOf } from "./files.ts";
-import { plannedPanel, plannedSection } from "./kit.ts";
+import { plannedPanel, plannedSection, setDs } from "./kit.ts";
 import { appLayout } from "./layouts.ts";
 import { slugOf } from "./notes.ts";
 import { DEVICES, type Device, type Drawn, MODES, type Mode, drawSections } from "./render.ts";
@@ -104,6 +104,7 @@ export const titleOf = (segment: string): string => {
 };
 
 export function run(options: Options): { pages: number; entries: number; planned: number; byCategory: Record<string, Record<string, number>>; files: string[] } {
+  setDs(options.ds);
   const pages = pagesOf(options);
   const name = options.spec.name.charAt(0).toUpperCase() + options.spec.name.slice(1);
   if (!pages.length) throw new Error("the language serves no page the catalogue draws.");

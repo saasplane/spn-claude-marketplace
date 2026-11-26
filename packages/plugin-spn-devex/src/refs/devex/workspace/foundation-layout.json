@@ -57,7 +57,7 @@
       "startsWith": ["UX", "UI", "PRODUCT"], "joinsWhen": ["MARKETING", "VOICE", "WEB_DEV", "PARTNER"],
       "sections": [
         { "id": "4.1", "title": "Delivery per audience", "needed": "for each audience: its own app, pages in another app, a tenant's domain, or embedded", "waitsOn": ["3.2"], "lands": ["N003", "N005"] },
-        { "id": "4.2", "title": "Page kinds per app", "needed": "for each app: public pages (the site look), signed-in pages (the app layout), or both", "waitsOn": ["4.1"], "lands": ["N003", "N005"] },
+        { "id": "4.2", "title": "Page kinds per app", "needed": "for each app: public pages (the site look), signed-in pages (the app layout), or both; its surface category, MARKETING, RESOURCES, MARKETPLACE, DASHBOARD or PORTAL, read from the person the app is for", "waitsOn": ["4.1"], "lands": ["N003", "N005"] },
         { "id": "4.3", "title": "A public site, or none", "needed": "whether there is a public site, and its page list", "waitsOn": ["4.1"], "lands": ["N003", "N005"] },
         { "id": "4.4", "title": "The brand", "needed": "the colour, the greys, the typefaces, the references, the media kinds; any answer may be not yet", "waitsOn": [], "lands": ["N003", "N005"] }
       ]
@@ -99,14 +99,14 @@
       "goal": "The business models, the categories, apps and pools, and each category's arrival, decided for the product module.",
       "tree": ["the product module: business models, categories, apps, pools", "the product module's migration contributions: each category's arrival"] },
     { "id": "N003", "title": "Surface", "subject": "surface", "landsIn": "the platform repository's docs",
-      "goal": "Delivery per audience, page kinds per app, the design language with the brand once and a row per app, and the public site's page list, decided.",
-      "tree": ["delivery per audience; page kinds per app", "the design language: the brand once, the site parts, a row per app", "the public site's page list, or none"] },
+      "goal": "Delivery per audience, page kinds per app, the design language with the brand once and a row per app, each row naming its surface category, and the public site's page list, decided.",
+      "tree": ["delivery per audience; page kinds per app", "the design language: the brand once, the site parts, a row per app naming its surface category", "the public site's page list, or none"] },
     { "id": "N004", "title": "Apps: runtime", "subject": "apps-runtime", "landsIn": "the platform repository",
       "goal": "The modules and their packages, the services and workloads, the stores, messaging and secrets, and an integration port per outside service, decided.",
       "tree": ["a module per domain: contract, service, entry and tests seats", "the service apps", "stores, messaging, secrets", "an integration port per outside service"] },
     { "id": "N005", "title": "Apps: web", "subject": "apps-web", "landsIn": "the platform repository",
-      "goal": "Each web app's route groups by page kind, its theme setting written from its row, and the modules its pages draw on, decided.",
-      "tree": ["each web app: public pages under the site layout, signed-in pages under the app shell", "its theme setting, written from its row", "skeleton pages"] },
+      "goal": "Each web app's route groups by page kind, its theme setting written from the surface category its row names, and the modules its pages draw on, decided.",
+      "tree": ["each web app: public pages under the site layout, signed-in pages under the app shell", "its theme setting, written from its row's surface category", "skeleton pages"] },
     { "id": "N006", "title": "Infra", "subject": "infra", "landsIn": "the estate repository",
       "goal": "The organization, cloud, regions and environments, the platform and its app rows, teams and owners, released and pinned, decided.",
       "tree": ["the organization package", "the platform package", "CODEOWNERS, and the book repository if several teams", "the versions the platform repository pins"] }

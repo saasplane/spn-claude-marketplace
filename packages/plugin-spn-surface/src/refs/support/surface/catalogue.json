@@ -1706,7 +1706,7 @@
           },
           "placement": {
             "level": "2 OR DEEPER",
-            "head": "the category head: the category's name and line; its search box opens BLOG_SEARCH",
+            "head": "the category head: the category's name and line; its search box, a DSSearchBar, opens BLOG_SEARCH",
             "smaller": "where the category holds smaller ones, they show as picture tiles (BROWSE_TILES) or as shelves, each a row of its first pieces with \"See all\" (BROWSE_SHELF)",
             "results": "every piece of the category in BROWSE_RESULTS, narrowed by tags as well as by the topic; the count line, and a message with the way back where nothing is found",
             "topics": "BROWSE_RESULTS DATED_FEED narrowed by a tab for each topic, each tab with its count, where the blog has several topics",
@@ -1806,7 +1806,7 @@
                 "VISITOR"
               ]
             },
-            "chooseWhen": "the blog searched: the words kept in the field with the count, tabs by kind where the blog has them (posts, authors, tags), then the results section",
+            "chooseWhen": "the blog searched: the words kept in the field (a DSSearchBar folded) with the count, tabs by kind where the blog has them (posts, authors, tags), then the results section",
             "notWhen": [
               {
                 "condition": "The reader browses one category",
@@ -2347,7 +2347,7 @@
                 "LEARNER"
               ]
             },
-            "chooseWhen": "the page's one claim, as its first words; forms the round names: category head · search head",
+            "chooseWhen": "the page's one claim, as its first words; forms the round names: category head · search head (DSSearchBar folded: the words kept in the field with the count of what answers them)",
             "notWhen": [
               {
                 "condition": "The section is a slideshow of several claims",
@@ -2400,7 +2400,8 @@
               "position": "FIRST",
               "fill": "NONE"
             },
-            "question": "What is this, and is it for me?"
+            "question": "What is this, and is it for me?",
+            "words": "the page's own title, description and actions: a hero says what its page is for, so two pages never share a hero's words"
           },
           "style": {
             "ground": "BASE",
@@ -4195,7 +4196,8 @@
               "kind": "CARD_ITEM",
               "holds": "its featured form"
             },
-            "led": "the one picked, else the newest; it leaves when a topic or a search narrows the list"
+            "led": "the one picked, else the newest; it leaves when a topic or a search narrows the list",
+            "runs": "the cards of the section are one grid in it, a run of cards never a container of its own, so rows stand at the grid's gap"
           },
           "style": {
             "ground": "BASE",
@@ -4308,7 +4310,8 @@
               "case": "SLIDE"
             },
             "seeAll": "\"See all\" opens the whole list",
-            "standsIn": "a front page, a category page, below an article"
+            "standsIn": "a front page, a category page, below an article",
+            "runs": "the cards of the section are one grid in it, a run of cards never a container of its own, so rows stand at the grid's gap"
           },
           "style": {
             "ground": "BASE",
@@ -5787,7 +5790,7 @@
             "notWhen": [
               {
                 "condition": "the fields are an app's own record",
-                "instead": "an app's ENTERED_VALUE"
+                "instead": "an app's VALUE_ENTERED"
               },
               {
                 "condition": "The section that frames the form, with the ways to reach beside it",
@@ -5880,7 +5883,7 @@
             "notWhen": [
               {
                 "condition": "the fields are an app's own record",
-                "instead": "an app's ENTERED_VALUE"
+                "instead": "an app's VALUE_ENTERED"
               },
               {
                 "condition": "The section that frames the form, with the ways to reach beside it",
@@ -5934,7 +5937,7 @@
             "notWhen": [
               {
                 "condition": "the fields are an app's own record",
-                "instead": "an app's ENTERED_VALUE"
+                "instead": "an app's VALUE_ENTERED"
               },
               {
                 "condition": "The section that frames the form, with the ways to reach beside it",
@@ -5986,7 +5989,7 @@
             "notWhen": [
               {
                 "condition": "the fields are an app's own record",
-                "instead": "an app's ENTERED_VALUE"
+                "instead": "an app's VALUE_ENTERED"
               },
               {
                 "condition": "The section that frames the form, with the ways to reach beside it",
@@ -6039,7 +6042,7 @@
             "notWhen": [
               {
                 "condition": "the fields are an app's own record",
-                "instead": "an app's ENTERED_VALUE"
+                "instead": "an app's VALUE_ENTERED"
               },
               {
                 "condition": "The section that frames the form, with the ways to reach beside it",
@@ -8207,7 +8210,8 @@
           "placement": {
             "level": "LAST",
             "pageGroup": "Act",
-            "portal": "ACTION_CLOSING's one action opens the order in PORTAL, after sign-in; a guest is offered an account there, never made to take one"
+            "portal": "ACTION_CLOSING's one action opens the order in PORTAL, after sign-in; a guest is offered an account there, never made to take one",
+            "summary": "ACTION_SUMMARY in its RECEIPT case: what was paid, never a second Pay"
           },
           "style": {
             "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
@@ -8527,7 +8531,7 @@
                 "LEARNER"
               ]
             },
-            "chooseWhen": "the page's one claim, as its first words. Forms: home (search in it); category head; brand head; seller head; item head; search head.",
+            "chooseWhen": "the page's one claim, as its first words. Forms: home (BROWSE_SEARCH in it, a DSSearchBar); category head; brand head; seller head; item head; search head (DSSearchBar folded: the words kept in the field with the count of what answers them).",
             "notWhen": [
               {
                 "condition": "The section is a slideshow of several claims",
@@ -8584,7 +8588,8 @@
               "position": "FIRST",
               "fill": "NONE"
             },
-            "question": "What is this, and is it for me?"
+            "question": "What is this, and is it for me?",
+            "words": "the page's own title, description and actions: a hero says what its page is for, so two pages never share a hero's words"
           },
           "style": {
             "ground": "BASE",
@@ -8854,7 +8859,7 @@
               ],
               "reason": "a Seeker who knows what they want and not where it is"
             },
-            "chooseWhen": "a search first, with the categories most looked in under it. Forms: one field; structured fields; tabs by vertical (flights, hotels, packages ...).",
+            "chooseWhen": "a search first, with the categories most looked in under it. Forms: one field; structured fields; tabs by vertical (flights, hotels, packages ...), which are the bar's scopes.",
             "notWhen": [
               {
                 "condition": "The reader browses with no search in mind",
@@ -8868,7 +8873,7 @@
           },
           "units": {
             "container": "DSSectionContainer",
-            "feature": "DSFeature head; DSAutocomplete, offering the categories and records that match as the reader types; DSNavList of the categories most looked in"
+            "feature": "DSFeature head; DSSearchBar, whose AUTOCOMPLETE field (DSAutocomplete) offers the categories and records that match as the reader types; DSNavList of the categories most looked in"
           },
           "placement": {
             "position": "FIRST",
@@ -8876,7 +8881,7 @@
               "MARKET_HOME",
               "MARKET_SEARCH"
             ],
-            "onSearch": "the words the reader typed stay in the field, with the count of what answers them"
+            "onSearch": "the words the reader typed stay in the field, with the count of what answers them; on MARKET_SEARCH the bar stands folded to one line"
           },
           "style": {
             "ground": "BASE",
@@ -8889,10 +8894,9 @@
           "cases": [
             {
               "code": "FREE_TEXT",
-              "when": "one field for what the Seeker types, offering categories and records as they type: a shop, a course site",
+              "when": "one field for what the Seeker types, a DSSearchBar with one AUTOCOMPLETE field (DSAutocomplete) offering categories and records as they type: a shop, a course site",
               "units": [
-                "DSAutocomplete",
-                "DSButton"
+                "DSSearchBar"
               ],
               "placement": {
                 "widths": {
@@ -8907,12 +8911,9 @@
             },
             {
               "code": "STRUCTURED",
-              "when": "several fields that each set one thing: where, when and who for travel; what and where for jobs; a community and an age for matrimony; a budget and a brand for cars",
+              "when": "several fields that each set one thing, in a DSSearchBar: where, when and who for travel; what and where for jobs; a community and an age for matrimony; a budget and a brand for cars. Verticals (flights, hotels, packages) become its scopes, a tab for each",
               "units": [
-                "DSAutocomplete",
-                "DSSelect",
-                "DSDateRangePicker",
-                "DSButton",
+                "DSSearchBar",
                 "DSSheet"
               ],
               "placement": {
@@ -8920,7 +8921,9 @@
                   "phone": "one card that sums up the search and opens a full-screen editor of the fields",
                   "tablet": "the fields in two rows",
                   "desktop": "the fields in one row, the button at its end (from 1024 up)"
-                }
+                },
+                "fields": "DSSearchBar fields: AUTOCOMPLETE for where or what, DATE_RANGE for when, COUNT for who for, SELECT for a choice such as a brand",
+                "scopes": "tabs by vertical are the bar's scopes, each with its own fields; a field two scopes share keeps its value when the tab changes"
               },
               "style": {},
               "status": "BUILT",
@@ -9327,7 +9330,8 @@
               "kind": "CARD_ITEM",
               "case": "GRID_CELL",
               "holds": "WITH_PICTURE"
-            }
+            },
+            "runs": "the cards of the section are one grid in it, a run of cards never a container of its own, so rows stand at the grid's gap"
           },
           "style": {
             "ground": "BASE",
@@ -9414,7 +9418,8 @@
               "kind": "CARD_ITEM",
               "case": "SLIDE",
               "holds": "WITH_PICTURE"
-            }
+            },
+            "runs": "the cards of the section are one grid in it, a run of cards never a container of its own, so rows stand at the grid's gap"
           },
           "style": {
             "ground": "BASE",
@@ -10449,7 +10454,7 @@
                 "SEEKER"
               ]
             },
-            "chooseWhen": "a cost a Seeker works out before they choose: a loan's monthly payment, a mortgage, a stay's total",
+            "chooseWhen": "a cost a Seeker works out before they choose: a loan's monthly payment, a mortgage, a stay's total, the instalments of a price paid later (Klarna, EMI), the instalments of a price paid later (Klarna, EMI), the instalments of a price paid later (Klarna, EMI), the instalments of a price paid later (Klarna, EMI)",
             "rules": [],
             "why": "the developer, 2026-11-25, Q70 A: 'think how those market places sites ahve sections also in common do one fullscan in bg and then propose final catalog for marketplace', 'Q70 - A'",
             "notWhen": [
@@ -10871,7 +10876,7 @@
           },
           "units": {
             "container": "DSSectionContainer",
-            "feature": "DSFeature head; a DSItem row for each record, its DSImage, name and DSFormatCurrency price; the total under the rows, then the one main action"
+            "feature": "DSFeature head; a DSItem row for each record, its DSImage, name and DSFormatCurrency price; the total under the rows, then, in checkout, the one main action"
           },
           "placement": {
             "space": {
@@ -10890,7 +10895,7 @@
           "cases": [
             {
               "code": "REVIEW",
-              "when": "the same rows read only, with the delivery and the total: in checkout's last step, beside the steps, and on the page after the order is placed",
+              "when": "the same rows read only, with the delivery and the total, and the one main action: in checkout's last step, beside the steps",
               "units": [
                 "DSItem",
                 "DSImage",
@@ -10902,6 +10907,21 @@
               "style": {},
               "status": "BUILT",
               "why": "the developer, 2026-11-25, Q64 A: 'SO we have to consider Brand, Category, Prodct Lisitng, Product Details, Cart, Checkout etc..', 'and portal will be used after login for such cases corrrect', 'Q64 - A'"
+            },
+            {
+              "code": "RECEIPT",
+              "when": "the rows read only, with the total paid, the order's number, the date and how it was paid, and no action: on the page after the order is placed, where ACTION_CLOSING carries the way on",
+              "units": [
+                "DSItem",
+                "DSImage",
+                "DSFormatCurrency"
+              ],
+              "placement": {
+                "rows": "read only; the order's number and the date paid in the head's description"
+              },
+              "style": {},
+              "status": "BUILT",
+              "why": "the developer, 2026-11-27, on the DL samples: 'can we do one full detail pass of all surface dl samples created for its data and actual values etc..'; the confirmation drew 'Review your order' with a Pay button after the order was placed"
             }
           ]
         },
@@ -10916,11 +10936,15 @@
               ],
               "reason": "a Seeker paying, often on a phone, who must never lose what they entered"
             },
-            "chooseWhen": "the steps from a cart to an order, one at a time: who you are, delivery, payment and review",
+            "chooseWhen": "the steps from a cart to an order, one at a time: who you are, delivery, payment and review. The payment step offers the ways of paying a site chooses to offer: pay in full now; a deposit now, the rest later; pay at the property, cash on delivery or pay the driver, as a choice, with nothing charged now; pay later or in instalments (Klarna, EMI), as a choice; and, in a membership's checkout, a free trial with the card kept for later.",
             "notWhen": [
               {
                 "condition": "The site does not sell",
                 "instead": "MARKET_ITEM's own action: apply, enquire or book"
+              },
+              {
+                "condition": "The payment is sent and waits to arrive (a bank transfer, a UPI request awaiting approval)",
+                "instead": "ACTION_CONFIRMATION, case PENDING"
               }
             ],
             "rules": [],
@@ -10937,7 +10961,7 @@
             "steps": [
               "who you are: sign in, or go on as a guest with an email (FORM_SUBSCRIBE); never forced to sign in",
               "delivery: the address (DSAddressForm) and the way it comes (DSRadioGroup)",
-              "payment: the payment method's own fields, embedded from the payment provider (DSEmbed)",
+              "payment: the payment method's own fields, embedded from the payment provider (DSEmbed). The ways of paying are choices in this step: pay in full now; a deposit now and the rest later; pay at the property, cash on delivery or pay the driver (nothing is charged now); pay later or in instalments (Klarna, EMI), with ITEM_CALCULATOR working out the instalments; in a membership's checkout, a free trial, the card kept for later (the confirmation says when the first charge comes). Each site picks the choices it offers",
               "review: ACTION_SUMMARY case REVIEW, and one action, Place order"
             ],
             "summary": "ACTION_SUMMARY case REVIEW at the end on a desktop; folded above the steps on a tablet and a phone",
@@ -10972,6 +10996,24 @@
               "style": {},
               "status": "BUILT",
               "why": "the developer, 2026-11-25, Q64 A: 'SO we have to consider Brand, Category, Prodct Lisitng, Product Details, Cart, Checkout etc..', 'and portal will be used after login for such cases corrrect', 'Q64 - A'"
+            },
+            {
+              "code": "FAILED",
+              "when": "a payment that failed: back on the payment step, with what went wrong, the details kept, and Try again or another way to pay",
+              "units": [
+                "DSStepper",
+                "DSForm",
+                "DSEmbed",
+                "DSButton"
+              ],
+              "placement": {
+                "where": "back on the payment step, with what went wrong said in words",
+                "kept": "everything the reader entered is kept, and a failed payment never charges twice",
+                "actions": "Try again, or another way to pay"
+              },
+              "style": {},
+              "status": "BUILT",
+              "why": "the developer, 2026-11-27, 'go as u recommend', on the five payment adds of the chat at 2026-11-26T17:00 ('So the five adds are: three ways of paying (at the property or on delivery, later or in instalments, a free trial) and two payment states (pending, failed)')"
             }
           ],
           "defaultCase": "IN_STEPS"
@@ -10986,7 +11028,7 @@
                 "SEEKER"
               ]
             },
-            "chooseWhen": "says an act worked: a done mark, the title, the reference, what happens next in order, where to follow it (the buyer's account in PORTAL), and the act's own next actions; its forms are order placed, booking confirmed, enquiry sent, application received, subscribed, waitlist joined and demo booked. Forms: order placed; booking confirmed; enquiry sent; application received; subscribed; waitlist joined; demo booked.",
+            "chooseWhen": "says an act worked: a done mark, the title, the reference, what happens next in order, where to follow it (the buyer's account in PORTAL), and the act's own next actions; its forms are order placed, booking confirmed, enquiry sent, application received, subscribed, waitlist joined and demo booked. Forms: order placed; booking confirmed; enquiry sent; application received; subscribed; waitlist joined; demo booked. A payment still on its way, such as a bank transfer or a UPI request awaiting approval, is the case PENDING.",
             "notWhen": [
               {
                 "condition": "The act is not done yet",
@@ -10999,6 +11041,10 @@
               {
                 "condition": "The page says only that something went wrong",
                 "instead": "COMMON_SERVER_ERROR"
+              },
+              {
+                "condition": "The payment failed",
+                "instead": "ACTION_CHECKOUT, case FAILED"
               }
             ],
             "rules": [],
@@ -11019,7 +11065,7 @@
           "placement": {
             "mark": "a done mark above the title",
             "reference": "the reference of the order, booking, enquiry or application",
-            "next": "what happens next, in order, as a short list",
+            "next": "what happens next, in order, as a short list; for a deposit, what is due and when; for a free trial, when the first charge comes",
             "follow": "where to follow it: the buyer's account in PORTAL, after sign-in; a guest is offered an account there, never made to take one",
             "actions": "the act's own next actions",
             "stands": "as a page (MARKET_CONFIRMATION) or in place of the form it answers"
@@ -11031,7 +11077,30 @@
               "fill": "NONE"
             }
           },
-          "status": "BUILT"
+          "status": "BUILT",
+          "cases": [
+            {
+              "code": "PENDING",
+              "when": "a payment that is not through yet (a bank transfer, a UPI request awaiting approval): \"We'll confirm once the payment arrives\"",
+              "units": [
+                "DSSectionContainer",
+                "DSFeature",
+                "DSIcon",
+                "DSText",
+                "DSList",
+                "DSButton",
+                "DSLink"
+              ],
+              "placement": {
+                "say": "We'll confirm once the payment arrives; it says plainly that nothing is confirmed yet",
+                "next": "what happens when the payment arrives, in order",
+                "follow": "where to follow it: the buyer's account in PORTAL, after sign-in"
+              },
+              "style": {},
+              "status": "BUILT",
+              "why": "the developer, 2026-11-27, 'go as u recommend', on the five payment adds of the chat at 2026-11-26T17:00 ('So the five adds are: three ways of paying (at the property or on delivery, later or in instalments, a free trial) and two payment states (pending, failed)')"
+            }
+          ]
         },
         {
           "code": "ACTION_CONTACT",
@@ -12462,7 +12531,7 @@
                 "SEEKER"
               ]
             },
-            "chooseWhen": "the record's one action with its price: a check that it can be had (a delivery code, the dates and guests, a city), its variants and its offers",
+            "chooseWhen": "the record's one action with its price: a check that it can be had (a delivery code, the dates and guests, a city), its variants and its offers; where the site lets a Seeker pay later or in instalments, a line under the price (\"or 3 × ₹1,543\"), which ITEM_CALCULATOR works out",
             "rules": [],
             "why": "the developer, 2026-11-25, Q70 A: 'think how those market places sites ahve sections also in common do one fullscan in bg and then propose final catalog for marketplace', 'Q70 - A'",
             "notWhen": [
@@ -12483,7 +12552,8 @@
               "phone": "a bar fixed at the foot with the price and the one action",
               "tablet": "under the words, not fixed",
               "desktop": "a column beside the pictures, about a third of the width, sticky as the page scrolls (from 1024 up)"
-            }
+            },
+            "instalments": "where the site offers pay later or instalments (Klarna, EMI), a line beside the price, such as \"or 3 × ₹1,543\"; ITEM_CALCULATOR works out the instalments"
           },
           "style": {},
           "status": "BUILT"
@@ -12535,7 +12605,7 @@
             "notWhen": [
               {
                 "condition": "the fields are an app's own record",
-                "instead": "an app's ENTERED_VALUE"
+                "instead": "an app's VALUE_ENTERED"
               },
               {
                 "condition": "Only an email",
@@ -12627,7 +12697,7 @@
               },
               {
                 "condition": "the fields are an app's own record",
-                "instead": "an app's ENTERED_VALUE"
+                "instead": "an app's VALUE_ENTERED"
               }
             ],
             "rules": [],
@@ -13919,7 +13989,7 @@
                 "LEARNER"
               ]
             },
-            "chooseWhen": "the start of the whole resources site, level 1: a hub where it holds several sets, else its one set's own home (DOCS_HOME, GUIDE_HOME or HELP_HOME) at the first level; its head is INTRO_HERO in its search-first form, with a tab for each set",
+            "chooseWhen": "the start of the whole resources site, level 1: a hub where it holds several sets, else its one set's own home (DOCS_HOME, GUIDE_HOME or HELP_HOME) at the first level; its head is INTRO_HERO in its search-first form, with a tab for each set (the scopes of its DSSearchBar) (the scopes of its DSSearchBar) (the scopes of its DSSearchBar) (the scopes of its DSSearchBar)",
             "research": "page-kinds research, 2026-11-24 (work/page-kinds-research.md): the developer, 'think the page purpose and check what kind of info usually used in that page from online'",
             "notWhen": [
               {
@@ -13953,7 +14023,7 @@
           "placement": {
             "level": 2,
             "languageOrder": {
-              "reading": "INTRO_HERO (one search across every set), EXPLAIN_DOORS (a card per set, with counts), BROWSE_SHELF (what's new across them), ACTION_CLOSING (still need help), COMMON_FOOTER"
+              "reading": "INTRO_HERO (one search across every set, a DSSearchBar with a scope for each set), EXPLAIN_DOORS (a card per set, with counts), BROWSE_SHELF (what's new across them), ACTION_CLOSING (still need help), COMMON_FOOTER"
             },
             "inApp": "a help centre may stand inside an app: a RESOURCES route group under the app's layout, wrapped in DSPageCategory RESOURCES; its pages keep their kinds and the layout stays the app's; Contact support leads to the site's CONTACT"
           },
@@ -13981,10 +14051,10 @@
           "cases": [
             {
               "code": "HUB",
-              "when": "several sets: one search across them, a door to each set with its count, what is new across them, still need help",
+              "when": "several sets: one search across them (a DSSearchBar, a scope for each set), a door to each set with its count, what is new across them, still need help",
               "units": [
                 "DSSectionContainer",
-                "DSAutocomplete",
+                "DSSearchBar",
                 "DSFeature"
               ],
               "placement": {
@@ -14179,7 +14249,7 @@
             "rows": "BROWSE_RESULTS PAGED_LIST, each row a CARD_ITEM LIST_ROW; the search keeps the query at the top and a tab for each kind of result",
             "states": "a count line, such as 1 result for plan, each row its group and reading time over its title; before a query, Enter a search term to find articles; with none found, what to try and the way to ask",
             "languageOrder": {
-              "reading": "INTRO_HERO (search head), BROWSE_RESULTS (tabs by kind), COMMON_FOOTER"
+              "reading": "INTRO_HERO (search head, a DSSearchBar folded, a DSSearchBar folded, a DSSearchBar folded, a DSSearchBar folded), BROWSE_RESULTS (tabs by kind), COMMON_FOOTER"
             }
           },
           "style": {
@@ -14371,7 +14441,7 @@
             "rows": "BROWSE_RESULTS PAGED_LIST, each row a CARD_ITEM LIST_ROW; the search keeps the query at the top and a tab for each kind of result",
             "states": "a count line, such as 1 result for plan, each row its group and reading time over its title; before a query, Enter a search term to find articles; with none found, what to try and the way to ask",
             "languageOrder": {
-              "reading": "INTRO_HERO (search head), BROWSE_RESULTS, COMMON_FOOTER"
+              "reading": "INTRO_HERO (search head, a DSSearchBar folded, a DSSearchBar folded, a DSSearchBar folded, a DSSearchBar folded), BROWSE_RESULTS, COMMON_FOOTER"
             }
           },
           "style": {
@@ -14431,7 +14501,7 @@
           "placement": {
             "level": 2,
             "languageOrder": {
-              "reading": "INTRO_HERO (the search band, \"Chat with a human\"), BROWSE_PROMO, BROWSE_FEATURED (what most people need), EXPLAIN_DOORS (a CARD_LIST per category), ACTION_CLOSING (still need help), COMMON_FOOTER"
+              "reading": "INTRO_HERO (the search band, a DSSearchBar, a DSSearchBar, a DSSearchBar, a DSSearchBar, \"Chat with a human\"), BROWSE_PROMO, BROWSE_FEATURED (what most people need), EXPLAIN_DOORS (a CARD_LIST per category), ACTION_CLOSING (still need help), COMMON_FOOTER"
             },
             "categories": "the categories stand as EXPLAIN_DOORS, a CARD_LIST for each: the category name, its first five topics as links and View all N; as DOOR_CARDS (its mark, name, line and count) where a category holds fewer than five"
           },
@@ -14647,7 +14717,7 @@
             "rows": "BROWSE_RESULTS PAGED_LIST, each row a CARD_ITEM LIST_ROW; the search keeps the query at the top and a tab for each kind of result",
             "states": "a count line, such as 1 result for plan, each row its group and reading time over its title; before a query, Enter a search term to find articles; with none found, what to try and the way to ask",
             "languageOrder": {
-              "reading": "INTRO_HERO (search head), BROWSE_RESULTS (answers, where each lives, \"did you mean\"), ACTION_CLOSING (ask a person), COMMON_FOOTER"
+              "reading": "INTRO_HERO (search head, a DSSearchBar folded, a DSSearchBar folded, a DSSearchBar folded, a DSSearchBar folded), BROWSE_RESULTS (answers, where each lives, \"did you mean\"), ACTION_CLOSING (ask a person), COMMON_FOOTER"
             }
           },
           "style": {
@@ -15080,7 +15150,7 @@
                 "LEARNER"
               ]
             },
-            "chooseWhen": "the head of a home, a category or a search: the page's one claim, as its first words; its search-first form, with a tab for each set, its search head and its category head with its line are forms the book owes a code",
+            "chooseWhen": "the head of a home, a category or a search: the page's one claim, as its first words. For a page's tree: its search-first form is a DSSearchBar with a tab for each set as its scopes; its search head is DSSearchBar folded, the words kept in the field with the count of what answers them; its category head carries its line",
             "notWhen": [
               {
                 "condition": "The section is a slideshow of several claims",
@@ -15129,7 +15199,8 @@
               "position": "FIRST",
               "fill": "NONE"
             },
-            "question": "What is this, and is it for me?"
+            "question": "What is this, and is it for me?",
+            "words": "the page's own title, description and actions: a hero says what its page is for, so two pages never share a hero's words"
           },
           "style": {
             "ground": "BASE",
@@ -15753,7 +15824,7 @@
               ],
               "reason": "a Learner who knows what they want and not where it is"
             },
-            "chooseWhen": "a search first, with the few most asked topics under it",
+            "chooseWhen": "a search first, a DSSearchBar, with the few most asked topics under it",
             "notWhen": [
               {
                 "condition": "The reader browses with no question",
@@ -15772,7 +15843,7 @@
           },
           "units": {
             "container": "DSSectionContainer",
-            "feature": "DSFeature head; DSInput or DSCommandPalette; DSNavList of topics"
+            "feature": "DSFeature head; DSSearchBar, whose AUTOCOMPLETE field (DSAutocomplete) offers what matches as the reader types; DSNavList of topics"
           },
           "placement": {
             "position": "FIRST",
@@ -15888,7 +15959,8 @@
               "section": "MD"
             },
             "columns": "BY_COUNT, 3_2_1",
-            "paging": "DSPagination when past one screen"
+            "paging": "DSPagination when past one screen",
+            "runs": "the cards of the section are one grid in it, a run of cards never a container of its own, so rows stand at the grid's gap"
           },
           "style": {
             "ground": "BASE",
@@ -15964,7 +16036,8 @@
               "section": "MD"
             },
             "columns": "BY_COUNT, 3_2_1",
-            "paging": "DSPagination when past one screen"
+            "paging": "DSPagination when past one screen",
+            "runs": "the cards of the section are one grid in it, a run of cards never a container of its own, so rows stand at the grid's gap"
           },
           "style": {
             "ground": "BASE",
@@ -19134,7 +19207,7 @@
               },
               {
                 "condition": "The entry is sent and its record made: what happened in one sentence, the record's name as a link, and the two next steps, such as Add another and Back to the list",
-                "instead": "a form owed a code: the end of a RECORD_ENTRY PAGE, as its DONE case was before (units DSPanelContainer, DSEmpty, DSButton)"
+                "instead": "the end of a RECORD_ENTRY page, drawn in the page's tree as it was before (units DSPanelContainer, DSEmpty, DSButton)"
               }
             ],
             "rules": [
@@ -21019,14 +21092,13 @@
             "mtype": "CONTAINERS"
           },
           "units": {
-            "unit": "no unit: the design system has no thread"
+            "unit": "DSPanelContainer, DSChatMessage, DSTextarea"
           },
           "placement": {
             "standsIn": "a record's page"
           },
           "style": {},
-          "status": "PLANNED",
-          "missing": "a thread unit: messages one answering another, with a reply box"
+          "status": "BUILT"
         },
         {
           "code": "RECORD_DANGER",
@@ -21553,7 +21625,7 @@
           "config": {
             "mtype": "WIDGETS"
           },
-          "units": "DSItemCard; DSAvatarGroup, DSProgress, DSBadge, DSFormatDate",
+          "units": "DSCardWidget; DSAvatarGroup, DSProgress, DSBadge, DSFormatDate",
           "placement": {
             "standsIn": "LISTING_GRID"
           },
@@ -21564,7 +21636,7 @@
               "code": "GRID_CELL",
               "when": "a card of a record with progress and people",
               "units": [
-                "DSItemCard",
+                "DSCardWidget",
                 "DSAvatarGroup",
                 "DSProgress",
                 "DSBadge",
@@ -24062,7 +24134,7 @@
               },
               {
                 "condition": "The entry is sent and its record made: what happened in one sentence, the record's name as a link, and the two next steps, such as Add another and Back to the list",
-                "instead": "a form owed a code: the end of a RECORD_ENTRY PAGE, as its DONE case was before (units DSPanelContainer, DSEmpty, DSButton)"
+                "instead": "the end of a RECORD_ENTRY page, drawn in the page's tree as it was before (units DSPanelContainer, DSEmpty, DSButton)"
               }
             ],
             "rules": [
@@ -25495,14 +25567,13 @@
             "mtype": "CONTAINERS"
           },
           "units": {
-            "unit": "no unit: the design system has no thread"
+            "unit": "DSPanelContainer, DSChatMessage, DSTextarea"
           },
           "placement": {
             "standsIn": "a record's page"
           },
           "style": {},
-          "status": "PLANNED",
-          "missing": "a thread unit: messages one answering another, with a reply box"
+          "status": "BUILT"
         },
         {
           "code": "RECORD_DANGER",
@@ -26012,7 +26083,7 @@
           "config": {
             "mtype": "WIDGETS"
           },
-          "units": "DSItemCard; DSAvatarGroup, DSProgress, DSBadge, DSFormatDate",
+          "units": "DSCardWidget; DSAvatarGroup, DSProgress, DSBadge, DSFormatDate",
           "placement": {
             "standsIn": "LISTING_GRID"
           },
@@ -26023,7 +26094,7 @@
               "code": "GRID_CELL",
               "when": "a card of a record with progress and people",
               "units": [
-                "DSItemCard",
+                "DSCardWidget",
                 "DSAvatarGroup",
                 "DSProgress",
                 "DSBadge",

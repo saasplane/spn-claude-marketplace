@@ -15,7 +15,7 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "38ba388c"
+      "seen": "82bac52b"
     }
   ]
 }
@@ -321,6 +321,7 @@ Take each block from the tree by layer of the app page kind, and from the list i
 - **Write no `variant` or `color` to make a mark, an avatar or a badge lighter on a coloured navigation or band.** A unit that is shown takes the lighter tints of the ground it stands on by itself, and a status badge keeps its hue (`architecture-core.md`).
 - **Write no duration, ease or animation.** Each unit enters and leaves by its role, at the theme's `motionSpeed` (`standards-core.md`, *Motion*). An icon moves only through what holds it: write `motion` and `hoverNode` on `DSIcon`, `startIconMotion` or `endIconMotion` on `DSButton`, or `iconMotion` on `DSMark`, where the movement says something, such as `NUDGE_START` on a way back.
 - **Give `DSDataTable` the layout that step 2 chose, and the `LIST` layout for a phone** (`RULE.SUPPORT.SURFACE.068` · GUIDE). Give `DSFilterBar` its fields, and say which stay in view. Never rearrange the bar (`RULE.SUPPORT.SURFACE.073` · MUST · skill:spn-surface/design).
+- **A search that starts the finding is `DSSearchBar`, and one that narrows a list is `DSFilterBar`.** The bar takes its fields as data and, where the search has verticals, its tabs as `scopes`; the head of a page of results is the same bar `folded`. It takes one corner, `radius`, of `DSRadiusType`, and a page writes none unless its design language asks for one.
 - **Where a ref says a unit does not do a thing yet, name it under *Missing*.** `architecture-components.md` says so plainly, under *Not there yet*. Write the tree as the pattern asks, and say which line waits for the unit.
 
 - **`variant`, `color` and `size` each mean one thing on every block.** `variant` is the surface treatment, `color` is the hue and `size` is the density step, read smallest to largest, `XS` to `XL`, with `SM` the default a theme sets. Every value comes from the vocabulary of its prop. `CUSTOM` is a value of `color` that means the caller owns the colour: a page sets a colour outside the theme only through it, as `customColor` on a block that takes it.
@@ -331,7 +332,7 @@ Take each block from the tree by layer of the app page kind, and from the list i
 - **What a block does stays in words**: where an action leads, and which permission gates it. Write it beside the block.
 - **A unit the stack's design system provides on its own is written by the name its stack gives it.** The book does not name it, and its stack's docs state its props. Say in the result that it is the stack's own, because another stack may not have it and the library holds no drawing of it.
 - **A run of steps is `DSStepper`, given its steps as data** (`RULE.SUPPORT.SURFACE.308` · GUIDE): a sign-up or an entry in steps, or a timeline. Write its `pageLevel`, its `activeKey` and, where a person may return to a done step, `onActiveKeyChange`; a step's `taskState` takes `IDLE`, `WORKING`, `DONE` or `FAILED`, and the stepper invents no state of its own (`RULE.SUPPORT.SURFACE.309` · MUST · skill:spn-surface/design). In a `DSFeature` it is the `contentNode`.
-- **A block the design system lacks is never built inside the page.** Name it under *Missing*, with the task that needs it, and with each shared axis of the surface it would take and a reason for each it leaves out (`architecture-components.md`) (`RULE.SUPPORT.SURFACE.316` · MUST · skill:spn-surface/design). It is proposed to the design system: one that every stack should build joins the core units, in the book first, and one that helps a single stack may be that stack's own unit.
+- **A block the design system lacks is never built inside the page.** Name it under *Missing*, with the task that needs it, and with each shared axis of the surface it would take and a reason for each it leaves out (`architecture-components.md`) (`RULE.SUPPORT.SURFACE.316` · MUST · skill:spn-surface/design), and with the neighbouring units whose props it read, reusing each field a neighbour has and naming each new one (`RULE.SUPPORT.SURFACE.627` · MUST · skill:spn-surface/design). It is proposed to the design system: one that every stack should build joins the core units, in the book first, and one that helps a single stack may be that stack's own unit.
 
 ## 6. State the page as a tree
 
@@ -699,3 +700,4 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **`DSItem` is an item line and knows nothing of navigation** (`RULE.SUPPORT.SURFACE.624` · MUST · skill:spn-surface/design)
 - **A page sets at most two containers side by side, one taking the larger share** (`RULE.SUPPORT.SURFACE.625` · MUST · skill:spn-surface/design)
 - **`DSPageLevel` gives a level, a part and `flush` to what it holds, and lays out nothing** (`RULE.SUPPORT.SURFACE.626` · MUST · skill:spn-surface/design)
+- **A new unit's props start from its nearest units' props: a field a neighbour already has is reused whole, with its name, its type and its meaning, and a proposal lists the neighbours it read and names each new field it could not reuse** (`RULE.SUPPORT.SURFACE.627` · MUST · skill:spn-surface/design)
