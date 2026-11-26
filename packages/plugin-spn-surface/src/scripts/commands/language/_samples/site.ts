@@ -1,7 +1,7 @@
 // The container recipes of the site categories (MARKETING, MARKETPLACE, RESOURCES): one recipe for each kind, each case a form of it, drawn with
 // the words of the category's brief. A recipe returns the section's node, or null where the language has no recipe for that kind or case, and
 // the caller then draws the kind from its catalogue description.
-import { DOORS_SURFACE, GRID, U, act, quote, badge, btn, cells, col, doors, eyebrow, feat, fitem, grid, item, lines, link, muted, row, sec, slot, table, txt, vl } from "./kit.ts";
+import { DOORS_SURFACE, GRID, U, act, bare, dsAtLeast, dsHas, quote, badge, btn, cells, col, doors, eyebrow, feat, fitem, grid, item, lines, link, muted, row, sec, slot, table, txt, vl } from "./kit.ts";
 import type { Brief, Line } from "./site-words.ts";
 import type { Tree } from "./types.ts";
 
@@ -23,23 +23,28 @@ const featureGrid = (heading: Tree, children: Tree[], desktop = 3, tablet = 2, m
   U("DSFeatureGridSectionContainer", { section: { size, color: "BASE" }, heading, grid: { desktop, tablet, mobile } }, children);
 
 // ---- the hero
+/** The page kind being drawn, so a hero says what its own page says; empty where a container is drawn alone. */
+let pageNow = "";
+export const setPage = (code: string): void => { pageNow = code; };
+
 function hero(b: Brief, c: string): Tree {
-  const base = { title: b.claim, description: b.claim2 };
-  const words = { ...base, actions: cta(b), facts: factsOf(b) };
+  const own = b.pageHeroes?.[pageNow];
+  const base = own ? { title: own[0], description: own[1] } : { title: b.claim, description: b.claim2 };
+  const words = own ? { ...base, actions: [act("main", own[2], "#doors", true), act("second", own[3], "#docs")] } : { ...base, actions: cta(b), facts: factsOf(b) };
   switch (c) {
-    case "ON_SCENE": return sec([feat({ ...words, textAlign: "START" }, "PAGE")], "XL", "BASE", { mediaNode: slot("Scene", "16:7") });
+    case "ON_SCENE": return sec([feat({ ...words, textAlign: "START" }, "PAGE")], "XL", "BASE", { mediaNode: bare("scene", "16:7"), pattern: "DOTS", fadedEdges: true });
     case "UNDER": return sec([feat({ ...words, type: "MEDIA_BOTTOM", textAlign: "START", frames: ["MEDIA"], surface: SURFACE_RAISED, mediaNode: slot("The whole product, wide", "16:7") }, "PAGE")], "LG");
-    case "BACKDROP": return sec([feat({ ...words, type: "BACKDROP", mediaNode: slot("A picture of the subject filling the feature", "16:7") }, "PAGE")], "LG");
+    case "BACKDROP": return sec([feat({ ...words, type: "BACKDROP", mediaNode: bare("backdrop-photo", "16:7") }, "PAGE")], "LG");
     case "WORDS_ALONE": return sec([feat({ ...base, actions: cta(b), textAlign: "CENTER" }, "PAGE")], "LG");
     case "ARTICLE_HEAD": return sec([feat({ eyebrow: eyebrow("Guide"), title: b.article.title, description: b.article.lede, facts: [{ mtype: "TEXT", text: b.article.by, startIcon: "USER" }, { mtype: "TEXT", text: b.article.date, startIcon: "CALENDAR" }] }, "PAGE")], "LG");
     case "FORM_BESIDE": return sec([feat({ type: "SPLIT_END", eyebrow: badge("Live webinar", "PRIMARY", "SOLID"), title: "Ship a new app in a week", description: "Watch a team go from an empty folder to a signed-in, role-aware app, live on 12 December at 16:00 IST. Bring a question.", facts: [{ mtype: "TEXT", text: "12 December 2026", startIcon: "CALENDAR" }, { mtype: "TEXT", text: "60 minutes with Q&A", startIcon: "CLOCK" }], contentNode: form([field("Name", input("Dana Lee")), field("Work email", input("dana@northwind.example"))], "Register", "We send the link and the recording the same day.") }, "PAGE")], "LG");
     case "ITEM_HEAD": {
       const r = b.records[0];
-      return sec([feat({ type: "SPLIT_START", eyebrow: badge("Bestseller", "PRIMARY", "SOLID"), title: r[0], description: `${r[1]} Sold by a verified seller, with ${b.numbers[2][0]} ${b.numbers[2][1]}.`, facts: [{ mtype: "TEXT", text: "4.8 (2,310 ratings)", startIcon: "CHECK" }, { mtype: "TEXT", text: "Last updated 3 November 2026", startIcon: "CALENDAR" }], mediaNode: slot(`${r[0]}, gallery`, "16:9"), actions: [act("buy", `Buy for ${r[2]}`, "#buy", true), act("save", "Save for later", "#save")] }, "PAGE")], "LG");
+      return sec([feat({ type: "SPLIT_START", eyebrow: badge("Bestseller", "PRIMARY", "SOLID"), title: r[0], description: `${r[1]} Sold by a verified seller, who answers questions within two working days.`, facts: [{ mtype: "TEXT", text: "4.8 (2,310 ratings)", startIcon: "CHECK" }, { mtype: "TEXT", text: "Last updated 3 November 2026", startIcon: "CALENDAR" }], mediaNode: slot(`${r[0]}, gallery`, "16:9"), actions: [act("buy", `Buy for ${r[2]}`, "#buy", true), act("save", "Save for later", "#save")] }, "PAGE")], "LG");
     }
     case "BRAND_HEAD": return sec([feat({ type: "SPLIT_START", eyebrow: eyebrow("Seller", "OUTLINE", "DEFAULT"), title: "Kite Studio", description: "A two-person studio in Pune that builds audit and reporting add-ons, verified since March 2025.", facts: [{ mtype: "TEXT", text: "4.9 across 312 reviews", startIcon: "CHECK" }, { mtype: "TEXT", text: "14 listings", startIcon: "LIST" }], mediaNode: slot("Kite Studio, logo", "1:1"), actions: [act("follow", "Follow", "#follow", true), act("ask", "Ask a question", "#ask")] }, "PAGE")], "LG");
-    case "SLIDES": return sec([feat({ ...words, type: "SPLIT_END", mediaNode: slot("First of three pictures, which turn on their own", "4:3"), frames: ["MEDIA"], surface: SURFACE_RAISED }, "PAGE")], "LG");
-    default: return sec([feat({ ...words, type: "SPLIT_END", eyebrow: eyebrow(b.nav[1][0], "SOLID", "PRIMARY"), frames: ["MEDIA"], surface: SURFACE_RAISED, mediaNode: slot(b.picture.hero, "4:3") }, "PAGE")], "LG");
+    case "SLIDES": return sec([feat({ ...words, textAlign: "START" }, "PAGE")], "LG", "BASE", { mediaNode: bare("slides-first", "16:7"), mediaScrim: "START" });
+    default: return sec([feat({ ...words, type: "SPLIT_END", eyebrow: own ? undefined : eyebrow(b.heads?.heroTag ?? b.nav[1][0], "SOLID", "PRIMARY"), frames: ["MEDIA"], surface: SURFACE_RAISED, mediaNode: slot(b.picture.hero, "4:3") }, "PAGE")], "LG");
   }
 }
 
@@ -47,7 +52,8 @@ function hero(b: Brief, c: string): Tree {
 const statement = (b: Brief, c: string): Tree => sec([feat({ textAlign: "CENTER", title: c === "LEAD_IN" ? "Find the page written for you" : b.problem, description: c === "LEAD_IN" ? "The sections below answer different readers. Pick by the question you are asking, and go straight to your own." : b.problem2, facts: c === "LEAD_IN" ? undefined : b.facts })], "MD");
 
 function points(b: Brief, c: string): Tree {
-  const words = { title: "What each team gets on day one", description: "Three things an admin does most, each done once for the whole organization instead of once per app." };
+  const [pt, pd] = b.heads?.points ?? ["What each team gets on day one", "Three things an admin does most, each done once for the whole organization instead of once per app."];
+  const words = { title: pt, description: pd };
   const nodes = b.points.map(iconLine);
   switch (c) {
     case "HEAD_ACROSS": return sec([feat({ ...words, textAlign: "START" }), grid(nodes.map((n) => feat({ title: n.title, description: n.description, media: n.media }, "WIDGET")), 3, 3, 1)], "MD");
@@ -86,7 +92,8 @@ function choose(b: Brief, c: string): Tree {
 }
 
 function doorsKind(b: Brief, c: string): Tree {
-  const head = { title: "Where each part lives", description: "Open the part you need, or start with the first and add the rest when your team is ready." };
+  const [dt, dd] = b.heads?.doors ?? ["Where each part lives", "Open the part you need, or start with the first and add the rest when your team is ready."];
+  const head = { title: dt, description: dd };
   const nodes = b.doors.map((l) => asItem(l, `#${l[0]}`));
   switch (c) {
     case "DOOR_ROWS": return sec([feat({ ...head, items: lines(nodes) })], "MD", "BASE", { id: "doors" });
@@ -95,7 +102,7 @@ function doorsKind(b: Brief, c: string): Tree {
     case "NEXT_TOPIC": return sec([feat({ textAlign: "CENTER", title: `You have seen how ${b.points[1][1].toLowerCase()}`, description: "Next, see how a member signs in once for every app, then reads the same role in each one.", actions: [{ ...act("next", "Next: One sign-in", "#next", true), endIcon: "ARROW_RIGHT" }, act("demo", "See the demo", "#demo")] })], "SM");
     case "WAY_BACK": return sec([feat({ textAlign: "CENTER", title: "We could not find that page", description: "The address may have changed. Go back to the start, or tell us what you were looking for.", actions: [act("home", "Back to home", "#home", true), act("touch", "Get in touch", "#contact")] }, "PAGE")], "LG");
     case "PREVIOUS_AND_NEXT": return sec([{ place: "row", gap: "MD", justify: "between", children: [btn("Previous: Invite a member", undefined, "OUTLINE", "ARROW_LEFT"), btn("Next: Assign a role", "PRIMARY", "SOLID")] }], "SM");
-    case "LINK_GROUPS": return sec([feat({ title: "Browse by group", description: "Each group opens its own set of listings.", items: cells(b.groups.slice(0, 3).map((g) => fitem(g[0], g[1], g[2].join(", "), undefined, `#${g[0]}`)), 3) })], "MD");
+    case "LINK_GROUPS": return sec([feat({ title: "Browse the listings by group", description: "Each group opens its own set of listings, so you can start from the kind of thing you need and narrow down from there.", items: cells(b.groups.slice(0, 3).map((g) => fitem(g[0], g[1], g[2].join(", "), undefined, `#${g[0]}`)), 3) })], "MD");
     default: return sec([feat({ ...head, items: doors(nodes, 3) })], "MD", "BASE", { id: "doors" });
   }
 }
@@ -110,10 +117,10 @@ function featureGridKind(b: Brief, c: string): Tree {
 
 function numbers(b: Brief, c: string): Tree {
   if (c === "WITH_FACTS") return sec([feat({ textAlign: "START", title: "Founded to end the rebuild", description: "Two founders began in 2022, and the team has grown to thirty-eight people since, still working from Pune.", facts: [{ mtype: "TEXT", text: "2022", label: "Founded" }, { mtype: "TEXT", text: "Pune", label: "Where" }, { mtype: "TEXT", text: "38", label: "People" }], items: { type: "STATS", nodes: b.numbers.map(([n, d], i) => ({ key: `n${i}`, title: n, description: d })) } })], "MD");
-  return sec([feat({ textAlign: "CENTER", title: c === "TRUST" ? "Trusted by buyers and sellers alike" : "Teams already build this way", description: "Figures from our customer survey of the last twelve months, across every organization that takes part.", items: { type: "STATS", nodes: b.numbers.map(([n, d], i) => ({ key: `n${i}`, title: n, description: d })) } }), muted("Source: customer survey, October 2026, 120 organizations.", "CONTENT_XS")], "MD");
+  return sec([feat({ textAlign: "CENTER", title: c === "TRUST" ? "Trusted by buyers and sellers alike" : "Teams already build this way", description: "Figures from our customer survey of the last twelve months, across every organization that takes part.", items: { type: "STATS", nodes: b.numbers.map(([n, d], i) => ({ key: `n${i}`, title: n, description: d })) } }), { place: "row", justify: "center", children: [muted("Source: customer survey, October 2026, 120 organizations.", "CONTENT_XS")] }], "MD");
 }
 
-const questions = (b: Brief, c: string): Tree => sec([feat({ textAlign: "CENTER", title: c === "ASKED" ? "Asked by buyers before they pay" : "What people ask before they start", contentNode: U("DSAccordionGroup", { bordered: true, options: b.qa.map(([q, a], i) => ({ key: `q${i}`, header: q, content: a, expanded: i === 0 })) }) })], "MD");
+const questions = (b: Brief, c: string): Tree => sec([feat({ textAlign: "CENTER", title: c === "ASKED" ? "Asked by buyers before they pay" : "What people ask before they start", contentNode: U("DSAccordionGroup", { bordered: true, options: b.qa.map(([q, a], i) => ({ key: `q${i}`, header: q, content: a, expanded: i === 0 })) }) })], "MD", "BASE", { width: "NARROW" });
 
 function closing(b: Brief, c: string): Tree {
   const base = { title: b.closing.title, description: b.closing.description };
@@ -135,54 +142,107 @@ function highlight(b: Brief, c: string): Tree {
 function reading(b: Brief, c: string): Tree {
   const kids: unknown[] = [];
   if (c === "TITLE_AND_COLUMN") kids.push(feat({ title: "How we keep your data private", description: "This notice says what we collect, why we keep it, and who can read it. We last changed it on 1 March 2026." }, "PAGE"));
-  kids.push(txt("A role is set once, on the member. Every app reads the same role, so a change reaches all of them together.", "CONTENT_LG"), txt("Where a role lives", "TITLE_MD", { element: "h2" }), txt("Each app asks the foundation which screens the role allows. The app never keeps its own copy of the role."), U("DSAlert", { color: "INFO", text: "A role carries a set of permissions, never one permission alone." }), U("DSCodeBlockView", { filename: b.code.file, language: b.code.language, bordered: true, code: b.code.text }));
-  return sec(kids, "MD");
+  kids.push(
+    txt("A role is set once, on the member. Every app reads the same role, so a change reaches all of them together, and nobody has to repeat it nine times.", "CONTENT_LG"),
+    txt("Where a role lives", "TITLE_LG", { element: "h2" }),
+    txt("Each app asks the foundation which screens the role allows. The app never keeps its own copy of the role, which is why a member removed on Monday morning cannot open anything by lunch."),
+    txt("A role is a name for a set of permissions. Editor can change content and sites; Viewer can read them; Owner can also change billing and invite other owners."),
+    U("DSAlert", { color: "INFO", text: "A role carries a set of permissions, never one permission alone." }),
+    txt("What a grant looks like", "TITLE_LG", { element: "h2" }),
+    txt("A grant names the member, the role and the organization, and nothing else. This one gives Dana Lee the Editor role in Lumen Labs."),
+    U("DSCodeBlockView", { filename: b.code.file, language: b.code.language, bordered: true, code: b.code.text }),
+    txt("What to check afterwards", "TITLE_LG", { element: "h2" }),
+    txt("Sign in as the member and open each app. The screens the role allows show, and the ones it does not allow are gone, not greyed out. The change also appears in the audit history, with your name and the time."),
+  );
+  return sec(c === "TITLE_AND_COLUMN" ? [kids[0], col(kids.slice(1), "LG")] : [col(kids, "LG")], "MD");
 }
 
 function articleBody(b: Brief): Tree { return reading(b, "COLUMN"); }
 
 const recordCard = (r: [string, string, string], form = "VERTICAL"): Tree => U("DSItemCard", { card: {}, item: { title: r[0], description: r[1], media: { mtype: "MARK", icon: "FILE" }, facts: [r[2]], pageLevel: "WIDGET", orientation: form } });
 const paging = (total = 48, per = 6): Tree => U("DSPagination", { totalRecords: total, valueLink: vl({ page: 1, recordsPerPage: per }) });
-const searchBar = (label = "Search"): Tree => U("DSFilterBar", { fields: [{ mtype: "TEXT", key: "q", label, placeholder: label, primary: true, valueLink: vl("") }] });
+const resultsBar = (b: Brief, label = "Search"): Tree => searchBar(b, "FREE_TEXT", true) ?? U("DSFilterBar", { fields: [{ mtype: "TEXT", key: "q", label, placeholder: label, primary: true, valueLink: vl("") }] });
 
 function records(b: Brief, c: string): Tree {
-  const head = feat({ title: "Everything written, newest first", description: "Notes from the team on roles, sign-in, sites and billing, each written by the person who built the part." });
-  const gridOf = (list: Array<[string, string, string]>, d = 3): Tree => featureGrid({}, list.map((r) => recordCard(r)), d, 2, 1, "XS");
+  const [rt, rd] = b.heads?.records ?? ["Everything written, newest first", "Notes from the team on roles, sign-in, sites and billing, each written by the person who built the part."];
+  const head = feat({ title: rt, description: rd });
+  // a run of cards is one grid placed in the section, so the gap between its rows is the grid's own and not a section's padding twice
+  const gridOf = (list: Array<[string, string, string]>, d = 3): Tree => grid(list.map((r) => recordCard(r)), d, 2, 1);
   switch (c) {
-    case "FEATURED_FIRST": return sec([head, featureGrid({}, b.records.slice(0, 2).map((r) => recordCard(r)), 2, 2, 1, "XS"), gridOf(b.records.slice(2, 5)), paging()], "MD");
-    case "BY_SHELF": return sec([feat({ title: "Most read this month", actions: [act("all", "See all", "#all")] }), gridOf(b.records.slice(0, 3)), feat({ title: "Newly added this week", actions: [act("all2", "See all", "#all")] }), gridOf(b.records.slice(3, 6))], "MD");
+    case "FEATURED_FIRST": return sec([head, grid(b.records.slice(0, 2).map((r) => recordCard(r)), 2, 2, 1), gridOf(b.records.slice(2, 5)), paging()], "MD");
+    case "BY_SHELF": return sec([feat({ title: b.heads?.shelves?.[0] ?? "Most read this month", actions: [act("all", "See all", "#all")] }), gridOf(b.records.slice(0, 3)), feat({ title: b.heads?.shelves?.[1] ?? "Newly added this week", actions: [act("all2", "See all", "#all")] }), gridOf(b.records.slice(3, 6))], "MD");
     case "FILTERED": {
       const f = [{ mtype: "TEXT", key: "q", label: "Search", placeholder: "Search 48 listings", primary: true, valueLink: vl("") }, ...[["topic", "Topic", ["Roles", "Sign-in", "Sites", "Billing"]], ["level", "Level", ["Beginner", "Intermediate", "Advanced"]], ["price", "Price", ["Free", "Paid"]]].map(([k, l, o]) => ({ mtype: "SELECT", key: k, label: l, options: (o as string[]).map((x) => ({ key: x.toLowerCase(), label: x })), valueLink: vl(null) }))];
       return sec([feat({ title: "Find the one for you", description: "Narrow the list by topic, level or price, and sort it the way you like." }), U("DSFilterBar", { fields: f }), gridOf(b.records), paging(48, 9)], "MD");
     }
-    case "A_TO_Z": return sec([head, searchBar(), U("DSList", { divided: true }, [...b.records].sort((x, y) => x[0].localeCompare(y[0])).map((r) => U("DSList.Item", { content: item(r[0], r[1], "CONTENT") }))), paging()], "MD");
+    case "A_TO_Z": return sec([head, resultsBar(b), U("DSList", { divided: true }, [...b.records].sort((x, y) => x[0].localeCompare(y[0])).map((r) => U("DSList.Item", { content: item(r[0], r[1], "CONTENT") }))), paging()], "MD");
     case "DATED_FEED": return sec([head, U("DSList", { divided: true }, b.records.map((r) => U("DSList.Item", { content: item(r[0], r[1], "CONTENT", muted(r[2])) }))), paging()], "MD");
-    case "PAGED_LIST": return sec([head, searchBar(), U("DSList", { divided: true }, b.records.map((r) => U("DSList.Item", { content: item(r[0], r[1], "CONTENT", btn(null, undefined, "GHOST", "ARROW_RIGHT", `Open ${r[0]}`)) }))), paging()], "MD");
+    case "PAGED_LIST": return sec([head, resultsBar(b), U("DSList", { divided: true }, b.records.map((r) => U("DSList.Item", { content: item(r[0], r[1], "CONTENT", btn(null, undefined, "GHOST", "ARROW_RIGHT", `Open ${r[0]}`)) }))), paging()], "MD");
     case "LIST_AND_PANE": return sec([head, grid([U("DSList", { divided: true }, b.records.slice(0, 4).map((r) => U("DSList.Item", { content: item(r[0], r[1], "CONTENT") }))), feat({ title: b.records[0][0], description: b.records[0][1], eyebrow: eyebrow(b.records[0][2]), type: "MEDIA_TOP", mediaNode: slot(`${b.records[0][0]}, preview`, "16:9"), actions: [act("open", "Open it", "#open", true)] }, "WIDGET")], 2, 1, 1)], "MD");
-    default: return sec([head, searchBar(), gridOf(b.records), paging()], "MD");
+    default: return sec([head, resultsBar(b), gridOf(b.records), paging()], "MD");
   }
 }
 
 function plans(b: Brief): Tree {
   const plan = (p: Brief["plans"][number]): Tree => feat({ title: p.name, description: p.line, eyebrow: { mtype: "CUSTOM", node: U("DSFormatCurrency", { value: p.price, currencyCode: "USD" }) }, items: lines(p.feats.map((f, i) => ({ key: `f${i}`, title: f, description: "Included in the plan." }))), actions: [act("choose", `Choose ${p.name}`, "#choose", !!p.recommended)], frames: ["TEXT"], surface: p.recommended ? { raised: true, elevation: "MD", lit: true } : { raised: false, elevation: "MD" }, ...(p.recommended ? { facts: [{ mtype: "BADGE", text: "Recommended", variant: "SOLID", color: "PRIMARY" }] } : {}) }, "WIDGET");
-  return featureGrid({ title: "Which plan is yours?", description: "Prices are per month, billed yearly.", textAlign: "CENTER" }, b.plans.map(plan));
+  return featureGrid({ title: "Which plan is yours?", description: "Prices are per month, billed yearly.", textAlign: "CENTER" }, b.plans.map(plan), Math.min(b.plans.length, 4), 2, 1);
+}
+
+// ---- the comparison: DSComparison reads FIELD rows (its cell is a data field's value) grouped under a head, subjects in columns and each subject's actions
+// in the last row. A tick is a BOOLEAN field worded "✓" and "—"; a number, a limit and a text are TEXT fields, so every cell of a row reads in one voice.
+const textRow = (key: string, label: string, subjects: string[], values: string[]): Tree => ({ mtype: "FIELD", key, config: { mtype: "TEXT", key, label }, values: Object.fromEntries(subjects.map((s, i) => [s, { mtype: "TEXT", value: values[i] }])) });
+const tickRow = (key: string, label: string, subjects: string[], values: string[]): Tree => ({ mtype: "FIELD", key, config: { mtype: "BOOLEAN", key, label, labelTrue: "✓", labelFalse: "—" }, values: Object.fromEntries(subjects.map((s, i) => [s, { mtype: "BOOLEAN", value: values[i] === "yes" }])) });
+const comparison = (subjects: Tree[], groups: Tree[], extra: Tree = {}): Tree => U("DSComparison", { size: "MD", subjects, groups, ...extra });
+
+function planComparison(b: Brief): Tree {
+  const rec = b.plans.findIndex((p) => p.recommended);
+  const subjects = b.plans.map((p, i): Tree => ({ key: p.name.toLowerCase(), title: i === rec ? `${p.name} · Recommended` : p.name, actions: U("DSButton", { label: p.price === 0 ? "Start free" : `Choose ${p.name}`, ...(i === rec ? { color: "PRIMARY", variant: "SOLID" } : { variant: "OUTLINE" }), anchor: { href: "#choose" } }) }));
+  const keys = subjects.map((s) => s.key as string);
+  const price = (p: Brief["plans"][number]): string => (p.price === 0 ? "Free" : `$${p.price} a month`);
+  const groups: Tree[] = [{ key: "price", header: { title: "Price" }, rows: [textRow("price", "Billed yearly", keys, b.plans.map(price)), textRow("monthly", "Billed monthly", keys, b.plans.map((p) => (p.price === 0 ? "Free" : `$${Math.round(p.price * 1.2)} a month`)))] }];
+  b.planTable.forEach(([group, rows], g) => groups.push({ key: `g${g}`, header: { title: group }, rows: rows.map(([label, kind, values], r) => (kind === "tick" ? tickRow : textRow)(`g${g}r${r}`, label, keys, values)) }));
+  return comparison(subjects, groups);
 }
 
 function compare(b: Brief, c: string): Tree {
-  if (c === "PLANS") return sec([feat({ title: "What each plan holds", description: "Each row is one thing, and each column a plan; the recommended plan stands out." }), table(["", ...b.plans.map((p) => p.name)], [["Apps", "1", "Unlimited", "Unlimited"], ["Members", "5", "50", "Unlimited"], ["Audit history", "", "Included", "Included"], ["Support", "", "", "Included"]])], "MD");
-  if (c === "ALTERNATIVES") return sec([feat({ title: "This, against what you use now", description: "Each row sets it against building it yourself, and each claim names the source it comes from." }), table(["", b.org, "What you use now"], [["Sign-in", "Built once", "Built per app"], ["Member list", "One list", "A list per app"], ["Role change", "Once, in every app", "App by app"]])], "MD");
-  if (c === "RATES") return sec([feat({ title: "What each plan costs", description: "Per month, billed yearly, in dollars." }), table(["Plan", "Per member", "Per app", "Support"], [["Starter", "Free", "Free", "Community"], ["Team", "$4", "$9", "Email"], ["Company", "$6", "$12", "A named person"]])], "MD");
-  return sec([feat({ title: "Compare the listings", description: "Two listings side by side, row by row." }), U("DSComparison", { subjects: b.records.slice(0, 3).map((r, i) => ({ key: `r${i}`, title: r[0] })), groups: [{ key: "g", rows: ["Price", "Seller", "Refund"].map((l, i) => ({ mtype: "FIELD", key: `k${i}`, config: { mtype: "TEXT", key: `k${i}`, label: l }, values: Object.fromEntries(b.records.slice(0, 3).map((r, j) => [`r${j}`, { mtype: "TEXT", value: i === 0 ? r[2] : i === 1 ? "Kite Studio" : "14 days" }])) })) }] })], "MD");
+  if (c === "PLANS") return sec([feat({ title: "What each plan holds", description: "Every row is one thing you can check before you pay, grouped by theme, with the plan most teams pick marked at its head." }), planComparison(b)], "MD");
+  if (c === "ALTERNATIVES") {
+    const keys = ["lumen", "app", "vendor"];
+    const subjects: Tree[] = [{ key: "lumen", title: b.org }, { key: "app", title: "Building it per app" }, { key: "vendor", title: "A sign-in vendor" }];
+    const groups: Tree[] = [
+      { key: "build", header: { title: "Building it" }, rows: [textRow("a1", "First app live", keys, ["2 days", "6 weeks", "3 weeks"]), textRow("a2", "Each further app", keys, ["Same day", "4 weeks", "1 week"]), tickRow("a3", "One member list", keys, ["yes", "no", "no"]), tickRow("a4", "Roles set once", keys, ["yes", "no", "yes"])] },
+      { key: "run", header: { title: "Running it" }, rows: [textRow("b1", "Cost for 50 members", keys, ["$49 a month", "About 1 engineer", "$250 a month"]), tickRow("b2", "Public sites included", keys, ["yes", "no", "no"]), tickRow("b3", "Audit history kept", keys, ["yes", "no", "yes"])] },
+      { key: "src", header: { title: "Where each claim comes from" }, rows: [textRow("c1", "Source", keys, ["Customer survey, October 2026", "Internal estimate, 12 teams", "Vendor pricing page, 3 November 2026"])] },
+    ];
+    return sec([feat({ title: "This, against what you use now", description: "Each row sets it beside building the base yourself and beside a sign-in vendor, and the last row names where each claim comes from." }), comparison(subjects, groups)], "MD");
+  }
+  if (c === "RATES") {
+    const row = (label: string, unit: string, price: number, note: string): unknown[] => [label, unit, U("DSFormatCurrency", { value: price, currencyCode: "USD" }), note];
+    const head = (t: string): unknown[] => [txt(t, "TITLE_SM"), "", "", ""];
+    return sec([feat({ title: "What each unit of use costs", description: "Per month, billed yearly, in dollars. Each row is one rate with the unit it is counted in, so you can add up your own bill." }), table(["Rate", "Unit", "Price", "Included in"], [head("Members"), row("Extra member", "Per member", 4, "Team and above"), row("Guest member", "Per guest", 1, "Every plan"), head("Apps"), row("Extra app", "Per app", 9, "Starter only"), row("Public site", "Per site", 12, "Team and above"), head("Add-ons"), row("SCIM provisioning", "Per organization", 99, "Business"), row("Extra audit year", "Per year kept", 29, "Team and above")])], "MD");
+  }
+  // marketplace: the listings a reader chose, a column each, the differences in rows, each listing's own action under it
+  const L = b.listings;
+  const keys = L.map((_, i) => `l${i}`);
+  const subjects: Tree[] = L.map((l, i) => ({ key: keys[i], title: l.title, actions: U("DSButton", { label: `Buy for ${l.price}`, ...(i === 0 ? { color: "PRIMARY", variant: "SOLID" } : { variant: "OUTLINE" }), anchor: { href: "#buy" } }) }));
+  const rows = (labels: string[]): Tree[] => labels.map((label, r) => textRow(`f${label}${r}`, label, keys, L.map((l) => l.facts[label])));
+  const groups: Tree[] = [{ key: "buy", header: { title: "The listing" }, rows: [textRow("price", "Price", keys, L.map((l) => l.price)), ...rows(["Seller", "Rating"])] }, { key: "fit", header: { title: "What it needs" }, rows: rows(["Works with", "Version", "Size", "Setup"]) }, { key: "after", header: { title: "After you buy" }, rows: rows(["Updated", "Refund", "Support"]) }];
+  // where the design system draws DSSelectMulti, a reader narrows the listings to the plans they hold
+  const plansHeld = dsHas("DSSelectMulti") ? [U("DSSelectMulti", { options: ["Starter", "Team", "Business", "Enterprise"].map((k) => ({ key: k.toLowerCase(), label: k })), placeholder: "Plans you hold", valueLink: vl(["team", "business"]) })] : [];
+  return sec([feat({ title: "Compare these listings side by side", description: "Three add-ons side by side, row by row, with what each one costs and needs. Take one off the list or add another, up to four." }), ...plansHeld, comparison(subjects, groups)], "MD");
 }
+
+/** A customer's mark as a wide lockup, one quiet tone, 36px tall at its own width: its glyph and its name. */
+const lockup = (name: string): Tree => U("DSItem", { pageLevel: "CONTAINER", title: name, media: { mtype: "MARK", text: name.slice(0, 1), shape: "ROUNDED", variant: "SUBTLE" } });
 
 function testimonials(b: Brief, c: string): Tree {
   const quoteOf = (q: [string, string, string], card = true): Tree => quote(q[0], q[1], q[2], card);
-  if (c === "CUSTOMER_MARKS" || c === "MARKS") return featureGrid({ title: "Used by teams like yours", description: "A few of the organizations that run on it today." }, b.marks.map((m) => feat({ title: m, media: { mtype: "MARK", text: m.slice(0, 2).toUpperCase() } }, "WIDGET")), 5, 3, 2, "SM");
+  if (c === "CUSTOMER_MARKS" || c === "MARKS" || c === "") return sec([feat({ textAlign: "START", title: "Trusted by teams like yours", description: b.logosLine }), U("DSHScroll", {}, [{ place: "row", gap: "XL", children: b.marks.slice(0, 5).map((m) => lockup(m)) }])], "MD");
   if (c === "QUOTE") return sec([feat({ title: "In their words" }), quoteOf(b.quotes[0], false)], "MD");
   if (c === "REVIEWS") return sec([feat({ title: "What buyers say about it", description: "4.8 out of 5, from 2,310 ratings, and many say it saved them a quarter of work.", items: { type: "STATS", nodes: [{ key: "a", title: "4.8", description: "average rating" }, { key: "b", title: "2,310", description: "ratings" }] } }), grid(["Ananya P.", "Marcus T.", "Lena K.", "Tomas R."].map((n, i) => U("DSItemCard", { card: {}, item: { title: n, description: b.quotes[i % 3][0], media: { mtype: "AVATAR", title: n }, facts: [`${5 - (i === 2 ? 1 : 0)} out of 5`], pageLevel: "WIDGET", orientation: "VERTICAL" } })), 2, 2, 1)], "MD");
-  if (c === "STORIES") return sec([feat({ title: "How teams use it", description: "Three teams tell how they moved onto one foundation, with the numbers they kept.", items: doors(b.marks.slice(0, 3).map((m, i) => fitem(`st${i}`, `${m}, in ${["a quarter", "a day", "a week"][i]}`, "How the team moved over, step by step.", "FILE", "#story")), 3) })], "MD");
-  if (c === "PRESS") return sec([feat({ title: "What the press wrote about us", description: "Publications and award lists have written about us, in their own words.", items: cells(["Daily Build", "Stack Review", "Ship Weekly"].map((t, i) => fitem(`pr${i}`, t, ["A foundation that ends the rebuild.", "Sign-in, set once.", "The base every app was missing."][i], undefined, undefined, { media: { mtype: "MARK", text: t.slice(0, 2).toUpperCase() } })), 3) })], "MD");
-  return sec([feat({ title: "Teams say it best", description: "Hear from the people who moved onto one foundation, in their own words." }), grid(b.quotes.map((q) => quoteOf(q)), 3, 1, 1)], "MD");
+  if (c === "STORIES") return sec([feat({ title: "How teams use it", description: "Three teams tell how they moved onto one foundation, which steps they took first, and the numbers they kept afterwards.", items: doors(b.marks.slice(0, 3).map((m, i) => fitem(`st${i}`, `${m}, in ${["a quarter", "a day", "a week"][i]}`, "How the team moved over, step by step.", "FILE", "#story")), 3) })], "MD");
+  if (c === "PRESS") return sec([feat({ title: "What the press wrote about us", description: "Publications and award lists have written about us, in their own words, and each piece opens in full on its own site.", items: cells(["Daily Build", "Stack Review", "Ship Weekly"].map((t, i) => fitem(`pr${i}`, t, ["A foundation that ends the rebuild.", "Sign-in, set once.", "The base every app was missing."][i], undefined, undefined, { media: { mtype: "MARK", text: t.slice(0, 2).toUpperCase() } })), 3) })], "MD");
+  return sec([feat({ title: "Teams say it best", description: "Hear from the people who moved onto one foundation, in their own words, and what changed for them in a single quarter." }), grid(b.quotes.map((q) => quoteOf(q)), 3, 1, 1)], "MD");
 }
 
 function people(b: Brief, c: string): Tree {
@@ -195,7 +255,7 @@ export const personCard = (n: string, r: string): Tree => U("DSCardWidget", { pa
 function enquiry(b: Brief, c: string): Tree {
   if (c === "REQUEST") {
     const f = form([field("Name", input("Dana Lee")), field("Work email", input("dana@northwind.example")), field("Team size", U("DSSelect", { options: ["1 to 10", "11 to 50", "51 to 200"].map((k) => ({ key: k, label: k })), valueLink: vl("11 to 50") })), field("What would you like to see?", U("DSTextarea", { valueLink: vl("How roles reach our nine apps."), rows: 4 }))], "Request a demo", "We reply within one working day, and a demo takes thirty minutes.");
-    const side = feat({ title: "What happens next", description: "A person from our team writes back to book a time.", items: lines([["r1", "We read your note", "We read it first, so the demo starts from your own case."], ["r2", "We book thirty minutes", "We offer a time that suits you."], ["r3", "You see it run", "We show it running with your own apps."]].map(([k, t, d]) => ({ key: k, title: t, description: d })), true) }, "GROUP");
+    const side = feat({ title: "What happens after you ask", description: "A person from our team writes back to book a time that suits you, within one working day.", items: lines([["r1", "We read your note", "We read it first, so the demo starts from your own case."], ["r2", "We book thirty minutes", "We offer a time that suits you."], ["r3", "You see it run", "We show it running with your own apps."]].map(([k, t, d]) => ({ key: k, title: t, description: d })), true) }, "GROUP");
     return sec([feat({ title: `See ${b.org} with your own apps`, description: "Tell us a little about your apps and your team, and we show you how it fits them." }), sideBySide(f, side)], "MD");
   }
   const f = form([field("Name", input("Dana Lee")), field("Work email", input("dana@northwind.example")), field("Topic", U("DSSelect", { options: ["Sales", "Support", "Press", "Partnerships"].map((k) => ({ key: k.toLowerCase(), label: k })), valueLink: vl("sales") })), field("Message", U("DSTextarea", { valueLink: vl("We run nine apps and want one sign-in for all of them."), rows: 5 }))], "Send message", "We reply within one working day.");
@@ -212,46 +272,64 @@ function locations(b: Brief, c: string): Tree {
   return sec([head, list(b.places.slice(0, 2))], "MD");
 }
 
+/** The search bar the catalogue names for every site search. Where the design system draws DSSearchBar it is the bar; where it does not yet, `null` and the caller draws today's fields. */
+function searchBar(b: Brief, c: string, folded = false): Tree | null {
+  if (!dsHas("DSSearchBar")) return null;
+  const select = (key: string, label: string, options: string[], value: string | null): Tree => ({ mtype: "SELECT", key, label, options: options.map((k) => ({ key: k.toLowerCase(), label: k })), valueLink: vl(value) });
+  const what: Tree = { mtype: "TEXT", key: "q", label: "What", placeholder: `Search ${b.org}`, primary: true, valueLink: vl(b.records[0][0]) };
+  if (c !== "STRUCTURED") return U("DSSearchBar", { fields: [what], folded, radius: "FULL" });
+  const fields: Tree[] = [what, select("price", "Price", ["Any price", "Free", "Under $50", "$50 to $150"], "any price"), { mtype: "DATE_RANGE", key: "when", label: "When", valueLink: vl({ start: null, end: null }) }, { mtype: "COUNT", key: "seats", label: "Seats", options: [{ key: "members", label: "Members", description: "Who will use it" }, { key: "admins", label: "Admins", description: "Who will manage it" }], limits: { members: { min: 1, max: 500 }, admins: { min: 1, max: 20 } }, valueLink: vl({ members: 10, admins: 2 }) }];
+  const scopes = { options: [{ key: "addons", label: "Add-ons", fields: ["q", "price", "seats"] }, { key: "courses", label: "Courses", fields: ["q", "price"] }, { key: "workshops", label: "Workshops", fields: ["q", "when", "seats"] }], valueLink: vl("addons") };
+  return U("DSSearchBar", { fields, scopes, folded, radius: "FULL" });
+}
+
 function find(b: Brief, c: string): Tree {
-  const head = feat({ title: c === "STRUCTURED" ? "Find the right listing" : "What are you looking for?", description: "Type a word, or choose a category and a price." }, "CONTAINER");
+  const head = feat({ title: c === "STRUCTURED" ? "Find the right listing for you" : "What are you looking for?", description: "Type a word, or choose a category, a price and the number of seats, and the list narrows as you go." }, "CONTAINER");
+  const popular = col([txt("Popular searches", "TITLE_SM"), { place: "row", gap: "SM", wrap: true, children: (b.heads?.popular ?? b.doors.map((d) => d[1])).map((t) => U("DSButton", { label: t, variant: "OUTLINE", size: "SM", startIcon: "SEARCH", anchor: { href: `#${t.toLowerCase().replace(/ /g, "-")}` } })) }], "SM");
+  const bar = searchBar(b, c);
+  const kinds = dsAtLeast("11.28.0") && b.org === "Lumen Market" ? [U("DSTabs", { options: [["addons", "Add-ons", "BLOCKS"], ["courses", "Courses", "FILE"], ["workshops", "Workshops", "USERS"]].map(([key, label, icon]) => ({ key, label, media: { mtype: "ICON", node: icon } })), activeKey: "addons", type: "LINE" })] : [];
+  if (bar) return sec([head, ...kinds, bar, popular], "MD");
   const auto = U("DSAutocomplete", { placeholder: `Search ${b.org}`, options: b.records.map((r) => ({ key: r[0].toLowerCase(), label: r[0] })), valueLink: vl(null) });
-  if (c === "STRUCTURED") return sec([head, grid([auto, U("DSSelect", { options: ["Add-ons", "Courses", "Workshops"].map((k) => ({ key: k, label: k })), valueLink: vl("Add-ons") }), U("DSSelect", { options: ["Any price", "Free", "Under $50"].map((k) => ({ key: k, label: k })), valueLink: vl("Any price") }), btn("Search", "PRIMARY", "SOLID", "SEARCH")], 4, 2, 1)], "MD");
-  return sec([head, auto, feat({ title: "Popular searches", items: lines(b.doors.map((d) => ({ key: d[0], title: d[1] }))) }, "GROUP")], "MD");
+  const seats = dsHas("DSInputNumberGroup") ? [U("DSInputNumberGroup", { options: [{ key: "members", label: "Members", description: "Who will use it" }, { key: "admins", label: "Admins", description: "Who will manage it" }], limits: { members: { min: 1, max: 500 }, admins: { min: 1, max: 20 } }, valueLink: vl({ members: 10, admins: 2 }) })] : [];
+  if (c === "STRUCTURED") return sec([head, ...kinds, grid([auto, U("DSSelect", { options: ["Add-ons", "Courses", "Workshops"].map((k) => ({ key: k, label: k })), valueLink: vl("Add-ons") }), U("DSSelect", { options: ["Any price", "Free", "Under $50"].map((k) => ({ key: k, label: k })), valueLink: vl("Any price") }), ...seats, btn("Search", "PRIMARY", "SOLID", "SEARCH")], seats.length ? 5 : 4, 2, 1)], "MD");
+  return sec([head, ...kinds, auto, popular], "MD");
 }
 
 const deals = (b: Brief): Tree => sec([feat({ frames: ["TEXT", "MEDIA"], surface: { raised: true, elevation: "MD", lit: true }, type: "SPLIT_END", eyebrow: badge("Ends Sunday", "PRIMARY", "SOLID"), title: "Two courses for the price of one", description: "Buy Roles in a day and get Audit history your auditors will read free, until Sunday 29 November 2026.", mediaNode: slot("The two courses side by side", "4:3"), actions: [act("buy", "Buy both for $49", "#buy", true)] })], "MD");
 
 function specifications(b: Brief): Tree {
   const group = (t: string, rows: string[][]): Tree => feat({ title: t, contentNode: table(["", ""], rows, false) }, "GROUP");
-  return sec([feat({ title: "Specifications", description: "What it is, what it needs and what it works with." }), group("What it is", [["Version", "2.4.0"], ["Updated", "3 November 2026"], ["Size", "1.2 MB"]]), group("What it needs", [["Plan", "Team or Company"], ["Apps", "Any"], ["Sign-in", "Single sign-on"]])], "MD");
+  return sec([feat({ title: "The full specifications of this listing", description: "What it is, what it needs and what it works with, so you can check the fit before you pay for it." }), group("What it is", [["Version", "2.4.0"], ["Updated", "3 November 2026"], ["Size", "1.2 MB"]]), group("What it needs", [["Plan", "Team or Company"], ["Apps", "Any"], ["Sign-in", "Single sign-on"]])], "MD");
 }
 
 function options(b: Brief): Tree {
-  return sec([feat({ title: "Choose an option", description: "Each option has its own price and what it includes." }), U("DSRadioGroup", { options: [["solo", "Solo", "1 seat, $29"], ["team", "Team", "10 seats, $99"], ["studio", "Studio", "Unlimited seats, $249"]].map(([key, label, description]) => ({ key, label, description })), valueLink: vl("team") })], "MD");
+  return sec([feat({ title: "Choose the option that fits", description: "Each option has its own price and its own seats, so you pay for the team you have today and not for more." }), U("DSRadioGroup", { options: [["solo", "Solo", "1 seat · $29"], ["team", "Team", "10 seats · $99"], ["studio", "Studio", "Unlimited seats · $249"]].map(([key, label, description]) => ({ key, label: `${label} · ${description}`, description: key === "team" ? "Most teams pick this" : undefined })), valueLink: vl("team") })], "MD");
 }
 
 function syllabus(b: Brief): Tree {
-  return sec([feat({ title: "What is in it", description: "Twenty-nine short lessons in six modules, each ending with a check.", contentNode: U("DSAccordionGroup", { bordered: true, options: ["Why roles belong to the member", "Designing a role", "Granting and revoking", "Reading roles in an app", "Audit and review"].map((t, i) => ({ key: `m${i}`, header: `${t} · ${4 + i} lessons`, content: "Short lessons, each with a check at the end.", expanded: i === 0 })) }) })], "MD");
+  return sec([feat({ title: "What is in the course", description: "Twenty-nine short lessons in six modules, each ending with a check, so you know what you have learned.", contentNode: U("DSAccordionGroup", { bordered: true, options: ["Why roles belong to the member", "Designing a role", "Granting and revoking", "Reading roles in an app", "Audit and review"].map((t, i) => ({ key: `m${i}`, header: `${t} · ${4 + i} lessons`, content: "Short lessons, each with a check at the end.", expanded: i === 0 })) }) })], "MD");
 }
 
 function owner(b: Brief): Tree {
-  return sec([feat({ title: "Sold by", description: "Every seller is verified before a listing goes live." }), U("DSCardWidget", { parts: [{ mtype: "FREE", key: "o", node: U("DSItem", { pageLevel: "WIDGET", title: "Kite Studio", description: "Pune, India · seller since March 2025", media: { mtype: "AVATAR", title: "Kite Studio" }, facts: ["4.9 across 312 reviews", "14 listings"], endNode: btn("See the seller", undefined, "OUTLINE") }) }] })], "MD");
+  return sec([feat({ title: "Who sells this listing", description: "Every seller is verified before a listing goes live, and each seller's page shows their reviews and their other listings." }), U("DSCardWidget", { parts: [{ mtype: "FREE", key: "o", node: U("DSItem", { pageLevel: "WIDGET", title: "Kite Studio", description: "Pune, India · seller since March 2025", media: { mtype: "AVATAR", title: "Kite Studio" }, facts: ["4.9 across 312 reviews", "14 listings"], endNode: btn("See the seller", undefined, "OUTLINE") }) }] })], "MD");
 }
 
 function policies(b: Brief): Tree {
-  return sec([feat({ title: "Refunds, delivery and licences", description: "Short answers, before you pay.", contentNode: U("DSAccordionGroup", { bordered: true, options: [["Can I get a refund?", "Yes, within 14 days, if the add-on does not do what its page says."], ["How is it delivered?", "Instantly, to your organization's Lumen account."], ["Who holds the licence?", "Your organization, for as long as it holds the add-on."]].map(([h, c], i) => ({ key: `p${i}`, header: h, content: c, expanded: i === 0 })) }) })], "MD");
+  return sec([feat({ title: "Refunds, delivery and licences", description: "Short answers about money back, how a purchase reaches you and who holds the licence, before you pay.", contentNode: U("DSAccordionGroup", { bordered: true, options: [["Can I get a refund?", "Yes, within 14 days, if the add-on does not do what its page says."], ["How is it delivered?", "Instantly, to your organization's Lumen account."], ["Who holds the licence?", "Your organization, for as long as it holds the add-on."]].map(([h, c], i) => ({ key: `p${i}`, header: h, content: c, expanded: i === 0 })) }) })], "MD");
 }
 
 function order(b: Brief, c: string): Tree {
   const lineOf = (r: [string, string, string], end: Tree): Tree => item(r[0], `${r[1]}`, "CONTENT", end, { media: { slot: `cover-${r[0].toLowerCase().replace(/[^a-z]+/g, "-")}`, label: `Cover of ${r[0]}`, ratio: "4:3" } });
-  const total = col([row([muted("Subtotal"), txt("$97.00", "CONTENT_MD")], "LG"), row([muted("Tax"), txt("$8.73", "CONTENT_MD")], "LG"), row([txt("Total", "TITLE_MD"), txt("$105.73", "TITLE_MD")], "LG")], "SM");
+  // the sums stand in a table of their own, the figures in one column, so the eye runs down them
+  const total = table(["Your order", "Amount"], [["Subtotal, three listings", "$97.00"], ["Tax, 9%", "$8.73"], [txt("Total", "TITLE_MD"), txt("$105.73", "TITLE_MD")]]);
   const rows = b.records.slice(0, 3).map((r) => lineOf(r, c === "CART" ? row([txt(r[2], "TITLE_MD"), btn(null, undefined, "GHOST", "X", `Remove ${r[0]}`)], "SM") : txt(r[2], "TITLE_MD")));
+  if (c === "RECEIPT") return sec([feat({ title: "What you ordered", description: "Order SPN-48213, paid on 27 Nov 2026 with the card ending 4242. The receipt is in your inbox, and every listing is ready to install." }), U("DSList", { divided: true }, rows.map((r) => U("DSList.Item", { content: r }))), table(["Paid", "Amount"], [["Subtotal, three listings", "$97.00"], ["Tax, 9%", "$8.73"], [txt("Total paid", "TITLE_MD"), txt("$105.73", "TITLE_MD")]])], "MD");
   return sec([feat({ title: c === "CART" ? "Your cart" : "Review your order", description: c === "CART" ? "Three listings, ready to pay for." : "Check the three listings and the total before you pay." }), U("DSList", { divided: true }, rows.map((r) => U("DSList.Item", { content: r }))), total, btn(c === "CART" ? "Go to checkout" : "Pay $105.73", "PRIMARY", "SOLID")], "MD");
 }
 
 function checkoutSteps(b: Brief): Tree {
   const f = form([field("Name on the card", input("Dana Lee")), field("Billing email", input("dana@lumenlabs.example"))], "Continue");
-  return sec([feat({ title: "Checkout", description: "Four steps, one form each." }), U("DSStepper", { items: [{ key: "a", label: "Details", taskState: "DONE" }, { key: "b", label: "Payment", taskState: "WORKING" }, { key: "c", label: "Review" }, { key: "d", label: "Done" }], activeKey: "b", type: "NUMBER" }), f], "MD");
+  return sec([feat({ title: "Checkout in four short steps", description: "Four steps, one form each: your details, the payment, a last review of the order, and then it is done." }), U("DSStepper", { items: [{ key: "a", label: "Details", taskState: "DONE" }, { key: "b", label: "Payment", taskState: "WORKING" }, { key: "c", label: "Review" }, { key: "d", label: "Done" }], activeKey: "b", type: "NUMBER" }), f], "MD");
 }
 
 function footer(b: Brief, c: string): Tree {
@@ -275,17 +353,17 @@ function footer(b: Brief, c: string): Tree {
 const itemRows = (b: Brief): Array<[string, string, number]> => [[b.records[0][0], "Kite Studio", 48], [b.records[0][0], "Northwind Labs", 52], [b.records[0][0], "Pune Add-ons", 61]];
 
 function offers(b: Brief): Tree {
-  const rows = itemRows(b).map(([t, seller, price], i) => item(seller, t, "CONTENT", row([...(i === 0 ? [badge("Best price", "PRIMARY", "SOLID")] : []), U("DSFormatCurrency", { value: price, currencyCode: "USD" }), btn("Buy", i === 0 ? "PRIMARY" : undefined, i === 0 ? "SOLID" : "OUTLINE")], "MD"), { facts: [`${(4.9 - i / 10).toFixed(1)} across ${312 - i * 90} reviews`] }));
-  return sec([feat({ title: "Offers for this listing", description: "Each seller's price, and what the buyer gets." }), U("DSList", { divided: true }, rows.map((r) => U("DSList.Item", { content: r })))], "MD");
+  const rows = itemRows(b).map(([, seller, price], i) => item(seller, "Instant delivery, 14-day refund", "CONTENT", row([...(i === 0 ? [badge("Best price", "PRIMARY", "SOLID")] : []), U("DSFormatCurrency", { value: price, currencyCode: "USD" }), btn("Buy", i === 0 ? "PRIMARY" : undefined, i === 0 ? "SOLID" : "OUTLINE")], "MD"), { facts: [`${(4.9 - i / 10).toFixed(1)} across ${312 - i * 90} reviews`] }));
+  return sec([feat({ title: "Offers from other sellers", description: "Each seller's price and what the buyer gets, with the seller's rating beside it, so you can pick the best offer." }), U("DSList", { divided: true }, rows.map((r) => U("DSList.Item", { content: r })))], "MD");
 }
 
 function bundle(b: Brief): Tree {
-  return sec([feat({ title: "Often bought together", description: "Three listings that buyers of this one also pay for." }), featureGrid({}, b.records.slice(0, 3).map((r) => recordCard(r)), 3, 2, 1, "XS"), row([txt("All three, $103.00", "TITLE_MD"), btn("Buy the three", "PRIMARY", "SOLID")], "LG")], "MD");
+  return sec([feat({ title: "Often bought together with this one", description: "Three listings that buyers of this one also pay for, priced as a set, so you can add them in one step." }), grid(b.records.slice(0, 3).map((r) => recordCard(r)), 3, 2, 1), row([txt("All three, $103.00", "TITLE_MD"), btn("Buy the three", "PRIMARY", "SOLID")], "LG")], "MD");
 }
 
-const description = (b: Brief): Tree => sec([feat({ title: "About this listing", description: b.records[0][1] }), txt("A longer account of what it is, what it does for the buyer and what it asks of them, written by the seller in plain words, with the parts that matter first.", "CONTENT_MD"), btn("Show more", undefined, "GHOST")], "MD");
+const description = (b: Brief): Tree => sec([feat({ title: "About this listing in full", description: `${b.records[0][1]} Written by the seller, with the parts that matter first.` }), txt("A longer account of what it is, what it does for the buyer and what it asks of them, written by the seller in plain words, with the parts that matter first.", "CONTENT_MD"), btn("Show more", undefined, "GHOST")], "MD");
 
-const notes = (b: Brief): Tree => sec([feat({ title: "Good to know", description: "Short notes to read before you pay." }), U("DSList", { divided: true }, ["Works with the Team and Company plans.", "Updates are free for a year.", "No setup call is needed."].map((t) => U("DSList.Item", { content: txt(t) })))], "MD");
+const notes = (b: Brief): Tree => sec([feat({ title: "Good to know before you pay", description: "Short notes to read before you pay: which plans it works with, how updates are priced and whether you need a call." }), U("DSList", { divided: true }, ["Works with the Team and Company plans.", "Updates are free for a year.", "No setup call is needed."].map((t) => U("DSList.Item", { content: txt(t) })))], "MD");
 
 const aboutOf = (name: string, line: string): Tree => sec([feat({ type: "SPLIT_END", verticalAlign: "TOP", title: `About ${name}`, description: line, mediaNode: slot(`${name}, in one picture`, "4:3") })], "MD");
 
@@ -298,10 +376,10 @@ function thread(b: Brief, kind: "QUESTIONS" | "COMMENTS"): Tree {
 }
 
 function confirmation(b: Brief): Tree {
-  return sec([feat({ textAlign: "CENTER", title: "Your order is placed", description: "We sent the receipt to dana@northwind.example.", items: lines([["c1", "We tell the seller", "The seller starts on it today."], ["c2", "You get it by email", "Instantly, to your organization's account."], ["c3", "You can see it any time", "Under Orders, in your account."]].map(([k, t, d]) => ({ key: k, title: t, description: d })), true), actions: [act("orders", "See your orders", "#orders", true), act("more", "Keep browsing", "#more")] })], "MD");
+  return sec([feat({ textAlign: "CENTER", title: "Your order is placed", description: "We sent the receipt to dana@northwind.example, and the seller has the order and starts on it today.", items: lines([["c1", "We tell the seller", "The seller starts on it today."], ["c2", "You get it by email", "Instantly, to your organization's account."], ["c3", "You can see it any time", "Under Orders, in your account."]].map(([k, t, d]) => ({ key: k, title: t, description: d })), true), actions: [act("orders", "See your orders", "#orders", true), act("more", "Keep browsing", "#more")] })], "MD");
 }
 
-const author = (b: Brief): Tree => sec([feat({ title: "Written by", description: "The person who wrote this page, and what they work on." }), grid([personCard(b.people[0][0], b.people[0][1])], 4, 3, 2)], "MD");
+const author = (b: Brief): Tree => sec([feat({ title: "Written by this page's author", description: "The person who wrote this page, what they work on, and how to find the other pages they have written for readers." }), grid([personCard(b.people[0][0], b.people[0][1])], 4, 3, 2)], "MD");
 
 /** The recipe of a kind and case for a site brief, or null where the language holds none. */
 export function siteContainer(kind: string, caseCode: string, b: Brief): Tree | null {
@@ -328,7 +406,8 @@ export function siteContainer(kind: string, caseCode: string, b: Brief): Tree | 
     case "BROWSE_SHELF": return records(b, "BY_SHELF");
     case "BROWSE_RESULTS": return records(b, c);
     case "PRICE_PLANS": return plans(b);
-    case "PRICE_COMPARE": case "ITEM_COMPARE": return compare(b, c);
+    case "PRICE_COMPARE": return compare(b, c || "PLANS");
+    case "ITEM_COMPARE": return compare(b, c || "RECORDS");
     case "PROOF_LOGOS": case "PROOF_TESTIMONIALS": return testimonials(b, c);
     case "PROOF_REVIEWS": case "ITEM_REVIEWS": case "SELLER_REVIEWS": return testimonials(b, "REVIEWS");
     case "ABOUT_TEAM": return people(b, c);
@@ -343,7 +422,7 @@ export function siteContainer(kind: string, caseCode: string, b: Brief): Tree | 
     case "ITEM_SELLER": return owner(b);
     case "ITEM_POLICIES": case "SELLER_POLICIES": return policies(b);
     case "ACTION_CART": return order(b, "CART");
-    case "ACTION_SUMMARY": return order(b, "REVIEW");
+    case "ACTION_SUMMARY": return order(b, c || (pageNow === "MARKET_CONFIRMATION" ? "RECEIPT" : "REVIEW"));
     case "ACTION_CHECKOUT": return checkoutSteps(b);
     case "ACTION_CONFIRMATION": return confirmation(b);
     case "ITEM_OFFERS": return offers(b);

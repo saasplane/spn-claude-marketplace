@@ -3,7 +3,7 @@
 import { feat, plannedSection, slot, sec } from "./kit.ts";
 import { siteLayout } from "./layouts.ts";
 import { noteOf, sentence, slugOf, words } from "./notes.ts";
-import { siteContainer } from "./site.ts";
+import { setPage, siteContainer } from "./site.ts";
 import { siteWidget } from "./widgets-site.ts";
 import type { Brief } from "./site-words.ts";
 import type { CatCase, CatKind, Entry, Page, Tree } from "./types.ts";
@@ -52,10 +52,12 @@ export function sitePages(category: string, cat: Record<string, CatKind[]>, b: B
   picked("PAGES").forEach((k, at) => {
     const order = (k.order ?? []).map((o) => (typeof o === "string" ? { kind: o, case: undefined } : o));
     const layout = layoutFor(category, k.code, layouts);
+    setPage(k.code);
     const entries: Entry[] = order.map((o) => {
       const kind = containers.get(o.kind) ?? { code: o.kind, title: words(o.kind).replace(/^./, (c) => c.toUpperCase()), description: "", status: "BUILT" };
       return containerEntry(kind, kind.cases?.find((x) => x.code === o.case), b);
     });
+    setPage("");
     if (!entries.length || k.status !== "BUILT") entries.splice(0, entries.length, { kind: k.title, case: "", note: noteOf(k), node: plannedSection(k.title, sentence(k.description), `${k.title}, as a page`), planned: true });
     else if (!order.some((o) => o.kind === "COMMON_FOOTER") && containers.has("COMMON_FOOTER")) entries.push(containerEntry(containers.get("COMMON_FOOTER") as CatKind, containers.get("COMMON_FOOTER")?.cases?.find((x) => x.code === (layout === "TOPNAV" ? "COLUMNS" : "SHORT")), b));
     // a kind's own cases are further pages of the same kind, each its own order where it states one

@@ -699,3 +699,4 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **`DSItem` is an item line and knows nothing of navigation** (`RULE.SUPPORT.SURFACE.624` · MUST · skill:spn-surface/design)
 - **A page sets at most two containers side by side, one taking the larger share** (`RULE.SUPPORT.SURFACE.625` · MUST · skill:spn-surface/design)
 - **`DSPageLevel` gives a level, a part and `flush` to what it holds, and lays out nothing** (`RULE.SUPPORT.SURFACE.626` · MUST · skill:spn-surface/design)
+- **A new unit's props start from its nearest units' props: a field a neighbour already has is reused whole, with its name, its type and its meaning, and a proposal lists the neighbours it read and names each new field it could not reuse** (`RULE.SUPPORT.SURFACE.627` · MUST · skill:spn-surface/design)
