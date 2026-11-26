@@ -120,5 +120,12 @@
     "docs-index.js": "a4a30436cf1cb7f03f11b854cad0fb15ccc9a228f8c203ce2da5aa8fda6b0137",
     "design-system-units.css": "3b6f23c094dcfdc079dbaa58269adab1bfd40081041c44cefbb17ce936278d73",
     "design-system.css": "1c615ba3cb2d719513e441fdbcdaa3354f4605472667a12e3ce061b7c35f8645"
+  },
+  "1.17.4": {
+    "docs-language.css": "2438685ab1de0ea0bc0c17a2a3cf34b1e0da8ae72c7008fe9df1f0cbe6709c5a",
+    "docs-page.js": "e96c75ae3ce10797254cd08dbe428ac66c93d3cf72ef391b8be796bf32235aa1",
+    "docs-index.js": "a4a30436cf1cb7f03f11b854cad0fb15ccc9a228f8c203ce2da5aa8fda6b0137",
+    "design-system-units.css": "7a4ae41059c74dbd9229739ee6015ad9ec13c1d7e1761b2cf997c74b7f075264",
+    "design-system.css": "8c73f98acb9677233e4ebef0c7ffaea589cf03b5df0a4fcb457a62d4f2cf5ee7"
   }
 }
