@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/08-architecture-widgets.md",
-      "seen": "e02545db"
+      "seen": "0ce66507"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-widgets/",
@@ -96,7 +96,7 @@ A card widget is chosen the way a card is, by what it holds: a head, and a body 
 
 ## Boundary
 
-This ref states what makes a unit a widget, and what `DSCardWidget` is built from. It stops at the edge of the widget. It does not state what a component is, or what any one of the components a widget is built from does — those are in `architecture-components.md`. It does not state how a page shows a list beside the detail of its chosen row. That is the app page kind Groups and their items, one of the Pages of DASHBOARD in the Surface Catalogue, and `architecture-containers.md` states what a person sees on such a page. No core unit is built for it; the web stack has page frames of its own, `DSPageFrameListDetail` and `DSPageFrameGroups`, which `architecture-components.md` states. A card widget is what stands in the aside of `DSPageFrameAside`, and it marks its record with `unread` and `accentColor`, as every record box does (`RULE.SUPPORT.SURFACE.620` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.621` · GUIDE). It does not state what fills a part of a container, or what a widget does in a `flush` part — that is `architecture-containers.md`. It does not state where a widget's size comes from when none is set — that is `architecture-app.md`. It does not state what a data table, a filter bar, a comparison or a feature is; each is a composite of `architecture-components.md`. It does not state how `DSCardWidget` is drawn in the library or built by a stack — those are `delivery-library.md` and `providers.md`.
+This ref states what makes a unit a widget, and what `DSCardWidget` is built from. It stops at the edge of the widget. It does not state what a component is, or what any one of the components a widget is built from does — those are in `architecture-components.md`. It does not state how a page shows a list beside the detail of its chosen row. That is the app page kind `RECORD_HOME` with its `GROUPS` case, one of the Pages of DASHBOARD in the Surface Catalogue, and `architecture-containers.md` states what a person sees on such a page. No core unit is built for it; the web stack has page frames of its own, `DSPageFrameListDetail` and `DSPageFrameGroups`, which `architecture-components.md` states. A card widget is what stands in the aside of `DSPageFrameAside`, and it marks its record with `unread` and `accentColor`, as every record box does (`RULE.SUPPORT.SURFACE.620` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.621` · GUIDE). It does not state what fills a part of a container, or what a widget does in a `flush` part — that is `architecture-containers.md`. It does not state where a widget's size comes from when none is set — that is `architecture-app.md`. It does not state what a data table, a filter bar, a comparison or a feature is; each is a composite of `architecture-components.md`. It does not state how `DSCardWidget` is drawn in the library or built by a stack — those are `delivery-library.md` and `providers.md`.
 
 ## Binds
 

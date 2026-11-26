@@ -11,9 +11,9 @@ import type { CatCase, CatKind, Entry, Page, Tree } from "./types.ts";
 export type Folders = { base: string; part: (part: string) => string };
 
 /** The pages that stand in a bare layout, not the category's first one. */
-const BARE = new Set(["LANDING", "MAINTENANCE", "SERVER_ERROR"]);
+const BARE = new Set(["MAIN_LANDING", "COMMON_MAINTENANCE", "COMMON_SERVER_ERROR"]);
 /** Where a category stands its home, a search and a group home in its other layout, where it has two. */
-const IN_TOP: Record<string, Set<string>> = { RESOURCES: new Set(["HOME", "SEARCH", "GROUP_HOME", "NOT_FOUND", "GROUPS_AND_THEIR_ITEMS"]) };
+const IN_TOP: Record<string, Set<string>> = { RESOURCES: new Set(["RESOURCES_HOME", "DOCS_HOME", "GUIDE_HOME", "HELP_HOME", "DOCS_SEARCH", "GUIDE_SEARCH", "HELP_SEARCH", "COMMON_NOT_FOUND"]) };
 
 export function layoutFor(category: string, kind: string, layouts: string[]): string {
   if (BARE.has(kind) && layouts.includes("CANVAS")) return "CANVAS";
@@ -40,9 +40,9 @@ export function sitePages(category: string, cat: Record<string, CatKind[]>, b: B
   const containers = new Map(picked("CONTAINERS").map((k) => [k.code, k]));
   // LAYOUTS: each layout holding a short page, the kind's cases after it
   picked("LAYOUTS").forEach((k, at) => {
-    const base: Entry[] = ["HERO", "POINTS", "CLOSING_CALL", "FOOTER"].filter((c) => containers.has(c)).map((c) => {
+    const base: Entry[] = ["INTRO_HERO", "EXPLAIN_FEATURES", "ACTION_CLOSING", "COMMON_FOOTER"].filter((c) => containers.has(c)).map((c) => {
       const kind = containers.get(c) as CatKind;
-      const one = c === "FOOTER" ? kind.cases?.find((x) => x.code === (k.code === "TOPNAV" ? "COLUMNS" : "SHORT")) : kind.cases?.[0];
+      const one = c === "COMMON_FOOTER" ? kind.cases?.find((x) => x.code === (k.code === "TOPNAV" ? "COLUMNS" : "SHORT")) : kind.cases?.[0];
       return containerEntry(kind, one, b);
     });
     const extra: Entry[] = (k.cases ?? []).filter((c) => c.status !== "BUILT").map((c) => ({ kind: k.title, case: words(c.code), note: noteOf(k, c), node: plannedSection(k.title, sentence(c.when), `${k.title}, ${words(c.code)}`), planned: true }));
@@ -56,8 +56,8 @@ export function sitePages(category: string, cat: Record<string, CatKind[]>, b: B
       const kind = containers.get(o.kind) ?? { code: o.kind, title: words(o.kind).replace(/^./, (c) => c.toUpperCase()), description: "", status: "BUILT" };
       return containerEntry(kind, kind.cases?.find((x) => x.code === o.case), b);
     });
-    if (!entries.length) entries.push({ kind: k.title, case: "", note: noteOf(k), node: plannedSection(k.title, sentence(k.description), `${k.title}, as a page`), planned: true });
-    else if (!order.some((o) => o.kind === "FOOTER") && containers.has("FOOTER")) entries.push(containerEntry(containers.get("FOOTER") as CatKind, containers.get("FOOTER")?.cases?.find((x) => x.code === (layout === "TOPNAV" ? "COLUMNS" : "SHORT")), b));
+    if (!entries.length || k.status !== "BUILT") entries.splice(0, entries.length, { kind: k.title, case: "", note: noteOf(k), node: plannedSection(k.title, sentence(k.description), `${k.title}, as a page`), planned: true });
+    else if (!order.some((o) => o.kind === "COMMON_FOOTER") && containers.has("COMMON_FOOTER")) entries.push(containerEntry(containers.get("COMMON_FOOTER") as CatKind, containers.get("COMMON_FOOTER")?.cases?.find((x) => x.code === (layout === "TOPNAV" ? "COLUMNS" : "SHORT")), b));
     // a kind's own cases are further pages of the same kind, each its own order where it states one
     pages.push({ file: `${folders.part("PAGES")}/${String(at + 1).padStart(2, "0")}-${slugOf(k.code)}.html`, title: k.title, category, part: "PAGES", kinds: [k.code], entries, ask: sentence(k.description), layout });
   });

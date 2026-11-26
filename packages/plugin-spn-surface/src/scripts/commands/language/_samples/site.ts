@@ -271,42 +271,90 @@ function footer(b: Brief, c: string): Tree {
   return U("DSSectionContainer", { size: "XS", color: "BASE" }, [col(kids, "LG")]);
 }
 
+// ---- the kinds the catalogue added: each is built from the pieces above, the units its entry names
+const itemRows = (b: Brief): Array<[string, string, number]> => [[b.records[0][0], "Kite Studio", 48], [b.records[0][0], "Northwind Labs", 52], [b.records[0][0], "Pune Add-ons", 61]];
+
+function offers(b: Brief): Tree {
+  const rows = itemRows(b).map(([t, seller, price], i) => item(seller, t, "CONTENT", row([...(i === 0 ? [badge("Best price", "PRIMARY", "SOLID")] : []), U("DSFormatCurrency", { value: price, currencyCode: "USD" }), btn("Buy", i === 0 ? "PRIMARY" : undefined, i === 0 ? "SOLID" : "OUTLINE")], "MD"), { facts: [`${(4.9 - i / 10).toFixed(1)} across ${312 - i * 90} reviews`] }));
+  return sec([feat({ title: "Offers for this listing", description: "Each seller's price, and what the buyer gets." }), U("DSList", { divided: true }, rows.map((r) => U("DSList.Item", { content: r })))], "MD");
+}
+
+function bundle(b: Brief): Tree {
+  return sec([feat({ title: "Often bought together", description: "Three listings that buyers of this one also pay for." }), featureGrid({}, b.records.slice(0, 3).map((r) => recordCard(r)), 3, 2, 1, "XS"), row([txt("All three, $103.00", "TITLE_MD"), btn("Buy the three", "PRIMARY", "SOLID")], "LG")], "MD");
+}
+
+const description = (b: Brief): Tree => sec([feat({ title: "About this listing", description: b.records[0][1] }), txt("A longer account of what it is, what it does for the buyer and what it asks of them, written by the seller in plain words, with the parts that matter first.", "CONTENT_MD"), btn("Show more", undefined, "GHOST")], "MD");
+
+const notes = (b: Brief): Tree => sec([feat({ title: "Good to know", description: "Short notes to read before you pay." }), U("DSList", { divided: true }, ["Works with the Team and Company plans.", "Updates are free for a year.", "No setup call is needed."].map((t) => U("DSList.Item", { content: txt(t) })))], "MD");
+
+const aboutOf = (name: string, line: string): Tree => sec([feat({ type: "SPLIT_END", verticalAlign: "TOP", title: `About ${name}`, description: line, mediaNode: slot(`${name}, in one picture`, "4:3") })], "MD");
+
+export const questionCard = (q: string, a: string, n: number): Tree => U("DSItem", { pageLevel: "WIDGET", title: q, description: a, facts: [`${n} found this helpful`], endNode: btn("Helpful", undefined, "OUTLINE") });
+export const commentCard = (name: string, text: string): Tree => U("DSItem", { pageLevel: "WIDGET", title: name, description: text, media: { mtype: "AVATAR", title: name }, facts: ["2 days ago"], endNode: btn("Reply", undefined, "GHOST") });
+
+function thread(b: Brief, kind: "QUESTIONS" | "COMMENTS"): Tree {
+  const cards = kind === "QUESTIONS" ? b.qa.slice(0, 3).map(([q, a], i) => questionCard(q, a, 12 - i * 4)) : b.quotes.map((q) => commentCard(q[1], q[0]));
+  return sec([feat({ title: kind === "QUESTIONS" ? "Questions and answers" : "Comments", description: kind === "QUESTIONS" ? "Asked by readers, and answered." : "What readers wrote under it." }), U("DSList", { divided: true }, cards.map((c) => U("DSList.Item", { content: c }))), btn(kind === "QUESTIONS" ? "Ask a question" : "Write a comment", undefined, "OUTLINE")], "MD");
+}
+
+function confirmation(b: Brief): Tree {
+  return sec([feat({ textAlign: "CENTER", title: "Your order is placed", description: "We sent the receipt to dana@northwind.example.", items: lines([["c1", "We tell the seller", "The seller starts on it today."], ["c2", "You get it by email", "Instantly, to your organization's account."], ["c3", "You can see it any time", "Under Orders, in your account."]].map(([k, t, d]) => ({ key: k, title: t, description: d })), true), actions: [act("orders", "See your orders", "#orders", true), act("more", "Keep browsing", "#more")] })], "MD");
+}
+
+const author = (b: Brief): Tree => sec([feat({ title: "Written by", description: "The person who wrote this page, and what they work on." }), grid([personCard(b.people[0][0], b.people[0][1])], 4, 3, 2)], "MD");
+
 /** The recipe of a kind and case for a site brief, or null where the language holds none. */
 export function siteContainer(kind: string, caseCode: string, b: Brief): Tree | null {
   const c = caseCode;
   switch (kind) {
-    case "HERO": return hero(b, c);
-    case "STATEMENT": return statement(b, c);
-    case "POINTS": return points(b, c);
-    case "STEPS": return steps(b, c);
-    case "SHOW_IT": return showIt(b, c);
-    case "REAL_SAMPLE": return realSample(b, c);
-    case "CHOOSE_TO_SEE": return choose(b, c);
-    case "DOORS": return doorsKind(b, c);
-    case "FEATURE_GRID": return featureGridKind(b, c);
-    case "NUMBERS": return numbers(b, c);
-    case "QUESTIONS": return questions(b, c);
-    case "CLOSING_CALL": return closing(b, c);
-    case "FOOTER": return footer(b, c);
-    case "HIGHLIGHT": return highlight(b, c);
-    case "READING_COLUMN": return c ? reading(b, c) : articleBody(b);
-    case "RECORDS": return records(b, c);
-    case "PLANS": return plans(b);
-    case "COMPARE": return compare(b, c);
-    case "TESTIMONIALS": return testimonials(b, c);
-    case "PEOPLE": return people(b, c);
-    case "ENQUIRY": return enquiry(b, c);
-    case "LOCATIONS": return locations(b, c);
-    case "FIND": return find(b, c);
-    case "DEALS": return deals(b);
-    case "SPECIFICATIONS": return specifications(b);
-    case "OPTIONS": return options(b);
-    case "SYLLABUS": return syllabus(b);
-    case "OWNER": return owner(b);
-    case "POLICIES": return policies(b);
-    case "ORDER": return order(b, c);
-    case "CHECKOUT_STEPS": return checkoutSteps(b);
+    case "INTRO_HERO": return hero(b, c);
+    case "ITEM_HERO": return hero(b, "ITEM_HEAD");
+    case "SELLER_HERO": case "BRAND_HERO": return hero(b, "BRAND_HEAD");
+    case "DOC_HERO": case "GUIDE_HERO": case "TOPIC_HERO": case "RELEASE_HERO": return hero(b, "ARTICLE_HEAD");
+    case "INTRO_PROBLEM": case "INTRO_STATEMENT": return statement(b, c);
+    case "EXPLAIN_FEATURES": case "ITEM_HIGHLIGHTS": return points(b, c);
+    case "EXPLAIN_STEPS": return steps(b, c);
+    case "EXPLAIN_SHOWCASE": return c === "SCROLL_THROUGH" ? choose(b, c) : showIt(b, c);
+    case "EXPLAIN_SAMPLE": return realSample(b, c);
+    case "EXPLAIN_DOORS": case "BROWSE_TILES": return doorsKind(b, c);
+    case "EXPLAIN_CATEGORIES": case "ITEM_INCLUDED": return featureGridKind(b, c);
+    case "PROOF_CLAIM": return numbers(b, c);
+    case "COMMON_FAQ": return questions(b, c);
+    case "ACTION_CLOSING": return closing(b, c);
+    case "COMMON_FOOTER": return footer(b, c);
+    case "READ_ARTICLE": return c ? reading(b, c) : articleBody(b);
+    case "READ_AUTHOR": return author(b);
+    case "BROWSE_FEATURED": return records(b, "FEATURED_FIRST");
+    case "BROWSE_SHELF": return records(b, "BY_SHELF");
+    case "BROWSE_RESULTS": return records(b, c);
+    case "PRICE_PLANS": return plans(b);
+    case "PRICE_COMPARE": case "ITEM_COMPARE": return compare(b, c);
+    case "PROOF_LOGOS": case "PROOF_TESTIMONIALS": return testimonials(b, c);
+    case "PROOF_REVIEWS": case "ITEM_REVIEWS": case "SELLER_REVIEWS": return testimonials(b, "REVIEWS");
+    case "ABOUT_TEAM": return people(b, c);
+    case "ABOUT_LOCATIONS": return locations(b, c);
+    case "ITEM_LOCATION": return locations(b, "MAP");
+    case "ACTION_CONTACT": return enquiry(b, c);
+    case "BROWSE_SEARCH": return find(b, c);
+    case "BROWSE_PROMO": return deals(b);
+    case "ITEM_FACTS": return specifications(b);
+    case "ITEM_VARIANTS": return options(b);
+    case "ITEM_OUTLINE": return syllabus(b);
+    case "ITEM_SELLER": return owner(b);
+    case "ITEM_POLICIES": case "SELLER_POLICIES": return policies(b);
+    case "ACTION_CART": return order(b, "CART");
+    case "ACTION_SUMMARY": return order(b, "REVIEW");
+    case "ACTION_CHECKOUT": return checkoutSteps(b);
+    case "ACTION_CONFIRMATION": return confirmation(b);
+    case "ITEM_OFFERS": return offers(b);
+    case "ITEM_BUNDLE": return bundle(b);
+    case "ITEM_DESCRIPTION": return description(b);
+    case "ITEM_NOTES": return notes(b);
+    case "SELLER_ABOUT": return aboutOf("Kite Studio", "A two-person studio in Pune that builds audit and reporting add-ons, verified since March 2025.");
+    case "BRAND_ABOUT": return aboutOf("Lumen", "The brand behind the listings on this page, with its own range and its own words about it.");
+    case "ITEM_QUESTIONS": case "TOPIC_QUESTIONS": return thread(b, "QUESTIONS");
+    case "ITEM_COMMENTS": case "DOC_COMMENTS": case "GUIDE_COMMENTS": case "TOPIC_COMMENTS": return thread(b, "COMMENTS");
     default: return null;
   }
 }
-export { DOORS_SURFACE, GRID };
+export { DOORS_SURFACE, GRID, highlight, field, input, form, recordCard };

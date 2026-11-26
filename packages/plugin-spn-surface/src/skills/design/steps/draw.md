@@ -7,11 +7,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/05-standards-names/",
-      "seen": "93508da5"
+      "seen": "ca230e58"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-containers/",
-      "seen": "e87bd9db"
+      "seen": "fc758fe6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-layouts/",
@@ -31,7 +31,7 @@ Its provenance is the foundation book's design library, names, and layout and co
 - **Say what you are about to change**: the file, and the items. Stay inside them, and show the result when you have written.
 - **A page is composed from the published library, in a file that is not a library file.** Never write a page into a library file. A case the showcase shows is placed as instances of its unit and never drawn as a new look.
 - **The library holds the core units, which are the ones the book names, and no other unit** (`RULE.SUPPORT.SURFACE.082` · MUST · skill:spn-surface/design). It draws no component for a unit that a stack provides on its own, and nothing of a pattern: no task pattern, no app page kind, no skeleton and no sample page (`RULE.SUPPORT.SURFACE.099` · MUST · skill:spn-surface/design). So an app page kind is drawn as its units, and never as one instance.
-- **A suffix names where a unit is placed: `App`, `Layout`, `Page`, `Container` or `Widget`** (`RULE.SUPPORT.SURFACE.229` · MUST · skill:spn-surface/design). A component takes no such word, a composite is a component, and no block carries a letter for its layer before its name. The core composites are `DSDataTable`, `DSFilterBar`, `DSComparison` and `DSFeature`, and the core widget is `DSCardWidget`. A page of groups and their items has no core unit that places its two parts, so draw the two containers themselves; `DSListDetail` is the web stack's own unit and has no drawing.
+- **A suffix names where a unit is placed: `App`, `Layout`, `Page`, `Container` or `Widget`** (`RULE.SUPPORT.SURFACE.229` · MUST · skill:spn-surface/design). A component takes no such word, a composite is a component, and no block carries a letter for its layer before its name. The core composites are `DSDataTable`, `DSFilterBar`, `DSComparison` and `DSFeature`, and the core widget is `DSCardWidget`. A `RECORD_HOME` page with its `GROUPS` case has no core unit that places its two parts, so draw the two containers themselves; `DSListDetail` is the web stack's own unit and has no drawing.
 - **Never ask the developer to draw, rebind, remove or confirm anything in Figma.** A developer's hands are two: saving a named version before the connector's first change in a library file, and publishing a file. Nothing else is asked. When the library lacks something, the connector changes the library, as `refs/support/surface/delivery-library.md` states under "A developer's hands are two, and you change the library through the connector". Before a connector write, read its heading "The connector's facts". Name the developer's next step.
 
 ## Before you draw

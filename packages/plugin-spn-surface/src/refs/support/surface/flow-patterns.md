@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-standards-patterns/01-common/02-flow-patterns.md",
-      "seen": "ca966085"
+      "seen": "3edd0389"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-standards-patterns/02-web/02-flow-patterns.md",
-      "seen": "e6eed69c"
+      "seen": "6e4788da"
     }
   ]
 }
@@ -67,15 +67,15 @@ Fourteen flow patterns are named (`RULE.SUPPORT.SURFACE.360` · MUST · skill:sp
 | Part | The flow states |
 | --- | --- |
 | Outcome | A visitor goes from the site's home to the topic that answers them, and goes back up or across without being lost. A site holds three levels by default, a home, a group and a topic, and one group may hold many topics |
-| Steps | Home, level 1: its Doors, case *Child section with parts*, one section for each group, name the group's claim, its parts as door rows, one onward action and a picture; a short group of three or so is a grid of door cards (*Door cards*) → a group's home, Group home, level 2: its doors, case *Child section with points*, one section for each topic, tell the topic's claim with two or three of its own points read, one onward action and a picture → a topic, the last level: it ends on *Next topic*, one action to the topic most often read next, and the closing call. Where a group's topics are many, its doors fall into named sets (*In named sets*) and the top bar's menu for the group lists the same sets |
+| Steps | `MAIN_HOME`, level 1: its Doors, case *Child section with parts*, one section for each group, name the group's claim, its parts as door rows, one onward action and a picture; a short group of three or so is a grid of door cards (*Door cards*) → a group's home, `MAIN_GROUP`, level 2: its doors, case *Child section with points*, one section for each topic, tell the topic's claim with two or three of its own points read, one onward action and a picture → a topic, `MAIN_TOPIC`, the last level: it ends on *Next topic*, one action to the topic most often read next, and the closing call. Where a group's topics are many, its doors fall into named sets (*In named sets*) and the top bar's menu for the group lists the same sets |
 | Across and back up | The top bar stands on every page: each group is a menu that lists its topics, and the group the reader is under is marked selected, so a reader on a topic sees which group they are in and reaches any sibling or other group in one press (Footer repeats the same groups in columns). A group's home is one press up from any of its topics, through the bar's menu header. A topic's *Next topic* goes across to a sibling. Where a topic's page is long, the topic's own sections carry an id and the menu or a link reaches them by anchor. **A help centre always draws `DSBreadcrumb` under the bar, one link for each level above the page and the page itself unlinked, and so does any site whose bar does not list its groups or that runs deeper than three levels** (`RULE.SUPPORT.SURFACE.598` · MUST · skill:spn-surface/design). A reader of such a site arrives deep, from a search, and the breadcrumb is the only thing on the page that says where it stands. saasplane.ai draws none today, since its bar lists its groups and three levels fit it |
-| A group that is one page | Where a group's parts are short and read in one go, the group is one page (case *One page* of Group home): its parts are its own sections, each with an id, and the bar's menu links to them by anchor. It holds no doors to child pages. AI-native does this with its two parts. A group is one page when its parts are short and read together; it holds child pages when each part needs a page's room |
-| A group inside a group | Never by default. A group sits inside a group, level 3 with topics at level 4, only when its topics are too many for one page and one menu even in named sets, and they fall into parts each worth a page of its own. A subgroup is then a Group home of its own, and the flow gains one step of the same kind |
-| On a marketplace | Home, its search and its categories as door tiles → a Category, level 2 or deeper, from the categories menu in the bar → its smaller categories, then a narrowed Listing or a record's Detail. The bar holds the search and the categories menu on every page, and the breadcrumb stands under it, so a Seeker who arrives deep from a search engine sees where the page stands. Finding a record among many and choosing it is Find one and choose it |
-| On a help centre | Home, its Find first, with the most asked topics under it → a group's home, Group home: its smaller groups as shelves (Records, case *By shelf*), each a few topics and *View all N*, then its own topics, paged; a group home may sit under another → a Topic, one help answer: the breadcrumb, its title and when it was updated, which plans it applies to, the answer, *Was this useful?*, the related topics, and *Still need help?*. On group and topic pages the top nav takes its side list: the group's topics at the start side and *On this page* at the end side, folding into a menu under the bar on a phone. A search from any page opens Search, a paged list of results |
-| A landing page | A Landing page sits off the tree, at level OUTSIDE: it is entered from a campaign, an advert or an email, never from the bar, and it names no group. It ends on its own ask in one place, so it has no doors to the tree and no *Next topic*. A reader who wants the site goes to the home through the brand mark in the bar |
+| A group that is one page | Where a group's parts are short and read in one go, the group is one page (case `ONE_PAGE` of `MAIN_GROUP`): its parts are its own sections, each with an id, and the bar's menu links to them by anchor. It holds no doors to child pages. AI-native does this with its two parts. A group is one page when its parts are short and read together; it holds child pages when each part needs a page's room |
+| A group inside a group | Never by default. A group sits inside a group, level 3 with topics at level 4, only when its topics are too many for one page and one menu even in named sets, and they fall into parts each worth a page of its own. A subgroup is then a `MAIN_GROUP` of its own, and the flow gains one step of the same kind |
+| On a marketplace | `MARKET_HOME`, its search and its categories as door tiles → a `MARKET_CATEGORY`, level 2 or deeper, from the categories menu in the bar → its smaller categories, then a category narrowed by its filters or an item's page, `MARKET_ITEM`. The bar holds the search and the categories menu on every page, and the breadcrumb stands under it, so a Seeker who arrives deep from a search engine sees where the page stands. Finding a record among many and choosing it is Find one and choose it |
+| On a help centre | `RESOURCES_HOME` or, for a help centre alone, `HELP_HOME`: its search band first (`INTRO_HERO`), with the most asked topics under it → a category, `HELP_CATEGORY`: its smaller categories, each a `CARD_LIST`, and what is in this section; a category may sit under another → a topic, `HELP_TOPIC`, one help answer: the breadcrumb, its title and when it was updated, the answer, *Was this useful?*, the related topics, and *Still need help?*. On category and topic pages the top nav takes its side list: the category's topics at the start side and `CONTENT_OUTLINE` at the end side, folding into a menu under the bar on a phone. A search from any page opens `HELP_SEARCH`, a paged list of results |
+| A landing page | A `MAIN_LANDING` page sits off the tree, at level OUTSIDE: it is entered from a campaign, an advert or an email, never from the bar, and it names no group. It ends on its own ask in one place, so it has no doors to the tree and no *Next topic*. A reader who wants the site goes to the home through the brand mark in the bar |
 | Starts | Any level of a MARKETING, MARKETPLACE or RESOURCES site, from a link or a search; the home from the address; a landing page from its campaign |
-| Ends | The topic that answers the reader, and the closing call or the demo that follows it. A reader who is lost ends at Not found, which says so and leads back to the home or to a person (*Way back*) |
+| Ends | The topic that answers the reader, and the closing call or the demo that follows it. A reader who is lost ends at `COMMON_NOT_FOUND`, which says so and leads back to the home or to a person (*Way back*) |
 | Task states | A site's page draws none of its own. A door to another site leaves it in its own tab and ends on the leaving arrow, never the inside arrow. An arrow stands only on a door, a boxed card or a lined row, never on a bare line of words |
 
 ### Find one and choose it
@@ -85,12 +85,12 @@ Fourteen flow patterns are named (`RULE.SUPPORT.SURFACE.360` · MUST · skill:sp
 | Part | The flow states |
 | --- | --- |
 | Outcome | A Seeker finds the record that fits among many and takes its one action: buys, books, enrols, applies, connects or asks for the price |
-| Steps | Home: its Find, one field or the fields a domain searches by, and the categories as door tiles → a Category, level 2 or deeper, a Brand, or Search for a typed query → a narrowed Listing: the records narrowed by filters, four or fewer in a bar above them and more as facets, the filters chosen kept in the page's address → a record's page, Detail, in the case of what the Seeker does with the record → where the Seeker weighs a few, Compare: two to four records picked from their cards, waiting in the compare tray at the foot of the page until it opens → the record's one action on its Detail page, or, on a site that sells, Buy one |
-| Across and back up | The bar holds the search and the categories menu on every page, and the breadcrumb stands under it, one link for each level above the page. Back from a Detail returns to the narrowed listing at the same filters, the same page of records and the same place in the list. Where records are scanned fast, such as jobs, the chosen record opens in a pane beside the list from 1024 up, and the list keeps its place |
-| Starts | Home from the address; a Category, a Brand or a narrowed Listing from a link someone shared or from a search engine, because the filters chosen are the address; a Detail from a link |
+| Steps | `MARKET_HOME`: its Find, one field or the fields a domain searches by, and the categories as door tiles → a `MARKET_CATEGORY`, level 2 or deeper, a `MARKET_BRAND`, a `MARKET_SELLER`, or `MARKET_SEARCH` for a typed query → the results, ending each of them: the records narrowed by filters, four or fewer in a bar above them and more as facets, the filters chosen kept in the page's address → an item's page, `MARKET_ITEM`, where the action panel's one button is named for what the Seeker does with the item → where the Seeker weighs a few, `MARKET_COMPARE`: two to four records picked from their cards, waiting in the compare tray at the foot of the page until it opens → the record's one action on its item page, or, on a site that sells, Buy one |
+| Across and back up | The bar holds the search and the categories menu on every page, and the breadcrumb stands under it, one link for each level above the page. Back from an item page returns to the narrowed results at the same filters, the same page of records and the same place in the list. Where records are scanned fast, such as jobs, the chosen record opens in a pane beside the list from 1024 up, and the list keeps its place |
+| Starts | `MARKET_HOME` from the address; a `MARKET_CATEGORY`, a `MARKET_BRAND` or a `MARKET_SELLER` from a link someone shared or from a search engine, because the filters chosen are the address; a `MARKET_ITEM` from a link |
 | Ends | The record's action done: an order, a booking, an enrolment, an application, an interest or an enquiry sent, said once by the page it lands on |
-| Task states | A narrowed listing shows its cards in its own shape while they read. Filters that leave nothing say so, name the filters, and offer to clear them (empty). A failure keeps the filters and offers Try again. A record no longer offered says so on its page and leads to similar records. Compare opens only once two records are picked, and the tray says how many more it takes |
-| Second content | *Clear filters*, on a narrowed listing; the shelf of similar records, on a Detail |
+| Task states | A category narrowed by filters shows its cards in their own shape while they read. Filters that leave nothing say so, name the filters, and offer to clear them (empty). A failure keeps the filters and offers Try again. A record no longer offered says so on its page and leads to similar records. Compare opens only once two records are picked, and the tray says how many more it takes |
+| Second content | *Clear filters*, on a narrowed category; the shelf of similar records, on a `MARKET_ITEM` |
 
 ### Keep one for later
 
@@ -99,11 +99,11 @@ Fourteen flow patterns are named (`RULE.SUPPORT.SURFACE.360` · MUST · skill:sp
 | Part | The flow states |
 | --- | --- |
 | Outcome | A Seeker keeps a record with one press and finds it again later, on this device or in their account |
-| Steps | A record's card on a narrowed Listing, or its page, Detail: one press keeps it, and the press is marked kept (Act) → Saved, from the bar: the records kept, newest first → back to a record's Detail page |
-| Starts | Any record's card or page; Saved from the bar |
-| Ends | A record's page, opened from Saved, or Saved with the record taken off |
-| Task states | Keeping shows on the press at once, and a failure turns the press back and says so in a toast. Saved shows its cards in their own shape while it reads, and an empty Saved says nothing is kept yet and leads to the records (empty). A record no longer offered stays on the list, marked as gone, until the Seeker takes it off. When the Seeker signs in, what was kept on the device joins the account's list, said once |
-| Second content | *Sign in to keep them on every device*, on Saved where the Seeker is not signed in; it is never asked before keeping |
+| Steps | An item's card on a category's results, or its page, `MARKET_ITEM`: one press keeps it, and the press is marked kept (Act) → the saved list, from the bar, which is PORTAL's: the records kept, newest first → back to an item's page |
+| Starts | Any record's card or page; the saved list from the bar |
+| Ends | A record's page, opened from the saved list, or the saved list with the record taken off |
+| Task states | Keeping shows on the press at once, and a failure turns the press back and says so in a toast. The saved list shows its cards in their own shape while it reads, and an empty one says nothing is kept yet and leads to the records (empty). A record no longer offered stays on the list, marked as gone, until the Seeker takes it off. When the Seeker signs in, what was kept on the device joins the account's list, said once |
+| Second content | *Sign in to keep them on every device*, on the saved list where the Seeker is not signed in; it is never asked before keeping |
 
 ### Buy one
 
@@ -112,9 +112,9 @@ Fourteen flow patterns are named (`RULE.SUPPORT.SURFACE.360` · MUST · skill:sp
 | Part | The flow states |
 | --- | --- |
 | Outcome | A Seeker buys the records they chose, knows the order is placed, and knows where to follow it |
-| Steps | A record's Detail, case *Buy*: *Add to cart* in its action panel → Cart: how many of each, what each costs and the total, then one way to checkout → Checkout, one step at a time, with `DSStepper` showing where the Seeker stands: who you are, signing in or going on as a guest with an email, and never forced to sign in → where it goes, the address and the way it comes → how you pay, in the payment provider's own fields → is it all right, the order read back, and one action, *Place order* → Order placed: the order read back, what happens next, and one action that opens the order in PORTAL after sign-in |
-| Starts | A Detail's *Add to cart*; the cart in the bar |
-| Ends | Order placed, said once. Following the order, its tracking and its returns are PORTAL's, in the app page kinds. A guest is offered an account there, and never made to take one |
+| Steps | An item's page, `MARKET_ITEM`: *Add to cart* in its action panel → `MARKET_CART`: how many of each, what each costs and the total, then one way to checkout → `MARKET_CHECKOUT`, one step at a time, with `DSStepper` showing where the Seeker stands: who you are, signing in or going on as a guest with an email, and never forced to sign in → where it goes, the address and the way it comes → how you pay, in the payment provider's own fields → is it all right, the order read back, and one action, *Place order* → `MARKET_CONFIRMATION`, the page after any act: the order read back, what happens next, and one action that opens the order in PORTAL after sign-in |
+| Starts | An item page's *Add to cart*; the cart in the bar |
+| Ends | The order placed, said once on `MARKET_CONFIRMATION`. Following the order, its tracking and its returns are PORTAL's, in the app page kinds. A guest is offered an account there, and never made to take one |
 | Task states | Adding shows on the button and on the cart's count in the bar. An empty cart says so and leads back to the records (empty). A record that ran out between the cart and the checkout is marked in the cart, and the total is read again. Each step keeps what was entered when the Seeker goes back. A payment that fails is an alert in the step of paying, with the order kept and nothing charged twice. *Place order* shows its own working state and takes one press |
 | Second content | *Continue shopping*, on the cart; *Back to cart*, on every step of the checkout |
 
@@ -125,7 +125,7 @@ Fourteen flow patterns are named (`RULE.SUPPORT.SURFACE.360` · MUST · skill:sp
 | Part | The flow states |
 | --- | --- |
 | Outcome | A visitor on a site reaches the sign-up or the sign-in of the app the site is about, or a person to talk to, and never a dead end |
-| Steps | A site's page, by the container kinds → its doors: *Sign in* in the bar (Move), and the call to sign up as the page's one `SOLID` primary, in the Hero and the Closing call → where the platform offers more than one way to join, a page to choose what to join as, by Doors, each door saying whether it is open → the app's own Sign up or Sign in |
+| Steps | A site's page, by the container kinds → its doors: *Sign in* in the bar (Move), and the call to sign up as the page's one `SOLID` primary, in the Hero and the `ACTION_CLOSING` → where the platform offers more than one way to join, a page to choose what to join as, by Doors, each door saying whether it is open → the app's own Sign up or Sign in |
 | Starts | Any page of a MARKETING, MARKETPLACE or RESOURCES site, from a link or a search |
 | Ends | The sign-up or the sign-in of the app the site is about. A site over several apps ends at the sign-in's front door, which ends at the workspace the person chooses. A site with no app ends on its own call: a demo, the docs, or a contact page |
 | Task states | A site's page draws none of its own. A page that reads whether each door is open shows its shape while it reads, and a failure with Try again |
@@ -191,7 +191,7 @@ Sending an invitation is no flow of its own: it is an entry over the list of inv
 | Part | The flow states |
 | --- | --- |
 | Outcome | A new member's empty place shows them the first thing to do, and they do it |
-| Steps | The Home, An overview: the welcome, once, and while the place holds nothing, one card that names the first step with its action, in place of a row of counts → the first step's entry, An entry over the page, such as *Invite members* as a sheet over the list of invitations → that list, by Find in a list, with the first record in it and a message. Every list opened for the first time draws its empty state, with the action that makes its first record |
+| Steps | The Home, `HOME_APP`: the welcome, once, and while the place holds nothing, one card that names the first step with its action, in place of a row of counts → the first step's entry, `RECORD_ENTRY`, such as *Invite members* as a sheet over the list of invitations → that list, by `RECORD_HOME`, with the first record in it and a message. Every list opened for the first time draws its empty state, with the action that makes its first record |
 | Starts | The end of Sign up or Accept an invitation |
 | Ends | The first record made, on its list |
 | Task states | Each count of the overview loads and fails by itself, with Try again. Each list's empty state. A count the person may not see is not drawn |
@@ -204,19 +204,19 @@ Sending an invitation is no flow of its own: it is an entry over the list of inv
 | Part | The flow states |
 | --- | --- |
 | Outcome | A person reads a record found in a list, and returns to the list where they left it |
-| Steps | Find in a list → the record: its own page, by A record and its setup, A record and what belongs to it or A record and its steps, or its look beside the list, a drawer at a desktop and a screen of its own on a phone → back to the list, with its search, its filters and its page kept |
+| Steps | `RECORD_HOME` → the record: its own page, by `RECORD_VIEW`, or its look beside the list, a drawer at a desktop and a screen of its own on a phone → back to the list, with its search, its filters and its page kept |
 | Starts | A row of a list; a link to a record |
 | Ends | The record, then the list as it was |
 | Task states | The record draws Read's states in its own place: its shape while it loads, not found, a failure with Try again, and a refusal. A spinner that never ends is a finding |
 
 ### Make or change one
 
-**For** Team · Individual. For a Team, a medium entry in a sheet, with the page beside it; for an Individual, only a small entry over the page, and a medium one is an entry that is a page in steps, with `DSStepper`.
+**For** Team · Individual. For a Team, a medium entry in a sheet, with the page beside it; for an Individual, only a small entry over the page, and a medium one is `RECORD_ENTRY` as a page in steps, with `DSStepper`.
 
 | Part | The flow states |
 | --- | --- |
 | Outcome | A record is made or changed, and the person is back where they started, told that it worked |
-| Steps | A list or a record → the entry, opened by its size, as step 4 says: An entry over the page for a small or a medium form, An entry that is a page for a large one → on save, a new record with a page of its own opens that page, one made in a sheet over a list returns to the list, and a change returns to where it was opened from, which the entry is given when it opens |
+| Steps | A list or a record → the entry, opened by its size, as step 4 says: `RECORD_ENTRY` for a small or a medium form, `RECORD_ENTRY` as a page for a large one → on save, a new record with a page of its own opens that page, one made in a sheet over a list returns to the list, and a change returns to where it was opened from, which the entry is given when it opens |
 | Starts | A list's main action, an empty state's action, *Edit* on a record, or an action on another page that names where to return |
 | Ends | As the steps say, with a message (Hear back) |
 | Task states | Enter's states: a refused field says why beside it, and a failed save is an alert in the entry that keeps everything typed, never a toast alone. An entry that changes a record shows its shape while the record is read |
@@ -228,7 +228,7 @@ Sending an invitation is no flow of its own: it is an entry over the list of inv
 | Part | The flow states |
 | --- | --- |
 | Outcome | A way of signing in, such as a second step, a passkey, a provider or a company's directory, is set up and shown to work before anyone relies on it |
-| Steps | The setup page, A record and its setup or Set up by kind → its entry, An entry over the page, or An entry that is a page for a directory's many settings → in the entry, a proof: a code from the new method, or for a provider or a directory a test sign-in in a window that signs nobody in → in the entry, a secret shown once, such as recovery codes, with one action that says it was kept, *Finish* → the setup page, the method marked on, and a message |
+| Steps | The setup page, `RECORD_VIEW` or `RECORD_HOME` → its entry, `RECORD_ENTRY`, or `RECORD_ENTRY` as a page for a directory's many settings → in the entry, a proof: a code from the new method, or for a provider or a directory a test sign-in in a window that signs nobody in → in the entry, a secret shown once, such as recovery codes, with one action that says it was kept, *Finish* → the setup page, the method marked on, and a message |
 | Starts | The setup page's *Add*; a sign-in that demands a second step, where every step stands in the sign-in's panel |
 | Ends | The setup page; from a sign-in, where the sign-in ends |
 | Task states | A failed proof says what to fix. A method set up and not proved stays on its list marked unverified, with *Verify* |
@@ -258,7 +258,7 @@ Each rule below is one the task patterns or app page kinds already state for one
 
 ## On the web: Back, a reload, a link and a closed tab — 🔮
 
-In a browser a person can leave any page of a flow by the browser's Back, reload it, send it as a link, or close its tab. An entry over the page is an address (`standards-patterns.md`, *On the web*), and a flow takes that rule as it is.
+In a browser a person can leave any page of a flow by the browser's Back, reload it, send it as a link, or close its tab. A `RECORD_ENTRY` is an address (`standards-patterns.md`, *On the web*), and a flow takes that rule as it is.
 
 - **A step that holds a proof from the server MUST be the page's state, kept in its tab across a reload and cleared when a new trip starts** (`RULE.SUPPORT.SURFACE.362` · MUST · skill:spn-surface/design). A code sent to a person is such a proof. A step before any proof falls back to the flow's first step, with what was typed kept and never a password. Every other step is an address.
 - **The browser's Back MUST leave a flow's page, and a step's own way back MUST move inside it** (`RULE.SUPPORT.SURFACE.362` · MUST · skill:spn-surface/design). The way back inside the panel gives a person the step before, and the browser's Back still does what it does on every other page.

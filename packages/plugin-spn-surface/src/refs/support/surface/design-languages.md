@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
-      "seen": "8f63789d"
+      "seen": "180df091"
     }
   ]
 }
@@ -52,7 +52,7 @@ A design language is described for each surface category it states, in the same 
 The groups and parts are the language's outline and the outline of its samples. A part or a category the language does not use says so in one line, and is never left out.
 
 - **A language is described for each surface category it states, in the same eight parts, in the groups Structure and Style, beside one Shared group.** An agent finds a choice at the same heading in every language, a partner's included. A category is described under `categories`, in one decision for each part, in the spec format of the blank template a partner starts from.
-- **A language works on each part's kinds with three verbs: pick, customise and add.** Customising never changes a kind's meaning, an added kind or case is built from units and never reuses a code or changes the kind's reason, and the floor is never customised: the standard pages, and the task and flow patterns. A language gives a page kind another case with a customised `order`, and adds a case to a catalogue kind with `{ "to": …, "case": … }`. The spec mirrors the catalogue key for key, so a script can check a spec against the catalogue.
+- **A language works on each part's kinds with three verbs: pick, customise and add.** Customising never changes a kind's meaning, an added kind or case is built from units and never reuses a code or changes the kind's reason, and the floor is never customised: the standard pages, and the task and flow patterns. A language gives a page kind another case with a customised `order`, and adds a case to a catalogue kind with `{ "to": …, "case": … }`. A `pick` is `ALL`, a list of `KIND` and `KIND.CASE` codes, or an object of kinds each with a list of cases or `ALL`, and `customise` and `notUsed` may name a `KIND.CASE`. A kind named with no case takes the cases the language it extends picked. The spec mirrors the catalogue key for key, so a script can check a spec against the catalogue.
 - **A child language states only what it sets differently.** It names its parent, `extends: surface@1`, and keys what it sets by surface category. Every part it does not state is INHERITED, and a parent never lists its children.
 - **Each part carries a fixed id and its source.** The id, such as `categories.MARKETING.THEME`, stays when a heading's words change, so a tool or an agent finds the part by its id. The source, OWN, INHERITED or NONE, says whether the language set the choice, took it from its parent or the design system, or uses none, so a blank is never read as a decision.
 - **One language covers every surface category of the platform, and it depends on no app and names none.** An app keeps its own typed theme setting, which names the language and the version it was written from, and its platform, Web or Native, is a separate axis, so a native app is one more setting written from the same language under the same brand.
@@ -135,7 +135,7 @@ A design language is kept as the platform's construct, and each app's capability
 - **An agent reads the platform's design language construct and the app's capability chapter before it draws a page or a picture** (`RULE.SUPPORT.SURFACE.525` · MUST · skill:spn-surface/design). It reads the language's page, which draws the whole spec, and the app's chapter, because the page holds the brand and each surface category's decisions and the chapter holds how the app fills them.
 - **Intake records what the partner shares**: each reference by address and date, each brand file, and each media kind.
 - **Each round shows options on real pages**, the running app or its worktree in the partner's brand values, and records its pick.
-- **A language records each media kind it uses**: line drawings, illustration, product views (drawn or captured), photography, icons and marks, data and numbers, motion and video, 3D. For each, where it comes from (made, supplied, licensed, captured), its treatment, the tokens it reads, where it goes, its tablet and phone forms, its files, and its rights and alt text.
+- **A language records each media kind it uses**: line drawings (`ART_DRAWING`), illustration, product views (`VIEW_PRODUCT`, drawn or captured), photography, icons and marks (`ICON_MARK`), data and numbers (`DATA_CHART`), motion and video (`MOTION_VIDEO`), 3D. For each, where it comes from (made, supplied, licensed, captured), its treatment, the tokens it reads, where it goes, its tablet and phone forms, its files, and its rights and alt text.
 - **Each platform keeps one brand, and each of its apps keeps its own design language.** An app changes only its looks over the brand, and an account's own branding comes last, at run time. The order: the design system's defaults, the platform's brand, the looks of the page's surface category, the account's branding.
 
 ## The media kinds, by the scale — 🔮
