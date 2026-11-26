@@ -6131,7 +6131,7 @@
       "level": "2 OR DEEPER",
       "pageGroup": "FIND",
       "records": "RECORDS FILTERED",
-      "facets": "DSPageFrameAside with asidePlacement START and asideWidth NARROW: the facets (DSFacetGroup) in the aside at the start, the records in the main part; four filters or fewer stand in a bar above the records instead and the page needs no frame (Q82 A)"
+      "facets": "DSPageFrameAside with asidePlacement START and asideWidth NARROW: the facets (DSFilterFacets) in the aside at the start, the records in the main part; four filters or fewer stand in a bar above the records instead and the page needs no frame (Q82 A)"
      },
      "style": {
       "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
@@ -6282,7 +6282,7 @@
      "placement": {
       "level": 2,
       "pageGroup": "FIND",
-      "facets": "DSPageFrameAside with asidePlacement START and asideWidth NARROW: the facets (DSFacetGroup) in the aside at the start, the records in the main part; four filters or fewer stand in a bar above the records instead and the page needs no frame (Q82 A)"
+      "facets": "DSPageFrameAside with asidePlacement START and asideWidth NARROW: the facets (DSFilterFacets) in the aside at the start, the records in the main part; four filters or fewer stand in a bar above the records instead and the page needs no frame (Q82 A)"
      },
      "style": {
       "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
@@ -6384,7 +6384,7 @@
      "placement": {
       "level": 2,
       "pageGroup": "FIND",
-      "facets": "DSPageFrameAside with asidePlacement START and asideWidth NARROW: the facets (DSFacetGroup) in the aside at the start, the records in the main part; four filters or fewer stand in a bar above the records instead and the page needs no frame (Q82 A)"
+      "facets": "DSPageFrameAside with asidePlacement START and asideWidth NARROW: the facets (DSFilterFacets) in the aside at the start, the records in the main part; four filters or fewer stand in a bar above the records instead and the page needs no frame (Q82 A)"
      },
      "style": {
       "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
