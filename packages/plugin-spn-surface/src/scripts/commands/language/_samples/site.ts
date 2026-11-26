@@ -25,7 +25,9 @@ const featureGrid = (heading: Tree, children: Tree[], desktop = 3, tablet = 2, m
 // ---- the hero
 /** The page kind being drawn, so a hero says what its own page says; empty where a container is drawn alone. */
 let pageNow = "";
-export const setPage = (code: string): void => { pageNow = code; };
+// a page that orders a shelf twice draws two different shelves, one for each turn, never the same pair twice
+let shelfTurn = 0;
+export const setPage = (code: string): void => { pageNow = code; shelfTurn = 0; };
 
 function hero(b: Brief, c: string): Tree {
   const own = b.pageHeroes?.[pageNow];
@@ -170,7 +172,11 @@ function records(b: Brief, c: string): Tree {
   const gridOf = (list: Array<[string, string, string]>, d = 3): Tree => grid(list.map((r) => recordCard(r)), d, 2, 1);
   switch (c) {
     case "FEATURED_FIRST": return sec([head, grid(b.records.slice(0, 2).map((r) => recordCard(r)), 2, 2, 1), gridOf(b.records.slice(2, 5)), paging()], "MD");
-    case "BY_SHELF": return sec([feat({ title: b.heads?.shelves?.[0] ?? "Most read this month", actions: [act("all", "See all", "#all")] }), gridOf(b.records.slice(0, 3)), feat({ title: b.heads?.shelves?.[1] ?? "Newly added this week", actions: [act("all2", "See all", "#all")] }), gridOf(b.records.slice(3, 6))], "MD");
+    case "BY_SHELF": {
+      const turn = shelfTurn++ % 2;
+      const title = turn === 0 ? (b.heads?.shelves?.[0] ?? "Most read this month") : (b.heads?.shelves?.[1] ?? "Newly added this week");
+      return sec([feat({ title, actions: [act(`all${turn}`, "See all", "#all")] }), gridOf(b.records.slice(turn * 3, turn * 3 + 3))], "MD");
+    }
     case "FILTERED": {
       const f = [{ mtype: "TEXT", key: "q", label: "Search", placeholder: "Search 48 listings", primary: true, valueLink: vl("") }, ...[["topic", "Topic", ["Roles", "Sign-in", "Sites", "Billing"]], ["level", "Level", ["Beginner", "Intermediate", "Advanced"]], ["price", "Price", ["Free", "Paid"]]].map(([k, l, o]) => ({ mtype: "SELECT", key: k, label: l, options: (o as string[]).map((x) => ({ key: x.toLowerCase(), label: x })), valueLink: vl(null) }))];
       return sec([feat({ title: "Find the one for you", description: "Narrow the list by topic, level or price, and sort it the way you like." }), U("DSFilterBar", { fields: f }), gridOf(b.records), paging(48, 9)], "MD");
@@ -191,12 +197,12 @@ function plans(b: Brief): Tree {
 // ---- the comparison: DSComparison reads FIELD rows (its cell is a data field's value) grouped under a head, subjects in columns and each subject's actions
 // in the last row. A tick is a BOOLEAN field worded "✓" and "—"; a number, a limit and a text are TEXT fields, so every cell of a row reads in one voice.
 const textRow = (key: string, label: string, subjects: string[], values: string[]): Tree => ({ mtype: "FIELD", key, config: { mtype: "TEXT", key, label }, values: Object.fromEntries(subjects.map((s, i) => [s, { mtype: "TEXT", value: values[i] }])) });
-const tickRow = (key: string, label: string, subjects: string[], values: string[]): Tree => ({ mtype: "FIELD", key, config: { mtype: "BOOLEAN", key, label, labelTrue: "✓", labelFalse: "—" }, values: Object.fromEntries(subjects.map((s, i) => [s, { mtype: "BOOLEAN", value: values[i] === "yes" }])) });
+const tickRow = (key: string, label: string, subjects: string[], values: string[]): Tree => ({ mtype: "FIELD", key, config: { mtype: "BOOLEAN", key, label, ...(dsAtLeast("11.28.0") ? {} : { labelTrue: "✓", labelFalse: "—" }) }, values: Object.fromEntries(subjects.map((s, i) => [s, { mtype: "BOOLEAN", value: values[i] === "yes" }])) });
 const comparison = (subjects: Tree[], groups: Tree[], extra: Tree = {}): Tree => U("DSComparison", { size: "MD", subjects, groups, ...extra });
 
 function planComparison(b: Brief): Tree {
   const rec = b.plans.findIndex((p) => p.recommended);
-  const subjects = b.plans.map((p, i): Tree => ({ key: p.name.toLowerCase(), title: i === rec ? `${p.name} · Recommended` : p.name, actions: U("DSButton", { label: p.price === 0 ? "Start free" : `Choose ${p.name}`, ...(i === rec ? { color: "PRIMARY", variant: "SOLID" } : { variant: "OUTLINE" }), anchor: { href: "#choose" } }) }));
+  const subjects = b.plans.map((p, i): Tree => ({ key: p.name.toLowerCase(), ...(i === rec ? (dsAtLeast("11.28.0") ? { title: p.name, badge: { mtype: "BADGE", text: "Recommended", color: "PRIMARY" } } : { title: `${p.name} · Recommended` }) : { title: p.name }), actions: U("DSButton", { label: p.price === 0 ? "Start free" : `Choose ${p.name}`, ...(i === rec ? { color: "PRIMARY", variant: "SOLID" } : { variant: "OUTLINE" }), anchor: { href: "#choose" } }) }));
   const keys = subjects.map((s) => s.key as string);
   const price = (p: Brief["plans"][number]): string => (p.price === 0 ? "Free" : `$${p.price} a month`);
   const groups: Tree[] = [{ key: "price", header: { title: "Price" }, rows: [textRow("price", "Billed yearly", keys, b.plans.map(price)), textRow("monthly", "Billed monthly", keys, b.plans.map((p) => (p.price === 0 ? "Free" : `$${Math.round(p.price * 1.2)} a month`)))] }];
@@ -224,9 +230,9 @@ function compare(b: Brief, c: string): Tree {
   // marketplace: the listings a reader chose, a column each, the differences in rows, each listing's own action under it
   const L = b.listings;
   const keys = L.map((_, i) => `l${i}`);
-  const subjects: Tree[] = L.map((l, i) => ({ key: keys[i], title: l.title, actions: U("DSButton", { label: `Buy for ${l.price}`, ...(i === 0 ? { color: "PRIMARY", variant: "SOLID" } : { variant: "OUTLINE" }), anchor: { href: "#buy" } }) }));
+  const subjects: Tree[] = L.map((l, i) => ({ key: keys[i], title: l.title, ...(dsAtLeast("11.28.0") ? { media: { mtype: "CUSTOM", node: slot(`Cover of ${l.title}`, "4:3") } } : {}), ...(i === 0 && dsAtLeast("11.28.0") ? { badge: { mtype: "BADGE", text: "Best rated", color: "PRIMARY" } } : {}), actions: U("DSButton", { label: `Buy for ${l.price}`, ...(i === 0 ? { color: "PRIMARY", variant: "SOLID" } : { variant: "OUTLINE" }), anchor: { href: "#buy" } }) }));
   const rows = (labels: string[]): Tree[] => labels.map((label, r) => textRow(`f${label}${r}`, label, keys, L.map((l) => l.facts[label])));
-  const groups: Tree[] = [{ key: "buy", header: { title: "The listing" }, rows: [textRow("price", "Price", keys, L.map((l) => l.price)), ...rows(["Seller", "Rating"])] }, { key: "fit", header: { title: "What it needs" }, rows: rows(["Works with", "Version", "Size", "Setup"]) }, { key: "after", header: { title: "After you buy" }, rows: rows(["Updated", "Refund", "Support"]) }];
+  const groups: Tree[] = [{ key: "buy", header: { title: "The listing" }, rows: [textRow("price", "Price", keys, L.map((l) => l.price)), ...rows(["Seller", "Rating"])] }, { key: "fit", header: { title: "What it needs" }, rows: rows(["Works with", "Version", "Size", "Setup"]) }, { key: "after", header: { title: "After you buy" }, rows: rows(["Updated", "Refund", "Support"]) }, { key: "inc", header: { title: "What it includes" }, rows: [tickRow("sso", "Works with single sign-on", keys, ["yes", "yes", "no"]), tickRow("audit", "Writes to the audit history", keys, ["yes", "no", "yes"]), tickRow("source", "Source code included", keys, ["no", "no", "yes"]), tickRow("trial", "Free 14-day trial", keys, ["yes", "yes", "yes"])] }];
   // where the design system draws DSSelectMulti, a reader narrows the listings to the plans they hold
   const plansHeld = dsHas("DSSelectMulti") ? [U("DSSelectMulti", { options: ["Starter", "Team", "Business", "Enterprise"].map((k) => ({ key: k.toLowerCase(), label: k })), placeholder: "Plans you hold", valueLink: vl(["team", "business"]) })] : [];
   return sec([feat({ title: "Compare these listings side by side", description: "Three add-ons side by side, row by row, with what each one costs and needs. Take one off the list or add another, up to four." }), ...plansHeld, comparison(subjects, groups)], "MD");
@@ -279,7 +285,8 @@ function searchBar(b: Brief, c: string, folded = false): Tree | null {
   const what: Tree = { mtype: "TEXT", key: "q", label: "What", placeholder: `Search ${b.org}`, primary: true, valueLink: vl(b.records[0][0]) };
   if (c !== "STRUCTURED") return U("DSSearchBar", { fields: [what], folded, radius: "FULL" });
   const fields: Tree[] = [what, select("price", "Price", ["Any price", "Free", "Under $50", "$50 to $150"], "any price"), { mtype: "DATE_RANGE", key: "when", label: "When", valueLink: vl({ start: null, end: null }) }, { mtype: "COUNT", key: "seats", label: "Seats", options: [{ key: "members", label: "Members", description: "Who will use it" }, { key: "admins", label: "Admins", description: "Who will manage it" }], limits: { members: { min: 1, max: 500 }, admins: { min: 1, max: 20 } }, valueLink: vl({ members: 10, admins: 2 }) }];
-  const scopes = { options: [{ key: "addons", label: "Add-ons", fields: ["q", "price", "seats"] }, { key: "courses", label: "Courses", fields: ["q", "price"] }, { key: "workshops", label: "Workshops", fields: ["q", "when", "seats"] }], valueLink: vl("addons") };
+  const icon = (node: string): Tree => (dsAtLeast("11.28.0") ? { media: { mtype: "ICON", node } } : {});
+  const scopes = { options: [{ key: "addons", label: "Add-ons", fields: ["q", "price", "seats"], ...icon("PLUG") }, { key: "courses", label: "Courses", fields: ["q", "price"], ...icon("FILE") }, { key: "workshops", label: "Workshops", fields: ["q", "when", "seats"], ...icon("CALENDAR") }], valueLink: vl("addons") };
   return U("DSSearchBar", { fields, scopes, folded, radius: "FULL" });
 }
 
@@ -287,8 +294,8 @@ function find(b: Brief, c: string): Tree {
   const head = feat({ title: c === "STRUCTURED" ? "Find the right listing for you" : "What are you looking for?", description: "Type a word, or choose a category, a price and the number of seats, and the list narrows as you go." }, "CONTAINER");
   const popular = col([txt("Popular searches", "TITLE_SM"), { place: "row", gap: "SM", wrap: true, children: (b.heads?.popular ?? b.doors.map((d) => d[1])).map((t) => U("DSButton", { label: t, variant: "OUTLINE", size: "SM", startIcon: "SEARCH", anchor: { href: `#${t.toLowerCase().replace(/ /g, "-")}` } })) }], "SM");
   const bar = searchBar(b, c);
-  const kinds = dsAtLeast("11.28.0") && b.org === "Lumen Market" ? [U("DSTabs", { options: [["addons", "Add-ons", "BLOCKS"], ["courses", "Courses", "FILE"], ["workshops", "Workshops", "USERS"]].map(([key, label, icon]) => ({ key, label, media: { mtype: "ICON", node: icon } })), activeKey: "addons", type: "LINE" })] : [];
-  if (bar) return sec([head, ...kinds, bar, popular], "MD");
+  const kinds = dsAtLeast("11.28.0") && b.org === "Lumen Market" ? [U("DSTabs", { options: [["addons", "Add-ons", "PLUG"], ["courses", "Courses", "FILE"], ["workshops", "Workshops", "CALENDAR"]].map(([key, label, icon]) => ({ key, label, media: { mtype: "ICON", node: icon } })), activeKey: "addons", type: "LINE" })] : [];
+  if (bar) return sec([head, bar, popular], "MD");
   const auto = U("DSAutocomplete", { placeholder: `Search ${b.org}`, options: b.records.map((r) => ({ key: r[0].toLowerCase(), label: r[0] })), valueLink: vl(null) });
   const seats = dsHas("DSInputNumberGroup") ? [U("DSInputNumberGroup", { options: [{ key: "members", label: "Members", description: "Who will use it" }, { key: "admins", label: "Admins", description: "Who will manage it" }], limits: { members: { min: 1, max: 500 }, admins: { min: 1, max: 20 } }, valueLink: vl({ members: 10, admins: 2 }) })] : [];
   if (c === "STRUCTURED") return sec([head, ...kinds, grid([auto, U("DSSelect", { options: ["Add-ons", "Courses", "Workshops"].map((k) => ({ key: k, label: k })), valueLink: vl("Add-ons") }), U("DSSelect", { options: ["Any price", "Free", "Under $50"].map((k) => ({ key: k, label: k })), valueLink: vl("Any price") }), ...seats, btn("Search", "PRIMARY", "SOLID", "SEARCH")], seats.length ? 5 : 4, 2, 1)], "MD");
@@ -337,7 +344,8 @@ function footer(b: Brief, c: string): Tree {
   const list = (title: string, rows: Array<[string, string]>): Tree => U("DSList", { title, size: "SM", flush: true }, rows.map(([t, h]) => U("DSList.Item", { content: l(t, h) })));
   const brand = col([U("DSItem", { pageLevel: "CONTENT", title: b.org, media: { mtype: "ICON", node: "ZAP", color: "PRIMARY" } }), txt(b.promise, "CONTENT_MD", { tone: "MUTED" })], "XS");
   const legalLinks = ["Privacy", "Terms", "Status", "X", "LinkedIn", "GitHub"].map((t) => U("DSLink", { label: t, size: "SM", tone: "MUTED", anchor: { href: `#${t.toLowerCase()}` } }));
-  const legal = { place: "row", gap: "MD", wrap: true, justify: "between", children: [txt(b.legal, "CONTENT_MD", { tone: "MUTED" }), { place: "row", gap: "MD", wrap: true, children: legalLinks }] };
+  // the legal line over its links: the render places a row without wrapping, so a row of the two squeezes the line on a phone
+  const legal = col([txt(b.legal, "CONTENT_MD", { tone: "MUTED" }), { place: "row", gap: "MD", children: legalLinks }], "SM");
   const kids: unknown[] = [brand];
   if (c !== "SHORT") {
     const lists = b.groups.map(([k, t, pages]) => list(t, [["Overview", `#${k}`], ...pages.map((p): [string, string] => [p, `#${p.toLowerCase().replace(/ /g, "-")}`])]));
