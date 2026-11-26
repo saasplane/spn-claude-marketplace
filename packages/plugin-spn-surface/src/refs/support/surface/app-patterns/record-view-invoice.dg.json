@@ -1,0 +1,514 @@
+{
+ "kind": "skeleton",
+ "title": "RECORD_VIEW: an invoice",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. The page level is the record, an invoice the platform sent to an organization: the way back, its number, and on the line under the number its state, the organization it was sent to and its total. A state that is not the normal one is a badge, and it stands before the other facts: the end of the page level holds actions only. Then the lists attached to the record, each a container: the lines the invoice is made of, the payments tried against it, and the emails sent about it. Each is only read, so none has a box at its top that finds a record to add. The lists stand side by side at a desktop, and one under another on a tablet and a phone. Every screen shows every list. No list shows a count.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Organizations",
+    "Plans",
+    "Invoices",
+    "Usage",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": "Invoices"
+  },
+  "content": {
+   "attached": true
+  }
+ },
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "media": "default",
+     "title": "INV-2026-1042",
+     "meta": [
+      {
+       "control": "badge",
+       "text": "Past due"
+      },
+      "Acme Corp",
+      "$4,980.00"
+     ]
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "Download"
+     },
+     {
+      "icon": "more"
+     }
+    ],
+    "back": true
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "label": "Lines",
+         "divided": true,
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Growth plan",
+              "meta": [
+               "1 to 30 Nov"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Seats",
+              "meta": [
+               "48 seats"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "API usage",
+              "meta": [
+               "2.1M calls"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "label": "Payments",
+         "divided": true,
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Card ending 4242",
+              "meta": [
+               "Declined",
+               "5 Nov"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Card ending 4242",
+              "meta": [
+               "Declined",
+               "2 Nov"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "label": "Emails",
+         "divided": true,
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Reminder to billing@acme.co",
+              "meta": [
+               "6 Nov"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Invoice sent to billing@acme.co",
+              "meta": [
+               "1 Nov"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "page": {
+    "item": {
+     "media": "default",
+     "title": "INV-2026-1042",
+     "meta": [
+      {
+       "control": "badge",
+       "text": "Past due"
+      },
+      "Acme Corp",
+      "$4,980.00"
+     ]
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "Download"
+     },
+     {
+      "icon": "more"
+     }
+    ],
+    "back": true
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "label": "Lines",
+         "divided": true,
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Growth plan",
+              "meta": [
+               "1 to 30 Nov"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Seats",
+              "meta": [
+               "48 seats"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "API usage",
+              "meta": [
+               "2.1M calls"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "label": "Payments",
+         "divided": true,
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Card ending 4242",
+              "meta": [
+               "Declined",
+               "5 Nov"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Card ending 4242",
+              "meta": [
+               "Declined",
+               "2 Nov"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "label": "Emails",
+         "divided": true,
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Reminder to billing@acme.co",
+              "meta": [
+               "6 Nov"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Invoice sent to billing@acme.co",
+              "meta": [
+               "1 Nov"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "media": "default",
+     "title": "INV-2026-1042",
+     "meta": [
+      {
+       "control": "badge",
+       "text": "Past due"
+      },
+      "Acme Corp",
+      "$4,980.00"
+     ]
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "Download"
+     },
+     {
+      "icon": "more"
+     }
+    ],
+    "back": true
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "label": "Lines",
+         "divided": true,
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Growth plan",
+              "meta": [
+               "1 to 30 Nov"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Seats",
+              "meta": [
+               "48 seats"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "API usage",
+              "meta": [
+               "2.1M calls"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "label": "Payments",
+         "divided": true,
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Card ending 4242",
+              "meta": [
+               "Declined",
+               "5 Nov"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Card ending 4242",
+              "meta": [
+               "Declined",
+               "2 Nov"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "label": "Emails",
+         "divided": true,
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Reminder to billing@acme.co",
+              "meta": [
+               "6 Nov"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Invoice sent to billing@acme.co",
+              "meta": [
+               "1 Nov"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

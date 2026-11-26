@@ -3,7 +3,7 @@
   "files": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/site-container-kinds",
-      "seen": "26ae1660"
+      "seen": "0cb0e6f3"
     }
   ]
 }
@@ -20,31 +20,31 @@ above names the folder and not each file, so a spec the book adds is seen as wel
 
 | Spec |
 | --- |
-| [`choose-to-see-under.dg.json`](choose-to-see-under.dg.json) |
-| [`choose-to-see.dg.json`](choose-to-see.dg.json) |
-| [`closing-call-beside.dg.json`](closing-call-beside.dg.json) |
-| [`closing-call.dg.json`](closing-call.dg.json) |
-| [`compare.dg.json`](compare.dg.json) |
-| [`doors.dg.json`](doors.dg.json) |
-| [`feature-grid.dg.json`](feature-grid.dg.json) |
-| [`find.dg.json`](find.dg.json) |
-| [`hero-under.dg.json`](hero-under.dg.json) |
-| [`hero.dg.json`](hero.dg.json) |
-| [`highlight.dg.json`](highlight.dg.json) |
-| [`numbers.dg.json`](numbers.dg.json) |
-| [`people.dg.json`](people.dg.json) |
-| [`plans.dg.json`](plans.dg.json) |
-| [`points.dg.json`](points.dg.json) |
-| [`questions.dg.json`](questions.dg.json) |
-| [`reading-column.dg.json`](reading-column.dg.json) |
-| [`real-sample-under.dg.json`](real-sample-under.dg.json) |
-| [`real-sample.dg.json`](real-sample.dg.json) |
-| [`records.dg.json`](records.dg.json) |
-| [`show-it-highlight.dg.json`](show-it-highlight.dg.json) |
-| [`show-it-under.dg.json`](show-it-under.dg.json) |
-| [`show-it.dg.json`](show-it.dg.json) |
-| [`statement.dg.json`](statement.dg.json) |
-| [`steps.dg.json`](steps.dg.json) |
+| [`about-team.dg.json`](about-team.dg.json) |
+| [`action-closing-beside.dg.json`](action-closing-beside.dg.json) |
+| [`action-closing.dg.json`](action-closing.dg.json) |
+| [`browse-results.dg.json`](browse-results.dg.json) |
+| [`browse-search.dg.json`](browse-search.dg.json) |
+| [`common-faq.dg.json`](common-faq.dg.json) |
+| [`explain-categories.dg.json`](explain-categories.dg.json) |
+| [`explain-doors.dg.json`](explain-doors.dg.json) |
+| [`explain-features.dg.json`](explain-features.dg.json) |
+| [`explain-sample-under.dg.json`](explain-sample-under.dg.json) |
+| [`explain-sample.dg.json`](explain-sample.dg.json) |
+| [`explain-showcase-choose-under.dg.json`](explain-showcase-choose-under.dg.json) |
+| [`explain-showcase-choose.dg.json`](explain-showcase-choose.dg.json) |
+| [`explain-showcase-highlight.dg.json`](explain-showcase-highlight.dg.json) |
+| [`explain-showcase-under.dg.json`](explain-showcase-under.dg.json) |
+| [`explain-showcase.dg.json`](explain-showcase.dg.json) |
+| [`explain-steps.dg.json`](explain-steps.dg.json) |
+| [`feature-highlight.dg.json`](feature-highlight.dg.json) |
+| [`intro-hero-under.dg.json`](intro-hero-under.dg.json) |
+| [`intro-hero.dg.json`](intro-hero.dg.json) |
+| [`intro-statement.dg.json`](intro-statement.dg.json) |
+| [`price-compare.dg.json`](price-compare.dg.json) |
+| [`price-plans.dg.json`](price-plans.dg.json) |
+| [`proof-claim.dg.json`](proof-claim.dg.json) |
+| [`read-article.dg.json`](read-article.dg.json) |
 
 **Never edit a file here.** It is an output. A builder changes the spec in the book, and the export
 carries it.

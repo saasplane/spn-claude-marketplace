@@ -3,7 +3,7 @@
   "files": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/app-page-kinds",
-      "seen": "783c2af7"
+      "seen": "641c5266"
     }
   ]
 }
@@ -21,28 +21,28 @@ above names the folder and not each file, so a spec the book adds is seen as wel
 | Spec |
 | --- |
 | [`a-value-from-an-enum.dg.json`](a-value-from-an-enum.dg.json) |
-| [`change-in-place.dg.json`](change-in-place.dg.json) |
-| [`choose-many-in-groups.dg.json`](choose-many-in-groups.dg.json) |
-| [`choose-many-in-one-list.dg.json`](choose-many-in-one-list.dg.json) |
-| [`compare-across-kinds-edit.dg.json`](compare-across-kinds-edit.dg.json) |
-| [`compare-across-kinds.dg.json`](compare-across-kinds.dg.json) |
-| [`editor-with-preview.dg.json`](editor-with-preview.dg.json) |
-| [`entry-as-a-page.dg.json`](entry-as-a-page.dg.json) |
-| [`entry-over-the-page.dg.json`](entry-over-the-page.dg.json) |
-| [`find-in-a-list-look.dg.json`](find-in-a-list-look.dg.json) |
-| [`find-in-a-list.dg.json`](find-in-a-list.dg.json) |
-| [`groups-and-their-items-many.dg.json`](groups-and-their-items-many.dg.json) |
-| [`groups-and-their-items-open.dg.json`](groups-and-their-items-open.dg.json) |
-| [`groups-and-their-items-two-lists.dg.json`](groups-and-their-items-two-lists.dg.json) |
-| [`groups-and-their-items.dg.json`](groups-and-their-items.dg.json) |
-| [`inherit-or-override.dg.json`](inherit-or-override.dg.json) |
-| [`one-action.dg.json`](one-action.dg.json) |
-| [`overview.dg.json`](overview.dg.json) |
-| [`record-and-its-setup.dg.json`](record-and-its-setup.dg.json) |
-| [`record-and-its-steps.dg.json`](record-and-its-steps.dg.json) |
-| [`record-and-what-belongs-to-it.dg.json`](record-and-what-belongs-to-it.dg.json) |
-| [`record-and-what-belongs-to-it-invoice.dg.json`](record-and-what-belongs-to-it-invoice.dg.json) |
-| [`set-up-by-kind.dg.json`](set-up-by-kind.dg.json) |
+| [`home-app.dg.json`](home-app.dg.json) |
+| [`record-entry-page.dg.json`](record-entry-page.dg.json) |
+| [`record-entry-sheet.dg.json`](record-entry-sheet.dg.json) |
+| [`record-entry-with-preview.dg.json`](record-entry-with-preview.dg.json) |
+| [`record-home-all-kinds.dg.json`](record-home-all-kinds.dg.json) |
+| [`record-home-choose-groups.dg.json`](record-home-choose-groups.dg.json) |
+| [`record-home-choose-list.dg.json`](record-home-choose-list.dg.json) |
+| [`record-home-edit-in-place.dg.json`](record-home-edit-in-place.dg.json) |
+| [`record-home-groups-many.dg.json`](record-home-groups-many.dg.json) |
+| [`record-home-groups-open.dg.json`](record-home-groups-open.dg.json) |
+| [`record-home-groups.dg.json`](record-home-groups.dg.json) |
+| [`record-home-stack.dg.json`](record-home-stack.dg.json) |
+| [`record-home.dg.json`](record-home.dg.json) |
+| [`record-view-aside.dg.json`](record-view-aside.dg.json) |
+| [`record-view-inherited.dg.json`](record-view-inherited.dg.json) |
+| [`record-view-invoice.dg.json`](record-view-invoice.dg.json) |
+| [`record-view-one-action.dg.json`](record-view-one-action.dg.json) |
+| [`record-view-sheet.dg.json`](record-view-sheet.dg.json) |
+| [`record-view-steps.dg.json`](record-view-steps.dg.json) |
+| [`record-view.dg.json`](record-view.dg.json) |
+| [`setup-compare-edit.dg.json`](setup-compare-edit.dg.json) |
+| [`setup-compare.dg.json`](setup-compare.dg.json) |
 
 **Never edit a file here.** It is an output. A builder changes the spec in the book, and the export
 carries it.
