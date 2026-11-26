@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/04-site-container-kinds.md",
-      "seen": "b7bf4510"
+      "seen": "9463fb48"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/02-web/02-site-container-kinds.md",
@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/02-site-page-kinds.md",
-      "seen": "804719ec"
+      "seen": "4c4b8bcf"
     }
   ]
 }
@@ -75,8 +75,10 @@ The order matters. A grid of things that each open a page is `EXPLAIN_CATEGORIES
 
 - **A kind of page orders its sections as its reader asks their questions, and does not count them** (`RULE.SUPPORT.SURFACE.340` · MUST · skill:spn-surface/design). A page skips a question its reader does not ask. A count of sections would make a page add a section with nothing to say, or cut one a reader needs.
 
-- **A resources site's Home is a hub only where it holds several sets, and a small product makes its one set the whole site** (`RULE.SUPPORT.SURFACE.617` · GUIDE): `RESOURCES_HOME` takes the case `HUB`, one search across every set with a tab for each set, a card for each set with how many pieces it holds, what is new across them, and *Still need help?*; or the case `ONE_SET`, the set's own home at the first level: `DOCS_HOME`, `GUIDE_HOME` or `HELP_HOME`. A resources site keeps no blog of its own: the Blog and its Articles are `MARKETING`'s.
+- **A resources site's Home is a hub only where it holds several sets, and a small product makes its one set the whole site** (`RULE.SUPPORT.SURFACE.617` · GUIDE): `RESOURCES_HOME` takes the case `HUB`, one search across every set, a `DSSearchBar` with a tab for each set as its scopes, a card for each set with how many pieces it holds, what is new across them, and *Still need help?*; or the case `ONE_SET`, the set's own home at the first level: `DOCS_HOME`, `GUIDE_HOME` or `HELP_HOME`. A resources site keeps no blog of its own: the Blog and its Articles are `MARKETING`'s.
 - **A site holds the floor's `COMMON_SERVER_ERROR` and `COMMON_MAINTENANCE` beside `COMMON_NOT_FOUND`** (`RULE.SUPPORT.SURFACE.605` · MUST · skill:spn-surface/design). `COMMON_SERVER_ERROR` stands in the site's layout where it can still be drawn, and `COMMON_MAINTENANCE` on `CANVAS`.
+- **The search of a site is a `DSSearchBar`, and the head of a page of results is the same bar folded.** The bar stands in `INTRO_HERO` or `BROWSE_SEARCH` with its fields, and tabs by vertical are its `scopes`; folded, it is one line that keeps the words asked, with the count of what answers them: the search head of `BLOG_SEARCH`, `DOCS_SEARCH`, `GUIDE_SEARCH`, `HELP_SEARCH` and `MARKET_SEARCH`. The search of one list is a `DSFilterBar`, not this bar.
+- **A checkout's payment step offers the ways of paying the site chooses to offer, and says where a payment stands.** A payment that failed comes back to the step as the case `FAILED` of `ACTION_CHECKOUT`, with what went wrong and the details kept, and never charges twice; a payment still on its way is the case `PENDING` of `ACTION_CONFIRMATION`, which says nothing is confirmed yet.
 - **A category is the page of its records, at any depth, and a search is the page of its results.** `MARKET_CATEGORY` and `MARKET_SEARCH` each end on the results section, `BROWSE_RESULTS`, so neither takes a separate Listing page.
 - **A results section's facets, where there are more than four filters, stand in a rail at the start of a desktop**: the aside of a `DSPageFrameAside` at `asidePlacement` `START` and `asideWidth` `NARROW`, 256 px, with the records in the main part, so the page writes no row of its own and the rail folds by its place as every frame does. On a tablet and a phone a Filters button opens the same facets in a sheet.
 - **A help centre always draws `DSBreadcrumb` under the bar, one link for each level above the page and the page itself unlinked, and so does any site whose bar does not list its groups or that runs deeper than three levels** (`RULE.SUPPORT.SURFACE.598` · MUST · skill:spn-surface/design). Any other site may draw none.

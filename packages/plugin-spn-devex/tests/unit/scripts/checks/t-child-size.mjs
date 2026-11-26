@@ -5,7 +5,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { workspace, BASE } from "../../../helpers/fixture.mjs";
 
-const { checkChildSize, stopLine, childTranscript, entriesIn, sizedStop } = await import(join(CHECKS, "child-size.ts"));
+const { checkChildSize, stopLine, childTranscript, entriesIn, sizedStop, startingContext } = await import(join(CHECKS, "child-size.ts"));
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -22,10 +22,10 @@ const order = join(root, ORDER_PATH);
 const report = order.replace(/\.md$/, ".report.md");
 
 /** A child's transcript: its brief, then `turns` model turns, the last holding `held` tokens. */
-const transcript = (name, { turns, held, brief = `Carry out the order ${order} and nothing more.` }) => {
+const transcript = (name, { turns, held, start = 1000, brief = `Carry out the order ${order} and nothing more.` }) => {
   const lines = [JSON.stringify({ type: "user", message: { role: "user", content: brief } })];
   for (let at = 1; at <= turns; at += 1) {
-    const size = at === turns ? held : 1000;
+    const size = at === turns ? held : at === 1 ? start : 1000;
     lines.push(JSON.stringify({ type: "assistant", message: { id: `m${at}`, usage: { input_tokens: 10, cache_read_input_tokens: size - 20, cache_creation_input_tokens: 10, output_tokens: 5 } } }));
   }
   const path = join(BASE, `${name}.jsonl`);
@@ -65,6 +65,18 @@ console.log("\n=== the line is sized from the entries the part holds");
     const sentence = JSON.stringify(stopLine(entries(count).replace("No line is set here.", written)));
     return sentence === JSON.stringify(stopLine(entries(count))) && sentence === JSON.stringify(stop);
   }), JSON.stringify([sizedStop(1), sizedStop(8)]));
+}
+
+console.log("\n=== the line sits above the context the child starts with (S96)");
+{
+  const sizedOrder = join(root, ".spndevex/workstreams/open/031-probe/notes/N001/orders/9-one.md");
+  writeFileSync(sizedOrder, "---\nentries: [\"a\"]\n---\n# Order 9\n");
+  const brief = `Carry out the order ${sizedOrder} and nothing more.`;
+  const stop = sizedStop(1);
+  ok("[MKT.HOOKS.325] the starting context is the first finished turn's size, 0 before any", startingContext([]) === 0 && startingContext([{ tokens: { in: 10, cacheRead: 80, cacheWrite: 10 } }, { tokens: { in: 1, cacheRead: 1, cacheWrite: 1 } }]) === 100);
+  ok("[MKT.HOOKS.325] a one-entry child that started at 60k and holds 82k is let through", checkChildSize(call(transcript("start-heavy-ok", { turns: 5, held: 82000, start: 60000, brief }), "Bash", { command: "ls" })) === null);
+  const over = checkChildSize(call(transcript("start-heavy-over", { turns: 5, held: 60000 + stop.context + 1000, start: 60000, brief }), "Bash", { command: "ls" }));
+  ok("[MKT.HOOKS.325] it is refused once it holds its start plus the sized line, and the refusal names the start", Boolean(over?.deny) && /above the 60k it started with/.test(over.deny), JSON.stringify(over));
 }
 
 console.log("\n=== refused: a child past its line");

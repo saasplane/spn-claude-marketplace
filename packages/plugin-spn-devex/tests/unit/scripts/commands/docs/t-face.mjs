@@ -560,6 +560,55 @@ console.log("\n=== the domain's glossary lands on its overview too, in HTML (Q22
     readAt(ownRoot, `docs/${SEAT.constructs}/01-core/README.md`), has("spn:generated glossary"));
 }
 
+console.log("\n=== a face's `glossary` key names the overview that carries the glossary (RULE.DEVEX.WORKSPACE.582)");
+{
+  const terms = "## Terms\n\n| Term | Contract term | What it means |\n| --- | --- | --- |\n" +
+    "| sign-in | `SPSession` | one person's live access |\n\n" +
+    "## Model\n\nx\n\n## Parts\n\nx\n\n## Boundary\n\nx\n\n" +
+    "## Binds\n\n| where it lives today | |\n| --- | --- |\n| a | b |\n\n## Proof\n\nx\n";
+  const ov = (id, title) =>
+    `<meta charset="utf-8">\n<title>${title}</title>\n` +
+    block({ id, variant: "overview", parentId: "concept", title, lenses: ["ARCHITECT"], summary: "s." }) +
+    `${linesFor("1.0.0").stylesheet}\n<h2>Overview</h2>\n<p>x</p>\n` +
+    `<section id="s1" data-block="glossary">\n  <div class="sds-section-head"><h2>Glossary</h2></div>\n` +
+    `  <p>Authored.</p>\n  <div class="sds-scroll"><table>\n    <thead><tr><th>Term</th></tr></thead>\n    <tbody><tr><td>typed by hand</td></tr></tbody>\n  </table></div>\n</section>\n` +
+    `<h2>Next — Where to go next</h2>\n<p>x</p>`;
+  const where = (name) => `docs/${POCKET.artifacts}/${ARTIFACT.docs}/01-core/${name}`;
+  const tree = (key) => ({
+    "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+    [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/01-core/README.md`]: doc({ id: "c", ...(key === undefined ? {} : { glossary: key }), title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/01-core/session.md`]:
+      doc({ id: "session", variant: "construct", parentId: "c", dependsOn: [], title: "Session", lenses: ["ARCHITECT"], status: "PLANNING" },
+          terms, "`For: Architect` · `Status: 🔮 PLANNING`"),
+    // Two reading paths of one domain: both are titled Core, so the title join finds the first.
+    [where("core-first-overview.html")]: ov("concept-core-first-overview", "Core"),
+    [where("core-second-overview.html")]: ov("concept-core-second-overview", "Core"),
+  });
+
+  const keyed = repo(tree("core-second-overview"));
+  run(keyed, ["face", "write", "docs"]);
+  one("the key names the overview that gains the glossary, ahead of the title match",
+    readAt(keyed, where("core-second-overview.html")), has("spn:generated glossary"));
+  one("and the other reading path of the domain is left as it was",
+    readAt(keyed, where("core-first-overview.html")), (g) => !g.includes("spn:generated glossary") && g.includes("typed by hand"));
+
+  const byId = repo(tree("concept-core-second-overview"));
+  run(byId, ["face", "write", "docs"]);
+  one("the overview's whole block id names it as well", readAt(byId, where("core-second-overview.html")), has("spn:generated glossary"));
+
+  const unkeyed = repo(tree(undefined));
+  run(unkeyed, ["face", "write", "docs"]);
+  one("without a key the title match still decides, as it did",
+    readAt(unkeyed, where("core-first-overview.html")), has("spn:generated glossary"));
+
+  const missing = repo(tree("core-third-overview"));
+  const said = run(missing, ["face", "write", "docs"]);
+  one("a key that names no overview of the domain is a finding, naming the key", said, (g) => g.includes("core-third-overview") && g.includes("RULE"));
+  one("and the glossary is then written into no overview",
+    readAt(missing, where("core-first-overview.html")) + readAt(missing, where("core-second-overview.html")), lacks("spn:generated glossary"));
+}
+
 console.log("\n=== an escaped pipe inside a Terms cell stays one cell (found by the column check)");
 {
   const root = repo({

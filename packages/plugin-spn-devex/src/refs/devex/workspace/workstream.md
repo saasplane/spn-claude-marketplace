@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "8395bf79"
+      "seen": "5e54a3e8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -37,7 +37,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An order is one delegated execution, and every order follows the same rules",
-      "seen": "57d783c5"
+      "seen": "662b9a27"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -61,7 +61,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
-      "seen": "657762de"
+      "seen": "48b8fca7"
     }
   ]
 }
@@ -1176,6 +1176,8 @@ cards, register rows and facts by id, and never copies a ruling or the developer
 launches no agent, the files it reads, and that its hand-back holds at most 8 lines. A brief
 that leaves one out lets an agent read the whole repository, spawn a child nobody is watching, or
 paste a report that drowns the next one.
+
+**A helper searches with `grep` in Bash, and its size stop counts from the context it starts with** (`RULE.DEVEX.WORKSPACE.478` · MUST · check:child-size). A helper has no Grep tool. The stop adds room set from the part's entries to that starting context: 60k, or 20k for each entry where that is more. A part of one entry is never stopped before its first edit.
 
 **A helper that meets a name, a shape or a construct no entry holds stops, and never invents it** (`RULE.DEVEX.WORKSPACE.495` · MUST · check:split-plan). Every order carries the line, whatever its form. The helper returns `needs-you` and lists what it met under the report's `unnamed:`, and `report write` refuses to land a part whose report lists one. A name a helper makes up becomes something every caller depends on.
 

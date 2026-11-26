@@ -2,6 +2,8 @@
 // A child past the stop line of its order is refused its next tool call, except the one that saves its report.
 // Silent in the main window and in a child that runs no order.
 // The size is read from the last finished turn, so the refusal lands one call after the line.
+// The context line counts what the child adds to the context it started with: the line is the first finished
+// turn's size plus the order's context, so a one-entry part can reach its first edit.
 
 import { existsSync, openSync, readFileSync, readSync, closeSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -28,6 +30,14 @@ export function entriesIn(order: string): number {
 /** The stop sized for a part that holds this many entries (RULE.DEVEX.WORKSPACE.478): `go.ts` writes it into each brief, `stopLine` reads it back. */
 export function sizedStop(entries: number): { context: number; turns: number } {
   return { context: Math.max(LEAST.context, entries * PER_ENTRY.context), turns: Math.max(LEAST.turns, entries * PER_ENTRY.turns) };
+}
+
+/** What a turn holds: the tokens it read in, from cache and written to it. */
+const heldBy = (turn: { tokens: { in: number; cacheRead: number; cacheWrite: number } }): number => turn.tokens.in + turn.tokens.cacheRead + turn.tokens.cacheWrite;
+
+/** The context a child starts with: what its first finished turn holds, 0 before any turn has finished. */
+export function startingContext(turns: { tokens: { in: number; cacheRead: number; cacheWrite: number } }[]): number {
+  return turns[0] ? heldBy(turns[0]) : 0;
 }
 
 /**
@@ -98,9 +108,10 @@ export function checkChildSize(payload: Payload): Verdict {
   if (!line) return null;
   const turns = turnsIn(readFileSync(transcript, "utf8"));
   const last = turns.at(-1);
-  const held = last ? last.tokens.in + last.tokens.cacheRead + last.tokens.cacheWrite : 0;
-  const over = line.context !== null && held >= line.context
-    ? `its context holds ${Math.round(held / 1000)}k tokens, past the order's ${Math.round(line.context / 1000)}k`
+  const held = last ? heldBy(last) : 0;
+  const start = startingContext(turns);
+  const over = line.context !== null && held >= start + line.context
+    ? `its context holds ${Math.round(held / 1000)}k tokens, past the order's ${Math.round(line.context / 1000)}k above the ${Math.round(start / 1000)}k it started with`
     : line.turns !== null && turns.length >= line.turns ? `it has taken ${turns.length} turns, past the order's ${line.turns}` : null;
   if (!over) return null;
   const report = order.path.replace(/\.md$/, ".report.md");

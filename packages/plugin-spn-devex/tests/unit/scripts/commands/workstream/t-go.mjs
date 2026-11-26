@@ -102,7 +102,7 @@ console.log("\n=== write: the plan and the briefs");
     new RegExp(`workstream report write \\S+/N001 ${codeId} --run`).test(brief) && brief.includes("at most 8 lines") && !brief.includes("save the report, at most 15 lines, beside this brief"), brief);
   ok("[MKT.SCRIPTS.306] it asks for a saved report only to return `needs-you`, a follow-up or an `unnamed:` list, and the `## Report` block keeps the front matter shape",
     brief.includes("needs-you") && brief.includes("unnamed:") && brief.includes("## Report") && brief.includes("outcome: landed \u00b7 stopped \u00b7 needs-you"), brief.slice(-700));
-  ok("[MKT.SCRIPTS.480] the Stop sentence comes from `sizedStop`, so it names the part's size of context and turns", /Stop at \d+k of context or \d+ turns/.test(brief), brief.slice(0, 900));
+  ok("[MKT.SCRIPTS.480] the Stop sentence comes from `sizedStop`, so it names the part's size of context and turns", /Stop at \d+k of context beyond what you start with, or \d+ turns/.test(brief), brief.slice(0, 900));
   ok("[MKT.SCRIPTS.480] the brief says to search with `grep` in Bash, since the helper has no Grep tool, and to read only the files below",
     brief.includes("Search with `grep` in Bash, since you have no Grep tool") && brief.includes("Read only the files below"), brief);
   ok("[MKT.SCRIPTS.481] the heading reads `# Order <part>` as the template does", brief.includes("# Order " + codeId) && !brief.includes("# Part " + codeId), brief.slice(0, 400));

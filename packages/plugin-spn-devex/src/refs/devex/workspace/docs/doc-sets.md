@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
-      "seen": "657762de"
+      "seen": "48b8fca7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
@@ -270,6 +270,8 @@ constraint matters and why each index exists.
 
 **A domain's overview is its face in HTML**: it sits in `artifacts/public/docs/<domain>/`, links into the `constructs/` folder beside it, and
 carries the same glossary. Extra reading paths beneath it carry none.
+
+**A domain with several reading paths names the overview that carries its glossary** (`RULE.DEVEX.WORKSPACE.582` · MUST · skill:spn-devex/develop): its face's block holds `"glossary"`, the overview's `id`, and `docs face` writes the glossary into that overview, ahead of the title match. A key that names no overview of the domain is a finding, and the glossary is then written nowhere.
 
 **An overview moves with the construct pages it summarises: writing a construct page again rewrites each overview that
 summarises it, in the same work and unasked** (`RULE.DEVEX.WORKSPACE.581` · MUST · check:doc-check). Its `spn:doc` block
