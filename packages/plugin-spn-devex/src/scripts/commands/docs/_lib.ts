@@ -1863,9 +1863,40 @@ export function overviewForDomain(domainDir: string): string | null {
   if (!split) return null;
   const face = join(dir, "README.md");
   if (!existsSync(face)) return null;
-  const title = readBlock(readFileSync(face, "utf8")).block?.title;
+  const { block } = readBlock(readFileSync(face, "utf8"));
+  const pages = overviewPages(split.docs);
+  // A FACE'S `glossary` KEY NAMES THE OVERVIEW THAT CARRIES THE DOMAIN'S GLOSSARY (RULE.DEVEX.WORKSPACE.582), and it wins over the
+  // title join, because a domain with several reading paths has one title and more than one overview. The value is the overview's `id`;
+  // the page's file name without its suffix, and the `id` without its `concept-` lead, name the same page.
+  if (typeof block?.glossary === "string" && block.glossary.trim()) {
+    const named = pages.find((page) => overviewIdsOf(page).includes(block.glossary.trim()));
+    if (named) return named;
+    return null;
+  }
+  const title = block?.title;
   if (!title) return null;
-  return overviewPages(split.docs).find((page) => readBlock(readFileSync(page, "utf8")).block?.title === title) ?? null;
+  return pages.find((page) => readBlock(readFileSync(page, "utf8")).block?.title === title) ?? null;
+}
+
+/** The ids one overview answers to: its block `id`, that id without `concept-`, and its file name without the suffix. */
+function overviewIdsOf(page: string): string[] {
+  const id = readBlock(readFileSync(page, "utf8")).block?.id;
+  const ids = [basename(page).replace(/\.html$/, "")];
+  if (typeof id === "string") ids.push(id, id.replace(/^concept-/, ""));
+  return ids;
+}
+
+/** The overview a domain face's `glossary` key names, as a finding where it names none of the domain's overviews. */
+export function glossaryKeyFinding(domainDir: string): Finding | null {
+  const face = join(resolve(domainDir), "README.md");
+  if (!existsSync(face)) return null;
+  const key = readBlock(readFileSync(face, "utf8")).block?.glossary;
+  if (key === undefined) return null;
+  if (typeof key !== "string" || !key.trim())
+    return { check: "face", grade: "RULE", file: face, message: "`glossary` names an overview by its `id`, a non-empty string" };
+  return overviewForDomain(domainDir)
+    ? null
+    : { check: "face", grade: "RULE", file: face, message: `\`glossary\` names \`${key}\`, and this domain has no overview with that id, so its glossary is written nowhere (RULE.DEVEX.WORKSPACE.582)` };
 }
 
 /**
@@ -2333,6 +2364,8 @@ export function face(tree: string, write: boolean, scope: FaceScope = { paths: [
   for (const dir of asked("glossary") ? constructFolders(constructsSeat).filter((d) => isDomainFolder(constructsSeat, d)) : []) {
     const domainFace = join(dir, "README.md");
     const overviewOfDomain = overviewForDomain(dir);
+    const keyFinding = glossaryKeyFinding(dir);
+    if (keyFinding && (fed(domainFace, dir) || under(domainFace, scope.paths))) findings.push(keyFinding);
     if (!fed(domainFace, dir) && !(overviewOfDomain && under(overviewOfDomain, scope.paths))) continue;
     if (!existsSync(domainFace)) {
       findings.push({ check: "face", grade: "SOFT", file: domainFace, message: "no domain face to write the glossary into" });

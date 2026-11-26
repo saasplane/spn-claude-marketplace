@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "46c71541"
+    "commit": "45682faf"
   },
   "rules": [
     {
@@ -3669,6 +3669,30 @@
           "plugin": "spn-devex",
           "path": "skills/bootstrap/SKILL.md",
           "heading": "Write the workstream from the layout data"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/bootstrap/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.FUNCTION.109",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/bootstrap"
+      },
+      "class": "stated in a skill",
+      "sentence": "Each app's design language row names the app's surface category, `MARKETING`, `RESOURCES`, `MARKETPLACE`, `DASHBOARD` or `PORTAL`, and never only `SITE` or `APP`",
+      "chapter": "04-capabilities/01-devex/01-function/01-bootstrap.md",
+      "heading": "The foundation workstream",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/function/bootstrap.md",
+          "heading": "The door, the ground, the foundation, the joining path"
         },
         {
           "plugin": "spn-devex",
@@ -14467,6 +14491,30 @@
           "plugin": "spn-devex",
           "path": "refs/devex/workspace/docs/writing-a-page.md",
           "heading": "The six steps"
+        }
+      ]
+    },
+    {
+      "id": "RULE.DEVEX.WORKSPACE.582",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/develop"
+      },
+      "class": "stated in a skill",
+      "sentence": "A domain with several reading paths names, in its face's block, the one overview that carries its generated glossary",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/05-pages.md",
+      "heading": "The overview set is fixed, and a name says its source",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "What each seat holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -39537,6 +39585,25 @@
           "path": "refs/support/surface/architecture-components.md",
           "heading": "Page — 🔮"
         },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.627",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A new unit's props start from its nearest units' props: a field a neighbour already has is reused whole, with its name, its type and its meaning, and a proposal lists the neighbours it read and names each new field it could not reuse",
+      "chapter": "04-capabilities/02-support/01-surface/07-architecture-components/01-common/01-components.md",
+      "heading": "A new unit weighs every axis the surface offers",
+      "decision": null,
+      "restated": [
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",

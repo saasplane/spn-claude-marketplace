@@ -79,5 +79,14 @@ console.log("\n=== every section decided, the go may run; a changed answer stops
   ok("[MKT.SCRIPTS.625] decided again on the new words, the go may run", again.code === 0, again.out);
 }
 
+console.log("\n=== each app's design language row names its surface category (RULE.DEVEX.FUNCTION.109)");
+{
+  const data = readFileSync(new URL("../../../../../src/refs/devex/workspace/foundation-layout.json", import.meta.url), "utf8");
+  const categories = ["MARKETING", "RESOURCES", "MARKETPLACE", "DASHBOARD", "PORTAL"];
+  const kinds = section("4.2").needed;
+  ok("[MKT.SCRIPTS.622] section 4.2 names every surface category", categories.every((one) => kinds.includes(one)), kinds);
+  ok("[MKT.SCRIPTS.622] the layout data says the design language row names its category", data.includes("a row per app naming its surface category") && !data.includes('"its theme setting, written from its row"'));
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream layout` : `\n  all ${total} passed — workstream layout`);
 process.exit(failed ? 1 : 0);
