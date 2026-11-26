@@ -1,6 +1,6 @@
 {
-  "designSystem": "11.26.0",
-  "readFrom": "11.26.0",
+  "designSystem": "11.27.0",
+  "readFrom": "11.27.0",
   "units": [
     "DSApp",
     "DSServerContext",
@@ -12,9 +12,9 @@
     "DSToolbar",
     "DSComparison",
     "DSDataTable",
-    "DSFacetGroup",
     "DSFeature",
     "DSFilterBar",
+    "DSFilterFacets",
     "DSQuote",
     "DSAccordion",
     "DSAccordionGroup",
