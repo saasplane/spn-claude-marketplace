@@ -190,7 +190,7 @@ function records(b: Brief, c: string): Tree {
 }
 
 function plans(b: Brief): Tree {
-  const plan = (p: Brief["plans"][number]): Tree => feat({ title: p.name, description: p.line, eyebrow: { mtype: "CUSTOM", node: U("DSFormatCurrency", { value: p.price, currencyCode: "USD" }) }, items: lines(p.feats.map((f, i) => ({ key: `f${i}`, title: f, description: "Included in the plan." }))), actions: [act("choose", `Choose ${p.name}`, "#choose", !!p.recommended)], frames: ["TEXT"], surface: p.recommended ? { raised: true, elevation: "MD", lit: true } : { raised: false, elevation: "MD" }, ...(p.recommended ? { facts: [{ mtype: "BADGE", text: "Recommended", variant: "SOLID", color: "PRIMARY" }] } : {}) }, "WIDGET");
+  const plan = (p: Brief["plans"][number]): Tree => feat({ title: p.name, description: p.line, eyebrow: { mtype: "CUSTOM", node: p.price === 0 ? txt("Free", "CONTENT_MD") : U("DSFormatCurrency", { value: p.price, currencyCode: "USD" }) }, items: lines(p.feats.map((f, i) => ({ key: `f${i}`, title: f, description: "Included in the plan." }))), actions: [act("choose", `Choose ${p.name}`, "#choose", !!p.recommended)], frames: ["TEXT"], surface: p.recommended ? { raised: true, elevation: "MD", lit: true } : { raised: false, elevation: "MD" }, ...(p.recommended ? { facts: [{ mtype: "BADGE", text: "Recommended", variant: "SOLID", color: "PRIMARY" }] } : {}) }, "WIDGET");
   return featureGrid({ title: "Which plan is yours?", description: "Prices are per month, billed yearly.", textAlign: "CENTER" }, b.plans.map(plan), Math.min(b.plans.length, 4), 2, 1);
 }
 
@@ -292,7 +292,7 @@ function searchBar(b: Brief, c: string, folded = false): Tree | null {
 
 function find(b: Brief, c: string): Tree {
   const head = feat({ title: c === "STRUCTURED" ? "Find the right listing for you" : "What are you looking for?", description: "Type a word, or choose a category, a price and the number of seats, and the list narrows as you go." }, "CONTAINER");
-  const popular = col([txt("Popular searches", "TITLE_SM"), { place: "row", gap: "SM", wrap: true, children: (b.heads?.popular ?? b.doors.map((d) => d[1])).map((t) => U("DSButton", { label: t, variant: "OUTLINE", size: "SM", startIcon: "SEARCH", anchor: { href: `#${t.toLowerCase().replace(/ /g, "-")}` } })) }], "SM");
+  const popular = col([txt("Popular searches", "TITLE_SM"), grid((b.heads?.popular ?? b.doors.map((d) => d[1])).map((t) => U("DSButton", { label: t, variant: "OUTLINE", size: "SM", startIcon: "SEARCH", anchor: { href: `#${t.toLowerCase().replace(/ /g, "-")}` } })), 5, 3, 2, "SM")], "SM");
   const bar = searchBar(b, c);
   const kinds = dsAtLeast("11.28.0") && b.org === "Lumen Market" ? [U("DSTabs", { options: [["addons", "Add-ons", "PLUG"], ["courses", "Courses", "FILE"], ["workshops", "Workshops", "CALENDAR"]].map(([key, label, icon]) => ({ key, label, media: { mtype: "ICON", node: icon } })), activeKey: "addons", type: "LINE" })] : [];
   if (bar) return sec([head, bar, popular], "MD");
