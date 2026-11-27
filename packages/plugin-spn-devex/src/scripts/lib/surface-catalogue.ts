@@ -132,8 +132,8 @@ export function checkSpec(raw: Json, outline: Outline): { spec: Spec | null; pro
 
 /** `surface@1` → its name and major. */
 export function parentRef(extendsRef: string): { name: string; major: string } | null {
-  const m = /^([a-z][\w-]*)@(\d+)$/.exec(extendsRef);
-  return m ? { name: m[1], major: m[2] } : null;
+  const m = /^([a-z][\w-]*)(?:@(\d+))?$/.exec(extendsRef);
+  return m ? { name: m[1], major: m[2] ?? "" } : null;
 }
 
 /** The chain of languages, the root first, read from `<name>.spdl.json` beside the spec or in the catalogue's `design-languages` folder. */
@@ -154,11 +154,12 @@ export function readChain(specFile: string, outline: Outline, otherFolders: stri
     if (spec.extends === null) break;
     const ref = parentRef(spec.extends);
     if (!ref) { problems.push(`${spec.name}: \`extends\` "${spec.extends}" is not parent@major`); break; }
-    const next = [dirname(file), ...otherFolders].map((d) => join(d, `${ref.name}.spdl.json`)).find(existsSync);
+    // A language is a folder, `<name>/<name>.spdl.json`; the older flat `<name>.spdl.json` is read for one release.
+    const next = [dirname(file), ...otherFolders].flatMap((d) => [join(d, ref.name, `${ref.name}.spdl.json`), join(d, `${ref.name}.spdl.json`)]).find(existsSync);
     if (!next) { problems.push(`${spec.name} extends ${spec.extends}, whose file ${ref.name}.spdl.json is in none of: ${[dirname(file), ...otherFolders].join(", ")}`); break; }
     file = next;
     const major = String((JSON.parse(readFileSync(file, "utf8")) as Obj).version).split(".")[0];
-    if (major !== ref.major) { problems.push(`${spec.name} extends ${spec.extends}, but ${file} is version ${(JSON.parse(readFileSync(file, "utf8")) as Obj).version}`); break; }
+    if (ref.major && major !== ref.major) { problems.push(`${spec.name} extends ${spec.extends}, but ${file} is version ${(JSON.parse(readFileSync(file, "utf8")) as Obj).version}`); break; }
   }
   if (!problems.length && chain[0].extends !== null) problems.push("the chain does not end in a language that extends null");
   return { chain, problems };

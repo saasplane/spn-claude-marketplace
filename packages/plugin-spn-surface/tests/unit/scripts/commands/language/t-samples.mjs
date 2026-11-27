@@ -79,6 +79,13 @@ console.log("\n=== language samples write — a unit the design system does not 
 ok("[MKT.SCRIPTS.703] a case the catalogue marks planned is drawn as the planned mark and its note says what it needs", /Planned: needs a slideshow unit\./.test(readFileSync(join(out, "02-site/01-marketing/03-containers/01-intro-hero.html"), "utf8")) && /Planned: needs a countdown unit\./.test(readFileSync(join(out, "02-site/01-marketing/04-widgets/02-live-countdown.html"), "utf8")));
 ok("[MKT.SCRIPTS.704] a section the render finds a unit missing from is drawn as the planned mark, and its note names the unit", notes[1].text.startsWith("Planned: needs DSQuote") && /Planned: needs DSQuote/.test(readFileSync(join(out, "02-site/01-marketing/03-containers/02-proof-testimonials.html"), "utf8")), JSON.stringify(notes));
 
+console.log("\n=== language samples write — a language kept in its own folder");
+const folderBook = join(dir, "folder-book");
+mkdirSync(join(folderBook, "docs", "specs", "design-languages", "sample", "data"), { recursive: true });
+writeFileSync(join(folderBook, "docs", "specs", "design-languages", "sample", "sample.spdl.json"), JSON.stringify(SPEC));
+const inFolder = run("sample", "--book", folderBook, "--catalogue", catalogue, "--out", join(dir, "out-folder"), "--quiet");
+ok("[MKT.SCRIPTS.713] a language in its own folder is drawn with no note about the old path, and the flat file says it is the old path", inFolder.code === 0 && !inFolder.out.includes("old flat path") && first.out.includes("old flat path"), inFolder.out);
+
 console.log("\n=== language samples write — the index and a second run");
 const data = JSON.parse(readFileSync(join(out, "samples.json"), "utf8"));
 const index = readFileSync(join(out, "index.html"), "utf8");

@@ -1,0 +1,93 @@
+{
+ "type": "BRAND",
+ "medium": "LOGO",
+ "roles": {
+  "title": "name",
+  "line": "knownFor",
+  "picture": "banner",
+  "date": "since",
+  "place": "city"
+ },
+ "records": [
+  {
+   "key": "studio-mira",
+   "name": "Studio Mira",
+   "knownFor": "Product design",
+   "city": "Bengaluru",
+   "since": "2023-02-14",
+   "mark": {
+    "icon": "PENCIL",
+    "color": "PRIMARY"
+   },
+   "banner": {
+    "caption": "Studio Mira's team reviewing screens on a wall",
+    "ratio": "21:9"
+   },
+   "about": "A design studio that teaches how real product work is done: from the first brief to the files a developer builds from."
+  },
+  {
+   "key": "byte-school",
+   "name": "Byte School",
+   "knownFor": "Data and AI",
+   "city": "Pune",
+   "since": "2022-09-01",
+   "mark": {
+    "icon": "CODE",
+    "color": "INFO"
+   },
+   "banner": {
+    "caption": "A classroom of laptops with charts on the screens",
+    "ratio": "21:9"
+   },
+   "about": "Engineers from product teams teach the code they use at work, with projects you can show an employer."
+  },
+  {
+   "key": "northlight",
+   "name": "Northlight Academy",
+   "knownFor": "Photography",
+   "city": "Mumbai",
+   "since": "2023-06-20",
+   "mark": {
+    "icon": "EYE",
+    "color": "WARNING"
+   },
+   "banner": {
+    "caption": "A photographer framing a street at dusk",
+    "ratio": "21:9"
+   },
+   "about": "Working photographers teach light and framing on the camera you already own, then walk the streets with you."
+  },
+  {
+   "key": "kiln-co",
+   "name": "Kiln & Co",
+   "knownFor": "Ceramics",
+   "city": "Pune",
+   "since": "2024-01-10",
+   "mark": {
+    "icon": "PALETTE",
+    "color": "ERROR"
+   },
+   "banner": {
+    "caption": "Shelves of glazed bowls in a sunlit studio",
+    "ratio": "21:9"
+   },
+   "about": "A ceramics studio in Koregaon Park with eight wheels, a gas kiln and weekend classes for every level."
+  },
+  {
+   "key": "crumb",
+   "name": "Crumb Collective",
+   "knownFor": "Baking",
+   "city": "Bengaluru",
+   "since": "2024-03-05",
+   "mark": {
+    "icon": "STORE",
+    "color": "SUCCESS"
+   },
+   "banner": {
+    "caption": "Loaves cooling on a rack in a small bakery",
+    "ratio": "21:9"
+   },
+   "about": "Three bakers who teach bread at home, from your first starter to a loaf you are proud to share."
+  }
+ ]
+}

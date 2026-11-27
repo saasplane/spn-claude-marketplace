@@ -1,0 +1,1655 @@
+{
+  "name": "surface",
+  "version": "1.0.0",
+  "extends": null,
+  "domain": {
+    "product": "SaaS Plane's own apps",
+    "records": [
+      "Organization",
+      "Member",
+      "App",
+      "Site",
+      "Role"
+    ],
+    "reads": "module screens, Support apps, sign-in, the consoles and any app with no language of its own"
+  },
+  "references": [],
+  "shared": {
+    "BRAND": {
+      "source": "NONE",
+      "values": {
+        "mtype": "BRAND"
+      },
+      "why": "Surface is brand-free: it sets no primary, greys or typefaces; they are the design system's own until a platform sets its brand."
+    },
+    "DRAWING": {
+      "source": "OWN",
+      "values": {
+        "mtype": "DRAWING",
+        "drawingStyle": {
+          "lineWeights": {
+            "detail": 0.75,
+            "line": 1,
+            "focus": 1.25
+          },
+          "lineStyles": {
+            "SOLID": "edges and wires",
+            "DASHED": "a reply, an inactive unit, a slot you fill",
+            "DOTTED": "a guide or a boundary"
+          },
+          "grid": 4,
+          "lineOpacity": false,
+          "textLevels": [
+            "LABEL",
+            "NAME",
+            "DETAIL"
+          ]
+        },
+        "colourAndStrength": {
+          "dashedLine": {
+            "color": "MUTED_TEXT"
+          },
+          "dottedGuide": {
+            "color": "ACCENT",
+            "strengthPercent": 24
+          },
+          "dottedBoundary": {
+            "color": "ACCENT",
+            "strengthPercentLight": 45,
+            "strengthPercentDark": 55
+          },
+          "illustrationLine": {
+            "color": "INK",
+            "strength": "FULL"
+          }
+        },
+        "characters": {
+          "inTheDesignSystem": "NONE",
+          "drawnBy": "A_LANGUAGE_THAT_WANTS_THEM"
+        },
+        "howTheBlocksMeet": {
+          "wireEnds": "MIDDLE_OF_FACING_EDGE",
+          "wireLabel": "CLEAR_OF_WIRE",
+          "plateName": "INSIDE_PLATE",
+          "wordsInset": "KEPT_NO_EDGE_CROSSES",
+          "glyphAndWords": "ONE_MIDDLE",
+          "wordsUnderAName": "ONE_SHORT_LINE",
+          "codeInDrawing": "REAL",
+          "noWireCrossesAWire": true
+        },
+        "drawingScale": {
+          "steps": {
+            "S": "IN_A_CARD",
+            "M": "BESIDE_OR_UNDER_WORDS",
+            "L": "IN_A_HERO"
+          },
+          "text": {
+            "LABEL": {
+              "S": 9,
+              "M": 9.5,
+              "L": 10.5
+            },
+            "NAME": {
+              "S": 11,
+              "M": 12,
+              "L": 14
+            },
+            "DETAIL": {
+              "S": 9.5,
+              "M": 10,
+              "L": 11.5
+            }
+          },
+          "smallestWord": 9,
+          "lineWeights": {
+            "detail": 0.75,
+            "line": 1,
+            "focus": 1.25
+          },
+          "grid": 4,
+          "textShrinksToFit": false,
+          "madeAt": "1:1"
+        }
+      },
+      "why": "Every drawing is made on one scale, with three weights, three styles and no faded line, so that two drawings read as one hand's; the sizes and percentages are SaaS Plane's defaults, which a language that draws may change."
+    },
+    "MOTION": {
+      "source": "INHERITED",
+      "values": {
+        "mtype": "MOTION"
+      },
+      "why": "Speed and easing are the design system's own, and no language sets its own timing yet; reduced motion holds everything still (RULE.SUPPORT.SURFACE.201)."
+    },
+    "VOICE": {
+      "source": "NONE",
+      "values": {
+        "mtype": "VOICE",
+        "howItSpeaks": null
+      },
+      "why": "Surface's voice is not written yet, so no part of this language holds one."
+    }
+  },
+  "categories": {
+    "MARKETING": {
+      "LAYOUTS": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "LAYOUTS"
+        },
+        "why": "A Visitor moves through a few groups from one bar; a landing page keeps them on its one action."
+      },
+      "PAGES": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "PAGES",
+          "pageAndSections": {
+            "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
+            "fill": {
+              "default": "BASE",
+              "readingChanges": "DEFAULT",
+              "closingCall": "PRIMARY",
+              "hero": "NONE"
+            },
+            "alternateByTurn": false,
+            "sizeStrongest": "LG",
+            "onward": "THE_GROUPS_OWN_LINK_FIRST",
+            "emphasisPerSection": "ONE"
+          }
+        },
+        "why": "A site page kind states one order of sections as its reader asks, and Surface keeps each order the catalogue gives it."
+      },
+      "CONTAINERS": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "CONTAINERS",
+          "grounds": {
+            "ground": "BASE",
+            "pattern": "NONE",
+            "scene": "NONE"
+          },
+          "sectionUnits": {
+            "hero": {
+              "unit": "DSFeature",
+              "pageLevel": "PAGE",
+              "type": "SPLIT_END",
+              "textAlign": "START",
+              "verticalAlign": "CENTER",
+              "actionsPlacement": "AFTER_ITEMS",
+              "factsPlacement": "AFTER_DESCRIPTION"
+            },
+            "band": {
+              "unit": "DSFeature",
+              "pageLevel": "CONTAINER",
+              "type": "MEDIA_BOTTOM",
+              "textAlign": "CENTER"
+            }
+          },
+          "twoLayers": {
+            "layers": [
+              "SECTION_BACKGROUND",
+              "FEATURE_MEDIA"
+            ],
+            "questions": {
+              "mustBeRead": "FEATURE",
+              "aPlaceTheWordsStandOn": "SECTION",
+              "belongsToOneItem": "ITEM"
+            },
+            "kinds": [
+              {
+                "kind": "LANDING_HERO",
+                "background": [
+                  "SCENE",
+                  "NONE"
+                ],
+                "media": "NONE_WHILE_A_SCENE_STANDS_ELSE_DRAWING_BESIDE"
+              },
+              {
+                "kind": "SUB_PAGE_HERO",
+                "background": [
+                  "NONE",
+                  "DOTS"
+                ],
+                "media": "DRAWING_BESIDE"
+              },
+              {
+                "kind": "CLAIM",
+                "background": [
+                  "NONE",
+                  "DOTS"
+                ],
+                "media": "DRAWING_BESIDE_OR_UNDER"
+              },
+              {
+                "kind": "ITEMS_WITH_PICTURE",
+                "background": [
+                  "NONE"
+                ],
+                "media": "DRAWING_BESIDE_ITEMS_AND_EACH_ITEMS_PICTURE"
+              },
+              {
+                "kind": "GRID_OR_STATS",
+                "background": [
+                  "NONE",
+                  "DOTS"
+                ],
+                "media": "NONE"
+              },
+              {
+                "kind": "QUOTE",
+                "background": [
+                  "NONE"
+                ],
+                "media": "NONE_OR_ONE_PICTURE"
+              },
+              {
+                "kind": "DEMO",
+                "background": [
+                  "NONE",
+                  "DOTS"
+                ],
+                "media": "PRODUCT_VIEW_UNDER_WORDS"
+              },
+              {
+                "kind": "ACTION_CLOSING",
+                "background": [
+                  "NONE",
+                  "DOTS"
+                ],
+                "media": "NONE"
+              }
+            ]
+          },
+          "scene": {
+            "perPage": 1,
+            "ratio": "1:1",
+            "stretched": false,
+            "landWidth": 2560,
+            "landEnds": "FADE",
+            "subjects": "INSIDE_CONTENT_BOX",
+            "behindFeatureMedia": false,
+            "onPhone": "UNDER_THE_WORDS"
+          },
+          "leftOpen": {
+            "textToMediaSplit": "NONE_STATED_BEYOND_SHOW_ITS_HALF_WIDTH",
+            "columnGap": "SECTION_ROOM"
+          }
+        },
+        "why": "A section is read from its container kind's look and the fill, size and alignment that hold across, and a language that sets none leaves the site as the container kinds state it."
+      },
+      "WIDGETS": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "WIDGETS",
+          "units": {
+            "card": {
+              "unit": "DSFeature",
+              "pageLevel": "WIDGET",
+              "type": "MEDIA_TOP"
+            }
+          },
+          "alignmentAndItems": {
+            "text": "START",
+            "centredOnlyFor": [
+              "A_STATEMENT",
+              "A_CLOSING_CALL",
+              "A_HERO_WITH_NO_PICTURE",
+              "SHORT_FRAMING_OVER_ONE_CENTREPIECE_MEDIUM"
+            ],
+            "neverCentred": [
+              "A_PARAGRAPH",
+              "AN_ITEM_GRID"
+            ],
+            "claimCarrier": "ITEMS_OR_THE_MEDIUMS_LABELS_NEVER_BOTH",
+            "itemsBesideAMedium": {
+              "words": "START",
+              "items": "ITEMS_SPLIT_END",
+              "medium": "CENTRED_ON_THE_ITEMS"
+            },
+            "gridOfPeers": "NO_DRAWING_BESIDE_IT"
+          }
+        },
+        "why": "One card form, a DSFeature with its media on top, and one alignment rule, so that a card and its words read the same on every page."
+      },
+      "THEME": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "THEME"
+        },
+        "why": "A site takes the looks of its surface category, layered as rule 575 orders them: the defaults, the brand, the category's looks, then an account's branding (DSPageCategory gives each route its category). Surface sets no look of its own for a site, so a product's look comes from its Brand, and each kind's emphasis is in the catalogue."
+      },
+      "MEDIA": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "MEDIA",
+          "icons": {
+            "thingOfItsOwn": {
+              "media": "MARK"
+            },
+            "lineAPersonReads": {
+              "media": "ICON"
+            },
+            "navigationEntry": "BARE_ICON",
+            "action": "ICON_INSIDE_THE_CONTROL",
+            "oneGroupHoldsOne": true,
+            "iconsOnAllOrNone": true
+          },
+          "photosAndProductViews": {
+            "productView": "FRAMED_RAISED",
+            "photo": "FLUSH_ROUNDED",
+            "screenshotInDrawnWindow": "CROP_TO_TOP_OF_PAGE"
+          },
+          "whereMediaGo": {
+            "heroScene": {
+              "placedOn": "SECTION",
+              "through": "mediaNode, edge to edge",
+              "type": "BACKDROP"
+            },
+            "closeUpOrSheet": {
+              "placedOn": "FEATURE",
+              "through": "media"
+            },
+            "smallPicture": {
+              "placedOn": "ITEM",
+              "through": "item media"
+            },
+            "onePicture": "SPLIT_END",
+            "widePictureOrTwoPanes": "MEDIA_BOTTOM",
+            "colours": "DESIGN_SYSTEM_TOKENS_ONLY"
+          },
+          "sizeByPlacement": {
+            "hero": "THE_MEDIA_COLUMN_BESIDE_THE_WORDS",
+            "besideTheWords": "THE_FEATURES_SPLIT",
+            "underTheWords": "THE_SECTIONS_CONTENT_WIDTH",
+            "bandOfMediaOnly": "THE_CONTENT_WIDTH",
+            "containerGround": "THE_CONTAINER_EDGE_TO_EDGE_QUIET",
+            "itemPicture": "THE_ITEMS_MEDIA_BOX",
+            "neverCut": true,
+            "madeForItsFrame": true
+          }
+        },
+        "why": "Each medium is framed by its kind and placed where its size fits, so a product view, a photo and a drawing keep one frame on every page."
+      },
+      "MOTION": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "MOTION",
+          "whatMoves": {
+            "door": "LIT_AS_ONE_TARGET_UNDER_THE_POINTER",
+            "arrow": "MOVES_ONLY_WHILE_HOVERED_OR_PRESSED",
+            "backdrop": "MAY_MOVE_STILL_UNDER_REDUCED_MOTION",
+            "phone": "READS_THE_SAME_WITHOUT_HOVER",
+            "arrival": {
+              "angle": "NONE_SET",
+              "drawing": "SET_BY_A_LANGUAGE_THAT_DRAWS"
+            }
+          }
+        },
+        "why": "Motion adds to a page and never carries it: hover only adds on the web, so a phone reads the same, and the shared motion tokens hold the speed."
+      },
+      "WORDS": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "WORDS",
+          "textUnits": {
+            "text": {
+              "paragraph": {
+                "unit": "DSText",
+                "typography": "CONTENT_MD"
+              },
+              "row": {
+                "typography": "CONTENT_SM"
+              },
+              "label": {
+                "typography": "CONTENT_SM",
+                "tone": "MUTED"
+              },
+              "note": {
+                "tone": "SUBTLE"
+              },
+              "eyebrow": {
+                "typography": "CONTENT_XS",
+                "tone": "MUTED",
+                "format": "UPPERCASE"
+              }
+            }
+          },
+          "pageText": {
+            "paragraph": "CONTENT_MD",
+            "row": "CONTENT_SM",
+            "label": {
+              "typography": "CONTENT_SM",
+              "tone": "MUTED"
+            },
+            "description": {
+              "tone": "QUIET"
+            },
+            "note": {
+              "typography": "CONTENT_SM",
+              "tone": "SUBTLE"
+            },
+            "finePrint": "CONTENT_XS",
+            "title": "TITLE_SM..TITLE_LG by level",
+            "display": "HEADING_LG and up as the container kinds give it",
+            "eyebrow": {
+              "typography": "CONTENT_XS",
+              "tone": "MUTED",
+              "format": "UPPERCASE"
+            }
+          },
+          "wordLengths": {
+            "eyebrow": {
+              "words": {
+                "min": 1,
+                "max": 3
+              }
+            },
+            "heroTitle": {
+              "words": {
+                "min": 4,
+                "max": 8
+              },
+              "lines": {
+                "max": 2
+              }
+            },
+            "heroLine": {
+              "words": {
+                "min": 15,
+                "max": 30
+              },
+              "lines": {
+                "max": 2
+              }
+            },
+            "sectionTitle": {
+              "words": {
+                "min": 4,
+                "max": 8
+              },
+              "lines": {
+                "max": 1
+              }
+            },
+            "sectionLine": {
+              "words": {
+                "min": 15,
+                "max": 30
+              },
+              "lines": {
+                "max": 2
+              }
+            },
+            "featureTitle": {
+              "words": {
+                "min": 2,
+                "max": 5
+              }
+            },
+            "featureLine": {
+              "words": {
+                "min": 8,
+                "max": 16
+              },
+              "lines": {
+                "max": 2
+              }
+            },
+            "itemTitle": {
+              "words": {
+                "min": 2,
+                "max": 4
+              }
+            },
+            "buttonLabel": {
+              "words": {
+                "min": 1,
+                "max": 3
+              }
+            }
+          },
+          "lengthLevels": {
+            "measuredAt": 1440,
+            "hero": "PAGE",
+            "section": "CONTAINER",
+            "feature": "WIDGET",
+            "item": "A_SECTIONS_ITEM"
+          },
+          "leftOut": {
+            "fields": [
+              "formHelp",
+              "emptyState",
+              "errorMessage"
+            ],
+            "because": "THE_BOOK_SAYS_WHAT_AN_ERROR_HOLDS_NOT_HOW_LONG_IT_RUNS"
+          }
+        },
+        "why": "A marketing page's words keep the book's length table by level, so every page reads at one pace, and a button label runs 1 to 3 words (RULE.SUPPORT.SURFACE.335); DSText's own steps give each role its size."
+      }
+    },
+    "MARKETPLACE": {
+      "LAYOUTS": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "LAYOUTS"
+        },
+        "why": "A Seeker comes back again and again to find one record, so one bar holds the search and the categories on every page."
+      },
+      "PAGES": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "PAGES",
+          "pageAndSections": {
+            "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
+            "fill": {
+              "default": "BASE",
+              "readingChanges": "DEFAULT",
+              "closingCall": "PRIMARY",
+              "hero": "NONE"
+            },
+            "alternateByTurn": false,
+            "sizeStrongest": "LG",
+            "onward": "THE_GROUPS_OWN_LINK_FIRST",
+            "emphasisPerSection": "ONE"
+          }
+        },
+        "why": "A Seeker moves from a search or a category through the records to one record and back, and Surface keeps each order the catalogue gives MARKETPLACE's page kinds."
+      },
+      "CONTAINERS": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "CONTAINERS",
+          "grounds": {
+            "ground": "BASE",
+            "pattern": "NONE",
+            "scene": "NONE"
+          },
+          "sectionUnits": {
+            "hero": {
+              "unit": "DSFeature",
+              "pageLevel": "PAGE",
+              "type": "SPLIT_END",
+              "textAlign": "START",
+              "verticalAlign": "CENTER",
+              "actionsPlacement": "AFTER_ITEMS",
+              "factsPlacement": "AFTER_DESCRIPTION"
+            },
+            "band": {
+              "unit": "DSFeature",
+              "pageLevel": "CONTAINER",
+              "type": "MEDIA_BOTTOM",
+              "textAlign": "CENTER"
+            }
+          },
+          "twoLayers": {
+            "layers": [
+              "SECTION_BACKGROUND",
+              "FEATURE_MEDIA"
+            ],
+            "questions": {
+              "mustBeRead": "FEATURE",
+              "aPlaceTheWordsStandOn": "SECTION",
+              "belongsToOneItem": "ITEM"
+            },
+            "kinds": [
+              {
+                "kind": "LANDING_HERO",
+                "background": [
+                  "SCENE",
+                  "NONE"
+                ],
+                "media": "NONE_WHILE_A_SCENE_STANDS_ELSE_DRAWING_BESIDE"
+              },
+              {
+                "kind": "SUB_PAGE_HERO",
+                "background": [
+                  "NONE",
+                  "DOTS"
+                ],
+                "media": "DRAWING_BESIDE"
+              },
+              {
+                "kind": "CLAIM",
+                "background": [
+                  "NONE",
+                  "DOTS"
+                ],
+                "media": "DRAWING_BESIDE_OR_UNDER"
+              },
+              {
+                "kind": "ITEMS_WITH_PICTURE",
+                "background": [
+                  "NONE"
+                ],
+                "media": "DRAWING_BESIDE_ITEMS_AND_EACH_ITEMS_PICTURE"
+              },
+              {
+                "kind": "GRID_OR_STATS",
+                "background": [
+                  "NONE",
+                  "DOTS"
+                ],
+                "media": "NONE"
+              },
+              {
+                "kind": "QUOTE",
+                "background": [
+                  "NONE"
+                ],
+                "media": "NONE_OR_ONE_PICTURE"
+              },
+              {
+                "kind": "DEMO",
+                "background": [
+                  "NONE",
+                  "DOTS"
+                ],
+                "media": "PRODUCT_VIEW_UNDER_WORDS"
+              },
+              {
+                "kind": "ACTION_CLOSING",
+                "background": [
+                  "NONE",
+                  "DOTS"
+                ],
+                "media": "NONE"
+              }
+            ]
+          },
+          "scene": {
+            "perPage": 1,
+            "ratio": "1:1",
+            "stretched": false,
+            "landWidth": 2560,
+            "landEnds": "FADE",
+            "subjects": "INSIDE_CONTENT_BOX",
+            "behindFeatureMedia": false,
+            "onPhone": "UNDER_THE_WORDS"
+          },
+          "leftOpen": {
+            "textToMediaSplit": "NONE_STATED_BEYOND_SHOW_ITS_HALF_WIDTH",
+            "columnGap": "SECTION_ROOM"
+          }
+        },
+        "why": "A section is read from its container kind's look and the fill, size and alignment that hold across, and a language that sets none leaves the site as the container kinds state it."
+      },
+      "WIDGETS": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "WIDGETS",
+          "units": {
+            "card": {
+              "unit": "DSFeature",
+              "pageLevel": "WIDGET",
+              "type": "MEDIA_TOP"
+            }
+          },
+          "alignmentAndItems": {
+            "text": "START",
+            "centredOnlyFor": [
+              "A_STATEMENT",
+              "A_CLOSING_CALL",
+              "A_HERO_WITH_NO_PICTURE",
+              "SHORT_FRAMING_OVER_ONE_CENTREPIECE_MEDIUM"
+            ],
+            "neverCentred": [
+              "A_PARAGRAPH",
+              "AN_ITEM_GRID"
+            ],
+            "claimCarrier": "ITEMS_OR_THE_MEDIUMS_LABELS_NEVER_BOTH",
+            "itemsBesideAMedium": {
+              "words": "START",
+              "items": "ITEMS_SPLIT_END",
+              "medium": "CENTRED_ON_THE_ITEMS"
+            },
+            "gridOfPeers": "NO_DRAWING_BESIDE_IT"
+          }
+        },
+        "why": "One card form for every record, its picture on top and the same facts in the same places, so a Seeker compares cards at a glance; the alignment rule is every site's."
+      },
+      "THEME": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "THEME"
+        },
+        "why": "A site takes the looks of its surface category, layered as rule 575 orders them: the defaults, the brand, the category's looks, then an account's branding (DSPageCategory gives each route its category). Surface sets no look of its own for a site, so a product's look comes from its Brand, and each kind's emphasis is in the catalogue."
+      },
+      "MEDIA": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "MEDIA",
+          "icons": {
+            "thingOfItsOwn": {
+              "media": "MARK"
+            },
+            "lineAPersonReads": {
+              "media": "ICON"
+            },
+            "navigationEntry": "BARE_ICON",
+            "action": "ICON_INSIDE_THE_CONTROL",
+            "oneGroupHoldsOne": true,
+            "iconsOnAllOrNone": true
+          },
+          "photosAndProductViews": {
+            "productView": "FRAMED_RAISED",
+            "photo": "FLUSH_ROUNDED",
+            "screenshotInDrawnWindow": "CROP_TO_TOP_OF_PAGE"
+          },
+          "whereMediaGo": {
+            "heroScene": {
+              "placedOn": "SECTION",
+              "through": "mediaNode, edge to edge",
+              "type": "BACKDROP"
+            },
+            "closeUpOrSheet": {
+              "placedOn": "FEATURE",
+              "through": "media"
+            },
+            "smallPicture": {
+              "placedOn": "ITEM",
+              "through": "item media"
+            },
+            "onePicture": "SPLIT_END",
+            "widePictureOrTwoPanes": "MEDIA_BOTTOM",
+            "colours": "DESIGN_SYSTEM_TOKENS_ONLY"
+          },
+          "sizeByPlacement": {
+            "hero": "THE_MEDIA_COLUMN_BESIDE_THE_WORDS",
+            "besideTheWords": "THE_FEATURES_SPLIT",
+            "underTheWords": "THE_SECTIONS_CONTENT_WIDTH",
+            "bandOfMediaOnly": "THE_CONTENT_WIDTH",
+            "containerGround": "THE_CONTAINER_EDGE_TO_EDGE_QUIET",
+            "itemPicture": "THE_ITEMS_MEDIA_BOX",
+            "neverCut": true,
+            "madeForItsFrame": true
+          }
+        },
+        "why": "A record is chosen by its pictures, so each photo keeps one frame and one ratio on its card and in its gallery, and a maker's mark keeps its own."
+      },
+      "MOTION": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "MOTION",
+          "whatMoves": {
+            "door": "LIT_AS_ONE_TARGET_UNDER_THE_POINTER",
+            "arrow": "MOVES_ONLY_WHILE_HOVERED_OR_PRESSED",
+            "backdrop": "MAY_MOVE_STILL_UNDER_REDUCED_MOTION",
+            "phone": "READS_THE_SAME_WITHOUT_HOVER",
+            "arrival": {
+              "angle": "NONE_SET",
+              "drawing": "SET_BY_A_LANGUAGE_THAT_DRAWS"
+            }
+          }
+        },
+        "why": "Motion adds to a page and never carries it: hover only adds on the web, so a phone reads the same, and the shared motion tokens hold the speed."
+      },
+      "WORDS": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "WORDS",
+          "textUnits": {
+            "text": {
+              "paragraph": {
+                "unit": "DSText",
+                "typography": "CONTENT_MD"
+              },
+              "row": {
+                "typography": "CONTENT_SM"
+              },
+              "label": {
+                "typography": "CONTENT_SM",
+                "tone": "MUTED"
+              },
+              "note": {
+                "tone": "SUBTLE"
+              },
+              "eyebrow": {
+                "typography": "CONTENT_XS",
+                "tone": "MUTED",
+                "format": "UPPERCASE"
+              }
+            }
+          },
+          "pageText": {
+            "paragraph": "CONTENT_MD",
+            "row": "CONTENT_SM",
+            "label": {
+              "typography": "CONTENT_SM",
+              "tone": "MUTED"
+            },
+            "description": {
+              "tone": "QUIET"
+            },
+            "note": {
+              "typography": "CONTENT_SM",
+              "tone": "SUBTLE"
+            },
+            "finePrint": "CONTENT_XS",
+            "title": "TITLE_SM..TITLE_LG by level",
+            "display": "HEADING_LG and up as the container kinds give it",
+            "eyebrow": {
+              "typography": "CONTENT_XS",
+              "tone": "MUTED",
+              "format": "UPPERCASE"
+            }
+          },
+          "wordLengths": {
+            "eyebrow": {
+              "words": {
+                "min": 1,
+                "max": 3
+              }
+            },
+            "heroTitle": {
+              "words": {
+                "min": 4,
+                "max": 8
+              },
+              "lines": {
+                "max": 2
+              }
+            },
+            "heroLine": {
+              "words": {
+                "min": 15,
+                "max": 30
+              },
+              "lines": {
+                "max": 2
+              }
+            },
+            "sectionTitle": {
+              "words": {
+                "min": 4,
+                "max": 8
+              },
+              "lines": {
+                "max": 1
+              }
+            },
+            "sectionLine": {
+              "words": {
+                "min": 15,
+                "max": 30
+              },
+              "lines": {
+                "max": 2
+              }
+            },
+            "featureTitle": {
+              "words": {
+                "min": 2,
+                "max": 5
+              }
+            },
+            "featureLine": {
+              "words": {
+                "min": 8,
+                "max": 16
+              },
+              "lines": {
+                "max": 2
+              }
+            },
+            "itemTitle": {
+              "words": {
+                "min": 2,
+                "max": 4
+              }
+            },
+            "buttonLabel": {
+              "words": {
+                "min": 1,
+                "max": 3
+              }
+            }
+          },
+          "lengthLevels": {
+            "measuredAt": 1440,
+            "hero": "PAGE",
+            "section": "CONTAINER",
+            "feature": "WIDGET",
+            "item": "A_SECTIONS_ITEM"
+          },
+          "leftOut": {
+            "fields": [
+              "formHelp",
+              "emptyState",
+              "errorMessage"
+            ],
+            "because": "THE_BOOK_SAYS_WHAT_AN_ERROR_HOLDS_NOT_HOW_LONG_IT_RUNS"
+          }
+        },
+        "why": "A record's words are its facts: its name and the two or three facts that decide, in the same order on every card, and a button label runs 1 to 3 words (RULE.SUPPORT.SURFACE.335); DSText's own steps give each role its size."
+      }
+    },
+    "RESOURCES": {
+      "LAYOUTS": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "LAYOUTS"
+        },
+        "why": "The layout follows the job: a Learner moving through deep docs keeps every level in the rail, and a Learner landing on one answer from a search needs only a bar."
+      },
+      "PAGES": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "PAGES",
+          "pageAndSections": {
+            "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
+            "fill": {
+              "default": "BASE",
+              "readingChanges": "DEFAULT",
+              "closingCall": "PRIMARY",
+              "hero": "NONE"
+            },
+            "alternateByTurn": false,
+            "sizeStrongest": "LG",
+            "onward": "THE_GROUPS_OWN_LINK_FIRST",
+            "emphasisPerSection": "ONE"
+          }
+        },
+        "why": "A Learner reads a few page kinds, each in the order that answers what they ask next, so Surface keeps the catalogue's page kinds for RESOURCES as they are."
+      },
+      "CONTAINERS": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "CONTAINERS",
+          "grounds": {
+            "ground": "BASE",
+            "pattern": "NONE",
+            "scene": "NONE"
+          },
+          "sectionUnits": {
+            "hero": {
+              "unit": "DSFeature",
+              "pageLevel": "PAGE",
+              "type": "SPLIT_END",
+              "textAlign": "START",
+              "verticalAlign": "CENTER",
+              "actionsPlacement": "AFTER_ITEMS",
+              "factsPlacement": "AFTER_DESCRIPTION"
+            },
+            "band": {
+              "unit": "DSFeature",
+              "pageLevel": "CONTAINER",
+              "type": "MEDIA_BOTTOM",
+              "textAlign": "CENTER"
+            }
+          },
+          "twoLayers": {
+            "layers": [
+              "SECTION_BACKGROUND",
+              "FEATURE_MEDIA"
+            ],
+            "questions": {
+              "mustBeRead": "FEATURE",
+              "aPlaceTheWordsStandOn": "SECTION",
+              "belongsToOneItem": "ITEM"
+            },
+            "kinds": [
+              {
+                "kind": "LANDING_HERO",
+                "background": [
+                  "SCENE",
+                  "NONE"
+                ],
+                "media": "NONE_WHILE_A_SCENE_STANDS_ELSE_DRAWING_BESIDE"
+              },
+              {
+                "kind": "SUB_PAGE_HERO",
+                "background": [
+                  "NONE",
+                  "DOTS"
+                ],
+                "media": "DRAWING_BESIDE"
+              },
+              {
+                "kind": "CLAIM",
+                "background": [
+                  "NONE",
+                  "DOTS"
+                ],
+                "media": "DRAWING_BESIDE_OR_UNDER"
+              },
+              {
+                "kind": "ITEMS_WITH_PICTURE",
+                "background": [
+                  "NONE"
+                ],
+                "media": "DRAWING_BESIDE_ITEMS_AND_EACH_ITEMS_PICTURE"
+              },
+              {
+                "kind": "GRID_OR_STATS",
+                "background": [
+                  "NONE",
+                  "DOTS"
+                ],
+                "media": "NONE"
+              },
+              {
+                "kind": "QUOTE",
+                "background": [
+                  "NONE"
+                ],
+                "media": "NONE_OR_ONE_PICTURE"
+              },
+              {
+                "kind": "DEMO",
+                "background": [
+                  "NONE",
+                  "DOTS"
+                ],
+                "media": "PRODUCT_VIEW_UNDER_WORDS"
+              },
+              {
+                "kind": "ACTION_CLOSING",
+                "background": [
+                  "NONE",
+                  "DOTS"
+                ],
+                "media": "NONE"
+              }
+            ]
+          },
+          "scene": {
+            "perPage": 1,
+            "ratio": "1:1",
+            "stretched": false,
+            "landWidth": 2560,
+            "landEnds": "FADE",
+            "subjects": "INSIDE_CONTENT_BOX",
+            "behindFeatureMedia": false,
+            "onPhone": "UNDER_THE_WORDS"
+          },
+          "leftOpen": {
+            "textToMediaSplit": "NONE_STATED_BEYOND_SHOW_ITS_HALF_WIDTH",
+            "columnGap": "SECTION_ROOM"
+          }
+        },
+        "why": "A section is read from its container kind's look and the fill, size and alignment that hold across, and a language that sets none leaves the site as the container kinds state it."
+      },
+      "WIDGETS": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "WIDGETS",
+          "units": {
+            "card": {
+              "unit": "DSFeature",
+              "pageLevel": "WIDGET",
+              "type": "MEDIA_TOP"
+            }
+          },
+          "alignmentAndItems": {
+            "text": "START",
+            "centredOnlyFor": [
+              "A_STATEMENT",
+              "A_CLOSING_CALL",
+              "A_HERO_WITH_NO_PICTURE",
+              "SHORT_FRAMING_OVER_ONE_CENTREPIECE_MEDIUM"
+            ],
+            "neverCentred": [
+              "A_PARAGRAPH",
+              "AN_ITEM_GRID"
+            ],
+            "claimCarrier": "ITEMS_OR_THE_MEDIUMS_LABELS_NEVER_BOTH",
+            "itemsBesideAMedium": {
+              "words": "START",
+              "items": "ITEMS_SPLIT_END",
+              "medium": "CENTRED_ON_THE_ITEMS"
+            },
+            "gridOfPeers": "NO_DRAWING_BESIDE_IT"
+          }
+        },
+        "why": "One card form, a DSFeature with its media on top, and one alignment rule, so that a card and its words read the same on every page."
+      },
+      "THEME": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "THEME"
+        },
+        "why": "A site takes the looks of its surface category, layered as rule 575 orders them: the defaults, the brand, the category's looks, then an account's branding (DSPageCategory gives each route its category). Surface sets no look of its own for a site, so a product's look comes from its Brand, and each kind's emphasis is in the catalogue."
+      },
+      "MEDIA": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "MEDIA",
+          "icons": {
+            "thingOfItsOwn": {
+              "media": "MARK"
+            },
+            "lineAPersonReads": {
+              "media": "ICON"
+            },
+            "navigationEntry": "BARE_ICON",
+            "action": "ICON_INSIDE_THE_CONTROL",
+            "oneGroupHoldsOne": true,
+            "iconsOnAllOrNone": true
+          },
+          "photosAndProductViews": {
+            "productView": "FRAMED_RAISED",
+            "photo": "FLUSH_ROUNDED",
+            "screenshotInDrawnWindow": "CROP_TO_TOP_OF_PAGE"
+          },
+          "whereMediaGo": {
+            "heroScene": {
+              "placedOn": "SECTION",
+              "through": "mediaNode, edge to edge",
+              "type": "BACKDROP"
+            },
+            "closeUpOrSheet": {
+              "placedOn": "FEATURE",
+              "through": "media"
+            },
+            "smallPicture": {
+              "placedOn": "ITEM",
+              "through": "item media"
+            },
+            "onePicture": "SPLIT_END",
+            "widePictureOrTwoPanes": "MEDIA_BOTTOM",
+            "colours": "DESIGN_SYSTEM_TOKENS_ONLY"
+          },
+          "sizeByPlacement": {
+            "hero": "THE_MEDIA_COLUMN_BESIDE_THE_WORDS",
+            "besideTheWords": "THE_FEATURES_SPLIT",
+            "underTheWords": "THE_SECTIONS_CONTENT_WIDTH",
+            "bandOfMediaOnly": "THE_CONTENT_WIDTH",
+            "containerGround": "THE_CONTAINER_EDGE_TO_EDGE_QUIET",
+            "itemPicture": "THE_ITEMS_MEDIA_BOX",
+            "neverCut": true,
+            "madeForItsFrame": true
+          },
+          "inTheReading": {
+            "kinds": [
+              "HEADINGS",
+              "FIGURES",
+              "CODE"
+            ],
+            "code": "PLACED_BY_ITS_LENGTH",
+            "width": "READING_WIDTH",
+            "pageHead": "HERO_A_DOC_PAGES_HEAD"
+          }
+        },
+        "why": "Each medium is framed by its kind and placed where its size fits, so a product view, a photo and a drawing keep one frame on every page. A doc is read whole, so its figures and its code stand in the reading at a reading width, under a doc page's head."
+      },
+      "MOTION": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "MOTION",
+          "whatMoves": {
+            "door": "LIT_AS_ONE_TARGET_UNDER_THE_POINTER",
+            "arrow": "MOVES_ONLY_WHILE_HOVERED_OR_PRESSED",
+            "backdrop": "MAY_MOVE_STILL_UNDER_REDUCED_MOTION",
+            "phone": "READS_THE_SAME_WITHOUT_HOVER",
+            "arrival": {
+              "angle": "NONE_SET",
+              "drawing": "SET_BY_A_LANGUAGE_THAT_DRAWS"
+            }
+          }
+        },
+        "why": "Motion adds to a page and never carries it: hover only adds on the web, so a phone reads the same, and the shared motion tokens hold the speed."
+      },
+      "WORDS": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "WORDS",
+          "textUnits": {
+            "text": {
+              "paragraph": {
+                "unit": "DSText",
+                "typography": "CONTENT_MD"
+              },
+              "row": {
+                "typography": "CONTENT_SM"
+              },
+              "label": {
+                "typography": "CONTENT_SM",
+                "tone": "MUTED"
+              },
+              "note": {
+                "tone": "SUBTLE"
+              },
+              "eyebrow": {
+                "typography": "CONTENT_XS",
+                "tone": "MUTED",
+                "format": "UPPERCASE"
+              }
+            }
+          },
+          "pageText": {
+            "paragraph": "CONTENT_MD",
+            "row": "CONTENT_SM",
+            "label": {
+              "typography": "CONTENT_SM",
+              "tone": "MUTED"
+            },
+            "description": {
+              "tone": "QUIET"
+            },
+            "note": {
+              "typography": "CONTENT_SM",
+              "tone": "SUBTLE"
+            },
+            "finePrint": "CONTENT_XS",
+            "title": "TITLE_SM..TITLE_LG by level",
+            "display": "HEADING_LG and up as the container kinds give it",
+            "eyebrow": {
+              "typography": "CONTENT_XS",
+              "tone": "MUTED",
+              "format": "UPPERCASE"
+            }
+          },
+          "wordLengths": {
+            "title": "the task, in the reader's words",
+            "body": "NO_BUDGET: a step says all it needs",
+            "order": "THE_REASON_BEFORE_THE_STEP",
+            "terms": "EACH_EXPLAINED",
+            "persuasion": "NONE"
+          },
+          "register": {
+            "writesAs": "A_DOC",
+            "reasonBeforeTheStep": true,
+            "eachTermExplained": true,
+            "persuasion": false,
+            "inTheReading": [
+              "HEADINGS",
+              "FIGURES",
+              "CODE"
+            ],
+            "width": "READING_WIDTH"
+          }
+        },
+        "why": "A Learner came to learn or to follow steps, so a doc follows the book's readability bar and carries no length budget by level."
+      }
+    },
+    "DASHBOARD": {
+      "LAYOUTS": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "LAYOUTS"
+        },
+        "why": "The page chooses its layout by the app's job, never by its look."
+      },
+      "PAGES": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "PAGES"
+        },
+        "why": "A screen's page kind follows from its data and its person, which the design skill reads; the language keeps the catalogue's kinds for the category and never says which page gets which."
+      },
+      "CONTAINERS": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "CONTAINERS",
+          "panels": {
+            "parts": [
+              "HEADER",
+              "CONTENT",
+              "FOOTER"
+            ],
+            "onePanelPer": "THING_READ_OR_SAVED_WHOLE",
+            "readAndEditPages": "SAME_PARTS_SAME_ORDER",
+            "actions": "FOOTER_START",
+            "sectionsAre": "TITLED_PARTS_NEVER_PANELS"
+          }
+        },
+        "why": "A panel frames what a person reads or saves as a whole, so a read page and an edit page keep the same parts in the same order."
+      },
+      "WIDGETS": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "WIDGETS",
+          "units": {
+            "list": "DSDataTable, its search and filters on the server",
+            "line": "the end holds actions, a badge or both",
+            "state": "a badge; the normal state shows none",
+            "entered": "DSForm.Field",
+            "read": "DSDataUnit"
+          }
+        },
+        "why": "Each small thing follows its rule of content, so every app reads the same (RULE.SUPPORT.SURFACE.056 to 063)."
+      },
+      "THEME": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "THEME",
+          "looks": {
+            "density": "DENSE",
+            "radius": "THE_DESIGN_SYSTEM_DEFAULT",
+            "mode": "THE_PERSON_CHOOSES"
+          }
+        },
+        "why": "A Team works in a dashboard all day, so it takes the dense step."
+      },
+      "MEDIA": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "MEDIA",
+          "icons": {
+            "set": "LUCIDE",
+            "emptyState": "ICON_IN_A_PLATE",
+            "avatars": "INITIALS_OR_PHOTO"
+          }
+        },
+        "why": "An app's media are small and functional; a drawing belongs to a site."
+      },
+      "MOTION": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "MOTION",
+          "stateChanges": {
+            "rows": "NONE",
+            "overlays": "THE_DESIGN_SYSTEM_SPEED",
+            "saves": "A_TOAST"
+          }
+        },
+        "why": "In an app, motion only says that something changed."
+      },
+      "WORDS": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "WORDS",
+          "wordLengths": null,
+          "notMeasuredYet": [
+            "pageTitle",
+            "columnHeader",
+            "fieldHelp",
+            "emptyState",
+            "error"
+          ]
+        },
+        "why": "An app's words are short labels, and the lengths of its titles, headers, help and errors are not measured yet."
+      }
+    },
+    "PORTAL": {
+      "LAYOUTS": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "LAYOUTS"
+        },
+        "why": "The page chooses its layout by the app's job, never by its look."
+      },
+      "PAGES": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "PAGES"
+        },
+        "why": "A screen's page kind follows from its data and its person, which the design skill reads; the language keeps the catalogue's kinds for the category and never says which page gets which."
+      },
+      "CONTAINERS": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "CONTAINERS",
+          "panels": {
+            "parts": [
+              "HEADER",
+              "CONTENT",
+              "FOOTER"
+            ],
+            "onePanelPer": "THING_READ_OR_SAVED_WHOLE",
+            "readAndEditPages": "SAME_PARTS_SAME_ORDER",
+            "actions": "FOOTER_START",
+            "sectionsAre": "TITLED_PARTS_NEVER_PANELS"
+          }
+        },
+        "why": "A panel frames what a person reads or saves as a whole, so a read page and an edit page keep the same parts in the same order."
+      },
+      "WIDGETS": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "WIDGETS",
+          "units": {
+            "list": "DSDataTable, its search and filters on the server",
+            "line": "the end holds actions, a badge or both",
+            "state": "a badge; the normal state shows none",
+            "entered": "DSForm.Field",
+            "read": "DSDataUnit"
+          }
+        },
+        "why": "Each small thing follows its rule of content, so every app reads the same (RULE.SUPPORT.SURFACE.056 to 063)."
+      },
+      "THEME": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "THEME",
+          "looks": {
+            "density": "ROOMY",
+            "radius": "THE_DESIGN_SYSTEM_DEFAULT",
+            "mode": "THE_PERSON_CHOOSES"
+          }
+        },
+        "why": "An Individual opens a portal now and then, often on a phone, so it takes room."
+      },
+      "MEDIA": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "MEDIA",
+          "icons": {
+            "set": "LUCIDE",
+            "emptyState": "ICON_IN_A_PLATE",
+            "avatars": "INITIALS_OR_PHOTO"
+          }
+        },
+        "why": "An app's media are small and functional; a drawing belongs to a site."
+      },
+      "MOTION": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "MOTION",
+          "stateChanges": {
+            "rows": "NONE",
+            "overlays": "THE_DESIGN_SYSTEM_SPEED",
+            "saves": "A_TOAST"
+          }
+        },
+        "why": "In an app, motion only says that something changed."
+      },
+      "WORDS": {
+        "source": "OWN",
+        "pick": "ALL",
+        "customise": [],
+        "add": [],
+        "notUsed": [],
+        "values": {
+          "mtype": "WORDS",
+          "wordLengths": null,
+          "notMeasuredYet": [
+            "pageTitle",
+            "columnHeader",
+            "fieldHelp",
+            "emptyState",
+            "error"
+          ]
+        },
+        "why": "An app's words are short labels, and the lengths of its titles, headers, help and errors are not measured yet."
+      }
+    }
+  },
+  "gaps": {
+    "notInTheLanguage": {
+      "source": "NONE",
+      "why": "Surface is the default and leaves nothing out of itself: a choice no default holds is a part set NONE above, with its reason.",
+      "cases": []
+    },
+    "designSystemGaps": {
+      "source": "NONE",
+      "why": "No design-system gap is recorded against the default; a technique no choice covers is recorded by the language that wants it (RULE.SUPPORT.SURFACE.442).",
+      "cases": []
+    },
+    "whatTheAgentMustAsk": {
+      "source": "OWN",
+      "from": {
+        "decision": "the design system's default",
+        "ref": "spn-surface refs/support/surface/site-patterns.md",
+        "section": "What holds across"
+      },
+      "value": {
+        "questions": [
+          "Does the kind of reading change from the neighbours, so the fill is DEFAULT and not BASE?",
+          "Is this one of the page's one or two strongest sections, so LG?",
+          "Is this the one claim the page leans on, so the highlight?",
+          "Is this the hero or the closing call, so the band that takes the emphasis?",
+          "Does the picture show the claim, the items or stand wide, so SPLIT_END, ITEMS_SPLIT_END or MEDIA_BOTTOM?",
+          "Is the section's words alone, so centred?"
+        ]
+      },
+      "why": "The container kinds' own questions, asked in order, each deciding one prop.",
+      "cases": []
+    }
+  }
+}

@@ -1,9 +1,11 @@
 // The surface catalogue and a design language as generated regions: the reader, the resolver's five states, the frame both blocks draw.
-import { resolve } from "node:path";
+import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const HERE = resolve(import.meta.dirname, "..", "..", "..", "..");
-const { checkCatalogue, checkSpec, resolve: resolveLanguage, renderCatalogue, renderLanguage } = await import(pathToFileURL(resolve(HERE, "src", "scripts", "lib", "surface-catalogue.ts")).href);
+const { checkCatalogue, checkSpec, readChain, resolve: resolveLanguage, renderCatalogue, renderLanguage } = await import(pathToFileURL(resolve(HERE, "src", "scripts", "lib", "surface-catalogue.ts")).href);
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -107,6 +109,19 @@ const factsBesideBadge = (md) => [...md.matchAll(/```catalog[^\n]*\n([\s\S]*?)``
 ok("[MKT.SCRIPTS.659] every list the language block writes names three keys or fewer beside its badge, across all its rows, a customised kind's config folded into one",
   Math.max(...factsBesideBadge(page)) <= 3 && page.includes("  Version") === false, JSON.stringify(factsBesideBadge(page)));
 ok("it ends with the gaps and the spec in a fold", page.includes("~~~group Gaps |") && page.endsWith("```json file=docs/specs/design-languages/demo.spdl.json fold\n```"));
+
+// A language is a folder, and `extends` may name the parent alone.
+{
+  const dir = mkdtempSync(join(tmpdir(), "spdl-folder-"));
+  const put = (file, value) => { mkdirSync(resolve(file, ".."), { recursive: true }); writeFileSync(file, JSON.stringify(value)); };
+  put(join(dir, "surface", "surface.spdl.json"), spec("surface", null));
+  put(join(dir, "kid", "kid.spdl.json"), spec("kid", "surface"));
+  put(join(dir, "old.spdl.json"), spec("old", "surface@1"));
+  const bare = readChain(join(dir, "kid", "kid.spdl.json"), outline, [dir]);
+  ok("a child that names its parent alone is read from the parent's folder", bare.problems.length === 0 && bare.chain.map((c) => c.name).join() === "surface,kid", bare.problems.join("; "));
+  const flat = readChain(join(dir, "old.spdl.json"), outline, [dir]);
+  ok("a child that names surface@1 is still read", flat.problems.length === 0 && flat.chain.length === 2, flat.problems.join("; "));
+}
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-surface-catalogue` : `\n  all ${total} passed — t-surface-catalogue`);
 process.exit(failed ? 1 : 0);

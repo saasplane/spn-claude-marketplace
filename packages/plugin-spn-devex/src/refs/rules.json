@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "4c13451a"
+    "commit": "4b39bd49"
   },
   "rules": [
     {
@@ -39643,6 +39643,82 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.628",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A design language is one folder, `docs/specs/design-languages/<name>/`, holding `<name>.spdl.json` and `data/`",
+      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
+      "heading": "The parts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.629",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A language keeps its own dataset in `data/`, one JSON file for each kind of record, and a page tree is prepared from it",
+      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
+      "heading": "The parts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.630",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A design language, its data and the catalogue are never versioned by a bump; they only grow",
+      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
+      "heading": "The parts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.631",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A child names its parent alone: `extends: \"surface\"`",
+      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
+      "heading": "The parts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
       ]

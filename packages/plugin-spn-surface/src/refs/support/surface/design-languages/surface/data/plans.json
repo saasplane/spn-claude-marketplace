@@ -1,0 +1,85 @@
+{
+ "type": "PLAN",
+ "medium": "NONE",
+ "roles": {
+  "title": "name",
+  "line": "line",
+  "price": "price",
+  "state": "recommended"
+ },
+ "records": {
+  "learner": [
+   {
+    "key": "free",
+    "name": "Free",
+    "price": 0,
+    "line": "Buy courses one at a time.",
+    "feats": [
+     "Lifetime access to what you buy",
+     "Preview lessons of every course"
+    ]
+   },
+   {
+    "key": "plus",
+    "name": "Atelier Plus",
+    "price": 799,
+    "line": "Every self-paced course, for one monthly price.",
+    "feats": [
+     "Every self-paced course",
+     "10% off workshops",
+     "Certificates"
+    ],
+    "recommended": true
+   },
+   {
+    "key": "teams",
+    "name": "Teams",
+    "price": 1299,
+    "line": "Per seat, for a company that learns together.",
+    "feats": [
+     "Everything in Plus",
+     "Seats you assign",
+     "Progress reports"
+    ]
+   }
+  ],
+  "teacher": [
+   {
+    "key": "starter",
+    "name": "Starter",
+    "price": 0,
+    "line": "Publish your first course and keep 70% of each sale.",
+    "feats": [
+     "One course",
+     "Your own teacher page",
+     "Payouts every month"
+    ]
+   },
+   {
+    "key": "pro",
+    "name": "Pro",
+    "price": 1499,
+    "line": "Teach for a living: courses, workshops and keep 90%.",
+    "feats": [
+     "Unlimited courses",
+     "Live and in-person workshops",
+     "Coupons and bundles",
+     "Keep 90% of each sale"
+    ],
+    "recommended": true
+   },
+   {
+    "key": "academy",
+    "name": "Academy",
+    "price": 5999,
+    "line": "For a studio of teachers under one name.",
+    "feats": [
+     "Everything in Pro",
+     "Up to 20 teachers",
+     "Your academy page and logo",
+     "Shared payouts"
+    ]
+   }
+  ]
+ }
+}

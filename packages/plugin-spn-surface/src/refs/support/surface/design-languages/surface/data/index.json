@@ -1,0 +1,25 @@
+{
+ "domain": "Atelier",
+ "line": "A platform of courses and live workshops from independent teachers and academies.",
+ "today": "2026-11-27",
+ "currency": "INR",
+ "surfaces": {
+  "MARKETING": "Atelier for teachers",
+  "MARKETPLACE": "The catalogue of courses and workshops",
+  "RESOURCES": "Help, teacher guides, docs and the changelog",
+  "DASHBOARD": "The teacher's studio",
+  "PORTAL": "The learner's account"
+ },
+ "files": [
+  "categories",
+  "academies",
+  "teachers",
+  "items",
+  "bundles",
+  "reviews",
+  "questions",
+  "plans",
+  "learner",
+  "studio"
+ ]
+}

@@ -253,6 +253,27 @@ function copyCatalogue(book) {
   return true;
 }
 
+/** Surface's own language folder in the book, and where spn-surface carries its one copy: the spec and its `data/`, kept in step by this build. */
+const BOOK_LANGUAGE = join("docs", "specs", "design-languages", "surface");
+const PLUGIN_LANGUAGE = join(PACKAGES, "plugin-spn-surface", "src", "refs", "support", "surface", "design-languages", "surface");
+
+/** THE LANGUAGE FOLDER IS COPIED HERE, byte for byte and subfolders kept, as the catalogue is. Returns the files written, or null where there is no book. */
+function copyLanguage(book) {
+  if (book === null) return null;
+  const from = join(book, BOOK_LANGUAGE);
+  if (!existsSync(from)) return null;
+  const written = [];
+  for (const file of filesUnder(from)) {
+    const source = readFileSync(join(from, file));
+    const target = join(PLUGIN_LANGUAGE, file);
+    if (isFile(target) && readFileSync(target).equals(source)) continue;
+    mkdirSync(dirname(target), { recursive: true });
+    writeFileSync(target, source);
+    written.push(file);
+  }
+  return written;
+}
+
 /** `dist/` rebuilt from nothing every time, so a renamed or removed source leaves no orphan bundle. */
 function cleanDist(outdir) {
   if (existsSync(outdir)) rmSync(outdir, { recursive: true, force: true });
@@ -299,6 +320,9 @@ async function buildOnce() {
   const catalogue = copyCatalogue(rules?.book ?? null);
   if (catalogue === null) console.log("  keep  plugin-spn-surface refs/support/surface/catalogue.json — no book catalogue beside this checkout");
   else console.log(`  ok    catalogue  (${catalogue ? "copied from the book" : "unchanged"})`);
+  const language = copyLanguage(rules?.book ?? null);
+  if (language === null) console.log("  keep  plugin-spn-surface refs/support/surface/design-languages/surface — no book language folder beside this checkout");
+  else console.log(`  ok    surface language folder  (${language.length} file(s) copied from the book)`);
   return builtAny;
 }
 

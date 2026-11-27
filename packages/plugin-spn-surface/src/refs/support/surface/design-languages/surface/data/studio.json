@@ -1,0 +1,26 @@
+{
+ "type": "STUDIO",
+ "medium": "AVATAR",
+ "roles": {
+  "owner": "teacher"
+ },
+ "teacher": "mira",
+ "sales": [
+  {
+   "item": "product-design",
+   "units": 212,
+   "refunds": 3
+  },
+  {
+   "item": "figma-teams",
+   "units": 88,
+   "refunds": 1
+  },
+  {
+   "item": "portfolio-review",
+   "units": 13,
+   "refunds": 0
+  }
+ ],
+ "share": 0.1
+}

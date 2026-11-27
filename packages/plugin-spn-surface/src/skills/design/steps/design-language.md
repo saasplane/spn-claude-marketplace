@@ -80,6 +80,10 @@
 - **A sample page draws each drawing in a frame that scales it whole and carries the app's own tokens** (`RULE.SUPPORT.SURFACE.591` · MUST · skill:spn-surface/design)
 - **A review of a site, and an arc's final re-check of a site, walks every page of the live site at a phone, a tablet and a desktop width, in light and in dark, and reads computed values** (`RULE.SUPPORT.SURFACE.592` · MUST · skill:spn-surface/design)
 - **A page that shows a render links the design system's stylesheet and the theme config generated from a resolved language, and an app's own stylesheet only where the app gives one** (`RULE.SUPPORT.SURFACE.595` · MUST · skill:spn-surface/design)
+- **A design language is one folder, `docs/specs/design-languages/<name>/`, holding `<name>.spdl.json` and `data/`** (`RULE.SUPPORT.SURFACE.628` · MUST · skill:spn-surface/design)
+- **A language keeps its own dataset in `data/`, one JSON file for each kind of record, and a page tree is prepared from it** (`RULE.SUPPORT.SURFACE.629` · MUST · skill:spn-surface/design)
+- **A design language, its data and the catalogue are never versioned by a bump; they only grow** (`RULE.SUPPORT.SURFACE.630` · MUST · skill:spn-surface/design)
+- **A child names its parent alone: `extends: "surface"`** (`RULE.SUPPORT.SURFACE.631` · MUST · skill:spn-surface/design)
 
 Read this before a page of a site or an app is drawn, and while a partner's design language is being made. 
 

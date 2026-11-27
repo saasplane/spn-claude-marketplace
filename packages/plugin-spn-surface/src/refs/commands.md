@@ -12,6 +12,10 @@ spn-surface check scan [<path>…] — Scan Surface code for every note the Surf
 
 spn-surface language check <app> [--construct <construct.md>] — Refuse a design-language construct whose filled tables differ from the `language` block they are filled from
 
+spn-surface language data check <language> [--book <folder>] [--spec <file>] [--catalogue <file>] [--icons <file>] — Check a design language's dataset: links that resolve, a medium and roles for each record file, no stored number the data can derive, the records its page kinds need
+
+spn-surface language diff <old.json> <new.json> | <language> --against <git-ref> [--book <folder>] — Refuse a change to a design language, its data or the catalogue that removes or renames a kind, case, role or field
+
 spn-surface language samples write <language> [--out <dir>] [--book <folder>] [--spec <file>] [--catalogue <file>] [--template <file>] [--assets <folder>] [--ds <version>] [--app <code>] [--only <text>] — Draw a design language's samples: each layout, page kind, container case and widget form of each surface category it serves, in the surface page template
 
 spn-surface language write <app> [--construct <construct.md>] — Fill a design-language construct's figures (drawing style, characters and building blocks, grounds, drawing kinds) from the `language` block of its own construct

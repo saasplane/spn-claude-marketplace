@@ -1,0 +1,32 @@
+{
+ "type": "QUESTION",
+ "medium": "NONE",
+ "roles": {
+  "title": "question",
+  "line": "answer",
+  "owner": "item"
+ },
+ "records": [
+  {
+   "item": "product-design",
+   "by": "Neha J.",
+   "question": "Do I need a paid Figma plan?",
+   "answer": "No. Every lesson works on Figma's free plan.",
+   "helpful": 41
+  },
+  {
+   "item": "product-design",
+   "by": "Omar F.",
+   "question": "Is there a project to show at the end?",
+   "answer": "Yes: a travel app you design from the brief, ready for your portfolio.",
+   "helpful": 27
+  },
+  {
+   "item": "wheel-weekend",
+   "by": "Isha B.",
+   "question": "Is the firing included?",
+   "answer": "Yes. We glaze and fire your two best bowls; collect them two weeks later.",
+   "helpful": 18
+  }
+ ]
+}
