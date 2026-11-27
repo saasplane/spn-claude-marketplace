@@ -22,12 +22,12 @@ Before you touch a node's folders, find its kind. A node declares one fact about
 | Term | Contract term | What it means |
 | --- | --- | --- |
 | Node | — | a package or an application inside a repository, declaring in its own manifest what it is; a repository root is never a node |
-| Kind | `SPKindType` | the one fact a node declares, and the source everything else about it derives from |
-| Family | `SPKindFamilyType` | the first token of a kind's name — `TOOLCHAIN` · `SUPPORT` · `MODULE` · `APP` · `CLIENT` |
-| Runtime | `SPKindRuntimeType` | where code runs — `SERVER` · `WEB` · `UNIVERSAL` — implied by the kind, never declared on its own |
-| Stack | `SPKindStackType` | the language ecosystem a node is built in; a stack declares which runtimes it joins, and kinds exist only for the runtimes it covers |
-| Kind manifest | `SPKind` | the file `spkind.json` at a node's root, the only file the kind system reads |
-| Kind config | `SPKindConfig` | the per-kind extra the manifest carries — `null` where a kind needs none |
+| Kind | `SPAppsKindType` | the one fact a node declares, and the source everything else about it derives from |
+| Family | `SPAppsKindFamilyType` | the first token of a kind's name — `TOOLCHAIN` · `SUPPORT` · `MODULE` · `APP` · `CLIENT` |
+| Runtime | `SPAppsKindRuntimeType` | where code runs — `SERVER` · `WEB` · `UNIVERSAL` — implied by the kind, never declared on its own |
+| Stack | `SPAppsKindStackType` | the language ecosystem a node is built in; a stack declares which runtimes it joins, and kinds exist only for the runtimes it covers |
+| Kind manifest | `SPAppsKind` | the file `spkind.json` at a node's root, the only file the kind system reads |
+| Kind config | `SPAppsKindConfig` | the per-kind extra the manifest carries — `null` where a kind needs none |
 | Mnemonic | `code` | the 2–4 letter word a module declares, inherited by every class, permission and configuration key it owns |
 | App code | `code` | the word an application declares, naming the code the estate's own rows grant a place to run |
 | Layer | — | one of `contract`, `app`, `entry` — the three standard folders a contract-publishing node is built from |
@@ -108,10 +108,10 @@ If you carry a tier the kind never owed, that is correct, not a breach — never
 Look for `spkind.json` at a node's own root — it is the only file the kind system reads, and it exists because two kinds of node have nowhere else to declare themselves: a module living inside an application has no project manifest of its own, and a project in a stack whose ecosystem carries no such manifest has nowhere to put it either.
 
 ```ts
-export interface SPKind {
-  kind: SPKindType;              // the declared value; everything else derives from it
+export interface SPAppsKind {
+  kind: SPAppsKindType;              // the declared value; everything else derives from it
   name: CDTString;                // what a person calls this node — declared, never derived from the folder
-  config: SPKindConfig | null;    // the per-kind extra; null where a kind adds nothing
+  config: SPAppsKindConfig | null;    // the per-kind extra; null where a kind adds nothing
 }
 ```
 

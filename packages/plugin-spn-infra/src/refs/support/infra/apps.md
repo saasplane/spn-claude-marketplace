@@ -28,15 +28,15 @@ Two independent statements have to agree before anything runs, made in two diffe
 ## The row
 
 ```ts
-export interface SPEstateApp {
+export interface SPInfraEstateApp {
   kindCode: CDTString;                     // the token the code node declares for itself
   repo: CDTString;                         // one of the repositories the platform declared
   space: CDTString | null;                 // a binding: which space holds its data; absent is the platform's resources
   platform: CDTBoolean | null;             // a binding: the platform's settings beside its space's; absent is false
   domain: CDTString;                       // a binding, required: which domain its hosts root at, by the code the organization registered
   localOnly: CDTBoolean | null;            // true stands the app on a laptop only; the cloud leaves it out; absent is false
-  grants: SPEstateAppGrantType[] | null;   // the cloud services its runtime may call as itself; absent is none
-  deployments: SPEstateAppDeployment[];    // the scheduled units this application runs
+  grants: SPInfraEstateAppGrantType[] | null;   // the cloud services its runtime may call as itself; absent is none
+  deployments: SPInfraEstateAppDeployment[];    // the scheduled units this application runs
 }
 ```
 
@@ -82,7 +82,7 @@ A database, a cache and a queue are reached with a user and a password, which ar
 | `SEAL` | use the environment's key for stored secrets, so the application seals secrets of its own in its own rows |
 | `EDGE` | bind a tenant's own domain: request its certificate and write its route |
 
-- **Each value comes from a closed list in the contract** (`SPEstateAppGrantType`). A manifest that names anything else is refused; a further cloud service is one more value. Mail is not one of them: a platform that sends mail brings its own provider, or attaches an estate module that stands the sender and publishes its values. The contract states no other key for a grant, and a manifest that writes one is refused.
+- **Each value comes from a closed list in the contract** (`SPInfraEstateAppGrantType`). A manifest that names anything else is refused; a further cloud service is one more value. Mail is not one of them: a platform that sends mail brings its own provider, or attaches an estate module that stands the sender and publishes its values. The contract states no other key for a grant, and a manifest that writes one is refused.
 - **A grant is not restricted by `space`.** An application that lists one is granted it, on the platform or in a space.
 - **A workload that lists no grant holds none**, so a permission problem surfaces because a declaration was missing rather than because a role was guessed too narrow. `EDGE` is true for the application that owns identity and for no other.
 - **A service lists `SEAL` only when a module it mounts stores secrets.** A service that holds that module remotely receives the opened value from it and never touches the seal.
@@ -92,11 +92,11 @@ On a machine the seal is a fixed key in the settings and nothing is granted.
 ## Every deployment declares the same four facts
 
 ```ts
-export interface SPEstateAppDeployment {
-  mtype: SPEstateAppDeploymentType;  // API, WEB or PROCESSOR
+export interface SPInfraEstateAppDeployment {
+  mtype: SPInfraEstateAppDeploymentType;  // API, WEB or PROCESSOR
   deploymentCode: CDTString;         // which deployment of its application this one is — never derived
-  ns: SPEstateNamespaceType;         // the blast-radius group it lands in
-  expose: SPEstateExposeType;        // how far its inbound surface reaches
+  ns: SPInfraEstateNamespaceType;         // the blast-radius group it lands in
+  expose: SPInfraEstateExposeType;        // how far its inbound surface reaches
 }
 ```
 
@@ -104,13 +104,13 @@ export interface SPEstateAppDeployment {
 
 **`deploymentCode` is mandatory and never derived — MUST.** It is the token that tells one deployment of an application from another in the internal host grammar, in every resource name, and in the configuration path. A nullable field would make that path conditional, and a conditional path cannot be enumerated — the estate stands one configuration seat per deployment, so it has to know how many there are and what each is called from the declaration alone. `(app, deploymentCode)` is unique, refused at resolve by name if not. Scaffolding writes the shape's own word (`api`, `web`, `processor`), so a single-deployment application reads exactly as it would without the field.
 
-**Every scheduled deployment of one application belongs to one blast-radius group** (`ns`, `SPEstateNamespaceType`: `PRD` · `PLT` · `VND`) — one identity, one configuration root, written on every row rather than inferred.
+**Every scheduled deployment of one application belongs to one blast-radius group** (`ns`, `SPInfraEstateNamespaceType`: `PRD` · `PLT` · `VND`) — one identity, one configuration root, written on every row rather than inferred.
 
 ## Exposure is declared, and the namespace is its ceiling — MUST
 
 Which edge a deployment answers on, which zone it sits in, and whether it stands on the public attack surface at all is **one declared fact**, never inferred (`RULE.SUPPORT.INFRA.103` · GUIDE).
 
-| Value (`SPEstateExposeType`) | The deployment | Reached by |
+| Value (`SPInfraEstateExposeType`) | The deployment | Reached by |
 | --- | --- | --- |
 | `PUBLIC` | answers on the internet | anybody |
 | `PRIVATE` | answers on the internal zone | a workload in the cluster, and an operator arriving through the platform's own ranges |
@@ -118,22 +118,22 @@ Which edge a deployment answers on, which zone it sits in, and whether it stands
 
 **The namespace is the ceiling, not the source — a deployment cannot declare more exposure than the namespace it sits in allows.** A platform or vendor-namespace service claiming `PUBLIC` is refused by name when the declaration is resolved, before any plan runs — widening the attack surface is a change somebody makes deliberately at the level that owns it, never an application granting itself reach because it asked. A background worker declares its exposure too, and anything but `INTERNAL` is refused: having no inbound surface is a fact about a background worker, not a choice it gets to make.
 
-`SPEstateExposeType` is an enum rather than a string because the value crosses three boundaries — declared here, handed to a layer whose own variable validates it, and asserted against in a check — and a bare string would type-check at none of them.
+`SPInfraEstateExposeType` is an enum rather than a string because the value crosses three boundaries — declared here, handed to a layer whose own variable validates it, and asserted against in a check — and a bare string would type-check at none of them.
 
 **A binding is supplied explicitly or not at all — MUST, no default at the layer that consumes it** (`RULE.SUPPORT.INFRA.089` · MUST · skill:spn-infra/run). A driver that stops passing one is reported as awaiting its input, never resolved quietly to no ingress or to the platform domain — a defaulted variable is the one omission nothing reports. A face binding is a choice **inside** the exposure already declared: it can place a public surface on a different apex, and it never widens how far that surface reaches.
 
 ## What each shape adds
 
 ```ts
-export interface SPEstateAppDeploymentApi extends SPEstateAppDeployment {
-  mtype: SPEstateAppDeploymentType.API;
+export interface SPInfraEstateAppDeploymentApi extends SPInfraEstateAppDeployment {
+  mtype: SPInfraEstateAppDeploymentType.API;
   port: CDTInt;
   healthPort: CDTInt | null;       // the probe's own port, when it differs from the serving port
   websocket: CDTBoolean;
-  scale: SPEstateAppDeploymentScale | null;  // its size, copies and signals per workload; null takes the environment's size, fixed copies
+  scale: SPInfraEstateAppDeploymentScale | null;  // its size, copies and signals per workload; null takes the environment's size, fixed copies
   subdomains: CDTString[];         // every label it answers on, first is primary
   remotePort: CDTInt | null;       // the remote listener's port; null serves no contract to other services
-  gateway: SPEstateAppDeploymentGateway | null;  // what it asks of its route; null takes the gateway's defaults
+  gateway: SPInfraEstateAppDeploymentGateway | null;  // what it asks of its route; null takes the gateway's defaults
 }
 ```
 
@@ -142,8 +142,8 @@ export interface SPEstateAppDeploymentApi extends SPEstateAppDeployment {
 **Labels are plural**, because one deployment can be reached by more than one name and a second name is not a second deployment — an API answers on its own label and on the authentication host: one process, one port, two names. The first label is the primary; an empty list is refused because it would compose no host at all.
 
 ```ts
-export interface SPEstateAppDeploymentWeb extends SPEstateAppDeployment {
-  mtype: SPEstateAppDeploymentType.WEB;
+export interface SPInfraEstateAppDeploymentWeb extends SPInfraEstateAppDeployment {
+  mtype: SPInfraEstateAppDeploymentType.WEB;
   port: CDTInt | null;             // null where nothing listens
   subdomains: CDTString[];
 }
@@ -151,7 +151,7 @@ export interface SPEstateAppDeploymentWeb extends SPEstateAppDeployment {
 
 **A publicly exposed web deployment is a bundle** — assets behind an edge, no process of its own, no port, no workload. **A privately exposed one is not** — it is a process serving files behind the internal zone and needs a workload like anything else. A server-rendered application binds a port in every environment exactly as a service does; without a declared port, local port discovery falls back to pattern-matching the application's own configuration, which stops matching the moment the number becomes a constant or the key gets renamed, and the first sign is an error naming nothing.
 
-A background worker (`SPEstateAppDeploymentProcessor`) declares its scale and nothing else — **the absence of a subdomain is the statement**: it has no inbound surface to name, and resolve refuses anything but `INTERNAL` exposure on it.
+A background worker (`SPInfraEstateAppDeploymentProcessor`) declares its scale and nothing else — **the absence of a subdomain is the statement**: it has no inbound surface to name, and resolve refuses anything but `INTERNAL` exposure on it.
 
 **Every port a deployment declares sits inside the five hundred local ports its platform declares** (`RULE.SUPPORT.INFRA.062` · MUST · skill:spn-infra/implement). The offsets count from the range's first port.
 
@@ -226,13 +226,13 @@ The book says "a gateway" and names no product where it states the rule; the pro
 A deployment that has a route may state limits for it on its own row; the blueprint turns them into the gateway's settings (`RULE.SUPPORT.INFRA.116` · MUST · skill:spn-infra/implement).
 
 ```ts
-export interface SPEstateAppDeploymentGateway {
-  rateLimit: SPEstateAppDeploymentGatewayRateLimit | null;  // a ceiling on requests from one address, counted in front of every pod
+export interface SPInfraEstateAppDeploymentGateway {
+  rateLimit: SPInfraEstateAppDeploymentGatewayRateLimit | null;  // a ceiling on requests from one address, counted in front of every pod
   timeoutSeconds: CDTInt | null;                            // how long one request may take
   maxBodyMegabytes: CDTInt | null;                          // the largest request body accepted
 }
 
-export interface SPEstateAppDeploymentGatewayRateLimit {
+export interface SPInfraEstateAppDeploymentGatewayRateLimit {
   max: CDTInt;
   windowSeconds: CDTInt;
 }
@@ -261,23 +261,23 @@ The internet-facing load balancer of every cluster carries one web firewall, cov
 A server deployment chooses its own size, how many copies of it run, and what brings more (`RULE.SUPPORT.INFRA.152` · MUST · skill:spn-infra/implement). An API and a processor each carry a `scale`; a web deployment carries none, because a bundle has no copies and a private web server runs one.
 
 ```ts
-export interface SPEstateAppDeploymentScaleSignals {
+export interface SPInfraEstateAppDeploymentScaleSignals {
   API: CDTInt | null;    // requests a second one copy carries; an API deployment only
   QUEUE: CDTInt | null;  // messages waiting that one copy carries; a processor only
   CPU: CDTInt | null;    // percent of the pod's CPU request
 }
 
-export interface SPEstateAppDeploymentScaleWorkload {
+export interface SPInfraEstateAppDeploymentScaleWorkload {
   size: CDTString | null;  // a size code from the catalog; null takes the environment's
   min: CDTInt | null;      // null: 1 in NP, 3 in PROD
   max: CDTInt | null;      // null: min
-  signals: SPEstateAppDeploymentScaleSignals | null;  // null runs min copies, fixed
+  signals: SPInfraEstateAppDeploymentScaleSignals | null;  // null runs min copies, fixed
 }
 
-export interface SPEstateAppDeploymentScale {
-  np: SPEstateAppDeploymentScaleWorkload | null;
-  prod: SPEstateAppDeploymentScaleWorkload | null;
-  envs: Record<CDTString, SPEstateAppDeploymentScaleWorkload> | null;  // one environment that differs
+export interface SPInfraEstateAppDeploymentScale {
+  np: SPInfraEstateAppDeploymentScaleWorkload | null;
+  prod: SPInfraEstateAppDeploymentScaleWorkload | null;
+  envs: Record<CDTString, SPInfraEstateAppDeploymentScaleWorkload> | null;  // one environment that differs
 }
 ```
 

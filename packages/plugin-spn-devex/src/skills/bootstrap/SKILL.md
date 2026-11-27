@@ -127,7 +127,7 @@ Name every section the answer fills, across rounds and arcs, so it is cited wher
 
 **The foundation decides the shape and leaves each module's inside to the next workstreams.** Round 2 settles high-level domains and subdomains; a module's states, contract, schema and journeys are its own workstream's, which the follow-ups arc names.
 
-**The brand is asked in section 4.4**, colour, greys, typefaces, references and media kinds, and every answer may be *not yet*. The read-back then names the brand, or *the design system's own look until you have one*. Each app's design language row names the app's surface category, `MARKETING`, `RESOURCES`, `MARKETPLACE`, `DASHBOARD` or `PORTAL`, read from the person the app is for (no new question is asked), and the scaffold writes the app's theme setting from it.
+**The brand is asked in section 4.4**, colour, greys, typefaces, references and media kinds, and every answer may be *not yet*. The read-back then names each app's colours, or *the design system's own look until you have one*. Each web app's surface categories, `MARKETING`, `RESOURCES`, `MARKETPLACE`, `DASHBOARD` or `PORTAL`, are read from the person the app is for (no new question is asked); the scaffold writes its `spsurface.json` naming the partner's language, and its `src/spn.surface.json` with a theme for each category, the app's own and never written from the language.
 
 ## Round 6 and round 3 — the estate and product questions
 

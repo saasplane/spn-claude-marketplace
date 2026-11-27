@@ -235,7 +235,7 @@ Never build a second variant of the application for a second deployment shape. A
 **Contract**
 
 ```text
-SPKindAppModeType  ALL · API · QUEUE · MIGRATE · CLI
+SPAppsKindAppModeType  ALL · API · QUEUE · MIGRATE · CLI
 ```
 
 Declare the full entry set in code regardless of how the application is deployed — a serving mode never changes what was composed; the mode filters only which entries phase 3 starts. Choose which entries a deployment activates with configuration, never with a code change. The same build ships as, for example, the `api` and `processor` deployments of the `{app}-{stype}` pattern, each scaled and sized for its own workload:

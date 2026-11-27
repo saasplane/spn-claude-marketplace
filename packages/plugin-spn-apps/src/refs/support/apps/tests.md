@@ -34,7 +34,7 @@ Five tiers, each buying something the others cannot. When you place a case, pick
 | `JOURNEY` | a person completing an outcome through a real entry | which rule failed when it fails | a quiesced running stack |
 
 ```text
-SPTestTierType      UNIT · INTEGRATION · CONTRACT · COMPONENT · JOURNEY
+SPAppsTestTierType      UNIT · INTEGRATION · CONTRACT · COMPONENT · JOURNEY
 SPTestNegativeType  REFUSAL · BAD_INPUT · ABSENT_ROW · CONFLICT · LIMIT
 ```
 

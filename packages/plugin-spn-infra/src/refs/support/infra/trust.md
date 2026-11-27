@@ -25,8 +25,8 @@ Enforce and check what follows when an estate change touches access, a credentia
 | Membership | — | what a person or a service actually holds; a credential is minted briefly from it |
 | Guardrail | — | an organization-level policy that can only refuse, never grant |
 | Break-glass role | — | a role for the emergencies the ordinary role sets deliberately cannot cover; assuming one raises an alarm |
-| Plan mode | `SPEstateProvisionModeType.PLAN` | a run that shows what would change and reaches no account, so it needs no credential |
-| Apply mode | `SPEstateProvisionModeType.APPLY` | a run that performs the change; against a cloud realization it also takes an explicit approval |
+| Plan mode | `SPInfraEstateProvisionModeType.PLAN` | a run that shows what would change and reaches no account, so it needs no credential |
+| Apply mode | `SPInfraEstateProvisionModeType.APPLY` | a run that performs the change; against a cloud realization it also takes an explicit approval |
 | Digest | — | the identity a build produces once; every later claim binds to it and is promoted forward unchanged |
 | Attestation | — | a signed record of what an artifact contains and how it was produced, bound to the digest |
 | Admission | — | the point where the runtime refuses anything carrying no valid attestation |

@@ -22,12 +22,12 @@
 Blueprints are shipped and nobody writes them, so **a module is the one place the model expects infrastructure to be written** — an estate package that composes the blueprint library at a step it names.
 
 ```ts
-export interface SPEstateModule {
+export interface SPInfraEstateModule {
   code: CDTString;                       // the purpose — `idp`, never a product name
-  layer: SPEstateLayerType;              // which layer it attaches at
+  layer: SPInfraEstateLayerType;              // which layer it attaches at
   after: CDTString | null;               // the named step whose outputs it reads
-  source: SPRepoPackageRef;              // the package, by version or by path while it is being written
-  hosting: SPEstateHostingType | null;   // null follows the environment; a pin needs both renderings
+  source: SPDevExRepoPackageRef;              // the package, by version or by path while it is being written
+  hosting: SPInfraEstateHostingType | null;   // null follows the environment; a pin needs both renderings
   config: Record<CDTString, unknown>;    // the module defines its variables; this row values them
 }
 ```

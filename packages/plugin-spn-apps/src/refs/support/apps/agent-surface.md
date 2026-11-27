@@ -49,13 +49,13 @@ Shape already has regenerated, authoritative sources — the validators, the pub
 A package's `symbols` array is **exactly its published surface** — no nesting, no layer wrapper, no file paths. A symbol is imported by package and symbol name, so the file it was written in is never part of the answer, and a barrel cannot re-export two identical names, so the list cannot collide.
 
 ```ts
-export interface SPKindSymbol {
-  name: string; group: string; role: SPKindSymbolRoleType;
+export interface SPAppsSymbol {
+  name: string; group: string; role: SPAppsSymbolRoleType;
   internal: boolean; deprecated: boolean;
   intent: string | null; description: string | null;
   signature: string | null;
-  roleMeta: SPKindSymbolRoleMeta | null;
-  seam: SPKindSymbolSeam | null;
+  roleMeta: SPAppsSymbolRoleMeta | null;
+  seam: SPAppsSymbolSeam | null;
 }
 ```
 
@@ -141,7 +141,7 @@ Read this beside the symbol index — both are **generated indexes of a surface*
 **The manifest is extracted by scanning call sites, never hand-written.** Nobody hand-curates it: a key added by editing the manifest describes a string nothing renders. Keys are normalized at extraction, so one string cannot enter the vocabulary twice under two spellings. Extraction is complete or it is broken — a string the scan cannot see (assembled at runtime, built by concatenation, passed through an indirection) is a defect in the call site, never a limit of the tool to work around with a different call shape.
 
 ```ts
-export interface SPKindLabel {
+export interface SPAppsLabel {
   code: string; category: string; fallback: string;
   variables: { name: string; type: SPDataFieldType }[];
 }

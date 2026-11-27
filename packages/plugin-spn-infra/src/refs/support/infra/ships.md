@@ -26,7 +26,7 @@ The estate half of the Support stage must publish what follows to count as shipp
 | Provider instance | — | one provider's own realization of a seam: a cloud, a repository host, or a developer's machine |
 | Conformance answer | — | the written reply a realization gives to every requirement the foundation states |
 | Release contract | — | the promise a consumer relies on: lockstep inside one repository, independent across repositories |
-| Pin | `SPRepoPackageRef.version` | the exact version a consumer names, rather than a range it would track |
+| Pin | `SPDevExRepoPackageRef.version` | the exact version a consumer names, rather than a range it would track |
 
 ## The repository, the group, and what sits beside each
 

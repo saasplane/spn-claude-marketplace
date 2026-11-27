@@ -156,7 +156,7 @@ Seven sizes, one ladder for both workloads — seven rather than three, because 
 
 ## What proves an estate change
 
-**A declaration is proven by rendering it against a target, never by calling a function and reading what comes back** (`RULE.SUPPORT.INFRA.097` · MUST · skill:spn-infra/implement). **The tiers are the apps ladder's own** — `SPTestTierType`, never a second enum that would drift from it (`DEC.SUPPORT.INFRA.102`) — and an estate node reuses a tier's name wherever its meaning is the same (`RULE.SUPPORT.INFRA.107` · MUST · skill:spn-infra/implement).
+**A declaration is proven by rendering it against a target, never by calling a function and reading what comes back** (`RULE.SUPPORT.INFRA.097` · MUST · skill:spn-infra/implement). **The tiers are the apps ladder's own** — `SPAppsTestTierType`, never a second enum that would drift from it (`DEC.SUPPORT.INFRA.102`) — and an estate node reuses a tier's name wherever its meaning is the same (`RULE.SUPPORT.INFRA.107` · MUST · skill:spn-infra/implement).
 
 | Tier | Stands on | Proves | Cannot prove |
 | --- | --- | --- | --- |

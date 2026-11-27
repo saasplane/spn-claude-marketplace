@@ -66,7 +66,7 @@ description: Write one of the five reports on a repository — coverage (how muc
 | **`code`** | where does the **source** depart from the stack's standards? | checks: one rule applied to one package | PASS · WARN · FAIL |
 | **`docs`** | where do the **documents** depart from the docs standards? | checks: one page each | PASS · WARN · FAIL |
 
-The block names the type with one `SPDocReportType` value: `COVERAGE` · `TESTS` · `AUDIT` · `CODE` · `DOCS`.
+The block names the type with one `SPDevExDocReportType` value: `COVERAGE` · `TESTS` · `AUDIT` · `CODE` · `DOCS`.
 
 **Each report type has one set of states that divides its whole unit with no overlap.** The same states drive the tiles, the table columns, the breakdown bar and the groups in Records, so the tiles and the tables add up to the same totals.
 
