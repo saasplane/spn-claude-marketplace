@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "5a06caa5"
+    "commit": "11e440e3"
   },
   "rules": [
     {
@@ -14535,7 +14535,18 @@
       "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "heading": "The five seats",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "What each seat holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",
@@ -18388,6 +18399,11 @@
       "heading": "Labels and symbols",
       "decision": "DEC.SUPPORT.APPS.126",
       "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/agent-surface.md",
+          "heading": "Labels: the index of what a surface says"
+        },
         {
           "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
@@ -38635,6 +38651,11 @@
       "decision": null,
       "restated": [
         {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/providers/ts/01-kinds.md",
+          "heading": "What the manifest carries"
+        },
+        {
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "One source for the platform's look — 🔮"
@@ -39771,7 +39792,13 @@
       "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
       "heading": "The parts",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.638",
@@ -39784,7 +39811,13 @@
       "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
       "heading": "The parts",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.639",
@@ -39797,7 +39830,13 @@
       "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
       "heading": "The parts",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.640",
@@ -39815,6 +39854,11 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "The language folder — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
         }
       ]
     },
@@ -39829,7 +39873,13 @@
       "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
       "heading": "The parts",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.642",
@@ -39842,7 +39892,18 @@
       "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
       "heading": "The parts",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The parts — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.643",
@@ -39855,7 +39916,18 @@
       "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
       "heading": "The parts",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/page-preview.md",
+          "heading": "A group of pages"
+        }
+      ]
     },
     {
       "id": "RULE.SUPPORT.SURFACE.644",
@@ -39868,7 +39940,13 @@
       "chapter": "04-capabilities/02-support/01-surface/14-delivery-library/01-common/02-render.md",
       "heading": "The tree",
       "decision": null,
-      "restated": []
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
     }
   ]
 }

@@ -134,5 +134,12 @@
     "docs-index.js": "a4a30436cf1cb7f03f11b854cad0fb15ccc9a228f8c203ce2da5aa8fda6b0137",
     "design-system-units.css": "c968b4a1a82d8d00afe19afd987ab02de44d72eea58e8ae0a8fe915cca839042",
     "design-system.css": "42e7436e3b197840a6b0c9ebf8f9ffbd8cbdb0a7d1d26c7ea9a05dccc15b8492"
+  },
+  "1.17.6": {
+    "docs-language.css": "cf96c49b4f37fa1a78b17219c7006553e51faa6e33d8d98bacdbfbfe7df3ec56",
+    "docs-page.js": "0a1a95d26e30e6020493a3fa8c30b52a4a38774a8836eaed04cb7299dff562fd",
+    "docs-index.js": "a4a30436cf1cb7f03f11b854cad0fb15ccc9a228f8c203ce2da5aa8fda6b0137",
+    "design-system-units.css": "c968b4a1a82d8d00afe19afd987ab02de44d72eea58e8ae0a8fe915cca839042",
+    "design-system.css": "42e7436e3b197840a6b0c9ebf8f9ffbd8cbdb0a7d1d26c7ea9a05dccc15b8492"
   }
 }
