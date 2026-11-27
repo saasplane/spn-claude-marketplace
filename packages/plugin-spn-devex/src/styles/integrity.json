@@ -127,5 +127,12 @@
     "docs-index.js": "sha384-v/QmXBUa53+BRBWdxh3erwPoYJ0SRcA7nvhAUvLG0uAK0yzDADzRxu5GerfXffNb",
     "design-system-units.css": "sha384-5VDp8z7r61Q2D/sIQQG34RXUBGlhr1Ok3t3jYqCc2BFdo+KJDMxycY+brPVyoM3A",
     "design-system.css": "sha384-7ZSbnXfgCjUYtrPPDd5F+hFYBYEiLeRCSC8GzQ8gGiDUXMPKrPAFUmyJZy24xZF8"
+  },
+  "1.17.5": {
+    "docs-language.css": "sha384-i6rhHn61fjNWwm9/gmvKkhKXP/sDSVNR0hTmkDa480EyhFsviavrOvsSAHsZzRkV",
+    "docs-page.js": "sha384-M8LyqX/C+eKwEGQpk8CI2Lmtf5+BkWYgUAYZ0sO799hENOy1f9yH1qlgrdpMK2vw",
+    "docs-index.js": "sha384-v/QmXBUa53+BRBWdxh3erwPoYJ0SRcA7nvhAUvLG0uAK0yzDADzRxu5GerfXffNb",
+    "design-system-units.css": "sha384-+sQbEE9wx1TxsH6c0rjmE4ohE8Ip3Kb/apfPrZsl95amZT7VvV4ZJi+/VVjlhgQ5",
+    "design-system.css": "sha384-ASIAXRsUyuFG5/1WoMfM4V7e+oHauuG7vjpxo7I/77yAIhlXKPAmd4dbEEgivnY4"
   }
 }

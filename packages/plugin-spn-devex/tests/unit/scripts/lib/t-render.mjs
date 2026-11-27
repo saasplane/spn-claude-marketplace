@@ -109,15 +109,15 @@ ok("a table that is not the Terms table carries no such class",
 const { cutVersions, integrityTable, newestVersion, linesFor } = await import(pathToFileURL(resolve(HERE, "..", "plugin-support-lib", "src", "lib", "page-styles.ts")).href);
 const { readFileSync } = await import("node:fs");
 const STYLES_HOME = resolve(HERE, "src", "styles");
-ok("the newest version of the shared styles is 1.17.4, which serves design-system-units.css and design-system.css, so every page writer links it",
-  newestVersion(Object.keys(cutVersions(STYLES_HOME))) === "1.17.4");
+ok("the newest version of the shared styles is 1.17.5, which serves design-system-units.css and design-system.css, so every page writer links it",
+  newestVersion(Object.keys(cutVersions(STYLES_HOME))) === "1.17.5");
 ok("and 1.10.0 serves the Terms shares: a fixed layout, and the stacked rows under 40rem",
   /table\.sds-terms\{table-layout:fixed\}|table\.sds-terms\s*\{[^}]*table-layout:\s*fixed/.test(readFileSync(resolve(HERE, "..", "..", "public", "assets", "docs", "1.10.0", "sds-docs.css"), "utf8"))
   && readFileSync(resolve(HERE, "..", "..", "public", "assets", "docs", "1.10.0", "sds-docs.css"), "utf8").includes("max-width:40rem"));
 for (const name of ["construct", "overview", "blocks"]) {
   const template = readFileSync(resolve(HERE, "src", "refs", "devex", "workspace", "docs", "templates", "docs", "pages", `${name}-template.html`), "utf8");
-  ok(`the ${name} template links 1.17.4, the version every page writer links, with its hash`,
-    template.includes(linesFor("1.17.4", undefined, integrityTable(STYLES_HOME)["1.17.4"]).stylesheet) && !template.includes("/1.15.0/"));
+  ok(`the ${name} template links 1.17.5, the version every page writer links, with its hash`,
+    template.includes(linesFor("1.17.5", undefined, integrityTable(STYLES_HOME)["1.17.5"]).stylesheet) && !template.includes("/1.15.0/"));
 }
 const binds = rowsOf(produced(table(["Rule", "What it decides", "Weight"], ["`RD.X.1`", "what every provider delivers", "MUST"])), "<thead>");
 ok("Binds keeps the Weight a reader compares down, and folds what a rule decides into the rule's cell",

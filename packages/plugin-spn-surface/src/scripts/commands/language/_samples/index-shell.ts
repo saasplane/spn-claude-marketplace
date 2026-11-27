@@ -6,7 +6,7 @@ export const INDEX_SHELL = `<meta charset="utf-8">
 <!-- spn:doc
 {"id": "{{SLUG}}", "variant": "index", "title": "{{NAME}} samples", "summary": "{{SUMMARY}}"}
 -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.17.4/docs-language.css" integrity="sha384-i6rhHn61fjNWwm9/gmvKkhKXP/sDSVNR0hTmkDa480EyhFsviavrOvsSAHsZzRkV" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.17.5/docs-language.css" integrity="sha384-i6rhHn61fjNWwm9/gmvKkhKXP/sDSVNR0hTmkDa480EyhFsviavrOvsSAHsZzRkV" crossorigin="anonymous">
 <div class="sds-index" id="index">
   <aside class="sds-index-side" id="index-side">
     <div class="sds-rail-head">
@@ -30,5 +30,5 @@ export const INDEX_SHELL = `<meta charset="utf-8">
 <script type="application/json" id="index-data">
 {{DATA}}
 </script>
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.17.4/docs-index.js" integrity="sha384-v/QmXBUa53+BRBWdxh3erwPoYJ0SRcA7nvhAUvLG0uAK0yzDADzRxu5GerfXffNb" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.17.5/docs-index.js" integrity="sha384-v/QmXBUa53+BRBWdxh3erwPoYJ0SRcA7nvhAUvLG0uAK0yzDADzRxu5GerfXffNb" crossorigin="anonymous"></script>
 `;
