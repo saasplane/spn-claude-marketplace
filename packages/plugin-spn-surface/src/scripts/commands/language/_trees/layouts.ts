@@ -1,7 +1,7 @@
 // The layouts a sample stands in: a site's DSLayout (TOPNAV with the brand's wide logo, RAIL, CANVAS) around a DSSiteLayout, and an app's
 // layouts (RAIL, TOPNAV, DOCK, CANVAS) around its page. A layout holds a page's entries, and the entries are what a note counts.
 import { U, slot, txt } from "./kit.ts";
-import type { Brief } from "./site-words.ts";
+import type { Brief } from "./words.ts";
 import type { Tree } from "./types.ts";
 
 export function siteLayout(b: Brief, kind: string, children: Tree[], selected?: string): Tree {

@@ -1,8 +1,9 @@
-// The values parts of a language's samples: Shared (Brand, Drawing, Motion, Voice) and each category's Theme, Media, Motion and Words. A page holds one
+// The values parts of a language's samples: Shared (Brand, Drawing, Motion, Voice) and each category's Media, Motion and Words. A page holds one
 // section for each thing the part sets: a head that says what it is, a sample drawn in the design system's units, and the language's own values
 // for it in a table, read from the spec and the catalogue's kind. A value the design system draws is drawn; a part that holds only words is words.
 import { U, badge, btn, col, eyebrow, feat, grid, item, kbd, muted, plannedSection, row, sec, slot, table, txt } from "./kit.ts";
 import { noteOf, sentence, slugOf, words } from "./notes.ts";
+import { partPath } from "./home.ts";
 import type { CatKind, Entry, Page, Tree } from "./types.ts";
 
 type Spec = Record<string, unknown>;
@@ -56,19 +57,6 @@ function sample(part: string, kind: CatKind): Tree[] {
     if (code === "EYEBROW") extra.format = "UPPERCASE";
     return [txt(SENTENCE[code] ?? sentence(kind.description), typography, extra)];
   }
-  if (part === "THEME") {
-    const card = (title: string, raised: boolean): Tree => U("DSCard", { color: raised ? "BASE" : "DEFAULT" }, [U("DSCard.Content", {}, [col([txt(title, "TITLE_MD"), muted("Owned by Dana Lee")], "XS")])]);
-    switch (code) {
-      case "ITEM_LOOK": return [grid([feat({ pageLevel: "WIDGET", title: "A door", description: "Raised, in the quiet tint.", surface: { color: "DEFAULT", raised: true } }), feat({ pageLevel: "WIDGET", title: "A point", description: "Flat, on the page itself." })], 2, 2, 1)];
-      case "DARK_MODE_LOOK": return [grid([card("Raised card", true), card("Quiet card", false)], 2, 2, 1), muted("Press Dark in the bar above to see the same units in dark.")];
-      case "LAYOUT_LOOK": case "APP_LOOK": return [row([btn("Save", "PRIMARY", "SOLID"), btn("Cancel", undefined, "OUTLINE"), badge("Active", "SUCCESS"), badge("Invited", "INFO")], "SM"), U("DSSwitch", { label: "Two-step sign-in", valueLink: { value: true } })];
-      case "PANEL_LOOK": return [U("DSPanelContainer", {}, [U("DSPanelContainer.Header", {}, [item("Billing app", "Owned by Dana Lee", "CONTAINER")]), U("DSPanelContainer.Content", {}, [txt("Region Mumbai · created 3 Mar 2024", "CONTENT_SM")])])];
-      case "CARD_LOOK": return [card("Billing app", true)];
-      case "CARD_WIDGET_LOOK": return [U("DSCardWidget", { header: { title: "Billing app", pageLevel: "WIDGET" }, parts: [{ mtype: "ITEMS", key: "a", items: [{ key: "a", title: "Owner", description: "Dana Lee" }] }] })];
-      case "TABLE_LOOK": return [table(["Name", "Role"], [["Dana Lee", "Owner"], ["Ravi Shah", "Admin"]])];
-      default: return [];
-    }
-  }
   if (part === "MEDIA") {
     switch (code) {
       case "ICON_MARK": case "ICON_UI": return [grid([["KEY", "A mark: a thing of its own"], ["USERS", "A bare icon: a line a person reads"], ["SHIELD", "An icon inside a control"]].map(([icon, text], at) => item(text, null, "CONTENT", undefined, { media: at === 0 ? { mtype: "MARK", icon } : { mtype: "ICON", node: icon } })), 3, 1, 1)];
@@ -109,14 +97,14 @@ function headEntry(part: string, title: string, setting: Spec | undefined): Entr
   return { kind: title, case: "", note: sentence(why) || `The language sets no values for ${title.toLowerCase()} of its own.`, node: sec(kids, "MD"), planned: false };
 }
 
-export const VALUE_PARTS = ["THEME", "MEDIA", "MOTION", "WORDS"] as const;
+export const VALUE_PARTS = ["MEDIA", "MOTION", "WORDS"] as const;
 
-/** The pages of a category's four values parts, each in the part's own file. */
+/** The pages of a category's three values parts, each in the part's own file; a language holds no Theme part (RULE.SUPPORT.SURFACE.642). */
 export function categoryValuePages(category: string, folder: string, cat: Record<string, CatKind[]>, specCat: Record<string, Spec> | undefined, titles: Record<string, string>): Page[] {
-  return VALUE_PARTS.map((part, at) => {
+  return VALUE_PARTS.map((part) => {
     const kinds = cat[part] ?? [];
     const entries = [headEntry(part, titles[part], specCat?.[part]), ...kinds.map((k) => kindEntry(part, k, specCat?.[part] ?? {}))];
-    return { file: `${folder}/${String(at + 5).padStart(2, "0")}-${part.toLowerCase()}.html`, title: titles[part], category, part, kinds: kinds.map((k) => k.code), entries, ask: sentence(titles[`${part}-ask`]) || "", layout: "CANVAS" };
+    return { file: `${partPath(folder, part)}.html`, title: titles[part], category, part, kinds: kinds.map((k) => k.code), entries, ask: sentence(titles[`${part}-ask`]) || "", layout: "CANVAS" };
   });
 }
 

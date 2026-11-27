@@ -1,4 +1,4 @@
-// The tokens of one library file, in the contract the tool takes in (`SPSurfaceInventory`): the variables
+// The tokens of one library file, in the contract the tool takes in (`SPSurfaceLibraryInventory`): the variables
 // with their collection, modes, default mode, and for each variable its name, its own id, its key in the
 // library and its value for each mode, and the text and effect styles.
 //

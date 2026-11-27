@@ -5,23 +5,24 @@ import { basename, dirname, join } from "node:path";
 import { appPages } from "./draw-app.ts";
 import { type Folders, sitePages, wrapSite } from "./draw-site.ts";
 import { categoryValuePages, sharedPages } from "./values.ts";
-import { type PageOptions, indexHtml, pageHtml, treeOf } from "./files.ts";
-import { plannedPanel, plannedSection, setDs } from "./kit.ts";
+import { type AssetFile, type DrawnCase, type PageOptions, indexHtml, pageHtml, treeOf } from "./files.ts";
+import { overviewPage } from "./home.ts";
+import { plannedPanel, plannedSection, sec, setDs } from "./kit.ts";
 import { appLayout } from "./layouts.ts";
 import { slugOf } from "./notes.ts";
-import { DEVICES, type Device, type Drawn, MODES, type Mode, drawSections } from "./render.ts";
-import { BRIEFS } from "./site-words.ts";
-import type { CatKind, Entry, Page, Tree } from "./types.ts";
-import { APP_WORDS } from "./app-words.ts";
+import { DEVICES, type Device, type Drawn, MODES, type Mode, type ThemeChoice, drawSections } from "./render.ts";
+import { BRIEFS, useWords } from "./words.ts";
+import type { CatKind, Entry, Page, PageCase, Tree } from "./types.ts";
+import { APP_WORDS } from "./words.ts";
 
 export type OutlinePart = { code: string; title: string; description: string; values?: { ALL?: string[] } };
 export type Catalogue = { version: string; outline: { groups?: Array<{ code: string; parts: OutlinePart[] }>; categories: Record<string, { family: string; person: string; description: string }> }; categories: Record<string, Record<string, CatKind[]>> };
 export type PartSetting = { source?: string; pick?: string | string[]; notUsed?: unknown[]; add?: unknown[] };
 export type Spec = { name: string; shared?: Record<string, Record<string, unknown>>; categories: Record<string, Record<string, PartSetting>> };
-export type Options = { indexShell: string; language: string; catalogue: Catalogue; spec: Spec; out: string; template: string; ds: string; app: string; assets: string | null; place: string; only: string | null; log: (line: string) => void };
+export type Options = { indexShell: string; language: string; catalogue: Catalogue; spec: Spec; out: string; template: string; ds: string; theme: ThemeChoice; assets: string | null; place: string; only: string | null; log: (line: string) => void; samples: unknown; languageFolder: string | null; assetFile?: AssetFile };
 
 const PARTS = ["LAYOUTS", "PAGES", "CONTAINERS", "WIDGETS"] as const;
-const ALL_PARTS = [...PARTS, "THEME", "MEDIA", "MOTION", "WORDS", "BRAND", "DRAWING", "VOICE"];
+const ALL_PARTS = ["OVERVIEW", ...PARTS, "THEME", "MEDIA", "MOTION", "WORDS", "BRAND", "DRAWING", "VOICE"];
 const TITLES: Record<string, string> = { site: "Site", app: "App", shared: "Shared" };
 const num = (n: number): string => String(n).padStart(2, "0");
 
@@ -59,43 +60,57 @@ export function pagesOf(options: Options): Array<Page & { family: string }> {
     const folders: Folders = { base: folder, part: (part) => `${folder}/${num(PARTS.indexOf(part as (typeof PARTS)[number]) + 1)}-${part.toLowerCase()}` };
     const picked = (part: string): CatKind[] => pickKinds(catalogue, spec, code, part);
     const pages = family === "site" ? sitePages(code, catalogue.categories[code], BRIEFS[code] ?? BRIEFS.MARKETING, folders, picked) : appPages(code, folders, picked);
-    for (const page of [...pages, ...categoryValuePages(code, folder, catalogue.categories[code], spec.categories[code] as never, titles)]) out.push({ ...page, family });
+    const parts = Object.fromEntries(PARTS.map((part) => [part, picked(part)]));
+    const overview = overviewPage(code, folder, options.samples, parts, (children) => [sec(children, "MD")]);
+    for (const page of [overview, ...pages, ...categoryValuePages(code, folder, catalogue.categories[code], spec.categories[code] as never, titles)]) out.push({ ...page, family });
   }
   return options.only ? out.filter((page) => page.file.includes(options.only as string)) : out;
 }
 
-const wrapperOf = (page: Page & { family: string }, children: Tree[]): Tree =>
-  page.family === "site" ? wrapSite(BRIEFS[page.category] ?? BRIEFS.MARKETING, page, children) : appLayout(APP_WORDS[page.category] ?? APP_WORDS.DASHBOARD, page.layout, children);
+const wrapperOf = (page: Page & { family: string }, children: Tree[], layout = page.layout): Tree =>
+  page.family === "site" ? wrapSite(BRIEFS[page.category] ?? BRIEFS.MARKETING, { ...page, layout }, children) : appLayout(APP_WORDS[page.category] ?? APP_WORDS.DASHBOARD, layout, children);
+
+/** The whole screens a page draws: its cases, or the page itself as its one screen. */
+const screensOf = (page: Page): PageCase[] => page.cases ?? [{ code: "DEFAULT", title: page.title, entries: page.entries, layout: page.layout }];
+
+/** The surface category a page is drawn in: its own, and Marketing for the Shared pages, which every category takes. */
+const drawnIn = (page: Page): string => (page.category === "SHARED" ? "MARKETING" : page.category);
 
 /** Draw the entries the design system cannot draw as the planned mark, and say which unit each needs. */
 function probe(pages: Array<Page & { family: string }>, options: Options): number {
-  const spots: Array<{ entry: Entry; page: Page & { family: string } }> = [];
-  const sections: Tree[] = [];
-  for (const page of pages) for (const entry of page.entries) {
-    if (entry.planned) continue;
-    spots.push({ entry, page });
-    sections.push(wrapperOf(page, [entry.node]));
+  const spots: Array<{ entry: Entry; page: Page & { family: string }; layout: string }> = [];
+  for (const page of pages) for (const screen of screensOf(page)) for (const entry of screen.entries) {
+    if (entry.planned || entry.heading) continue;
+    spots.push({ entry, page, layout: screen.layout });
   }
   let planned = 0;
   const CHUNK = 60;
-  for (let from = 0; from < sections.length; from += CHUNK) {
-    options.log(`probing sections ${from + 1} to ${Math.min(from + CHUNK, sections.length)} of ${sections.length}`);
-    const part = sections.slice(from, from + CHUNK);
-    const drawn = drawSections(part, options.app, options.ds, ["LIGHT"], ["DESKTOP"], true);
-    const units = new Map<number, Set<string>>();
-    for (const finding of drawn.findings) units.set(finding.section, (units.get(finding.section) ?? new Set()).add(finding.unit));
-    for (const [at, set] of units) {
-      const { entry, page } = spots[from + at];
-      const need = [...set].join(", ");
-      entry.note = `Planned: needs ${need}, which the design system has not built.`;
-      entry.planned = true;
-      entry.node = page.family === "site" ? plannedSection(entry.kind, `${entry.kind}${entry.case ? `, ${entry.case}` : ""}: a section a visitor would meet, drawn once the unit is built.`, `${entry.kind}${entry.case ? `, ${entry.case}` : ""}`) : plannedPanel(entry.kind, `${entry.kind}${entry.case ? `, ${entry.case}` : ""}`);
-      planned += 1;
-      options.log(`planned ${page.file} · ${entry.kind} ${entry.case} (${need})`);
+  const categories = [...new Set(spots.map((spot) => drawnIn(spot.page)))];
+  for (const category of categories) {
+    const mine = spots.filter((spot) => drawnIn(spot.page) === category);
+    for (let from = 0; from < mine.length; from += CHUNK) {
+      options.log(`probing ${category.toLowerCase()} sections ${from + 1} to ${Math.min(from + CHUNK, mine.length)} of ${mine.length}`);
+      const part = mine.slice(from, from + CHUNK);
+      const drawn = drawSections(part.map((spot) => wrapperOf(spot.page, [spot.entry.node], spot.layout)), category, options.theme, options.ds, ["LIGHT"], ["DESKTOP"], true);
+      const units = new Map<number, Set<string>>();
+      for (const finding of drawn.findings) units.set(finding.section, (units.get(finding.section) ?? new Set()).add(finding.unit));
+      for (const [at, set] of units) {
+        const { entry, page } = part[at];
+        const need = [...set].join(", ");
+        entry.note = `Planned: needs ${need}, which the design system has not built.`;
+        entry.planned = true;
+        entry.node = page.family === "site" ? plannedSection(entry.kind, `${entry.kind}${entry.case ? `, ${entry.case}` : ""}: a section a visitor would meet, drawn once the unit is built.`, `${entry.kind}${entry.case ? `, ${entry.case}` : ""}`) : plannedPanel(entry.kind, `${entry.kind}${entry.case ? `, ${entry.case}` : ""}`);
+        planned += 1;
+        options.log(`planned ${page.file} · ${entry.kind} ${entry.case} (${need})`);
+      }
     }
   }
   return planned;
 }
+
+/** A screen's notes: one for each section that is not a family page's heading, counted among all the screen's top-level sections. */
+const notesOf = (entries: Entry[]): DrawnCase["notes"] =>
+  entries.flatMap((entry, n) => (entry.heading ? [] : [{ n, kind: entry.kind, case: entry.case, text: entry.note }]));
 
 /** The segment of a path in words: `02-site` is Site, `01-marketing` is Marketing, `03-containers` is Containers. */
 export const titleOf = (segment: string): string => {
@@ -105,28 +120,39 @@ export const titleOf = (segment: string): string => {
 
 export function run(options: Options): { pages: number; entries: number; planned: number; byCategory: Record<string, Record<string, number>>; files: string[] } {
   setDs(options.ds);
+  useWords(options.samples);
   const pages = pagesOf(options);
   const name = options.spec.name.charAt(0).toUpperCase() + options.spec.name.slice(1);
   if (!pages.length) throw new Error("the language serves no page the catalogue draws.");
   probe(pages, options);
-  const planned = pages.reduce((sum, page) => sum + page.entries.filter((entry) => entry.planned).length, 0);
-  const pageOptions: PageOptions = { template: options.template, ds: options.ds, appCss: "", assets: options.assets, out: options.out };
+  const planned = pages.reduce((sum, page) => sum + screensOf(page).reduce((inner, screen) => inner + screen.entries.filter((entry) => entry.planned).length, 0), 0);
+  const pageOptions: PageOptions = { template: options.template, ds: options.ds, appCss: "", assets: options.assets, out: options.out, assetFile: options.assetFile, log: options.log };
   const written: string[] = [];
+  // Every screen of every page, drawn in batches of one category, then written page by page.
+  const drawnScreens = new Map<string, DrawnCase[]>();
+  const jobs = pages.flatMap((page) => screensOf(page).map((screen) => ({ page, screen })));
   const CHUNK = 12;
-  for (let from = 0; from < pages.length; from += CHUNK) {
-    const batch = pages.slice(from, from + CHUNK);
-    const drawn: Drawn = drawSections(batch.map((page) => wrapperOf(page, page.entries.map((entry) => entry.node))), options.app, options.ds);
-    if (drawn.findings.length) throw new Error(`the render has findings after planned units were set aside: ${JSON.stringify(drawn.findings.slice(0, 3))}`);
-    batch.forEach((page, at) => {
-      const html = {} as Record<Mode, Record<Device, string>>;
-      for (const mode of MODES) { html[mode] = {} as Record<Device, string>; for (const device of DEVICES) html[mode][device] = drawn.html[mode][device][at]; }
-      const notes = page.entries.map((entry, n) => ({ n, kind: entry.kind, case: entry.case, text: entry.note }));
-      const file = join(options.out, page.file);
-      mkdirSync(dirname(file), { recursive: true });
-      writeFileSync(file, pageHtml(page, notes, html, pageOptions));
-      written.push(page.file);
-      options.log(`wrote ${page.file}`);
-    });
+  for (const category of [...new Set(jobs.map((job) => drawnIn(job.page)))]) {
+    const mine = jobs.filter((job) => drawnIn(job.page) === category);
+    for (let from = 0; from < mine.length; from += CHUNK) {
+      const batch = mine.slice(from, from + CHUNK);
+      const drawn: Drawn = drawSections(batch.map((job) => wrapperOf(job.page, job.screen.entries.map((entry) => entry.node), job.screen.layout)), category, options.theme, options.ds);
+      if (drawn.findings.length) throw new Error(`the render has findings after planned units were set aside: ${JSON.stringify(drawn.findings.slice(0, 3))}`);
+      batch.forEach((job, at) => {
+        const html = {} as Record<Mode, Record<Device, string>>;
+        for (const mode of MODES) { html[mode] = {} as Record<Device, string>; for (const device of DEVICES) html[mode][device] = drawn.html[mode][device][at]; }
+        const list = drawnScreens.get(job.page.file) ?? [];
+        list.push({ code: job.screen.code, title: job.screen.title, html, notes: notesOf(job.screen.entries) });
+        drawnScreens.set(job.page.file, list);
+      });
+    }
+  }
+  for (const page of pages) {
+    const file = join(options.out, page.file);
+    mkdirSync(dirname(file), { recursive: true });
+    writeFileSync(file, pageHtml(page, drawnScreens.get(page.file) ?? [], pageOptions));
+    written.push(page.file);
+    options.log(`wrote ${page.file}`);
   }
   // the index data and the home
   const label = (page: Page): string => `${titleOf(page.category.toLowerCase())} · ${titleOf(page.part.toLowerCase())} · ${page.title}`;
@@ -144,9 +170,9 @@ export function run(options: Options): { pages: number; entries: number; planned
   }
   writeFileSync(dataFile, `${JSON.stringify({ language: options.language, name, home: "index.html", samples }, null, 1)}\n`);
   const tree = treeOf(pages.map((page) => ({ file: page.file, title: page.title, label: label(page) })), titleOf);
-  writeFileSync(join(options.out, "index.html"), indexHtml(options.indexShell, name, options.place, `One sample for each layout, page kind, container case and widget form of ${name}'s catalogue: each category in turn.`, tree, "", options.assets, options.out));
+  writeFileSync(join(options.out, "index.html"), indexHtml(options.indexShell, name, options.place, `${name}'s samples: Shared, then each category's overview, layouts, pages, containers, widgets, media, motion and words.`, tree, "", options.assets, options.out));
   const byCategory: Record<string, Record<string, number>> = {};
   for (const page of pages) { const cat = (byCategory[page.category] ??= {}); cat[page.part] = (cat[page.part] ?? 0) + 1; }
-  return { pages: pages.length, entries: pages.reduce((sum, page) => sum + page.entries.length, 0), planned, byCategory, files: written };
+  return { pages: pages.length, entries: pages.reduce((sum, page) => sum + screensOf(page).reduce((inner, screen) => inner + screen.entries.filter((entry) => !entry.heading).length, 0), 0), planned, byCategory, files: written };
 }
 export { basename, slugOf };

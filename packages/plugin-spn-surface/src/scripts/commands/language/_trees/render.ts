@@ -1,6 +1,7 @@
-// The render, called in batches: `spnutils apps surface render --app surface --ds <version> --file <tree> --modes <modes> --devices <devices>`
-// draws each section of a tree for each mode and device and prints the copies as JSON, writing no file. A sample page is one section, so a
-// batch of pages is one call, and the window of each section is told from the next by the window's own opening tag.
+// The render, called in batches: `spnutils apps surface render [--app <package> | --theme <file>] --ds <version> --file <tree> --modes <modes>
+// --devices <devices>` draws each section of a tree `{ title, category, sections }` for each mode and device and prints the copies as JSON,
+// writing no file. With neither --app nor --theme the copies wear the design system's default theme, as a language's own samples do. A sample
+// page is one section, so a batch of pages of one category is one call, and each section's window is told from the next by its opening tag.
 import { spawnSync } from "node:child_process";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -66,13 +67,18 @@ export function windowsOf(html: string): string[] {
   return out;
 }
 
-/** Draw each section for the modes and devices, in one call. A section's findings name the unit the design system does not build. */
-export function drawSections(sections: Tree[], app: string, ds: string, modes: readonly Mode[] = MODES, devices: readonly Device[] = DEVICES, tolerant = false): Drawn {
+/** The theme the copies wear: a web app's, by its package, a theme file, or neither, the design system's default (RULE.SUPPORT.SURFACE.579). */
+export type ThemeChoice = { app: string | null; theme: string | null };
+export const DEFAULT_THEME: ThemeChoice = { app: null, theme: null };
+const themeArgs = (choice: ThemeChoice): string[] => (choice.app ? ["--app", choice.app] : choice.theme ? ["--theme", choice.theme] : []);
+
+/** Draw each section for the modes and devices, in one call, in one surface category. A section's findings name the unit the design system does not build. */
+export function drawSections(sections: Tree[], category: string, choice: ThemeChoice, ds: string, modes: readonly Mode[] = MODES, devices: readonly Device[] = DEVICES, tolerant = false): Drawn {
   const dir = mkdtempSync(join(tmpdir(), "surface-samples-"));
   try {
     const file = join(dir, "batch.tree.json");
-    writeFileSync(file, JSON.stringify({ treeVersion: 1, title: "samples", sections }));
-    const run = spawnSync(spnutils(), ["apps", "surface", "render", "--app", app, "--ds", ds, "--file", file, "--modes", modes.join(","), "--devices", devices.join(",")], { encoding: "utf8", maxBuffer: 1 << 30 });
+    writeFileSync(file, JSON.stringify({ title: "samples", category, sections }));
+    const run = spawnSync(spnutils(), ["apps", "surface", "render", ...themeArgs(choice), "--ds", ds, "--file", file, "--modes", modes.join(","), "--devices", devices.join(",")], { encoding: "utf8", maxBuffer: 1 << 30 });
     let parsed: { renders: Record<string, Record<string, { html: string; findings: Array<{ path: string; unit: string; message: string }> }>> };
     try { parsed = JSON.parse(run.stdout); } catch { throw new Error(`the render printed no JSON: ${(run.stdout || run.stderr || String(run.error)).slice(0, 600)}`); }
     const html = { LIGHT: { DESKTOP: [], TABLET: [], PHONE: [] }, DARK: { DESKTOP: [], TABLET: [], PHONE: [] } } as Drawn["html"];
@@ -86,7 +92,7 @@ export function drawSections(sections: Tree[], app: string, ds: string, modes: r
         const search = (from: number, to: number): void => {
           const part = sections.slice(from, to);
           try {
-            const drawn = drawSections(part, app, ds, [modes[0]], [devices[0]], false);
+            const drawn = drawSections(part, category, choice, ds, [modes[0]], [devices[0]], false);
             for (const finding of drawn.findings) merged.push({ ...finding, section: from + finding.section });
           } catch (error) {
             if (part.length === 1) { merged.push({ section: from, unit: /(DS[\w.]+) will not render/.exec(String(error))?.[1] ?? "a unit", message: String(error).slice(0, 300), path: "" }); return; }
@@ -97,7 +103,15 @@ export function drawSections(sections: Tree[], app: string, ds: string, modes: r
         search(0, sections.length);
         return { findings: merged, html };
       }
-      if (windows.length !== sections.length && process.env.SPN_SURFACE_KEEP) writeFileSync(process.env.SPN_SURFACE_KEEP, JSON.stringify({ treeVersion: 1, title: "samples", sections }));
+      if (windows.length !== sections.length && process.env.SPN_SURFACE_KEEP) writeFileSync(process.env.SPN_SURFACE_KEEP, JSON.stringify({ title: "samples", category, sections }));
+      // A batch can fail where each of its sections draws on its own, as two forms in one batch do: draw each section
+      // alone then, and refuse only a section that will not draw by itself.
+      if (windows.length !== sections.length && sections.length > 1) {
+        const alone = sections.map((section) => drawSections([section], category, choice, ds, modes, devices, false));
+        for (const m of modes) for (const d of devices) html[m][d] = alone.flatMap((one) => one.html[m][d]);
+        alone.forEach((one, at) => { for (const finding of one.findings) findings.push({ ...finding, section: at }); });
+        return { findings, html };
+      }
       if (windows.length !== sections.length) throw new Error(`${copy.findings.slice(0, 3).map((f) => `${f.path}: ${f.message}`).join(" | ")} the render drew ${windows.length} windows for ${sections.length} sections (${mode} ${device}).`);
       html[mode][device] = windows.map(steadyIds);
       if (mode === modes[0] && device === devices[0]) for (const finding of copy.findings) findings.push({ section: Number(/sections\[(\d+)\]/.exec(finding.path)?.[1] ?? -1), unit: finding.unit, message: finding.message, path: finding.path });

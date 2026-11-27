@@ -1,4 +1,4 @@
-// The units of one page of a library file, in the contract the tool takes in (`SPSurfaceInventory`).
+// The units of one page of a library file, in the contract the tool takes in (`SPSurfaceLibraryInventory`).
 //
 // Passed to the Figma connector's `use_figma` as it is. A plain script with top-level `await` and
 // `return`, no wrapper. Fill INPUTS, change nothing else. Never writes to the file. The agent saves each
@@ -26,7 +26,7 @@
 //   text            the distinct text case and text decoration of the text layers, sorted
 //   measures        per version, the first layer whose field is a number, with the variable bound to it
 // and of every unit, its `layout`: the layout the section named for the unit keeps as shared plugin data, the contract's
-// `SPSurfaceInventoryLayout`, or null where it stands in no such section or the section keeps none.
+// `SPSurfaceLibraryInventoryLayout`, or null where it stands in no such section or the section keeps none.
 
 const INPUTS = {
   pageId: null,

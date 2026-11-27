@@ -28,7 +28,7 @@ const outline = {
 const kind = (code, extra = {}) => ({ code, title: code[0] + code.slice(1).toLowerCase(), description: `the ${code}`, config: {}, ...extra });
 const raw = { version: "1.0.0", outline, categories: { MARKETING: { LAYOUTS: [kind("TOPNAV", { floor: true })], CONTAINERS: [kind("HERO"), kind("NUMBERS")], THEME: [] } } };
 const decision = (extra) => ({ source: "OWN", pick: "ALL", customise: [], add: [], notUsed: [], values: { mtype: "X" }, why: "", ...extra });
-const spec = (name, extendsRef, extra = {}) => ({ name, version: "1.0.0", extends: extendsRef, domain: { product: "p", records: [], reads: "r" }, references: [], shared: {}, categories: {}, gaps: { notInTheLanguage: [], designSystemGaps: [], whatTheAgentMustAsk: [] }, ...extra });
+const spec = (name, extendsRef, extra = {}) => ({ name, extends: extendsRef, domain: { product: "p", records: [], reads: "r" }, references: [], shared: {}, categories: {}, gaps: { notInTheLanguage: [], designSystemGaps: [], whatTheAgentMustAsk: [] }, ...extra });
 
 const { catalogue, problems } = checkCatalogue(raw);
 console.log("=== the catalogue reader");
@@ -92,7 +92,7 @@ ok("a child that customises a code the parents lack is a problem", resolveLangua
 
 console.log("=== a language's frame");
 const page = renderLanguage(catalogue, r, { specPath: "specs/design-languages/demo.spdl.json", parentPage: "13-language-surface.md" });
-ok("it opens with the language's panel and links the parent's page", page.startsWith("~~~group Language | demo 1.0.0") && page.includes("Extends: [surface@1](13-language-surface.md)"));
+ok("it opens with the language's panel and links the parent's page", page.startsWith("~~~group Language | demo\n") && page.includes("Extends: [surface@1](13-language-surface.md)"));
 ok("a kind's state stands as a tag beside its code", page.includes("  Code: [HERO] [CUSTOMISED]") && page.includes("  Code: [NUMBERS] [NOT_USED]") && page.includes("  Code: [PLANS] [NEW]"));
 ok("the part's source and its values stand in the tab", page.includes("Filled by: [OWN]") && page.includes("  Source: [OWN]"));
 ok("a value's key stands in words as its row's title, and its JSON is emitted for the writer to draw", !page.includes("\ntheBrand\n") && /\nThe brand\n  Source: \[(OWN|INHERITED)\]/.test(page) && /  Value: `\{"primary"/.test(page), page.slice(0, 900));

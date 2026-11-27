@@ -26,7 +26,7 @@ import { appendLog, sessionDir } from "../../../../plugin-support-lib/src/lib/de
 import { carryTags, repoOf, rowId, tagsOf, telemetryDir, utcNow, workOfPart, type WorkTags } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import {
   ARC_PATTERN, ID_PATTERN, NODE_PATTERN, PART_PATTERN, WORKSTREAM_PATTERN, SPDevExAgentSkillType, SPDevExWorkspaceTelemetryEventType,
-  SPDevExWorkspaceTelemetryRowType, SPDevExWorkspaceTelemetryToolType, SPDevExWorkspaceTelemetryVersionType, SPDevExWorkstreamWorkType, SPDocBehaviourStatusType, SPTestTierType,
+  SPDevExWorkspaceTelemetryRowType, SPDevExWorkspaceTelemetryToolType, SPDevExWorkspaceTelemetryVersionType, SPDevExWorkstreamWorkType, SPAppsTestBehaviourStatusType, SPAppsTestTierType,
   SPDevExStageType, held, known,
 } from "../../../../plugin-support-lib/src/lib/telemetry-values.ts";
 import { isTestCommand } from "../checks/test-run.ts";
@@ -329,7 +329,7 @@ export function landTests(root: string, session: string, cwd: string): void {
     let changed = false;
     for (const { file, verdict } of verdictsSince(marker.at)) {
       if (marker.done.includes(file) || typeof verdict.worktree !== "string" || !inside(verdict.worktree, marker.cwd)) continue;
-      const tier = known(SPTestTierType, verdict.tier);
+      const tier = known(SPAppsTestTierType, verdict.tier);
       const node = held(String(verdict.project ?? "").replace(/^@[^/]+\//, ""), NODE_PATTERN);
       const run = held(verdict.run, /^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$/);
       if (!tier || !node || !run) continue;
@@ -344,7 +344,7 @@ export function landTests(root: string, session: string, cwd: string): void {
         v: SPDevExWorkspaceTelemetryVersionType.V1, mtype: SPDevExWorkspaceTelemetryRowType.TEST, id,
         at: `${new Date(Date.parse(String(verdict.at)) - ms).toISOString().slice(0, 19)}Z`, ms,
         event: SPDevExWorkspaceTelemetryEventType.COMMAND, ...marker.head, work: SPDevExWorkstreamWorkType.TEST, retryOf: held(was, ID_PATTERN),
-        call: marker.call, status: failed ? SPDocBehaviourStatusType.FAILED : SPDocBehaviourStatusType.SUCCESS,
+        call: marker.call, status: failed ? SPAppsTestBehaviourStatusType.FAILED : SPAppsTestBehaviourStatusType.SUCCESS,
         test: { node, run, tier, tests },
       }));
       marker.done.push(file);

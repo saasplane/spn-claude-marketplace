@@ -515,13 +515,14 @@ try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(
   });
 })();
 
-/* THE SURFACE PAGE: the bar's three switches, and the frame's document. The page's markup stands in one `<template id="page-<MODE>-<DEVICE>">`
-   for each device and mode that was rendered; the switches pick the template for the choice and swap the frame's markup, and where there is none
+/* THE SURFACE PAGE: the bar's switches, and the frame's document. The page's markup stands in one `<template id="page-<MODE>-<DEVICE>">`
+   for each device and mode that was rendered, and on a page with cases one `<template id="page-<CASE>-<MODE>-<DEVICE>">` for each other case,
+   which the Case switch picks and `#case-<case>` opens; the switches pick the template for the choice and swap the frame's markup, and where there is none
    for it they restyle the nearest one only (mode on the frame's `<html>`, width on the frame). The frame's document holds the template's
    markup and nothing else, linking `design-system.css` from the folder this script was served from (the cut of the design system that
    `<meta name="surface-ds">` names) and the app's stylesheet at the path `<meta name="surface-app-css">` names. Notes live outside the page, in
    `<script type="application/json" id="sample-notes">`, a list of { n, kind, case, status, text }, `n` the place of a top-level section
-   counted from 0; a note is a number, a short title and one plain sentence, with no link; the Notes switch opens a panel beside the stage and puts a small numbered badge over each section's top-left, and does neither when off. A `#<id>` in
+   counted from 0, or on a page with cases an object of such a list for each case; a note is a number, a short title and one plain sentence, with no link; the Notes switch opens a panel beside the stage and puts a small numbered badge over each section's top-left, and does neither when off. A `#<id>` in
    the page's address scrolls the frame to that element. The choice is kept in this browser (05-pages.md, The surface preview). */
 (function () {
   var root = document.querySelector('.sds-surface'); if (!root) return;
@@ -531,22 +532,31 @@ try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(
   var panel = root.querySelector('.sds-surface-panel');
   var state = { width: 'desktop', mode: 'light', notes: false };
   try { var kept = JSON.parse(localStorage.getItem('sds-surface') || '{}'); for (var k in state) if (k in kept) state[k] = kept[k]; } catch (e) {}
+  // The Case switch: the page's cases as tabs, the default first; the chosen case is the page's, never kept across pages.
+  var caseButtons = Array.prototype.slice.call(root.querySelectorAll('[data-surface="case"]'));
+  var CASES = caseButtons.map(function (b) { return b.getAttribute('data-value'); });
+  function caseHash(key) { return 'case-' + String(key).toLowerCase().replace(/_/g, '-'); }
+  function caseFromHash() { var h = decodeURIComponent((location.hash || '').slice(1)); for (var i = 0; i < CASES.length; i++) if (caseHash(CASES[i]) === h) return CASES[i]; return null; }
+  var chosen = caseFromHash() || CASES[0] || '';
   function meta(name) { var m = document.querySelector('meta[name="' + name + '"]'); return m ? (m.getAttribute('content') || '').trim() : ''; }
   function attr(text) { return String(text).replace(/&/g, '&amp;').replace(/"/g, '&quot;'); }
   function text(v) { return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
   var own = document.querySelector('script[src*="docs-page.js"]');
   var folder = own ? own.getAttribute('src').replace(/[^\/]*$/, '') : '';
   var appCss = meta('surface-app-css');
-  var notes = []; try { var nj = document.getElementById('sample-notes'); notes = nj ? JSON.parse(nj.textContent || '[]') : []; } catch (e) {}
+  var allNotes = []; try { var nj = document.getElementById('sample-notes'); allNotes = nj ? JSON.parse(nj.textContent || '[]') : []; } catch (e) {}
+  function notesFor() { return Array.isArray(allNotes) ? allNotes : (allNotes && allNotes[chosen]) || []; }
+  var notes = notesFor();
   var templates = Array.prototype.slice.call(document.querySelectorAll('template[id^="page-"], template#page'));
   var DEVICE = { desktop: 'DESKTOP', tablet: 'TABLET', phone: 'PHONE' };
   // The template for the choice: the exact one, else the same device in the other mode, else the other devices in the same mode, else any.
   function pick() {
     var mode = state.mode.toUpperCase(), device = DEVICE[state.width] || 'DESKTOP';
+    var prefix = chosen && chosen !== CASES[0] ? 'page-' + chosen + '-' : 'page-';
     function by(id) { return document.getElementById(id) && document.getElementById(id).tagName === 'TEMPLATE' ? document.getElementById(id) : null; }
-    var found = by('page-' + mode + '-' + device) || by('page-' + (mode === 'LIGHT' ? 'DARK' : 'LIGHT') + '-' + device);
-    for (var i = 0; i < templates.length && !found; i++) if (templates[i].id.indexOf('page-' + mode + '-') === 0) found = templates[i];
-    return found || templates[0] || null;
+    var found = by(prefix + mode + '-' + device) || by(prefix + (mode === 'LIGHT' ? 'DARK' : 'LIGHT') + '-' + device);
+    for (var i = 0; i < templates.length && !found; i++) if (templates[i].id.indexOf(prefix + mode + '-') === 0) found = templates[i];
+    return found || by(prefix + 'LIGHT-DESKTOP') || templates[0] || null;
   }
   var shown = null;
   function pageDocument(template) {
@@ -633,6 +643,7 @@ try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(
     fit();
     Array.prototype.forEach.call(root.querySelectorAll('[data-surface]'), function (b) {
       var key = b.getAttribute('data-surface'), value = b.getAttribute('data-value');
+      if (key === 'case') { b.setAttribute('aria-selected', String(chosen === value)); b.setAttribute('aria-pressed', String(chosen === value)); return; }
       b.setAttribute('aria-pressed', String(key === 'notes' ? state.notes : state[key] === value));
     });
     try { localStorage.setItem('sds-surface', JSON.stringify(state)); } catch (e) {}
@@ -640,7 +651,11 @@ try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(
     if (want !== shown) { shown = want; frame.srcdoc = pageDocument(want); } else set();
   }
   addEventListener('resize', function () { fit(); drawNotes(); });
-  addEventListener('hashchange', anchor);
+  addEventListener('hashchange', function () {
+    var c = caseFromHash();
+    if (c && c !== chosen) { chosen = c; notes = notesFor(); panel.textContent = ''; apply(); return; }
+    anchor();
+  });
   root.addEventListener('click', function (e) {
     var n = e.target.closest('[data-note]');
     if (n) {
@@ -651,6 +666,11 @@ try{if('scrollRestoration' in history)history.scrollRestoration='manual';}catch(
     }
     var b = e.target.closest('[data-surface]'); if (!b) return;
     var key = b.getAttribute('data-surface');
+    if (key === 'case') {
+      chosen = b.getAttribute('data-value'); notes = notesFor(); panel.textContent = '';
+      try { history.replaceState(null, '', chosen === CASES[0] ? location.pathname + location.search : '#' + caseHash(chosen)); } catch (e2) {}
+      apply(); return;
+    }
     if (key === 'notes') state.notes = !state.notes; else state[key] = b.getAttribute('data-value');
     apply();
   });

@@ -2,7 +2,7 @@
 // sees its size and its neighbours as a visitor does.
 import { quote as quoteCard, U, act, badge, btn, col, eyebrow, feat, fitem, grid, item, lines, link, muted, row, sec, slot, table, txt, vl } from "./kit.ts";
 import { commentCard, field as formField, form as formOf, highlight, input as formInput, personCard, questionCard } from "./site.ts";
-import type { Brief } from "./site-words.ts";
+import type { Brief } from "./words.ts";
 import type { Tree } from "./types.ts";
 
 const h2 = (t: string): Tree => txt(t, "HEADING_SM");

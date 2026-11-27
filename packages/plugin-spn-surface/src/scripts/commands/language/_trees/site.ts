@@ -2,7 +2,7 @@
 // the words of the category's brief. A recipe returns the section's node, or null where the language has no recipe for that kind or case, and
 // the caller then draws the kind from its catalogue description.
 import { DOORS_SURFACE, GRID, U, act, bare, dsAtLeast, dsHas, quote, badge, btn, cells, col, doors, eyebrow, feat, fitem, grid, item, lines, link, muted, row, sec, slot, table, txt, vl } from "./kit.ts";
-import type { Brief, Line } from "./site-words.ts";
+import type { Brief, Line } from "./words.ts";
 import type { Tree } from "./types.ts";
 
 const asItem = (l: Line, href?: string): Tree => fitem(l[0], l[1], l[2], l[3] || undefined, href);
@@ -163,7 +163,9 @@ function articleBody(b: Brief): Tree { return reading(b, "COLUMN"); }
 
 const recordCard = (r: [string, string, string], form = "VERTICAL"): Tree => U("DSItemCard", { card: {}, item: { title: r[0], description: r[1], media: { mtype: "MARK", icon: "FILE" }, facts: [r[2]], pageLevel: "WIDGET", orientation: form } });
 const paging = (total = 48, per = 6): Tree => U("DSPagination", { totalRecords: total, valueLink: vl({ page: 1, recordsPerPage: per }) });
-const resultsBar = (b: Brief, label = "Search"): Tree => searchBar(b, "FREE_TEXT", true) ?? U("DSFilterBar", { fields: [{ mtype: "TEXT", key: "q", label, placeholder: label, primary: true, valueLink: vl("") }] });
+// The search of one section's records, a shelf's or a seller's: an open bar of one field at the content's width; only the
+// head of a page of results is folded.
+const resultsBar = (b: Brief, label = "Search"): Tree => searchBar(b, "FREE_TEXT") ?? U("DSFilterBar", { fields: [{ mtype: "TEXT", key: "q", label, placeholder: label, primary: true, valueLink: vl("") }] });
 
 function records(b: Brief, c: string): Tree {
   const [rt, rd] = b.heads?.records ?? ["Everything written, newest first", "Notes from the team on roles, sign-in, sites and billing, each written by the person who built the part."];
@@ -283,11 +285,11 @@ function searchBar(b: Brief, c: string, folded = false): Tree | null {
   if (!dsHas("DSSearchBar")) return null;
   const select = (key: string, label: string, options: string[], value: string | null): Tree => ({ mtype: "SELECT", key, label, options: options.map((k) => ({ key: k.toLowerCase(), label: k })), valueLink: vl(value) });
   const what: Tree = { mtype: "TEXT", key: "q", label: "What", placeholder: `Search ${b.org}`, primary: true, valueLink: vl(b.records[0][0]) };
-  if (c !== "STRUCTURED") return U("DSSearchBar", { fields: [what], folded, radius: "FULL" });
+  if (c !== "STRUCTURED") return U("DSSearchBar", { fields: [what], folded });
   const fields: Tree[] = [what, select("price", "Price", ["Any price", "Free", "Under $50", "$50 to $150"], "any price"), { mtype: "DATE_RANGE", key: "when", label: "When", valueLink: vl({ start: null, end: null }) }, { mtype: "COUNT", key: "seats", label: "Seats", options: [{ key: "members", label: "Members", description: "Who will use it" }, { key: "admins", label: "Admins", description: "Who will manage it" }], limits: { members: { min: 1, max: 500 }, admins: { min: 1, max: 20 } }, valueLink: vl({ members: 10, admins: 2 }) }];
   const icon = (node: string): Tree => (dsAtLeast("11.28.0") ? { media: { mtype: "ICON", node } } : {});
   const scopes = { options: [{ key: "addons", label: "Add-ons", fields: ["q", "price", "seats"], ...icon("PLUG") }, { key: "courses", label: "Courses", fields: ["q", "price"], ...icon("FILE") }, { key: "workshops", label: "Workshops", fields: ["q", "when", "seats"], ...icon("CALENDAR") }], valueLink: vl("addons") };
-  return U("DSSearchBar", { fields, scopes, folded, radius: "FULL" });
+  return U("DSSearchBar", { fields, scopes, folded });
 }
 
 function find(b: Brief, c: string): Tree {
@@ -350,7 +352,9 @@ function footer(b: Brief, c: string): Tree {
   if (c !== "SHORT") {
     const lists = b.groups.map(([k, t, pages]) => list(t, [["Overview", `#${k}`], ...pages.map((p): [string, string] => [p, `#${p.toLowerCase().replace(/ /g, "-")}`])]));
     const contact = [list("Contact", b.emails.map((a): [string, string] => [a, `mailto:${a}`])), row([U("DSButton", { label: "Get in touch", variant: "OUTLINE", size: "SM", anchor: { href: "#contact" } })])];
-    const cellsOf = [[lists[0]], [lists[1]], [lists[2], lists[4]], [lists[3], ...contact]];
+    // four columns of the groups the language names, a fifth group under the third, and the contact under the fourth; a
+    // language with fewer groups fills fewer columns, and never draws an empty one
+    const cellsOf = [[lists[0]], [lists[1]], [lists[2], lists[4]], [lists[3], ...contact]].map((cell) => cell.filter((one): one is Tree => one !== undefined)).filter((cell) => cell.length > 0);
     kids.push({ place: "grid", gap: "LG", columns: { desktop: 4, tablet: 2, mobile: 2 }, children: cellsOf.map((cell) => col(cell, "LG")) });
   }
   kids.push(U("DSSeparator", {}), legal);

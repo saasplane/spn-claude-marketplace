@@ -1237,11 +1237,15 @@ pre .sds-tk-g { color: var(--sds-tk-c); font-style: normal; }
 .sds-surface-switch button { font: inherit; color: var(--fg-muted); background: none; border: 0; border-radius: var(--radius-md); padding: .2rem .7rem; cursor: pointer; }
 .sds-surface-switch button:hover { color: var(--fg); }
 .sds-surface-switch button[aria-pressed="true"] { color: var(--fg); background: var(--surface); box-shadow: 0 0 0 1px var(--surface-border); }
+.sds-surface-cases { flex: 0 1 auto; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.sds-surface-cases button { white-space: nowrap; }
+.sds-surface-icon { display: inline-grid; place-items: center; padding: .3rem .45rem !important; }
+.sds-surface-icon svg { display: block; width: 16px; height: 16px; }
 .sds-surface-stage { flex: 1; min-width: 0; min-height: 0; position: relative; overflow: hidden; }
 /* The script gives the frame its device's width (desktop 1440, tablet 768, phone 390) and scales it to the stage; it is never narrowed. */
 .sds-surface-frame { display: block; width: 1440px; height: 100%; border: 0; background: var(--surface); transform-origin: 0 0; }
 .sds-surface[data-width="tablet"] .sds-surface-frame, .sds-surface[data-width="phone"] .sds-surface-frame { box-shadow: 0 0 0 1px var(--surface-border); }
-@media (max-width: 40rem) { .sds-surface-bar { flex-wrap: wrap; gap: .4rem .75rem; padding-inline: 16px; } .sds-surface-title { flex-basis: 100%; } }
+@media (max-width: 40rem) { .sds-surface-bar { flex-wrap: wrap; gap: .4rem .75rem; padding-inline: 16px; } .sds-surface-title { flex-basis: 100%; } .sds-surface-cases { flex-basis: 100%; } }
 /* THE NOTES: Notes opens a panel beside the stage, so nothing lies over the page's words. The panel is plain and solid (the raised surface, its border, the page's
    text colour, no alpha, no blur); over the page there are only the numbered badges, in the page's side room at each section's top-left. */
 .sds-surface-panel { flex: none; box-sizing: border-box; width: 20rem; overflow: auto; padding: 1rem 1.25rem 1.5rem; color: var(--fg); background: var(--surface-raised); border-left: 1px solid var(--surface-border);

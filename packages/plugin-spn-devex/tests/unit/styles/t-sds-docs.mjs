@@ -53,8 +53,8 @@ const added = mark("add"), removed = mark("del");
 /** For each language: the plain code a page's file holds, and the markup the block holds once the page is open. */
 const SAMPLES = {
   ts: {
-    plain: "export interface SPRepo {\n  name: CDTString;   // what a person calls it\n  size: 26 | null;\n  label: 'a class of <one>';\n}",
-    coloured: `${keyword("export")} ${keyword("interface")} ${type("SPRepo")} {\n  name: ${type("CDTString")};   ${comment("// what a person calls it")}\n`
+    plain: "export interface SPDevExRepo {\n  name: CDTString;   // what a person calls it\n  size: 26 | null;\n  label: 'a class of <one>';\n}",
+    coloured: `${keyword("export")} ${keyword("interface")} ${type("SPDevExRepo")} {\n  name: ${type("CDTString")};   ${comment("// what a person calls it")}\n`
       + `  size: ${number("26")} | ${keyword("null")};\n  label: ${string("'a class of &lt;one&gt;'")};\n}`,
   },
   json: {
@@ -76,8 +76,8 @@ const SAMPLES = {
     coloured: `${comment("# wire the agent")}\nspnutils repo agent-sync`,
   },
   md: {
-    plain: "| Estate | `SPEstate` | everything a company's work runs on |",
-    coloured: `| Estate | ${string("`SPEstate`")} | everything a company's work runs on |`,
+    plain: "| Estate | `SPInfraEstate` | everything a company's work runs on |",
+    coloured: `| Estate | ${string("`SPInfraEstate`")} | everything a company's work runs on |`,
   },
   diff: {
     plain: "  kept as it is\n- what the file says today\n+ what it will say, with <a tag>",

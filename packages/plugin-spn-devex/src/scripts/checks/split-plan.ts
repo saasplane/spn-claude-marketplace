@@ -1039,7 +1039,7 @@ const STATUS_FIELD = /\bstatus\s*:\s*([^|]*)$/i;
 //
 //   the approach document's own set   `05-pages.md` § The approach document —
 //                                     🚧 in progress · ✅ authoritative · ✅ executed — record · living
-//   a document's front-matter status  `SPDocStatusType` — DONE · IMPLEMENTING · PLANNING
+//   a document's front-matter status  `SPDevExDocStatusType` — DONE · IMPLEMENTING · PLANNING
 //
 // `closed` · `landed` · `complete` are kept beside them: the pages closed before the standard was
 // written say so in those words, and a gate that stopped reading them would report nine settled

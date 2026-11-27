@@ -1,4 +1,6 @@
-// `language data check`, `language diff` and the folder a language is kept in: the dataset's rules, and a change that only grows.
+// A design language kept as one folder (RULE.SUPPORT.SURFACE.628 to 636): where it is found, what its data and samples must agree
+// on, and what `language diff` refuses. The data checks run on a small folder in the new shape; the contract's own reading of each
+// file is `language check`'s, proved where the contract is installed.
 import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -7,134 +9,149 @@ import { pathToFileURL } from "node:url";
 
 const SRC = resolve(import.meta.dirname, "..", "..", "..", "..", "..", "src");
 const CLI = join(SRC, "scripts", "cli.ts");
-const { parentName, findLanguage } = await import(pathToFileURL(join(SRC, "scripts", "commands", "language", "_folder.ts")).href);
+const { parentName, findLanguage, loadData, checkData } = await import(pathToFileURL(join(SRC, "scripts", "commands", "language", "_folder.ts")).href);
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
   total += 1;
   if (condition) { console.log(`  PASS  ${label}`); return; }
   failed += 1;
-  console.log(`  FAIL  ${label}${detail ? `\n        ${detail}` : ""}`);
+  console.log(`  FAIL  ${label}${detail ? `\n        ${String(detail).slice(0, 500)}` : ""}`);
 };
 const run = (...args) => {
   try { return { out: execFileSync("node", [CLI, "language", ...args], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], env: { ...process.env, SPN_TELEMETRY: "off" } }), code: 0 }; }
   catch (error) { return { out: `${error.stdout ?? ""}${error.stderr ?? ""}`, code: error.status ?? 1 }; }
 };
+const root = mkdtempSync(join(tmpdir(), "t-language-data-"));
+process.on("exit", () => rmSync(root, { recursive: true, force: true }));
+const put = (file, value) => { mkdirSync(resolve(file, ".."), { recursive: true }); writeFileSync(file, typeof value === "string" ? value : JSON.stringify(value)); };
 
-const dir = mkdtempSync(join(tmpdir(), "language-data-"));
-const book = join(dir, "book");
-const folder = join(book, "docs", "specs", "surface", "languages", "demo");
-const write = (file, value) => { mkdirSync(resolve(file, ".."), { recursive: true }); writeFileSync(file, JSON.stringify(value, null, 1)); };
-const SPEC = { name: "demo", version: "1.0.0", extends: "surface", categories: { MARKETPLACE: { PAGES: { pick: ["MARKET_ITEM", "MARKET_PRICING"], add: [], notUsed: [] } } } };
-const CATALOGUE = { version: "1.0.0", categories: { MARKETPLACE: { PAGES: [{ code: "MARKET_ITEM" }, { code: "MARKET_PRICING" }, { code: "MARKET_CART" }] } } };
-const GOOD = {
-  index: { domain: "Demo", today: "2026-11-27", currency: "INR", surfaces: { MARKETPLACE: "the catalogue" }, files: ["items", "reviews", "plans"] },
-  items: { type: "ITEM", medium: "PICTURE", roles: { title: "title", price: "price", ratingSource: "reviews.rating" }, records: [{ key: "a", title: "A", price: 10 }] },
-  reviews: { type: "REVIEW", medium: "AVATAR", roles: { owner: "item", ratingSource: "rating" }, records: [{ item: "a", rating: 5 }] },
-  plans: { type: "PLAN", medium: "NONE", roles: { title: "name", price: "price" }, records: [{ key: "free", name: "Free", price: 0 }] },
+// A catalogue in the in-memory shape the checks read, and a small language in the folder's shape.
+const catalogue = {
+  outline: { categories: { MARKETPLACE: { family: "SITE", person: "SEEKER" }, PORTAL: { family: "APP", person: "INDIVIDUAL" } } },
+  categories: { MARKETPLACE: { PAGES: [{ code: "MARKET_ITEM" }, { code: "MARKET_SEARCH" }] }, PORTAL: { PAGES: [{ code: "HOME_APP" }] } },
 };
-const lay = (data) => {
-  rmSync(join(folder, "data"), { recursive: true, force: true });
-  write(join(folder, "demo.spdl.json"), SPEC);
-  for (const [name, value] of Object.entries(data)) write(join(folder, "data", `${name}.json`), value);
+const spec = { name: "demo", extends: "base", categories: { MARKETPLACE: {}, PORTAL: {} } };
+const types = { types: [
+  { type: "OrgCategory", file: "categories", medium: "NONE", roles: { title: "label" }, required: ["code", "label", "pluralLabel", "orgType"], derived: [], neededBy: [] },
+  { type: "Org", file: "orgs", medium: "LOGO", roles: { title: "name" }, required: ["key", "name", "category"], derived: [], neededBy: [] },
+  { type: "Person", file: "people", medium: "AVATAR", roles: { title: "name" }, required: ["key", "name"], derived: [], neededBy: [] },
+  { type: "Member", file: "members", medium: "NONE", roles: { owner: "org" }, required: ["key", "person", "org", "role"], derived: [], neededBy: [] },
+  { type: "Item", file: "items", medium: "PICTURE", roles: { title: "title", owner: "teacher" }, required: ["key", "title"], derived: [], neededBy: [] },
+  { type: "Review", file: "reviews", medium: "AVATAR", roles: { title: "by", ratingSource: "rating" }, required: ["item"], derived: [], neededBy: [] },
+] };
+const data = {
+  index: { domain: "Demo", line: "A demo", today: "2026-11-27", currency: "INR", files: ["categories", "orgs", "people", "members", "items", "reviews"] },
+  categories: { type: "OrgCategory", records: [
+    { code: "PLATFORM", label: "Platform", pluralLabel: "Platform", orgType: "PLATFORM", parentOrgCategoryCode: null },
+    { code: "MERCHANT", label: "Merchant", pluralLabel: "Merchants", orgType: "ENTERPRISE", parentOrgCategoryCode: "PLATFORM" },
+    { code: "SHOPPER", label: "Shopper", pluralLabel: "Shoppers", orgType: "CONSUMER", parentOrgCategoryCode: "PLATFORM" },
+  ] },
+  orgs: { type: "Org", records: [
+    { key: "demo", name: "Demo", category: "PLATFORM", parent: null },
+    { key: "studio", name: "A studio", category: "MERCHANT", parent: "demo" },
+    { key: "ana", name: "Ana", category: "SHOPPER", parent: "demo" },
+  ] },
+  people: { type: "Person", records: [{ key: "mira", name: "Mira" }, { key: "ana", name: "Ana" }] },
+  members: { type: "Member", records: [{ key: "mira@studio", person: "mira", org: "studio", role: "OWNER" }, { key: "ana@ana", person: "ana", org: "ana", role: "OWNER" }] },
+  items: { type: "Item", records: [{ key: "course", title: "A course", teacher: "mira" }] },
+  reviews: { type: "Review", records: [{ item: "course", by: "Ana P.", rating: 5 }] },
 };
-const catalogue = join(dir, "catalogue.json");
-write(catalogue, CATALOGUE);
-const icons = join(dir, "icons.json");
-write(icons, { icons: ["PENCIL", "CODE"] });
-const check = () => run("data", "check", "demo", "--book", book, "--catalogue", catalogue, "--icons", icons);
-const mutate = (change) => { const copy = JSON.parse(JSON.stringify(GOOD)); change(copy); return copy; };
+const samples = { categories: {
+  MARKETPLACE: { person: { type: "SEEKER", who: "a learner", comes: "from a search", asks: "is it good", sees: "the catalogue" }, navigation: {}, words: {},
+    pages: [{ page: "MARKET_ITEM", record: "items/course", as: null }, { page: "MARKET_SEARCH", record: null, as: null }], flows: [{ key: "BUY", pages: ["MARKET_SEARCH", "MARKET_ITEM"], record: "items/course" }] },
+  PORTAL: { person: { type: "INDIVIDUAL", who: "Ana", comes: "to learn", asks: "where was I", sees: "her account" }, navigation: {}, words: {},
+    pages: [{ page: "HOME_APP", record: null, as: "members/ana@ana" }], flows: [] },
+} };
+const write = (folder, over = {}) => {
+  rmSync(folder, { recursive: true, force: true });
+  put(join(folder, "spdl.json"), spec);
+  put(join(folder, "types.json"), over.types ?? types);
+  put(join(folder, "samples.json"), over.samples ?? samples);
+  for (const [name, value] of Object.entries({ ...data, ...(over.data ?? {}) })) put(join(folder, "data", `${name}.json`), value);
+  if (over.assets) for (const [name, value] of Object.entries(over.assets)) put(join(folder, "assets", name), value);
+  return folder;
+};
+const problemsOf = (folder) => { const { data: read, problems } = loadData(folder); return problems.length ? problems : checkData(read, spec, catalogue, ["PENCIL"]); };
+const lang = join(root, "docs", "specs", "surface", "languages", "demo");
 
-console.log("=== language data check");
-lay(GOOD);
-const good = check();
-ok("[MKT.SCRIPTS.714] a dataset that agrees prints one OK line and exits 0", good.code === 0 && /^OK .*data: 3 record file\(s\) agree$/m.test(good.out), good.out);
-lay(mutate((d) => { d.items.records[0].teacher = "nobody"; d.reviews.records[0].item = "gone"; }));
-ok("[MKT.SCRIPTS.715] a link that resolves to no record is refused, naming the file", check().code === 1 && check().out.includes('item "gone" resolves to no record of data/items.json'));
-lay(mutate((d) => { delete d.plans.medium; }));
-ok("[MKT.SCRIPTS.715] a record file with no medium is refused", check().out.includes("data/plans.json has no medium"), check().out);
-lay(mutate((d) => { delete d.plans.roles; }));
-ok("[MKT.SCRIPTS.715] a record file with no roles is refused", check().out.includes("data/plans.json has no roles"), check().out);
-lay(mutate((d) => { d.items.records[0].reviewCount = 3; d.items.records[0].rating = 4.5; d.plans.records[0].total = 9; }));
-const derived = check().out;
-ok("[MKT.SCRIPTS.715] a stored count, rating average or total is refused", derived.includes("`reviewCount` is a number the data can derive") && derived.includes("`rating` is stored outside the reviews") && derived.includes("`total` is a number"), derived);
-lay(mutate((d) => { d.items.records[0].icon = "PEN_TOOL"; d.items.records[0].mark = { icon: "CODE" }; }));
-ok("[MKT.SCRIPTS.715] an icon the design system's DSIconType lacks is refused, one it holds is not", check().out.includes("the icon PEN_TOOL is not one of the design system's DSIconType") && !check().out.includes("icon CODE"), check().out);
-lay(mutate((d) => { d.index.files = ["items", "reviews"]; delete d.plans; d.index.files = ["items", "reviews"]; }));
-ok("[MKT.SCRIPTS.715] a page kind the language picks whose records are missing is refused", check().out.includes("MARKETPLACE picks MARKET_PRICING, which need PLAN records"), check().out);
+{
+  const clean = problemsOf(write(lang));
+  ok("[MKT.SCRIPTS.714] a language folder whose data, types and samples agree has no problem", clean.length === 0, clean.join(" | "));
+}
+{
+  const links = problemsOf(write(lang, { data: { items: { type: "Item", records: [{ key: "course", title: "A course", teacher: "nobody" }] } } }));
+  ok("[MKT.SCRIPTS.715] a link that resolves to no record is refused, naming the file", links.some((one) => one.includes("data/items.json: teacher \"nobody\" resolves to no record of data/people.json")), links.join(" | "));
+  const untyped = problemsOf(write(lang, { types: { types: types.types.filter((one) => one.type !== "Item") } }));
+  ok("[MKT.SCRIPTS.715] a data file whose type types.json does not hold is refused", untyped.some((one) => one.includes("holds the type Item, which types.json does not hold")), untyped.join(" | "));
+  const noMedium = problemsOf(write(lang, { types: { types: types.types.map((one) => (one.type === "Item" ? { ...one, medium: "COLOUR" } : one)) } }));
+  ok("[MKT.SCRIPTS.715] a type with no medium is refused", noMedium.some((one) => one.includes("Item has no medium")), noMedium.join(" | "));
+  const noRoles = problemsOf(write(lang, { types: { types: types.types.map((one) => (one.type === "Item" ? { ...one, roles: {} } : one)) } }));
+  ok("[MKT.SCRIPTS.715] a type with no roles is refused", noRoles.some((one) => one.includes("Item has no roles")), noRoles.join(" | "));
+  const derived = problemsOf(write(lang, { data: { orgs: { type: "Org", records: [...data.orgs.records.slice(0, 2), { ...data.orgs.records[2], courseCount: 3 }] } } }));
+  ok("[MKT.SCRIPTS.715] a stored count, rating average or total is refused", derived.some((one) => one.includes("`courseCount` is a number the data can derive")), derived.join(" | "));
+  const icon = problemsOf(write(lang, { data: { people: { type: "Person", records: [{ key: "mira", name: "Mira", icon: "SPARKLE" }, { key: "ana", name: "Ana", icon: "PENCIL" }] } } }));
+  ok("[MKT.SCRIPTS.715] an icon the design system's DSIconType lacks is refused, one it holds is not", icon.some((one) => one.includes("the icon SPARKLE")) && !icon.some((one) => one.includes("PENCIL")), icon.join(" | "));
+}
+{
+  const page = problemsOf(write(lang, { samples: { categories: { ...samples.categories, MARKETPLACE: { ...samples.categories.MARKETPLACE, pages: [{ page: "MARKET_CART", record: "items/nothing", as: null }] } } } }));
+  ok("[MKT.SCRIPTS.718] a sample page that is no page kind of its category, or whose record does not resolve, is refused", page.some((one) => one.includes("MARKET_CART is no page kind of MARKETPLACE")) && page.some((one) => one.includes("record items/nothing resolves to no record of data/items.json")), page.join(" | "));
+  const person = problemsOf(write(lang, { samples: { categories: { ...samples.categories, PORTAL: { ...samples.categories.PORTAL, person: { ...samples.categories.PORTAL.person, type: "SHOPPER" } } } } }));
+  ok("[MKT.SCRIPTS.718] a person outside the surface person types is refused", person.some((one) => one.includes("the person SHOPPER is not a surface person type")), person.join(" | "));
+  const flow = problemsOf(write(lang, { samples: { categories: { ...samples.categories, MARKETPLACE: { ...samples.categories.MARKETPLACE, flows: [{ key: "BUY", pages: ["MARKET_CHECKOUT"], record: null }] } } } }));
+  ok("[MKT.SCRIPTS.718] a flow through a page the category does not sample is refused", flow.some((one) => one.includes("flow BUY: MARKET_CHECKOUT is none of the category's sample pages")), flow.join(" | "));
+}
+{
+  const parent = problemsOf(write(lang, { data: { orgs: { type: "Org", records: [data.orgs.records[0], { ...data.orgs.records[1], parent: "studio" }, data.orgs.records[2]] } } }));
+  ok("[MKT.SCRIPTS.719] an org whose parent is not of its category's parent category is refused", parent.some((one) => one.includes("studio is a MERCHANT, whose parent is a PLATFORM")), parent.join(" | "));
+  const category = problemsOf(write(lang, { data: { orgs: { type: "Org", records: [...data.orgs.records, { key: "x", name: "X", category: "TENANT", parent: "demo" }] } } }));
+  ok("[MKT.SCRIPTS.719] an org of a category categories.json does not hold is refused", category.some((one) => one.includes("x has the category TENANT")), category.join(" | "));
+  const member = problemsOf(write(lang, { data: { members: { type: "Member", records: [{ key: "zed@nowhere", person: "zed", org: "nowhere", role: "" }] } } }));
+  ok("[MKT.SCRIPTS.719] a member whose person or org does not resolve, or with no role, is refused", member.some((one) => one.includes('the person "zed"')) && member.some((one) => one.includes('the org "nowhere"')) && member.some((one) => one.includes("has no role")), member.join(" | "));
+  const types2 = problemsOf(write(lang, { data: { categories: { type: "OrgCategory", records: data.categories.records.map((one) => (one.code === "MERCHANT" ? { ...one, orgType: "TENANT" } : one)) } } }));
+  ok("[MKT.SCRIPTS.719] a category of an org type outside PLATFORM, ENTERPRISE and CONSUMER is refused", types2.some((one) => one.includes("the org type TENANT")), types2.join(" | "));
+}
+{
+  const noSources = (() => { const folder = write(lang); put(join(folder, "assets", "brand", "mark.svg"), "<svg/>"); return loadData(folder).problems; })();
+  ok("[MKT.SCRIPTS.720] an assets/ folder with no sources.json is refused", noSources.some((one) => one.includes("assets/ holds no sources.json")), noSources.join(" | "));
+  const sources = problemsOf(write(lang, { assets: { "sources.json": { brand: {}, pictures: [{ record: "items/nowhere", field: "cover", file: null, caption: null, state: "AWAITED" }], drawings: [], note: null } } }));
+  ok("[MKT.SCRIPTS.720] a picture sources.json lists for a record that is not there is refused", sources.some((one) => one.includes("assets/sources.json: record items/nowhere")), sources.join(" | "));
+  const held = problemsOf(write(lang, { assets: { "sources.json": { brand: {}, pictures: [{ record: "items/course", field: "cover", file: null, caption: "a cover", state: "AWAITED" }], drawings: [], note: null } } }));
+  ok("[MKT.SCRIPTS.720] an awaited picture of a record that is there is accepted", held.length === 0, held.join(" | "));
+}
+{
+  write(lang);
+  const found = findLanguage("demo", root, undefined);
+  ok("[MKT.SCRIPTS.713] a language is found in its folder by spdl.json, with no note", found && found.spec.endsWith(join("demo", "spdl.json")) && found.notes.length === 0, JSON.stringify(found));
+  const older = join(root, "docs", "specs", "surface", "languages", "aged");
+  put(join(older, "aged.spdl.json"), { ...spec, name: "aged" });
+  const named = findLanguage("aged", root, undefined);
+  ok("[MKT.SCRIPTS.713] the old file name is read, and the reading says so", named && named.spec.endsWith("aged.spdl.json") && named.notes.some((one) => one.includes("the old file name")), JSON.stringify(named));
+  put(join(root, "docs", "specs", "design-languages", "past", "spdl.json"), { ...spec, name: "past" });
+  const past = findLanguage("past", root, undefined);
+  ok("[MKT.SCRIPTS.713] the folder at the old design-languages path is read, and the reading says so", past && past.notes.some((one) => one.includes("the old folder")), JSON.stringify(past));
+  put(join(root, "docs", "specs", "surface", "languages", "base", "spdl.json"), { ...spec, name: "base", extends: null });
+  const renamed = findLanguage("surface", root, undefined);
+  ok("[MKT.SCRIPTS.713] surface is read as base, and the reading says so", renamed && renamed.name === "base" && renamed.notes.some((one) => one.includes("now named `base`")), JSON.stringify(renamed));
+}
+ok("[MKT.SCRIPTS.717] `base`, `base@1`, `surface` and `surface@1` all name base, and null names none", ["base", "base@1", "surface", "surface@1"].every((one) => parentName(one) === "base") && parentName(null) === null);
+{
+  const a = join(root, "a.json"), b = join(root, "b.json");
+  const kinds = (list) => ({ categories: { MARKETING: { PAGES: list } } });
+  put(a, { version: "1.0.0", ...kinds([{ code: "HOME", cases: [{ code: "WIDE" }] }]) });
+  put(b, kinds([{ code: "HOME", cases: [{ code: "WIDE" }] }, { code: "ABOUT" }]));
+  const added = run("diff", a, b);
+  ok("[MKT.SCRIPTS.716] a kind added, and the version key gone, is not a breaking change", added.code === 0 && added.out.startsWith("OK"), added.out);
+  put(b, kinds([]));
+  const gone = run("diff", a, b);
+  ok("[MKT.SCRIPTS.716] a kind removed is refused and listed", gone.code === 1 && gone.out.includes("[HOME]"), gone.out);
+  put(b, kinds([{ code: "HOME", status: "DEPRECATED", replacedBy: "MAIN_HOME", cases: [{ code: "WIDE" }] }]));
+  ok("[MKT.SCRIPTS.716] a kind retired as DEPRECATED stays, and is not refused", run("diff", a, b).code === 0);
+  put(b, kinds([{ code: "HOME", cases: [{ code: "BROAD" }] }]));
+  ok("[MKT.SCRIPTS.716] a case renamed is refused", run("diff", a, b).code === 1);
+  put(a, kinds([{ code: "HOME", title: "Home" }])); put(b, kinds([{ code: "HOME" }]));
+  ok("[MKT.SCRIPTS.716] a field removed from a kind is refused", run("diff", a, b).code === 1);
+}
 
-
-console.log("\n=== language data check — people, pages, tenancy and assets");
-const GROWN = (change) => mutate((d) => {
-  d.index.files = ["items", "reviews", "plans", "organizations", "members"];
-  d.index.people = { MARKETPLACE: { person: "SEEKER", who: "A learner", comes: "to find a course", asks: ["Is it worth it?"], sees: ["items", "reviews"] } };
-  d.teachers = { type: "SELLER", medium: "AVATAR", roles: { title: "name" }, records: [{ key: "mira", name: "Mira" }] };
-  d.index.files.push("teachers");
-  d.organizations = { type: "ORGANIZATION", medium: "LOGO", roles: { title: "name" }, records: [{ key: "atelier", name: "Atelier", level: "PLATFORM", plan: "free" }, { key: "studio", name: "Studio", level: "TENANT", parent: "atelier", plan: "free" }] };
-  d.members = { type: "MEMBER", medium: "AVATAR", roles: { owner: "org" }, records: [{ key: "m1", person: "mira", org: "studio", role: "OWNER" }] };
-  d.pages = { MARKET_ITEM: { record: "items/a", sections: { PROOF_REVIEWS: { title: "Reviews", description: "What learners say", from: "reviews where item = a" } } } };
-  change(d);
-});
-const layGrown = (d) => { lay(Object.fromEntries(Object.entries(d).filter(([k]) => k !== "pages"))); if (d.pages) write(join(folder, "data", "pages.json"), d.pages); };
-const CAT = { version: "1.0.0", outline: { categories: { MARKETPLACE: { person: "SEEKER" } } }, categories: { MARKETPLACE: { PAGES: [{ code: "MARKET_ITEM" }, { code: "MARKET_PRICING" }], CONTAINERS: [{ code: "PROOF_REVIEWS" }] } } };
-write(catalogue, CAT);
-layGrown(GROWN(() => {}));
-const grown = check();
-ok("[MKT.SCRIPTS.718] people, pages.json, organizations and members that agree are accepted", grown.code === 0, grown.out);
-layGrown(GROWN((d) => { d.index.people.MARKETPLACE.person = "NOBODY"; d.index.people.MARKETPLACE.sees = ["ghost"]; }));
-ok("[MKT.SCRIPTS.718] a person outside the surface person types, and a seen file that is not there, are refused", check().out.includes("the person NOBODY is not a surface person type") && check().out.includes("sees ghost"), check().out);
-layGrown(GROWN((d) => { d.pages.MARKET_ITEM.record = "items/zzz"; d.pages.MARKET_ITEM.sections.PROOF_REVIEWS.from = "reviews where item = zzz"; d.pages.MARKET_ITEM.sections.NO_SUCH = { title: "t", description: "d", from: "teachers" }; }));
-const pagesOut = check().out;
-ok("[MKT.SCRIPTS.718] a page whose record, section filter or container kind does not resolve is refused", pagesOut.includes("record items/zzz resolves to no record") && pagesOut.includes('item "zzz" resolves to no record') && pagesOut.includes("NO_SUCH is no container kind"), pagesOut);
-layGrown(GROWN((d) => { d.organizations.records[1].parent = "ghost"; d.organizations.records[1].plan = "gold"; d.organizations.records[1].level = "WHOLE"; d.members.records[0].org = "nowhere"; d.members.records[0].person = "nobody"; }));
-const tenancy = check().out;
-ok("[MKT.SCRIPTS.719] an organization's parent, plan and level and a member's org and person that do not resolve are refused", tenancy.includes('parent "ghost"') && tenancy.includes('plan "gold"') && tenancy.includes("level WHOLE") && tenancy.includes('org "nowhere"') && tenancy.includes('person "nobody"'), tenancy);
-layGrown(GROWN((d) => { d.organizations.medium = "PICTURE"; }));
-ok("[MKT.SCRIPTS.719] organizations are type ORGANIZATION with the medium LOGO", check().out.includes("data/organizations.json is type ORGANIZATION with the medium LOGO"), check().out);
-layGrown(GROWN((d) => { d.items.records[0].cover = { asset: "pictures/a.png" }; }));
-ok("[MKT.SCRIPTS.720] an asset named when the language has no assets/ folder is refused", check().out.includes("has no assets/ folder"), check().out);
-mkdirSync(join(folder, "data", "assets", "pictures"), { recursive: true });
-ok("[MKT.SCRIPTS.720] an assets/ folder with no sources.json is refused", check().out.includes("holds no sources.json"), check().out);
-writeFileSync(join(folder, "data", "assets", "sources.json"), "{}");
-ok("[MKT.SCRIPTS.720] an asset that is not under assets/ is refused", check().out.includes("the asset pictures/a.png is not under assets/"), check().out);
-writeFileSync(join(folder, "data", "assets", "pictures", "a.png"), "x");
-ok("[MKT.SCRIPTS.720] an asset that stands under assets/ is accepted", check().code === 0, check().out);
-
-console.log("\n=== the folder, and the old flat path");
-lay(GOOD);
-ok("[MKT.SCRIPTS.713] a language is found in its folder, with no note", findLanguage("demo", book, undefined).spec.endsWith("demo/demo.spdl.json") && findLanguage("demo", book, undefined).notes.length === 0);
-const flatBook = join(dir, "flat");
-write(join(flatBook, "docs", "specs", "design-languages", "old.spdl.json"), SPEC);
-const oldBook = join(dir, "old-folder");
-write(join(oldBook, "docs", "specs", "design-languages", "older", "older.spdl.json"), SPEC);
-write(join(oldBook, "docs", "specs", "design-languages", "older", "data", "index.json"), {});
-const flat = findLanguage("old", flatBook, undefined);
-ok("[MKT.SCRIPTS.713] the old flat file is read, and the reading says so", flat && flat.folder === null && flat.notes[0].includes("old flat path"));
-const older = findLanguage("older", oldBook, undefined);
-ok("[MKT.SCRIPTS.713] the folder at the old design-languages path is read, and the reading says so", older && older.folder && older.notes[0].includes("the old path"), JSON.stringify(older));
-write(join(book, "docs", "specs", "surface", "languages", "base", "base.spdl.json"), { ...SPEC, name: "base" });
-const renamed = findLanguage("surface", book, undefined);
-ok("[MKT.SCRIPTS.713] surface is read as base, and the reading says so", renamed && renamed.name === "base" && renamed.notes[0].includes("is now named"), JSON.stringify(renamed));
-ok("[MKT.SCRIPTS.713] a flat language has no data, and `data check` refuses it saying so", run("data", "check", "old", "--book", flatBook, "--catalogue", catalogue).out.includes("no data/"));
-
-console.log("\n=== extends names the parent alone");
-ok("[MKT.SCRIPTS.717] `base`, `base@1`, `surface` and `surface@1` all name base, and null names none", parentName("base") === "base" && parentName("base@1") === "base" && parentName("surface") === "base" && parentName("surface@1") === "base" && parentName(null) === null && parentName("Surface 1") === null);
-
-console.log("\n=== language diff");
-const before = join(dir, "before.json"), after = join(dir, "after.json");
-const kinds = (codes, extra = {}) => ({ version: "1.0.0", categories: { MARKETING: { PAGES: codes.map((code) => ({ code, title: code, ...extra, cases: [{ code: "ONE" }] })) } } });
-write(before, kinds(["A", "B"]));
-write(after, { ...kinds(["A", "B", "C"]), version: undefined });
-ok("[MKT.SCRIPTS.716] a kind added, and the version key gone, is not a breaking change", run("diff", before, after).code === 0);
-write(after, kinds(["A"]));
-const gone = run("diff", before, after);
-ok("[MKT.SCRIPTS.716] a kind removed is refused and listed", gone.code === 1 && gone.out.includes("categories.MARKETING.PAGES[B]"), gone.out);
-write(after, kinds(["A", "B"], { status: "DEPRECATED", replacedBy: "C" }));
-ok("[MKT.SCRIPTS.716] a kind retired as DEPRECATED stays, and is not refused", run("diff", before, after).code === 0);
-write(after, { version: "1.0.0", categories: { MARKETING: { PAGES: [{ code: "A", title: "A", cases: [{ code: "TWO" }] }, { code: "B", title: "B", cases: [{ code: "ONE" }] }] } } });
-ok("[MKT.SCRIPTS.716] a case renamed is refused", run("diff", before, after).out.includes("[A].cases[ONE]"));
-write(after, { version: "1.0.0", categories: { MARKETING: { PAGES: [{ code: "A", cases: [{ code: "ONE" }] }, { code: "B", title: "B", cases: [{ code: "ONE" }] }] } } });
-ok("[MKT.SCRIPTS.716] a field removed from a kind is refused", run("diff", before, after).out.includes("[A].title"));
-
-console.log(failed ? `\n  ${failed} of ${total} FAILED — t-data` : `\n  all ${total} passed — t-data`);
+console.log(failed ? `\n  ${failed} of ${total} FAILED` : `\n  all ${total} passed`);
 process.exit(failed ? 1 : 0);

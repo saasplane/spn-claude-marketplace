@@ -1,7 +1,7 @@
 // The recipes of the app categories (DASHBOARD for a team, PORTAL for an individual): panels, lists, forms and the widgets of an app, with the
 // words of a sample product, Lumen Labs. A page of an app is a layout holding panels; a recipe returns the panels, and the layout is the kind's.
 import { U, badge, btn, col, dsAtLeast, dsHas, grid, item, link, muted, row, sec, slot, table as plainTable, txt, vl } from "./kit.ts";
-import { BRIEFS } from "./site-words.ts";
+import { BRIEFS } from "./words.ts";
 import { siteContainer } from "./site.ts";
 import type { Tree } from "./types.ts";
 

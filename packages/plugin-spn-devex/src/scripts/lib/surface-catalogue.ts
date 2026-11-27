@@ -7,6 +7,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { keyInWords } from "./render.ts";
 import { basename, dirname, join } from "node:path";
+import { catalogueFolderOf, legacyCatalogue, readCatalogueFolder } from "../../../../plugin-support-lib/src/lib/surface-catalogue-folder.ts";
 
 /** What a kind is in a language: the contract's `SPSurfaceItemStateType`. */
 export type State = "PICKED" | "INHERITED" | "CUSTOMISED" | "NEW" | "NOT_USED";
@@ -30,18 +31,18 @@ const cap = (s: string): string => (s ? s[0].toUpperCase() + s.slice(1) : s);
 
 // ---------------------------------------------------------------------------- the reader
 
-/** The catalogue file, or the reasons it cannot be drawn. */
-export function readCatalogue(file: string): { catalogue: Catalogue | null; problems: string[] } {
-  if (!existsSync(file)) return { catalogue: null, problems: [`${file} does not exist`] };
-  let raw: Json;
-  try { raw = JSON.parse(readFileSync(file, "utf8")); } catch (e) { return { catalogue: null, problems: [`${file} is not JSON: ${(e as Error).message}`] }; }
-  return checkCatalogue(raw);
+/** The catalogue's folder, `docs/specs/surface/catalogue/` (or its `spcatalogue.json`), or the reasons it cannot be drawn. */
+export function readCatalogue(path: string): { catalogue: Catalogue | null; problems: string[] } {
+  const folder = catalogueFolderOf(path);
+  if (!existsSync(folder)) return { catalogue: null, problems: [`${folder} does not exist`] };
+  const read = readCatalogueFolder(folder);
+  if (!read.catalogue) return { catalogue: null, problems: read.problems };
+  return checkCatalogue(legacyCatalogue(read.catalogue));
 }
 
 export function checkCatalogue(raw: Json): { catalogue: Catalogue | null; problems: string[] } {
   const problems: string[] = [];
   if (!isObj(raw)) return { catalogue: null, problems: ["the catalogue is not an object"] };
-  if (typeof raw.version !== "string") problems.push("`version` is missing");
   const outline = raw.outline;
   if (!isObj(outline) || !Array.isArray(outline.groups) || !isObj(outline.categories)) problems.push("`outline` is missing: it holds `groups`, `categories` and `partNotes`, the outline the contract states");
   if (!isObj(raw.categories)) problems.push("`categories` is missing");
@@ -57,14 +58,14 @@ export function checkCatalogue(raw: Json): { catalogue: Catalogue | null; proble
   for (const cat of Object.keys(o.categories)) if (!cats[cat]) problems.push(`\`outline.categories\` names ${cat}, which \`categories\` lacks`);
   for (const g of o.groups) for (const p of g.parts) if (!p.title || !p.description) problems.push(`outline part ${p.code} has no title or description`);
   if (problems.length) return { catalogue: null, problems };
-  return { catalogue: { version: raw.version as string, outline: o, categories: cats }, problems: [] };
+  return { catalogue: { version: typeof raw.version === "string" ? raw.version : "", outline: o, categories: cats }, problems: [] };
 }
 
 // ---------------------------------------------------------------------------- a language, read as §5 states it
 
 export type Decision = { source?: Source; pick?: "ALL" | string[]; customise?: Array<{ code: string; change?: string; config?: Obj }>; add?: Kind[]; notUsed?: string[]; values?: Obj; why?: string };
 export type Spec = {
-  name: string; version: string; extends: string | null;
+  name: string; extends: string | null;
   domain: { product: string; records: string[]; reads: string };
   references: Array<Obj>;
   shared: Record<string, Decision>;
@@ -78,18 +79,18 @@ function gapCases(g: Json): Json[] | null {
   return isObj(g) && Array.isArray(g.cases) ? g.cases : null;
 }
 
-const SPEC_TOP = ["name", "version", "extends", "domain", "references", "shared", "categories", "gaps"];
+const SPEC_TOP = ["name", "extends", "domain", "references", "shared", "categories", "gaps"];
 const DECISION_KEYS = ["source", "pick", "customise", "add", "notUsed", "values", "why"];
 
 /** A language file against §5's shape and nothing else: what the old shape (site, app, serves, lower-case parts) fails on is named line by line. */
 export function checkSpec(raw: Json, outline: Outline): { spec: Spec | null; problems: string[] } {
   const problems: string[] = [];
   if (!isObj(raw)) return { spec: null, problems: ["the spec is not an object"] };
-  for (const k of Object.keys(raw)) if (!SPEC_TOP.includes(k)) problems.push(`\`${k}\` is not a key of a language (${SPEC_TOP.join(", ")})`);
+  // `version` is read and ignored for one release: a language only grows and carries none (RULE.SUPPORT.SURFACE.630).
+  for (const k of Object.keys(raw)) if (!SPEC_TOP.includes(k) && k !== "version") problems.push(`\`${k}\` is not a key of a language (${SPEC_TOP.join(", ")})`);
   for (const k of SPEC_TOP) if (!(k in raw)) problems.push(`\`${k}\` is missing`);
   if (typeof raw.name !== "string") problems.push("`name` is not a string");
-  if (typeof raw.version !== "string") problems.push("`version` is not a string");
-  if (raw.extends !== null && typeof raw.extends !== "string") problems.push("`extends` is null or \"parent@major\"");
+  if (raw.extends !== null && typeof raw.extends !== "string") problems.push("`extends` is null or the parent's name");
   if (isObj(raw.domain)) {
     for (const k of Object.keys(raw.domain)) if (!["product", "records", "reads"].includes(k)) problems.push(`\`domain.${k}\` is not a key of a domain (product, records, reads)`);
     if (typeof raw.domain.product !== "string") problems.push("`domain.product` is not a string");
@@ -136,7 +137,7 @@ export function parentRef(extendsRef: string): { name: string; major: string } |
   return m ? { name: m[1], major: m[2] ?? "" } : null;
 }
 
-/** The chain of languages, the root first, read from `<name>.spdl.json` beside the spec or in the catalogue's `design-languages` folder. */
+/** The chain of languages, the root first, each read from its folder's `spdl.json` beside the spec's folder or in the languages folder. */
 export function readChain(specFile: string, outline: Outline, otherFolders: string[]): { chain: Spec[]; problems: string[] } {
   const chain: Spec[] = [];
   const problems: string[] = [];
@@ -153,15 +154,13 @@ export function readChain(specFile: string, outline: Outline, otherFolders: stri
     chain.unshift(spec);
     if (spec.extends === null) break;
     const ref = parentRef(spec.extends);
-    if (!ref) { problems.push(`${spec.name}: \`extends\` "${spec.extends}" is not parent@major`); break; }
-    // A language is a folder, `<name>/<name>.spdl.json`; the older flat `<name>.spdl.json` is read for one release.
+    if (!ref) { problems.push(`${spec.name}: \`extends\` "${spec.extends}" names no parent`); break; }
+    // A language is a folder, `<name>/spdl.json`; the older `<name>/<name>.spdl.json` and flat `<name>.spdl.json` are read for one release.
     // Surface's own language was named `surface` and is now `base`: a child that still extends `surface` finds `base`.
     const names = ref.name === "surface" ? ["base", "surface"] : [ref.name];
-    const next = [dirname(file), ...otherFolders].flatMap((d) => names.flatMap((name) => [join(d, name, `${name}.spdl.json`), join(d, `${name}.spdl.json`)])).find(existsSync);
-    if (!next) { problems.push(`${spec.name} extends ${spec.extends}, whose file ${ref.name}.spdl.json is in none of: ${[dirname(file), ...otherFolders].join(", ")}`); break; }
+    const next = [dirname(file), dirname(dirname(file)), ...otherFolders].flatMap((d) => names.flatMap((name) => [join(d, name, "spdl.json"), join(d, name, `${name}.spdl.json`), join(d, `${name}.spdl.json`)])).find(existsSync);
+    if (!next) { problems.push(`${spec.name} extends ${spec.extends}, whose folder ${ref.name}/spdl.json is in none of: ${[dirname(dirname(file)), ...otherFolders].join(", ")}`); break; }
     file = next;
-    const major = String((JSON.parse(readFileSync(file, "utf8")) as Obj).version).split(".")[0];
-    if (ref.major && major !== ref.major) { problems.push(`${spec.name} extends ${spec.extends}, but ${file} is version ${(JSON.parse(readFileSync(file, "utf8")) as Obj).version}`); break; }
   }
   if (!problems.length && chain[0].extends !== null) problems.push("the chain does not end in a language that extends null");
   return { chain, problems };
@@ -444,11 +443,11 @@ export function renderLanguage(catalogue: Catalogue, resolved: Resolved, opts: {
   const out: string[] = [];
   const parent = spec.extends === null ? "none, this language is a root" : opts.parentPage ? `[${spec.extends}](${opts.parentPage})` : spec.extends;
   const refs = spec.references.map((r) => clean((r.id ?? r.url ?? JSON.stringify(r)) as string));
-  // The panel's title carries the version and its line who reads the product, so the row holds three facts (RULE.DEVEX.WORKSPACE.576).
+  // The panel's title carries the language's name and its line who reads the product (RULE.DEVEX.WORKSPACE.576).
   const product = clean(spec.domain.product) + (spec.domain.reads ? `, read by ${clean(spec.domain.reads)}` : "");
   const panel = [CATALOG, `${spec.name} | ${product}`, `  Extends: ${parent}`,
     `  Records: ${spec.domain.records.map(clean).join(", ") || "none"}`, `  References: ${refs.join(", ") || "none"}`, "```"].join("\n");
-  out.push(`~~~group Language | ${clean(spec.name)} ${clean(spec.version)}\n${panel}\n~~~`, "", languageShared(outline, resolved.shared), "");
+  out.push(`~~~group Language | ${clean(spec.name)}\n${panel}\n~~~`, "", languageShared(outline, resolved.shared), "");
   for (const cat of resolved.categories) {
     out.push(`### ${cat.code} — ${clean(cat.description.split(", who")[0])}${cat.fresh ? " (a category of its own)" : ""}`, "");
     if (cat.wholly) { out.push(`Inherited whole from ${spec.extends}: this language says nothing here.`, ""); continue; }
