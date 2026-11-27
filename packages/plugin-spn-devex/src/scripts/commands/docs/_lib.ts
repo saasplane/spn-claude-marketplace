@@ -2313,7 +2313,7 @@ function surfaceBlocks(tree: string, write: boolean, scope: FaceScope, touched: 
       } else {
         if (!marker.spec || marker.what !== `surface-design-language spec=${marker.spec}`) { problem(file, `\`${marker.what}\`: a surface-design-language marker names its spec as \`spec=<path from docs/>\` and nothing else`); continue; }
         const specFile = join(tree, marker.spec);
-        const { chain, problems } = readChain(specFile, read.catalogue.outline, [join(tree, "specs", "design-languages")]);
+        const { chain, problems } = readChain(specFile, read.catalogue.outline, [join(tree, "specs", "surface", "languages"), join(tree, "specs", "design-languages")]);
         if (problems.length) { problem(file, `\`${marker.what}\` cannot be drawn:\n         ${problems.join("\n         ")}`); continue; }
         const resolved = resolveLanguage(read.catalogue, chain);
         for (const m of resolved.problems) problem(file, `\`${marker.what}\`: ${m}`);

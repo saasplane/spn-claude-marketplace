@@ -155,7 +155,9 @@ export function readChain(specFile: string, outline: Outline, otherFolders: stri
     const ref = parentRef(spec.extends);
     if (!ref) { problems.push(`${spec.name}: \`extends\` "${spec.extends}" is not parent@major`); break; }
     // A language is a folder, `<name>/<name>.spdl.json`; the older flat `<name>.spdl.json` is read for one release.
-    const next = [dirname(file), ...otherFolders].flatMap((d) => [join(d, ref.name, `${ref.name}.spdl.json`), join(d, `${ref.name}.spdl.json`)]).find(existsSync);
+    // Surface's own language was named `surface` and is now `base`: a child that still extends `surface` finds `base`.
+    const names = ref.name === "surface" ? ["base", "surface"] : [ref.name];
+    const next = [dirname(file), ...otherFolders].flatMap((d) => names.flatMap((name) => [join(d, name, `${name}.spdl.json`), join(d, `${name}.spdl.json`)])).find(existsSync);
     if (!next) { problems.push(`${spec.name} extends ${spec.extends}, whose file ${ref.name}.spdl.json is in none of: ${[dirname(file), ...otherFolders].join(", ")}`); break; }
     file = next;
     const major = String((JSON.parse(readFileSync(file, "utf8")) as Obj).version).split(".")[0];

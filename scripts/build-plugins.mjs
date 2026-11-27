@@ -253,9 +253,9 @@ function copyCatalogue(book) {
   return true;
 }
 
-/** Surface's own language folder in the book, and where spn-surface carries its one copy: the spec and its `data/`, kept in step by this build. */
-const BOOK_LANGUAGE = join("docs", "specs", "design-languages", "surface");
-const PLUGIN_LANGUAGE = join(PACKAGES, "plugin-spn-surface", "src", "refs", "support", "surface", "design-languages", "surface");
+/** The base language's folder in the book (Surface's own language, once named `surface`), and where spn-surface carries its one copy: the spec and its `data/`, kept in step by this build. */
+const BOOK_LANGUAGE = join("docs", "specs", "surface", "languages", "base");
+const PLUGIN_LANGUAGE = join(PACKAGES, "plugin-spn-surface", "src", "refs", "support", "surface", "languages", "base");
 
 /** THE LANGUAGE FOLDER IS COPIED HERE, byte for byte and subfolders kept, as the catalogue is. Returns the files written, or null where there is no book. */
 function copyLanguage(book) {
@@ -321,7 +321,7 @@ async function buildOnce() {
   if (catalogue === null) console.log("  keep  plugin-spn-surface refs/support/surface/catalogue.json — no book catalogue beside this checkout");
   else console.log(`  ok    catalogue  (${catalogue ? "copied from the book" : "unchanged"})`);
   const language = copyLanguage(rules?.book ?? null);
-  if (language === null) console.log("  keep  plugin-spn-surface refs/support/surface/design-languages/surface — no book language folder beside this checkout");
+  if (language === null) console.log("  keep  plugin-spn-surface refs/support/surface/languages/base — no book language folder beside this checkout");
   else console.log(`  ok    surface language folder  (${language.length} file(s) copied from the book)`);
   return builtAny;
 }

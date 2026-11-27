@@ -3,7 +3,7 @@
 //     spn-surface language samples write <language> [--out <dir>] [--book <folder>] [--spec <file>] [--catalogue <file>] [--template <file>]
 //                                        [--assets <folder>] [--ds <version>] [--app <code>] [--only <text>]
 //
-// It reads the language's spec (`docs/specs/design-languages/<language>/<language>.spdl.json` of the book, or the old flat `<language>.spdl.json` for one release) and the surface catalogue, and for each
+// It reads the language's spec (`docs/specs/surface/languages/<language>/<language>.spdl.json` of the book, or for one release the old `docs/specs/design-languages/<language>/` and the flat `<language>.spdl.json`; `surface` is read as `base`) and the surface catalogue, and for each
 // category the language serves it draws each layout, each page kind, each case of each container kind and each case of each widget kind.
 // Each is a tree of the design system's units, with the sample words of a made-up company, drawn by `spnutils apps surface render`
 // for light and dark and for a desktop, a tablet and a phone. A unit the design system has not built is drawn as the planned mark, and its note says
@@ -26,9 +26,10 @@ export const usage = "<language> [--out <dir>] [--book <folder>] [--spec <file>]
 function write(args: string[]): number {
   const words = readWords(args, { out: VALUE, book: VALUE, spec: VALUE, catalogue: VALUE, template: VALUE, assets: VALUE, ds: VALUE, app: VALUE, only: VALUE, place: VALUE, quiet: FLAG });
   if (words.paths.length !== 1 || !/^[a-z][a-z0-9-]*$/.test(words.paths[0])) throw new UsageFault("takes one language, by its name, such as `surface`.");
-  const language = words.paths[0];
+  const asked = words.paths[0];
   const book = words.value("book") ? resolve(words.value("book") as string) : bookFrom(process.cwd());
-  const located = findLanguage(language, book, words.value("spec"));
+  const located = findLanguage(asked, book, words.value("spec"));
+  const language = located?.name ?? asked;
   const specFile = located?.spec ?? "";
   for (const note of located?.notes ?? []) console.log(note);
   if (!specFile || !existsSync(specFile)) throw new UsageFault(`found no spec for \`${language}\`; name it with \`--spec <file>\` or the book with \`--book <folder>\`.`);
@@ -43,7 +44,7 @@ function write(args: string[]): number {
   const quiet = words.given("quiet");
   // THE ONE HAND-OVER: the language's dataset, read from its `data/` folder, goes to the drawers as `data`; a language with none passes null.
   const options: Parameters<typeof draw>[0] & { data: ReturnType<typeof loadData>["data"] | null } = {
-    indexShell: INDEX_SHELL, language, catalogue, spec, out, template: readFileSync(templateFile, "utf8"), ds: words.value("ds") ?? installedVersion(), app: words.value("app") ?? "surface",
+    indexShell: INDEX_SHELL, language, catalogue, spec, out, template: readFileSync(templateFile, "utf8"), ds: words.value("ds") ?? installedVersion(), app: words.value("app") ?? "base",
     assets: words.value("assets") ? resolve(words.value("assets") as string) : null, place: words.value("place") ?? `SaaS Plane · ${book ? resolve(book).split("/").pop() : language}`,
     only: words.value("only"), log: (line) => { if (!quiet) console.log(line); },
     data: located?.folder && existsSync(join(located.folder, "data")) ? loadData(located.folder).data : null,

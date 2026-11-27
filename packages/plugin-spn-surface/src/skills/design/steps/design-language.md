@@ -80,10 +80,15 @@
 - **A sample page draws each drawing in a frame that scales it whole and carries the app's own tokens** (`RULE.SUPPORT.SURFACE.591` · MUST · skill:spn-surface/design)
 - **A review of a site, and an arc's final re-check of a site, walks every page of the live site at a phone, a tablet and a desktop width, in light and in dark, and reads computed values** (`RULE.SUPPORT.SURFACE.592` · MUST · skill:spn-surface/design)
 - **A page that shows a render links the design system's stylesheet and the theme config generated from a resolved language, and an app's own stylesheet only where the app gives one** (`RULE.SUPPORT.SURFACE.595` · MUST · skill:spn-surface/design)
-- **A design language is one folder, `docs/specs/design-languages/<name>/`, holding `<name>.spdl.json` and `data/`** (`RULE.SUPPORT.SURFACE.628` · MUST · skill:spn-surface/design)
+- **A design language is one folder, `docs/specs/surface/languages/<name>/`, holding `<name>.spdl.json` and `data/`** (`RULE.SUPPORT.SURFACE.628` · MUST · skill:spn-surface/design)
 - **A language keeps its own dataset in `data/`, one JSON file for each kind of record, and a page tree is prepared from it** (`RULE.SUPPORT.SURFACE.629` · MUST · skill:spn-surface/design)
 - **A design language, its data and the catalogue are never versioned by a bump; they only grow** (`RULE.SUPPORT.SURFACE.630` · MUST · skill:spn-surface/design)
-- **A child names its parent alone: `extends: "surface"`** (`RULE.SUPPORT.SURFACE.631` · MUST · skill:spn-surface/design)
+- **A child names its parent alone: `extends: "base"`** (`RULE.SUPPORT.SURFACE.631` · MUST · skill:spn-surface/design)
+- **Specs sit under the domain that states them: `docs/specs/<domain>/`, and Surface's are `docs/specs/surface/catalogue.json` and `docs/specs/surface/languages/<name>/`** (`RULE.SUPPORT.SURFACE.632` · MUST · skill:spn-surface/design)
+- **A language names the people of each surface in `index.json`, under `people`** (`RULE.SUPPORT.SURFACE.633` · MUST · skill:spn-surface/design)
+- **`pages.json` names the record each sample page shows and the words of its sections** (`RULE.SUPPORT.SURFACE.634` · MUST · skill:spn-surface/design)
+- **`assets/` holds what the data's pictures are made from, and `sources.json` says where each came from** (`RULE.SUPPORT.SURFACE.635` · MUST · skill:spn-surface/design)
+- **Organizations and members are the tenancy the samples show, so one language draws B2C, B2B, B2B2C and B2B2B** (`RULE.SUPPORT.SURFACE.636` · MUST · skill:spn-surface/design)
 
 Read this before a page of a site or an app is drawn, and while a partner's design language is being made. 
 

@@ -81,10 +81,10 @@ ok("[MKT.SCRIPTS.704] a section the render finds a unit missing from is drawn as
 
 console.log("\n=== language samples write — a language kept in its own folder");
 const folderBook = join(dir, "folder-book");
-mkdirSync(join(folderBook, "docs", "specs", "design-languages", "sample", "data"), { recursive: true });
-writeFileSync(join(folderBook, "docs", "specs", "design-languages", "sample", "sample.spdl.json"), JSON.stringify(SPEC));
+mkdirSync(join(folderBook, "docs", "specs", "surface", "languages", "sample", "data"), { recursive: true });
+writeFileSync(join(folderBook, "docs", "specs", "surface", "languages", "sample", "sample.spdl.json"), JSON.stringify(SPEC));
 const inFolder = run("sample", "--book", folderBook, "--catalogue", catalogue, "--out", join(dir, "out-folder"), "--quiet");
-ok("[MKT.SCRIPTS.713] a language in its own folder is drawn with no note about the old path, and the flat file says it is the old path", inFolder.code === 0 && !inFolder.out.includes("old flat path") && first.out.includes("old flat path"), inFolder.out);
+ok("[MKT.SCRIPTS.713] a language in its own folder is drawn with no note about the old path, and the flat file says it is the old path", inFolder.code === 0 && !inFolder.out.includes("note: read") && first.out.includes("old flat path"), inFolder.out);
 
 console.log("\n=== language samples write — the index and a second run");
 const data = JSON.parse(readFileSync(join(out, "samples.json"), "utf8"));

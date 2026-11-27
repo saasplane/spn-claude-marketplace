@@ -2,7 +2,7 @@
 //
 //     spn-surface language data check <language> [--book <folder>] [--spec <file>] [--catalogue <file>] [--icons <file>]
 //
-// The dataset is `docs/specs/design-languages/<language>/data/`: `index.json` and one file for each kind of record. It refuses a link that
+// The dataset is `docs/specs/surface/languages/<language>/data/`: `index.json` and one file for each kind of record. It refuses a link that
 // does not resolve, a record file with no medium or no roles, a stored number the data can derive (a count, a rating average, a cart
 // total), and a page kind the language picks whose records are missing, and an icon the design system's DSIconType does not hold (`refs/support/surface/icons.json`, or `--icons <file>`). A language kept in the old flat file has no data, and is said so.
 import { existsSync, readFileSync } from "node:fs";

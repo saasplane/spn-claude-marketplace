@@ -23,7 +23,7 @@ const run = (...args) => {
 
 const dir = mkdtempSync(join(tmpdir(), "language-data-"));
 const book = join(dir, "book");
-const folder = join(book, "docs", "specs", "design-languages", "demo");
+const folder = join(book, "docs", "specs", "surface", "languages", "demo");
 const write = (file, value) => { mkdirSync(resolve(file, ".."), { recursive: true }); writeFileSync(file, JSON.stringify(value, null, 1)); };
 const SPEC = { name: "demo", version: "1.0.0", extends: "surface", categories: { MARKETPLACE: { PAGES: { pick: ["MARKET_ITEM", "MARKET_PRICING"], add: [], notUsed: [] } } } };
 const CATALOGUE = { version: "1.0.0", categories: { MARKETPLACE: { PAGES: [{ code: "MARKET_ITEM" }, { code: "MARKET_PRICING" }, { code: "MARKET_CART" }] } } };
@@ -63,17 +63,62 @@ ok("[MKT.SCRIPTS.715] an icon the design system's DSIconType lacks is refused, o
 lay(mutate((d) => { d.index.files = ["items", "reviews"]; delete d.plans; d.index.files = ["items", "reviews"]; }));
 ok("[MKT.SCRIPTS.715] a page kind the language picks whose records are missing is refused", check().out.includes("MARKETPLACE picks MARKET_PRICING, which need PLAN records"), check().out);
 
+
+console.log("\n=== language data check — people, pages, tenancy and assets");
+const GROWN = (change) => mutate((d) => {
+  d.index.files = ["items", "reviews", "plans", "organizations", "members"];
+  d.index.people = { MARKETPLACE: { person: "SEEKER", who: "A learner", comes: "to find a course", asks: ["Is it worth it?"], sees: ["items", "reviews"] } };
+  d.teachers = { type: "SELLER", medium: "AVATAR", roles: { title: "name" }, records: [{ key: "mira", name: "Mira" }] };
+  d.index.files.push("teachers");
+  d.organizations = { type: "ORGANIZATION", medium: "LOGO", roles: { title: "name" }, records: [{ key: "atelier", name: "Atelier", level: "PLATFORM", plan: "free" }, { key: "studio", name: "Studio", level: "TENANT", parent: "atelier", plan: "free" }] };
+  d.members = { type: "MEMBER", medium: "AVATAR", roles: { owner: "org" }, records: [{ key: "m1", person: "mira", org: "studio", role: "OWNER" }] };
+  d.pages = { MARKET_ITEM: { record: "items/a", sections: { PROOF_REVIEWS: { title: "Reviews", description: "What learners say", from: "reviews where item = a" } } } };
+  change(d);
+});
+const layGrown = (d) => { lay(Object.fromEntries(Object.entries(d).filter(([k]) => k !== "pages"))); if (d.pages) write(join(folder, "data", "pages.json"), d.pages); };
+const CAT = { version: "1.0.0", outline: { categories: { MARKETPLACE: { person: "SEEKER" } } }, categories: { MARKETPLACE: { PAGES: [{ code: "MARKET_ITEM" }, { code: "MARKET_PRICING" }], CONTAINERS: [{ code: "PROOF_REVIEWS" }] } } };
+write(catalogue, CAT);
+layGrown(GROWN(() => {}));
+const grown = check();
+ok("[MKT.SCRIPTS.718] people, pages.json, organizations and members that agree are accepted", grown.code === 0, grown.out);
+layGrown(GROWN((d) => { d.index.people.MARKETPLACE.person = "NOBODY"; d.index.people.MARKETPLACE.sees = ["ghost"]; }));
+ok("[MKT.SCRIPTS.718] a person outside the surface person types, and a seen file that is not there, are refused", check().out.includes("the person NOBODY is not a surface person type") && check().out.includes("sees ghost"), check().out);
+layGrown(GROWN((d) => { d.pages.MARKET_ITEM.record = "items/zzz"; d.pages.MARKET_ITEM.sections.PROOF_REVIEWS.from = "reviews where item = zzz"; d.pages.MARKET_ITEM.sections.NO_SUCH = { title: "t", description: "d", from: "teachers" }; }));
+const pagesOut = check().out;
+ok("[MKT.SCRIPTS.718] a page whose record, section filter or container kind does not resolve is refused", pagesOut.includes("record items/zzz resolves to no record") && pagesOut.includes('item "zzz" resolves to no record') && pagesOut.includes("NO_SUCH is no container kind"), pagesOut);
+layGrown(GROWN((d) => { d.organizations.records[1].parent = "ghost"; d.organizations.records[1].plan = "gold"; d.organizations.records[1].level = "WHOLE"; d.members.records[0].org = "nowhere"; d.members.records[0].person = "nobody"; }));
+const tenancy = check().out;
+ok("[MKT.SCRIPTS.719] an organization's parent, plan and level and a member's org and person that do not resolve are refused", tenancy.includes('parent "ghost"') && tenancy.includes('plan "gold"') && tenancy.includes("level WHOLE") && tenancy.includes('org "nowhere"') && tenancy.includes('person "nobody"'), tenancy);
+layGrown(GROWN((d) => { d.organizations.medium = "PICTURE"; }));
+ok("[MKT.SCRIPTS.719] organizations are type ORGANIZATION with the medium LOGO", check().out.includes("data/organizations.json is type ORGANIZATION with the medium LOGO"), check().out);
+layGrown(GROWN((d) => { d.items.records[0].cover = { asset: "pictures/a.png" }; }));
+ok("[MKT.SCRIPTS.720] an asset named when the language has no assets/ folder is refused", check().out.includes("has no assets/ folder"), check().out);
+mkdirSync(join(folder, "data", "assets", "pictures"), { recursive: true });
+ok("[MKT.SCRIPTS.720] an assets/ folder with no sources.json is refused", check().out.includes("holds no sources.json"), check().out);
+writeFileSync(join(folder, "data", "assets", "sources.json"), "{}");
+ok("[MKT.SCRIPTS.720] an asset that is not under assets/ is refused", check().out.includes("the asset pictures/a.png is not under assets/"), check().out);
+writeFileSync(join(folder, "data", "assets", "pictures", "a.png"), "x");
+ok("[MKT.SCRIPTS.720] an asset that stands under assets/ is accepted", check().code === 0, check().out);
+
 console.log("\n=== the folder, and the old flat path");
 lay(GOOD);
 ok("[MKT.SCRIPTS.713] a language is found in its folder, with no note", findLanguage("demo", book, undefined).spec.endsWith("demo/demo.spdl.json") && findLanguage("demo", book, undefined).notes.length === 0);
 const flatBook = join(dir, "flat");
 write(join(flatBook, "docs", "specs", "design-languages", "old.spdl.json"), SPEC);
+const oldBook = join(dir, "old-folder");
+write(join(oldBook, "docs", "specs", "design-languages", "older", "older.spdl.json"), SPEC);
+write(join(oldBook, "docs", "specs", "design-languages", "older", "data", "index.json"), {});
 const flat = findLanguage("old", flatBook, undefined);
 ok("[MKT.SCRIPTS.713] the old flat file is read, and the reading says so", flat && flat.folder === null && flat.notes[0].includes("old flat path"));
+const older = findLanguage("older", oldBook, undefined);
+ok("[MKT.SCRIPTS.713] the folder at the old design-languages path is read, and the reading says so", older && older.folder && older.notes[0].includes("the old path"), JSON.stringify(older));
+write(join(book, "docs", "specs", "surface", "languages", "base", "base.spdl.json"), { ...SPEC, name: "base" });
+const renamed = findLanguage("surface", book, undefined);
+ok("[MKT.SCRIPTS.713] surface is read as base, and the reading says so", renamed && renamed.name === "base" && renamed.notes[0].includes("is now named"), JSON.stringify(renamed));
 ok("[MKT.SCRIPTS.713] a flat language has no data, and `data check` refuses it saying so", run("data", "check", "old", "--book", flatBook, "--catalogue", catalogue).out.includes("no data/"));
 
 console.log("\n=== extends names the parent alone");
-ok("[MKT.SCRIPTS.717] `surface` and `surface@1` both name surface, and null names none", parentName("surface") === "surface" && parentName("surface@1") === "surface" && parentName(null) === null && parentName("Surface 1") === null);
+ok("[MKT.SCRIPTS.717] `base`, `base@1`, `surface` and `surface@1` all name base, and null names none", parentName("base") === "base" && parentName("base@1") === "base" && parentName("surface") === "base" && parentName("surface@1") === "base" && parentName(null) === null && parentName("Surface 1") === null);
 
 console.log("\n=== language diff");
 const before = join(dir, "before.json"), after = join(dir, "after.json");

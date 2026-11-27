@@ -119,6 +119,10 @@ ok("it ends with the gaps and the spec in a fold", page.includes("~~~group Gaps 
   put(join(dir, "old.spdl.json"), spec("old", "surface@1"));
   const bare = readChain(join(dir, "kid", "kid.spdl.json"), outline, [dir]);
   ok("a child that names its parent alone is read from the parent's folder", bare.problems.length === 0 && bare.chain.map((c) => c.name).join() === "surface,kid", bare.problems.join("; "));
+  put(join(dir, "base", "base.spdl.json"), spec("base", null));
+  put(join(dir, "kid2", "kid2.spdl.json"), spec("kid2", "surface@1"));
+  const alias = readChain(join(dir, "kid2", "kid2.spdl.json"), outline, [dir]);
+  ok("a child that still extends surface finds the language named base", alias.problems.length === 0 && alias.chain.map((c) => c.name).join() === "base,kid2", alias.problems.join("; "));
   const flat = readChain(join(dir, "old.spdl.json"), outline, [dir]);
   ok("a child that names surface@1 is still read", flat.problems.length === 0 && flat.chain.length === 2, flat.problems.join("; "));
 }
