@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/07-architecture-components.md",
-      "seen": "4e713a8d"
+      "seen": "9f53d3f1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-components/",
-      "seen": "33915c82"
+      "seen": "94c8215f"
     }
   ]
 }
@@ -1024,25 +1024,24 @@ The bar has one form, read from its start to its end. A person who has used one 
 
 ### DSSearchBar
 
-`DSSearchBar` is the control a person finds by: one or more fields, a Search button, and, where the search has verticals, tabs that say what is searched. It stands beside `DSFilterBar` and in its grammar: its fields are data, each holds its own `valueLink`, `onSearch` is its `onApply`, and on a phone its fields open in a sheet as the filter bar's open in a drawer. A filter bar narrows records already on the page, and a search bar starts the finding.
+`DSSearchBar` is the control a person finds by: one or more fields, a Search button, and, where the search has verticals, tabs that say what is searched. It stands beside `DSFilterBar` and in its grammar: its fields are data, each holds its own `valueLink`, `onSearch` is its `onApply`, and on a phone it stays on the page as a card of its fields, where only a folded bar opens a sheet, as the filter bar's open in a drawer. A filter bar narrows records already on the page, and a search bar starts the finding.
 
 | Prop | The page gives | What the composite does with it |
 | --- | --- | --- |
-| `fields` | each an `mtype` of `DSSearchBarFieldType` (`TEXT` · `AUTOCOMPLETE` · `SELECT` · `DATE_RANGE` · `COUNT`), a `key`, a `label`, a `placeholder`, `options` (for `SELECT`, and the rows of a `COUNT`), `dataSource` (for `AUTOCOMPLETE`, which the stack gives and a set never writes), `limits`, `gridColumns` and `valueText` (on a `COUNT`), and the `valueLink` it holds | one field for each thing a person gives; one is a plain search, several a structured one. The first four kinds are `DSFilterBar`'s of the same names, and `COUNT` is `DSInputNumberGroup` in a popover |
+| `fields` | each an `mtype` of `DSSearchBarFieldType` (`TEXT` · `AUTOCOMPLETE` · `SELECT` · `DATE_RANGE` · `COUNT`), a `key`, a `label` (the title of the field's segment where the bar shows two or more; with one it is not drawn and names the field for a screen reader), a `placeholder`, `options` (for `SELECT`, and the rows of a `COUNT`), `dataSource` (for `AUTOCOMPLETE`, which the stack gives and a set never writes), `limits`, `gridColumns` and `valueText` (on a `COUNT`), and the `valueLink` it holds | one field for each thing a person gives; one is a plain search, several a structured one. The first four kinds are `DSFilterBar`'s of the same names, and `COUNT` is `DSInputNumberGroup` in a popover |
 | `scopes` | `options`, `DSTabs`' options without `anchor` and with one more key, `fields`, the keys of the fields shown while that scope is open; `valueLink`, the key of the open scope, never empty; `type` (`LINE` · `SWITCH` · `PILL`, `LINE` by default) | the tabs over the bar that say what is searched, drawn by `DSTabs`; left out, the bar has no tabs and shows every field. A field two scopes share keeps its value when the tab changes |
 | `folded` | a yes-or-no, no by default | the bar as one line that says what was searched, such as *Paris · 12 to 14 Mar · 2 guests*, opening to the fields when pressed; a results page's head is folded |
-| `radius` | `DSRadiusType`: `SQUARE` · `SMALL` · `MEDIUM` · `LARGE` · `FULL`; `FULL`, or `SQUARE` under a `SQUARE` theme, by default | the corner of the bar, of its Search button and of the folded line; at `FULL` the button is a circle with its icon alone, and at any other radius it carries the word |
+| `shape` | `DSMarkShapeType`: `CIRCLE` · `ROUNDED` · `SQUARE`; `CIRCLE`, or `SQUARE` under a `SQUARE` theme, by default | the shape of the bar, of its Search button and of the folded line, as a mark's: `ROUNDED` takes the theme's radius; at `CIRCLE` the button is a circle with its icon alone, and at any other shape it carries the word |
 | `size` · `onSearch` · `onClear` · `testData` | the size step, the place's by default; what runs on Search or on the key that submits a form in a text field; what runs when every field is cleared; the test hook | |
 
-- **A field that is a search is `DSAutocomplete`, and the bar is its frame.** `DSAutocomplete` finds and draws results of any kind; the bar adds the segments around it, the scopes over it and the Search button after it.
+- **A field that is a search is `DSAutocomplete`, and the bar is its frame.** `DSAutocomplete` finds and draws results of any kind, typed in the field itself; the bar adds the segments around it, the scopes over it and the Search button after it.
+- **A bar of one field draws no label.** A `TEXT`, `AUTOCOMPLETE` or `SELECT` field is its own control in the bar with the search mark and its placeholder; a `DATE_RANGE` or `COUNT` field alone is a segment of its placeholder that opens its panel.
+- **In a bar of several, a field of words or choices is its control under its label.** A `TEXT`, `AUTOCOMPLETE` or `SELECT` segment is typed or chosen in place; a `DATE_RANGE` or `COUNT` segment opens its panel.
+- **The bar is a form of the search role.** Search is its submit button, so Enter in any field searches.
 - **A scope's tabs are `DSTabs`, and the open scope is never empty.** A field the bar shows is a field of the open scope; a field no open scope names is not drawn, and its value is kept for when its scope opens again.
-- **On a phone the bar is one button, and its fields open in a sheet with its own `Header`, `Content` and `Footer`,** as the filter bar's drawer does, so it pads once. The sheet's extent is `FIT`.
-- **The radius is the bar's, and the bar's alone.** A popover of a field keeps the theme's popover radius, so a `FULL` bar opens panels with the corners of every other panel.
-- **One search bar stands in a view, and the search of one list is a `DSFilterBar`, not this unit** (`RULE.SUPPORT.SURFACE.299` · MUST · skill:spn-surface/design). The search of a site stands in the band at the top of a page at the unit's radius; the head of a page of results is the same fields folded.
-
-#### `DSRadiusType`
-
-`DSRadiusType` names a corner: `SQUARE`, `SMALL`, `MEDIUM` and `LARGE`, the theme's steps, and `FULL`, a corner as round as the box is high. `FULL` is a value of this vocabulary only, and the theme's own radius does not take it. A unit that offers a full corner takes `radius` as `DSRadiusType`, and a unit that offers none keeps the theme's steps.
+- **On a phone the bar stays on the page as a card of its fields, one under another, with Search across its foot.** A `DATE_RANGE` or `COUNT` field opens a sheet of its own, and a folded bar is one card that opens every field in a sheet with its own `Header`, `Content` and `Footer`, as the filter bar's drawer does, so it pads once. The sheet's extent is `FIT`.
+- **The shape is the bar's, and the bar's alone.** A popover of a field keeps the theme's popover radius, so a `CIRCLE` bar opens panels with the corners of every other panel.
+- **One search bar stands in a view, and the search of one list is a `DSFilterBar`, not this unit** (`RULE.SUPPORT.SURFACE.299` · MUST · skill:spn-surface/design). The search of a site stands in the band at the top of a page at the unit's shape; the head of a page of results is the same fields folded.
 
 ### DSComparison
 

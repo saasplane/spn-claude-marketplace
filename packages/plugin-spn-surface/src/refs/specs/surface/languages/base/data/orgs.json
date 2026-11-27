@@ -1,0 +1,253 @@
+{
+ "type": "Org",
+ "records": [
+  {
+   "key": "atelier",
+   "name": "Atelier",
+   "category": "PLATFORM",
+   "parent": null,
+   "city": "Pune",
+   "since": "2022-06-01",
+   "mark": {
+    "icon": "BRUSH",
+    "color": "PRIMARY"
+   }
+  },
+  {
+   "key": "studio-mira",
+   "name": "Studio Mira",
+   "knownFor": "Product design",
+   "city": "Bengaluru",
+   "since": "2023-02-14",
+   "mark": {
+    "icon": "PENCIL",
+    "color": "PRIMARY"
+   },
+   "banner": {
+    "caption": "Studio Mira's team reviewing screens on a wall",
+    "ratio": "21:9"
+   },
+   "about": "A design studio that teaches how real product work is done: from the first brief to the files a developer builds from.",
+   "category": "MERCHANT",
+   "parent": "atelier",
+   "sales": [
+    {
+     "item": "product-design",
+     "units": 212,
+     "refunds": 3
+    },
+    {
+     "item": "figma-teams",
+     "units": 88,
+     "refunds": 1
+    },
+    {
+     "item": "portfolio-review",
+     "units": 13,
+     "refunds": 0
+    }
+   ],
+   "share": 0.1
+  },
+  {
+   "key": "byte-school",
+   "name": "Byte School",
+   "knownFor": "Data and AI",
+   "city": "Pune",
+   "since": "2022-09-01",
+   "mark": {
+    "icon": "CODE",
+    "color": "INFO"
+   },
+   "banner": {
+    "caption": "A classroom of laptops with charts on the screens",
+    "ratio": "21:9"
+   },
+   "about": "Engineers from product teams teach the code they use at work, with projects you can show an employer.",
+   "category": "MERCHANT",
+   "parent": "atelier"
+  },
+  {
+   "key": "northlight",
+   "name": "Northlight Academy",
+   "knownFor": "Photography",
+   "city": "Mumbai",
+   "since": "2023-06-20",
+   "mark": {
+    "icon": "EYE",
+    "color": "WARNING"
+   },
+   "banner": {
+    "caption": "A photographer framing a street at dusk",
+    "ratio": "21:9"
+   },
+   "about": "Working photographers teach light and framing on the camera you already own, then walk the streets with you.",
+   "category": "MERCHANT",
+   "parent": "atelier"
+  },
+  {
+   "key": "kiln-co",
+   "name": "Kiln & Co",
+   "knownFor": "Ceramics",
+   "city": "Pune",
+   "since": "2024-01-10",
+   "mark": {
+    "icon": "PALETTE",
+    "color": "ERROR"
+   },
+   "banner": {
+    "caption": "Shelves of glazed bowls in a sunlit studio",
+    "ratio": "21:9"
+   },
+   "about": "A ceramics studio in Koregaon Park with eight wheels, a gas kiln and weekend classes for every level.",
+   "category": "MERCHANT",
+   "parent": "atelier"
+  },
+  {
+   "key": "crumb",
+   "name": "Crumb Collective",
+   "knownFor": "Baking",
+   "city": "Bengaluru",
+   "since": "2024-03-05",
+   "mark": {
+    "icon": "STORE",
+    "color": "SUCCESS"
+   },
+   "banner": {
+    "caption": "Loaves cooling on a rack in a small bakery",
+    "ratio": "21:9"
+   },
+   "about": "Three bakers who teach bread at home, from your first starter to a loaf you are proud to share.",
+   "category": "MERCHANT",
+   "parent": "atelier"
+  },
+  {
+   "key": "tomas-studio",
+   "name": "Tomas Reyes Studio",
+   "category": "MERCHANT",
+   "parent": "atelier",
+   "knownFor": "Watercolour and lettering",
+   "city": "Goa",
+   "since": "2024-03-09",
+   "mark": {
+    "icon": "PALETTE",
+    "color": "DEFAULT"
+   }
+  },
+  {
+   "key": "ananya",
+   "name": "Ananya Patel",
+   "category": "SHOPPER",
+   "parent": "atelier",
+   "city": "Pune",
+   "since": "2025-04-18",
+   "plan": "free",
+   "cart": [
+    {
+     "item": "product-design",
+     "variant": "self",
+     "qty": 1
+    },
+    {
+     "item": "wheel-weekend",
+     "qty": 1
+    },
+    {
+     "item": "sourdough",
+     "variant": "self",
+     "qty": 1
+    }
+   ],
+   "orders": [
+    {
+     "number": "ATL-20461",
+     "placed": "2026-11-27",
+     "lines": [
+      {
+       "item": "product-design",
+       "variant": "self",
+       "qty": 1
+      },
+      {
+       "item": "wheel-weekend",
+       "qty": 1
+      },
+      {
+       "item": "sourdough",
+       "variant": "self",
+       "qty": 1
+      }
+     ],
+     "paidWith": "UPI · ananya@okbank"
+    }
+   ]
+  },
+  {
+   "key": "brightpath",
+   "name": "Brightpath Learning",
+   "category": "ACCOUNT",
+   "parent": "atelier",
+   "city": "Hyderabad",
+   "since": "2024-08-12",
+   "knownFor": "Data and analytics, taught in its own school",
+   "plan": "teams",
+   "mark": {
+    "icon": "CHART",
+    "color": "PRIMARY"
+   }
+  },
+  {
+   "key": "rohan",
+   "name": "Rohan Iyer",
+   "category": "ACCOUNT_CONSUMER",
+   "parent": "brightpath",
+   "city": "Chennai",
+   "since": "2025-10-02"
+  },
+  {
+   "key": "kestrel",
+   "name": "Kestrel Insurance",
+   "category": "ACCOUNT_ENTERPRISE",
+   "parent": "brightpath",
+   "city": "Mumbai",
+   "since": "2025-06-30",
+   "seats": 12
+  },
+  {
+   "key": "pinecone",
+   "name": "Pinecone Labs",
+   "category": "ACCOUNT",
+   "parent": "atelier",
+   "city": "Bengaluru",
+   "since": "2025-01-20",
+   "plan": "teams",
+   "seats": 8,
+   "mark": {
+    "icon": "TREE",
+    "color": "DEFAULT"
+   }
+  },
+  {
+   "key": "kabir",
+   "name": "Kabir Shah",
+   "category": "ACCOUNT",
+   "parent": "atelier",
+   "city": "Delhi",
+   "since": "2025-09-14",
+   "plan": "plus",
+   "individual": true
+  },
+  {
+   "key": "noor-studio",
+   "name": "Noor Clay Studio",
+   "category": "MERCHANT",
+   "parent": "atelier",
+   "city": "Kochi",
+   "since": "2026-11-26",
+   "mark": {
+    "icon": "PALETTE",
+    "color": "PRIMARY"
+   }
+  }
+ ]
+}

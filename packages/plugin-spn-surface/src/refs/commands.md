@@ -10,13 +10,13 @@ spn-surface check page <spec.json> --app <app root> [--media <dir>] [--content <
 
 spn-surface check scan [<path>…] — Scan Surface code for every note the Surface check gives, whole files
 
-spn-surface language check <app> [--construct <construct.md>] — Refuse a design-language construct whose filled tables differ from the `language` block they are filled from
+spn-surface language check <language> [--book <folder>] [--spec <file>] [--catalogue <folder>] [--icons <file>] | <app> --construct <construct.md> — Check a design language's whole folder against the contract: its chain, its files, its data, its samples and its module types
 
-spn-surface language data check <language> [--book <folder>] [--spec <file>] [--catalogue <file>] [--icons <file>] — Check a design language's dataset: links that resolve, a medium and roles for each record file, no stored number the data can derive, the records its page kinds need
+spn-surface language diff <old.json> <new.json> | <language> [--against <git-ref>] [--book <folder>] — Refuse a change to a design language, its data or the catalogue that removes or renames a kind, case, role or field
 
-spn-surface language diff <old.json> <new.json> | <language> --against <git-ref> [--book <folder>] — Refuse a change to a design language, its data or the catalogue that removes or renames a kind, case, role or field
+spn-surface language resolve <language> [--book <folder>] [--json] — Find a design language live: the repository's own, then an installed package's, then one this plugin lists, then the base it carries
 
-spn-surface language samples write <language> [--out <dir>] [--book <folder>] [--spec <file>] [--catalogue <file>] [--template <file>] [--assets <folder>] [--ds <version>] [--app <code>] [--only <text>] — Draw a design language's samples: each layout, page kind, container case and widget form of each surface category it serves, in the surface page template
+spn-surface language samples write <language> [--out <dir>] [--book <folder>] [--spec <file>] [--catalogue <folder>] [--template <file>] [--assets <folder>] [--ds <version>] [--app <package> | --theme <file>] [--only <text>] — Draw a design language's samples home: Shared, then each category's overview, layouts, pages, containers, widgets, media, motion and words, in the surface page template
 
 spn-surface language write <app> [--construct <construct.md>] — Fill a design-language construct's figures (drawing style, characters and building blocks, grounds, drawing kinds) from the `language` block of its own construct
 

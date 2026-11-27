@@ -1,0 +1,5952 @@
+{
+  "category": "RESOURCES",
+  "parts": {
+    "LAYOUTS": [
+      {
+        "code": "RAIL",
+        "title": "Rail",
+        "description": "a sidebar with a fixed head and foot, which a person opens and shuts to icons",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "a Learner who browses a tree of pages: guides and API docs in groups of several levels",
+          "notWhen": [
+            {
+              "condition": "Not found or No access",
+              "instead": "the site's own layout, its navigation kept"
+            },
+            {
+              "condition": "The reader starts from a question and a search",
+              "instead": "TOPNAV"
+            }
+          ],
+          "rules": [
+            "RULE.SUPPORT.SURFACE.139",
+            "RULE.SUPPORT.SURFACE.156",
+            "RULE.SUPPORT.SURFACE.161",
+            "RULE.SUPPORT.SURFACE.173",
+            "RULE.SUPPORT.SURFACE.200",
+            "RULE.SUPPORT.SURFACE.206",
+            "RULE.SUPPORT.SURFACE.255",
+            "RULE.SUPPORT.SURFACE.257",
+            "RULE.SUPPORT.SURFACE.410"
+          ]
+        },
+        "config": {
+          "mtype": "LAYOUTS"
+        },
+        "units": [
+          {
+            "unit": "DSLayout",
+            "part": "LAYOUT",
+            "role": "unit",
+            "props": {}
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "navigation",
+            "props": {
+              "value": "RAIL"
+            }
+          },
+          {
+            "unit": "DSSitePage: draws no layout; wraps the page's sections inside DSLayout's content to apply the site's styles, the display headings and the design language's choices",
+            "part": null,
+            "role": "siteStyles",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "room": {
+            "container": "DSSectionContainer",
+            "sizes": [
+              "XS",
+              "SM",
+              "MD",
+              "LG",
+              "XL"
+            ],
+            "siteSection": "MD",
+            "hero": [
+              "LG",
+              "XL"
+            ],
+            "strongestSection": "LG",
+            "statement": "MD",
+            "closingCall": "SM",
+            "footer": "SM"
+          },
+          "tabletAndPhone": {
+            "phone": {
+              "order": "WORDS_FIRST",
+              "scene": "UNDER_THE_WORDS",
+              "columns": "THE_COUNT_OF_ITEMS_FOUR_AT_MOST",
+              "menuTilePanel": "THREE_ACROSS_AT_MOST",
+              "tablet": "TWO_ACROSS",
+              "phoneItems": "ONE_ACROSS"
+            }
+          },
+          "usedFor": "guides and API docs, whose pages run in groups of several levels: the brand in its head, its foot the way back to the site; it stays open, its config setting collapsible to false, because its entries carry no icon",
+          "sideRoom": {
+            "decidedBy": "--layout-space, which follows the device and the layout's size (set on the layout's root as data-layout-size)",
+            "desktop": "32px at every size",
+            "tablet": "24px at XS, SM and MD, 32px at LG and XL",
+            "phone": "16px at every size",
+            "sectionWordsStartAt": "--section-box-inset: the box's edge plus the layout's space, less the content's line (--layout-content-line)",
+            "sources": [
+              "packages/support-web-ds-ts/src/assets/styles/_variables.css",
+              "packages/support-web-ds-ts/src/assets/styles/_tailwind.css"
+            ]
+          },
+          "notes": [
+            {
+              "on": "longPage",
+              "value": "ITS_OWN_HEADINGS_AT_ITS_SIDE_IN_THE_CONTENT"
+            }
+          ]
+        },
+        "style": {
+          "look": "the site default theme"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "TOPNAV",
+        "title": "Top nav",
+        "description": "a bar across the top, with the content below it",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "a Learner who asks a question: a help centre started from a search, of any depth, with SIDE_LIST on group and topic pages",
+          "notWhen": [
+            {
+              "condition": "Not found or No access",
+              "instead": "the site's own layout, its navigation kept"
+            },
+            {
+              "condition": "The reader browses a tree of pages",
+              "instead": "RAIL"
+            }
+          ],
+          "rules": [
+            "RULE.SUPPORT.SURFACE.139",
+            "RULE.SUPPORT.SURFACE.156",
+            "RULE.SUPPORT.SURFACE.161",
+            "RULE.SUPPORT.SURFACE.173",
+            "RULE.SUPPORT.SURFACE.200",
+            "RULE.SUPPORT.SURFACE.255",
+            "RULE.SUPPORT.SURFACE.257",
+            "RULE.SUPPORT.SURFACE.410"
+          ]
+        },
+        "config": {
+          "mtype": "LAYOUTS"
+        },
+        "units": [
+          {
+            "unit": "DSLayout",
+            "part": "LAYOUT",
+            "role": "unit",
+            "props": {}
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "navigation",
+            "props": {
+              "value": "TOPNAV"
+            }
+          },
+          {
+            "unit": "DSSitePage: draws no layout; wraps the page's sections inside DSLayout's content to apply the site's styles, the display headings and the design language's choices",
+            "part": null,
+            "role": "siteStyles",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "room": {
+            "container": "DSSectionContainer",
+            "sizes": [
+              "XS",
+              "SM",
+              "MD",
+              "LG",
+              "XL"
+            ],
+            "siteSection": "MD",
+            "hero": [
+              "LG",
+              "XL"
+            ],
+            "strongestSection": "LG",
+            "statement": "MD",
+            "closingCall": "SM",
+            "footer": "SM",
+            "sideBySide": {
+              "gap": "the section's room at its size (MD: 6rem wide, 3.5rem narrow)",
+              "heights": "each block its own, aligned to the top; a card beside a longer form is never stretched",
+              "stacked": "the section's gap",
+              "why": "the developer, 2026-11-25, Q56 A ('Q56 - A'): 'for marketing its important to add proper spacing between widgets if placed like this'"
+            }
+          },
+          "tabletAndPhone": {
+            "phone": {
+              "order": "WORDS_FIRST",
+              "scene": "UNDER_THE_WORDS",
+              "columns": "THE_COUNT_OF_ITEMS_FOUR_AT_MOST",
+              "menuTilePanel": "THREE_ACROSS_AT_MOST",
+              "tablet": "TWO_ACROSS",
+              "phoneItems": "ONE_ACROSS"
+            }
+          },
+          "usedFor": "a help centre started from a search, of any depth",
+          "sideRoom": {
+            "decidedBy": "--layout-space, which follows the device and the layout's size (set on the layout's root as data-layout-size)",
+            "desktop": "32px at every size",
+            "tablet": "24px at XS, SM and MD, 32px at LG and XL",
+            "phone": "16px at every size",
+            "sectionWordsStartAt": "--section-box-inset: the box's edge plus the layout's space, less the content's line (--layout-content-line)",
+            "sources": [
+              "packages/support-web-ds-ts/src/assets/styles/_variables.css",
+              "packages/support-web-ds-ts/src/assets/styles/_tailwind.css"
+            ]
+          },
+          "brand": {
+            "holds": "the wide logo (wideLogoUrl) at the start of the bar at every width, linking home (rule 443)",
+            "fallback": "the square logo (logoUrl) and the product's name, where no wide logo is set",
+            "squareAlone": "a browser tab, a collapsed rail, an app's sign-in mark",
+            "why": "the developer, 2026-11-25, Q55 A ('Q55 - A'), restating 2026-11-20 ('okay so lets take this'): an organization keeps logoUrl (square) and wideLogoUrl (wide)"
+          },
+          "notes": [
+            {
+              "on": "longPage",
+              "value": "ITS_OWN_HEADINGS_AT_ITS_SIDE_IN_THE_CONTENT"
+            }
+          ]
+        },
+        "style": {
+          "look": "the site default theme",
+          "body": {
+            "width": "XWIDE",
+            "maxWidth": "--layout-xwide, 1400px"
+          },
+          "size": "SM"
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "SIDE_LIST",
+            "when": "the group and topic pages of a help centre: the group's topics at the start side, CONTENT_OUTLINE at the end side",
+            "why": "the developer, 2026-11-25: 'yes go for both 1 and 2' (2: RESOURCES, from the Freshdesk help-centre analysis)",
+            "units": [
+              {
+                "unit": "DSLayout",
+                "part": "LAYOUT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSNavList",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "CONTENT_OUTLINE",
+                "part": null,
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "notes": [
+                {
+                  "on": "start",
+                  "value": "a DSNavList of the group's topics, the open one marked"
+                },
+                {
+                  "on": "end",
+                  "value": "CONTENT_OUTLINE, the topic's headings"
+                },
+                {
+                  "on": "phone",
+                  "value": "both fold into a menu under the bar"
+                },
+                {
+                  "on": "widget",
+                  "value": {
+                    "kind": "CARD_LIST",
+                    "case": "SIDE_LIST",
+                    "holds": "WORDS_ONLY"
+                  }
+                }
+              ]
+            },
+            "style": {},
+            "status": "PLANNED",
+            "missing": "no unit folds a top nav's side lists into a menu under the bar on a phone"
+          },
+          {
+            "code": "PRODUCT_SWITCH",
+            "when": "a help centre over several products: a switch of products in the bar, and each product its own groups",
+            "why": "the developer, 2026-11-25: 'and yes add those two as planned' (from crmsupport.freshworks.com)",
+            "units": [
+              {
+                "unit": "DSLayout",
+                "part": "LAYOUT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSDropdownMenu",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "notes": [
+                {
+                  "on": "bar",
+                  "value": "the switch after the brand, naming the product in view"
+                },
+                {
+                  "on": "phone",
+                  "value": "the switch at the top of the menu"
+                }
+              ]
+            },
+            "style": {},
+            "status": "PLANNED",
+            "seenOn": "crmsupport.freshworks.com",
+            "missing": "no unit draws a product switch in a top nav's bar"
+          }
+        ]
+      }
+    ],
+    "PAGES": [
+      {
+        "code": "RESOURCES_HOME",
+        "title": "Resources home",
+        "description": "the start of the whole resources site: a hub over several sets, or one set's own home",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "the start of the whole resources site, level 1: a hub where it holds several sets, else its one set's own home (DOCS_HOME, GUIDE_HOME or HELP_HOME) at the first level; its head is INTRO_HERO in its search-first form, with a tab for each set (the scopes of its DSSearchBar) (the scopes of its DSSearchBar) (the scopes of its DSSearchBar) (the scopes of its DSSearchBar)",
+          "research": "page-kinds research, 2026-11-24 (work/page-kinds-research.md): the developer, 'think the page purpose and check what kind of info usually used in that page from online'",
+          "notWhen": [
+            {
+              "condition": "A Visitor deciding whether a product is for them",
+              "instead": "MARKETING PAGES.MAIN_HOME"
+            },
+            {
+              "condition": "A Seeker finding and choosing among records",
+              "instead": "MARKETPLACE PAGES.MARKET_HOME"
+            },
+            {
+              "condition": "A blog",
+              "instead": "MARKETING PAGES.BLOG_HOME"
+            },
+            {
+              "condition": "The home of one set or one group, under the hub",
+              "instead": "DOCS_HOME, GUIDE_HOME, HELP_HOME or HELP_CATEGORY"
+            }
+          ],
+          "rules": [
+            "RULE.SUPPORT.SURFACE.617"
+          ]
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "the category layouts"
+            }
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "layout",
+            "props": {
+              "value": "TOPNAV"
+            }
+          }
+        ],
+        "placement": {
+          "level": 2,
+          "languageOrder": {
+            "reading": "INTRO_HERO (one search across every set, a DSSearchBar with a scope for each set), EXPLAIN_DOORS (a card per set, with counts), BROWSE_SHELF (what's new across them), ACTION_CLOSING (still need help), COMMON_FOOTER"
+          },
+          "notes": [
+            {
+              "on": "inApp",
+              "value": "a help centre may stand inside an app: a RESOURCES route group under the app's layout, wrapped in DSPageCategory RESOURCES; its pages keep their kinds and the layout stays the app's; Contact support leads to the site's CONTACT"
+            }
+          ]
+        },
+        "style": {
+          "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
+          "fill": {
+            "default": "BASE",
+            "readingChanges": "DEFAULT",
+            "closingCall": "PRIMARY",
+            "hero": "NONE"
+          },
+          "alternateByTurn": false,
+          "sizeStrongest": "LG",
+          "onward": "THE_GROUPS_OWN_LINK_FIRST",
+          "emphasisPerSection": "ONE"
+        },
+        "status": "BUILT",
+        "order": [
+          "INTRO_HERO",
+          "EXPLAIN_DOORS",
+          "BROWSE_SHELF",
+          "ACTION_CLOSING",
+          "COMMON_FOOTER"
+        ],
+        "cases": [
+          {
+            "code": "HUB",
+            "when": "several sets: one search across them (a DSSearchBar, a scope for each set), a door to each set with its count, what is new across them, still need help",
+            "why": "the developer, 2026-11-25: 'scope is clear' (Q79 A)",
+            "units": [
+              {
+                "unit": "DSSectionContainer",
+                "part": "CONTAINER",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSSearchBar",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSFeature",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "order": [
+                "INTRO_HERO",
+                {
+                  "kind": "EXPLAIN_DOORS",
+                  "case": "DOOR_CARDS"
+                },
+                {
+                  "kind": "BROWSE_SHELF",
+                  "case": "BY_SHELF"
+                },
+                {
+                  "kind": "ACTION_CLOSING",
+                  "case": "STILL_NEED_HELP"
+                }
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "ONE_SET",
+            "when": "one set, such as a help centre alone: the set's own home (DOCS_HOME, GUIDE_HOME or HELP_HOME), standing at the first level",
+            "why": "the developer, 2026-11-25: 'scope is clear' (Q79 A)",
+            "units": [
+              {
+                "unit": "DSSectionContainer",
+                "part": "CONTAINER",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "order": "the set's own home page, in the order of its purpose"
+            },
+            "style": {},
+            "status": "BUILT"
+          }
+        ]
+      },
+      {
+        "code": "DOCS_HOME",
+        "title": "Docs home",
+        "description": "What is this place → start here → browse by product → what changed lately",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "the home of a set of docs: what this place is, start here, the sections with their counts, the reference's entry points, what changed lately",
+          "research": "page-kinds research, 2026-11-24 (work/page-kinds-research.md): the developer, 'think the page purpose and check what kind of info usually used in that page from online'",
+          "notWhen": [
+            {
+              "condition": "The start of the whole site",
+              "instead": "RESOURCES_HOME"
+            }
+          ],
+          "why": "the developer, 2026-11-25: 'scope is clear' (Q79 A); it was the page kind PAGES.DOCS until the overlap check"
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "the category layouts"
+            }
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "layout",
+            "props": {
+              "value": "RAIL"
+            }
+          }
+        ],
+        "placement": {
+          "level": 2,
+          "languageOrder": {
+            "reading": "INTRO_HERO, EXPLAIN_DOORS (start here: a CARD_LIST per group), EXPLAIN_DOORS (browse by product: a CARD_LIST per group), BROWSE_SHELF (what changed lately), COMMON_FOOTER"
+          },
+          "notes": [
+            {
+              "on": "example",
+              "value": "the showcase's Home"
+            },
+            {
+              "on": "doors",
+              "value": "start here, and browse by product: EXPLAIN_DOORS, a CARD_LIST for each group"
+            }
+          ]
+        },
+        "style": {
+          "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
+          "fill": {
+            "default": "BASE",
+            "readingChanges": "DEFAULT",
+            "closingCall": "PRIMARY",
+            "hero": "NONE"
+          },
+          "alternateByTurn": false,
+          "sizeStrongest": "LG",
+          "onward": "THE_GROUPS_OWN_LINK_FIRST",
+          "emphasisPerSection": "ONE"
+        },
+        "status": "BUILT",
+        "order": [
+          "INTRO_HERO",
+          "EXPLAIN_DOORS",
+          "EXPLAIN_DOORS",
+          "BROWSE_SHELF",
+          "COMMON_FOOTER"
+        ]
+      },
+      {
+        "code": "DOCS_PAGE",
+        "title": "Docs page",
+        "description": "The title and when it was updated → the reading → was this useful → where next",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "a piece in a set, read for its own sake, or one endpoint, command, record or option, looked up and stated in full; its body is READ_ARTICLE, whose sections the content decides, and a docs page that wants comments takes DOC_COMMENTS",
+          "research": "page-kinds research, 2026-11-24 (work/page-kinds-research.md): the developer, 'think the page purpose and check what kind of info usually used in that page from online'",
+          "notWhen": [
+            {
+              "condition": "The reader needs one thing working",
+              "instead": "HELP_TOPIC"
+            },
+            {
+              "condition": "The reader follows steps end to end",
+              "instead": "GUIDE_PAGE"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "the category layouts"
+            }
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "layout",
+            "props": {
+              "value": "RAIL"
+            }
+          }
+        ],
+        "placement": {
+          "level": "LAST",
+          "languageOrder": {
+            "reading": "DOC_HERO, READ_ARTICLE, FORM_FEEDBACK, EXPLAIN_DOORS (see also, previous and next), DOC_COMMENTS (if picked), COMMON_FOOTER"
+          },
+          "afterTheBody": "FORM_FEEDBACK, then EXPLAIN_DOORS: see also (related pages within the set and across sets, each door naming its set), previous and next in the rail's order, then DOC_COMMENTS where the site picks it"
+        },
+        "style": {
+          "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
+          "fill": {
+            "default": "BASE",
+            "readingChanges": "DEFAULT",
+            "closingCall": "PRIMARY",
+            "hero": "NONE"
+          },
+          "alternateByTurn": false,
+          "sizeStrongest": "LG",
+          "onward": "THE_GROUPS_OWN_LINK_FIRST",
+          "emphasisPerSection": "ONE"
+        },
+        "status": "BUILT",
+        "order": [
+          "DOC_HERO",
+          "READ_ARTICLE",
+          "EXPLAIN_DOORS",
+          "DOC_COMMENTS",
+          "COMMON_FOOTER"
+        ]
+      },
+      {
+        "code": "DOCS_SEARCH",
+        "title": "Docs search",
+        "description": "What was asked → what answers it, a paged list with tabs by kind",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "the results of a search in the docs: a search head, then a paged list with a tab for each kind of result; the search in the bar opens an overlay, and its See all results opens DOCS_SEARCH",
+          "notWhen": [
+            {
+              "condition": "The reader asks a question in a help centre",
+              "instead": "HELP_SEARCH"
+            },
+            {
+              "condition": "The reader searches the guides",
+              "instead": "GUIDE_SEARCH"
+            },
+            {
+              "condition": "The home of the docs, which starts from a search band",
+              "instead": "DOCS_HOME"
+            }
+          ],
+          "rules": [],
+          "why": "the developer, 2026-11-26: 'yes to all' (2026-11-26T21:08+05:30): docs search through the overlay in the bar, whose See all results opens DOCS_SEARCH"
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "the category layouts"
+            }
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "layout",
+            "props": {
+              "value": "RAIL"
+            }
+          }
+        ],
+        "placement": {
+          "level": 2,
+          "rows": "BROWSE_RESULTS PAGED_LIST, each row a CARD_ITEM LIST_ROW; the search keeps the query at the top and a tab for each kind of result",
+          "states": "a count line, such as 1 result for plan, each row its group and reading time over its title; before a query, Enter a search term to find articles; with none found, what to try and the way to ask",
+          "languageOrder": {
+            "reading": "INTRO_HERO (search head, a DSSearchBar folded, a DSSearchBar folded, a DSSearchBar folded, a DSSearchBar folded), BROWSE_RESULTS (tabs by kind), COMMON_FOOTER"
+          }
+        },
+        "style": {
+          "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
+          "fill": {
+            "default": "BASE",
+            "readingChanges": "DEFAULT",
+            "closingCall": "PRIMARY",
+            "hero": "NONE"
+          },
+          "alternateByTurn": false,
+          "sizeStrongest": "LG",
+          "onward": "THE_GROUPS_OWN_LINK_FIRST",
+          "emphasisPerSection": "ONE"
+        },
+        "status": "BUILT",
+        "order": [
+          "INTRO_HERO",
+          {
+            "kind": "BROWSE_RESULTS",
+            "case": "PAGED_LIST"
+          },
+          "COMMON_FOOTER"
+        ]
+      },
+      {
+        "code": "GUIDE_HOME",
+        "title": "Guide home",
+        "description": "What guides are here → featured topics → featured and latest guides → all topics, A to Z",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "the home of a set of guides: its featured topics, its featured and latest guides, then all its topics from A to Z; a site with one large guides set puts GUIDE_SEARCH beside it",
+          "research": "page-kinds research, 2026-11-24 (work/page-kinds-research.md): the developer, 'think the page purpose and check what kind of info usually used in that page from online'",
+          "notWhen": [
+            {
+              "condition": "The start of the whole site",
+              "instead": "RESOURCES_HOME"
+            },
+            {
+              "condition": "One guide, read from its first step",
+              "instead": "GUIDE_PAGE"
+            }
+          ],
+          "why": "the developer, 2026-11-25: 'scope is clear' (Q79 A)"
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "the category layouts"
+            }
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "layout",
+            "props": {
+              "value": "RAIL"
+            }
+          }
+        ],
+        "placement": {
+          "level": 2,
+          "languageOrder": {
+            "reading": "INTRO_HERO, BROWSE_FEATURED (featured topics), BROWSE_SHELF (featured guides, latest guides), BROWSE_RESULTS (all topics, A to Z), COMMON_FOOTER"
+          }
+        },
+        "style": {
+          "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
+          "fill": {
+            "default": "BASE",
+            "readingChanges": "DEFAULT",
+            "closingCall": "PRIMARY",
+            "hero": "NONE"
+          },
+          "alternateByTurn": false,
+          "sizeStrongest": "LG",
+          "onward": "THE_GROUPS_OWN_LINK_FIRST",
+          "emphasisPerSection": "ONE"
+        },
+        "status": "BUILT",
+        "order": [
+          "INTRO_HERO",
+          "BROWSE_FEATURED",
+          "BROWSE_SHELF",
+          {
+            "kind": "BROWSE_RESULTS",
+            "case": "A_TO_Z"
+          },
+          "COMMON_FOOTER"
+        ]
+      },
+      {
+        "code": "GUIDE_PAGE",
+        "title": "Guide page",
+        "description": "The guide's head → the reading → was this useful → next steps and related pages → comments",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "steps followed end to end, to build or set up one thing; the steps, the checks and the troubleshooting are the author's blocks inside READ_ARTICLE; its overview form is the path's guides in order: GUIDE_HERO, then EXPLAIN_DOORS",
+          "research": "page-kinds research, 2026-11-24 (work/page-kinds-research.md): the developer, 'think the page purpose and check what kind of info usually used in that page from online'",
+          "notWhen": [
+            {
+              "condition": "The reader needs one thing working",
+              "instead": "HELP_TOPIC"
+            },
+            {
+              "condition": "The reader looks one fact up",
+              "instead": "DOCS_PAGE"
+            },
+            {
+              "condition": "The reader reads a piece for its own sake",
+              "instead": "DOCS_PAGE"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "the category layouts"
+            }
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "layout",
+            "props": {
+              "value": "RAIL"
+            }
+          }
+        ],
+        "placement": {
+          "level": "LAST",
+          "languageOrder": {
+            "reading": "GUIDE_HERO, READ_ARTICLE, FORM_FEEDBACK, EXPLAIN_DOORS (next steps, related), GUIDE_COMMENTS, COMMON_FOOTER"
+          },
+          "afterTheBody": "FORM_FEEDBACK, then EXPLAIN_DOORS: next steps and related pages, then GUIDE_COMMENTS",
+          "notes": [
+            {
+              "on": "overview",
+              "value": "the path's guides in order: GUIDE_HERO, then EXPLAIN_DOORS"
+            }
+          ]
+        },
+        "style": {
+          "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
+          "fill": {
+            "default": "BASE",
+            "readingChanges": "DEFAULT",
+            "closingCall": "PRIMARY",
+            "hero": "NONE"
+          },
+          "alternateByTurn": false,
+          "sizeStrongest": "LG",
+          "onward": "THE_GROUPS_OWN_LINK_FIRST",
+          "emphasisPerSection": "ONE"
+        },
+        "status": "BUILT",
+        "order": [
+          "GUIDE_HERO",
+          "READ_ARTICLE",
+          "EXPLAIN_DOORS",
+          "GUIDE_COMMENTS",
+          "COMMON_FOOTER"
+        ]
+      },
+      {
+        "code": "GUIDE_SEARCH",
+        "title": "Guide search",
+        "description": "What was asked → what answers it, a paged list",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "the results of a search in the guides, built only by a site whose guides set has grown large: guides search through the overlay alone until then; a search head, then a paged list",
+          "notWhen": [
+            {
+              "condition": "The reader asks a question in a help centre",
+              "instead": "HELP_SEARCH"
+            },
+            {
+              "condition": "The reader searches the docs",
+              "instead": "DOCS_SEARCH"
+            },
+            {
+              "condition": "The home of the guides",
+              "instead": "GUIDE_HOME"
+            }
+          ],
+          "rules": [],
+          "why": "the developer, 2026-11-26: 'yes to all' (2026-11-26T21:08+05:30): guides search through the overlay only, GUIDE_SEARCH added when a guides set grows large"
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "the category layouts"
+            }
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "layout",
+            "props": {
+              "value": "RAIL"
+            }
+          }
+        ],
+        "placement": {
+          "level": 2,
+          "rows": "BROWSE_RESULTS PAGED_LIST, each row a CARD_ITEM LIST_ROW; the search keeps the query at the top and a tab for each kind of result",
+          "states": "a count line, such as 1 result for plan, each row its group and reading time over its title; before a query, Enter a search term to find articles; with none found, what to try and the way to ask",
+          "languageOrder": {
+            "reading": "INTRO_HERO (search head, a DSSearchBar folded, a DSSearchBar folded, a DSSearchBar folded, a DSSearchBar folded), BROWSE_RESULTS, COMMON_FOOTER"
+          }
+        },
+        "style": {
+          "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
+          "fill": {
+            "default": "BASE",
+            "readingChanges": "DEFAULT",
+            "closingCall": "PRIMARY",
+            "hero": "NONE"
+          },
+          "alternateByTurn": false,
+          "sizeStrongest": "LG",
+          "onward": "THE_GROUPS_OWN_LINK_FIRST",
+          "emphasisPerSection": "ONE"
+        },
+        "status": "BUILT",
+        "order": [
+          "INTRO_HERO",
+          {
+            "kind": "BROWSE_RESULTS",
+            "case": "PAGED_LIST"
+          },
+          "COMMON_FOOTER"
+        ]
+      },
+      {
+        "code": "HELP_HOME",
+        "title": "Help home",
+        "description": "What do I ask → what most people need → each category with its first topics → still need help",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "the home of a help centre: the search band, one time-bound promotion, what most people need first, each category with its first topics and its count, still need help",
+          "research": "page-kinds research, 2026-11-24 (work/page-kinds-research.md): the developer, 'think the page purpose and check what kind of info usually used in that page from online'",
+          "notWhen": [
+            {
+              "condition": "The start of the whole site",
+              "instead": "RESOURCES_HOME"
+            },
+            {
+              "condition": "One category inside the help centre",
+              "instead": "HELP_CATEGORY"
+            }
+          ],
+          "why": "the developer, 2026-11-25: 'scope is clear' (Q79 A)"
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "the category layouts"
+            }
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "layout",
+            "props": {
+              "value": "TOPNAV"
+            }
+          }
+        ],
+        "placement": {
+          "level": 2,
+          "languageOrder": {
+            "reading": "INTRO_HERO (the search band, a DSSearchBar, a DSSearchBar, a DSSearchBar, a DSSearchBar, \"Chat with a human\"), BROWSE_PROMO, BROWSE_FEATURED (what most people need), EXPLAIN_DOORS (a CARD_LIST per category), ACTION_CLOSING (still need help), COMMON_FOOTER"
+          },
+          "notes": [
+            {
+              "on": "categories",
+              "value": "the categories stand as EXPLAIN_DOORS, a CARD_LIST for each: the category name, its first five topics as links and View all N; as DOOR_CARDS (its mark, name, line and count) where a category holds fewer than five"
+            }
+          ]
+        },
+        "style": {
+          "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
+          "fill": {
+            "default": "BASE",
+            "readingChanges": "DEFAULT",
+            "closingCall": "PRIMARY",
+            "hero": "NONE"
+          },
+          "alternateByTurn": false,
+          "sizeStrongest": "LG",
+          "onward": "THE_GROUPS_OWN_LINK_FIRST",
+          "emphasisPerSection": "ONE"
+        },
+        "status": "BUILT",
+        "order": [
+          "INTRO_HERO",
+          "BROWSE_PROMO",
+          {
+            "kind": "BROWSE_FEATURED",
+            "case": "FEATURED_FIRST"
+          },
+          "EXPLAIN_DOORS",
+          {
+            "kind": "ACTION_CLOSING",
+            "case": "STILL_NEED_HELP"
+          },
+          "COMMON_FOOTER"
+        ]
+      },
+      {
+        "code": "HELP_CATEGORY",
+        "title": "Help category",
+        "description": "What is this category → its sub-categories, a few topics each → what is in this section → what will I ask",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "one category of a help centre: its head with its line, its sub-categories each a few topics, then what is in this section; a category may sit under another, and the breadcrumb under the bar names each",
+          "research": "page-kinds research, 2026-11-24 (work/page-kinds-research.md): the developer, 'think the page purpose and check what kind of info usually used in that page from online'",
+          "notWhen": [
+            {
+              "condition": "The start of the help centre",
+              "instead": "HELP_HOME"
+            },
+            {
+              "condition": "The start of the whole site",
+              "instead": "RESOURCES_HOME"
+            }
+          ],
+          "why": "the developer, 2026-11-25: 'yes go for both 1 and 2' (2: RESOURCES, from the Freshdesk help-centre analysis)"
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "the category layouts"
+            }
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "layout",
+            "props": {
+              "value": "TOPNAV"
+            }
+          },
+          {
+            "unit": "DSBreadcrumb",
+            "part": "COMPONENT",
+            "role": "breadcrumb",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "level": "2 OR DEEPER",
+          "languageOrder": {
+            "reading": "INTRO_HERO (category head, with its line), EXPLAIN_DOORS (sub-categories, a CARD_LIST each), EXPLAIN_DOORS (in this section), COMMON_FAQ, COMMON_FOOTER"
+          },
+          "notes": [
+            {
+              "on": "underAnother",
+              "value": "a category may sit under another, and the breadcrumb under the bar names each; a help centre always shows its breadcrumb"
+            },
+            {
+              "on": "subCategories",
+              "value": "EXPLAIN_DOORS, a CARD_LIST GRID_CELL for each in DSFeatureGridSectionContainer: two across on a desktop and a tablet, one on a phone; each cell a DSFeature at WIDGET holding a group of links: the sub-category's name as its title, its first five topics as a DSList of DSLink, each with the topic's mark as its startIcon, and View all N, a DSLink, under them; a group of plain links, and never DSNavList, which marks the open page and belongs to the side list"
+            },
+            {
+              "on": "whyGroupOfLinks",
+              "value": "the developer, 2026-11-25: 'feels like section of widget with some kind of nav group?'"
+            },
+            {
+              "on": "whyShelves",
+              "value": "the developer, 2026-11-25, on support.freshdesk.com/support/solutions/45923: 'it feels like support pages like freshdesk are using sectons mostly with grid section features containers?'"
+            },
+            {
+              "on": "inThisSection",
+              "value": "EXPLAIN_DOORS, in this section: the category's own topics, one a row with when each was updated"
+            },
+            {
+              "on": "depth",
+              "value": "at most three levels of categories under the help centre home; a help centre that needs more is two"
+            },
+            {
+              "on": "holds",
+              "value": "only sub-categories, only its own topics, or both, the sub-categories first; each sub-category a CARD_LIST GRID_CELL with its own links, its first five or its most read, and View all N, which opens that category"
+            },
+            {
+              "on": "featured",
+              "value": "a picked topic's row carries a Featured fact; the head carries the category's mark, title, line, count and the way back to all categories"
+            }
+          ]
+        },
+        "style": {
+          "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
+          "fill": {
+            "default": "BASE",
+            "readingChanges": "DEFAULT",
+            "closingCall": "PRIMARY",
+            "hero": "NONE"
+          },
+          "alternateByTurn": false,
+          "sizeStrongest": "LG",
+          "onward": "THE_GROUPS_OWN_LINK_FIRST",
+          "emphasisPerSection": "ONE"
+        },
+        "status": "BUILT",
+        "order": [
+          "INTRO_HERO",
+          "EXPLAIN_DOORS",
+          "EXPLAIN_DOORS",
+          "COMMON_FAQ",
+          "COMMON_FOOTER"
+        ]
+      },
+      {
+        "code": "HELP_TOPIC",
+        "title": "Help topic",
+        "description": "Where am I, and is this for my plan → the answer → did it help → related pages → questions and comments → who do I ask",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "the last level of a help centre: one help answer, read to get one thing working, with its questions and comments under it",
+          "notWhen": [
+            {
+              "condition": "The reader follows steps end to end",
+              "instead": "GUIDE_PAGE"
+            },
+            {
+              "condition": "The reader looks one fact up",
+              "instead": "DOCS_PAGE"
+            },
+            {
+              "condition": "The reader reads a piece for its own sake",
+              "instead": "DOCS_PAGE"
+            }
+          ],
+          "research": "help-centre analysis, 2026-11-25: support.freshdesk.com and its sub pages",
+          "why": "the developer, 2026-11-25: 'yes go for both 1 and 2' (2: RESOURCES, from the Freshdesk help-centre analysis)"
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "the category layouts"
+            }
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "layout",
+            "props": {
+              "value": "TOPNAV"
+            }
+          },
+          {
+            "unit": "DSBreadcrumb",
+            "part": "COMPONENT",
+            "role": "breadcrumb",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "level": "LAST",
+          "head": "the breadcrumb under the bar, then TOPIC_HERO: the title, when it was updated and the plans it applies to",
+          "languageOrder": {
+            "reading": "TOPIC_HERO, READ_ARTICLE (the category's other answers in a side CARD_LIST), FORM_FEEDBACK, EXPLAIN_DOORS (related, within and across sets), TOPIC_QUESTIONS, TOPIC_COMMENTS, ACTION_CLOSING (still need help), COMMON_FOOTER"
+          },
+          "afterTheBody": "FORM_FEEDBACK, then EXPLAIN_DOORS in its related form (within the set and across sets, each door naming its set), then TOPIC_QUESTIONS and TOPIC_COMMENTS, then ACTION_CLOSING",
+          "notes": [
+            {
+              "on": "outline",
+              "value": "CONTENT_OUTLINE at the end side on a desktop, from TOPNAV's case SIDE_LIST; folded under the head on a phone"
+            },
+            {
+              "on": "feedback",
+              "value": "FORM_FEEDBACK after READ_ARTICLE"
+            },
+            {
+              "on": "aside",
+              "value": "a DSPageFrameAside at END on a desktop: CONTENT_OUTLINE for a long topic, else CARD_LIST SIDE_LIST, the category's other answers (More in <category>), each its title and reading time, and all categories with their counts; under the topic on a phone"
+            }
+          ]
+        },
+        "style": {
+          "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
+          "fill": {
+            "default": "BASE",
+            "readingChanges": "DEFAULT",
+            "closingCall": "PRIMARY",
+            "hero": "NONE"
+          },
+          "alternateByTurn": false,
+          "sizeStrongest": "LG",
+          "onward": "THE_GROUPS_OWN_LINK_FIRST",
+          "emphasisPerSection": "ONE"
+        },
+        "status": "BUILT",
+        "order": [
+          "TOPIC_HERO",
+          "READ_ARTICLE",
+          "EXPLAIN_DOORS",
+          "TOPIC_QUESTIONS",
+          "TOPIC_COMMENTS",
+          {
+            "kind": "ACTION_CLOSING",
+            "case": "STILL_NEED_HELP"
+          },
+          "COMMON_FOOTER"
+        ],
+        "level": "LAST"
+      },
+      {
+        "code": "HELP_SEARCH",
+        "title": "Help search",
+        "description": "What was asked → what answers it, a paged list with where each lives → who to ask",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "the results of a search in a help centre, of any depth: a search head, then a paged list, each result its title, the words that matched, where it lives and when it was updated, with a tab for each kind; with none found, \"did you mean\" and the way to ask a person",
+          "research": "page-kinds research, 2026-11-24 (work/page-kinds-research.md): the developer, 'think the page purpose and check what kind of info usually used in that page from online'",
+          "notWhen": [
+            {
+              "condition": "The home of a help centre, which starts from a search band",
+              "instead": "HELP_HOME"
+            },
+            {
+              "condition": "The reader searches the docs",
+              "instead": "DOCS_SEARCH"
+            },
+            {
+              "condition": "The reader searches the guides",
+              "instead": "GUIDE_SEARCH"
+            }
+          ],
+          "why": "the developer, 2026-11-25: 'yes go for both 1 and 2' (2: RESOURCES, from the Freshdesk help-centre analysis)"
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "the category layouts"
+            }
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "layout",
+            "props": {
+              "value": "TOPNAV"
+            }
+          }
+        ],
+        "placement": {
+          "level": 2,
+          "rows": "BROWSE_RESULTS PAGED_LIST, each row a CARD_ITEM LIST_ROW; the search keeps the query at the top and a tab for each kind of result",
+          "states": "a count line, such as 1 result for plan, each row its group and reading time over its title; before a query, Enter a search term to find articles; with none found, what to try and the way to ask",
+          "languageOrder": {
+            "reading": "INTRO_HERO (search head, a DSSearchBar folded, a DSSearchBar folded, a DSSearchBar folded, a DSSearchBar folded), BROWSE_RESULTS (answers, where each lives, \"did you mean\"), ACTION_CLOSING (ask a person), COMMON_FOOTER"
+          }
+        },
+        "style": {
+          "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
+          "fill": {
+            "default": "BASE",
+            "readingChanges": "DEFAULT",
+            "closingCall": "PRIMARY",
+            "hero": "NONE"
+          },
+          "alternateByTurn": false,
+          "sizeStrongest": "LG",
+          "onward": "THE_GROUPS_OWN_LINK_FIRST",
+          "emphasisPerSection": "ONE"
+        },
+        "status": "BUILT",
+        "order": [
+          "INTRO_HERO",
+          {
+            "kind": "BROWSE_RESULTS",
+            "case": "PAGED_LIST"
+          },
+          "ACTION_CLOSING",
+          "COMMON_FOOTER"
+        ]
+      },
+      {
+        "code": "CHANGELOG_HOME",
+        "title": "Changelog home",
+        "description": "What this page records → each release in turn, newest first → subscribe",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "what changed in which release, newest first, each release dated: tabs by kind, a dated feed of releases, older updates, and a way to subscribe",
+          "research": "page-kinds research, 2026-11-24 (work/page-kinds-research.md): the developer, 'think the page purpose and check what kind of info usually used in that page from online'",
+          "notWhen": [
+            {
+              "condition": "One release, read whole",
+              "instead": "CHANGELOG_ENTRY"
+            },
+            {
+              "condition": "What will be built next",
+              "instead": "ROADMAP_HOME"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "the category layouts"
+            }
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "layout",
+            "props": {
+              "value": "TOPNAV"
+            }
+          }
+        ],
+        "placement": {
+          "level": 2,
+          "languageOrder": {
+            "reading": "INTRO_HERO (words alone), BROWSE_RESULTS (tabs by kind; a dated feed of CARD_RELEASE; \"Older updates\"), FEATURE_CTA (subscribe), COMMON_FOOTER"
+          },
+          "notes": [
+            {
+              "on": "entries",
+              "value": "BROWSE_RESULTS DATED_FEED, each entry a CARD_RELEASE; FEATURE_CTA (subscribe) after the feed"
+            }
+          ]
+        },
+        "style": {
+          "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
+          "fill": {
+            "default": "BASE",
+            "readingChanges": "DEFAULT",
+            "closingCall": "PRIMARY",
+            "hero": "NONE"
+          },
+          "alternateByTurn": false,
+          "sizeStrongest": "LG",
+          "onward": "THE_GROUPS_OWN_LINK_FIRST",
+          "emphasisPerSection": "ONE"
+        },
+        "status": "BUILT",
+        "order": [
+          {
+            "kind": "INTRO_HERO",
+            "case": "WORDS_ALONE"
+          },
+          {
+            "kind": "BROWSE_RESULTS",
+            "case": "DATED_FEED"
+          },
+          "COMMON_FOOTER"
+        ]
+      },
+      {
+        "code": "CHANGELOG_ENTRY",
+        "title": "Changelog entry",
+        "description": "One release: its date, version and title → what changed → back to the changelog, previous and next",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "one release, read whole: its date, version and title, then what changed as the content writes it, then the way back to the changelog and the releases before and after",
+          "research": "page-kinds research, 2026-11-24 (work/page-kinds-research.md): the developer, 'think the page purpose and check what kind of info usually used in that page from online'",
+          "notWhen": [
+            {
+              "condition": "The page of every release",
+              "instead": "CHANGELOG_HOME"
+            },
+            {
+              "condition": "A piece read for its own sake",
+              "instead": "DOCS_PAGE"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "the category layouts"
+            }
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "layout",
+            "props": {
+              "value": "TOPNAV"
+            }
+          }
+        ],
+        "placement": {
+          "level": "LAST",
+          "languageOrder": {
+            "reading": "RELEASE_HERO, READ_ARTICLE, EXPLAIN_DOORS (back to the changelog, previous and next), COMMON_FOOTER"
+          },
+          "notes": [
+            {
+              "on": "entry",
+              "value": "RELEASE_HERO, then READ_ARTICLE for what changed"
+            }
+          ]
+        },
+        "style": {
+          "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
+          "fill": {
+            "default": "BASE",
+            "readingChanges": "DEFAULT",
+            "closingCall": "PRIMARY",
+            "hero": "NONE"
+          },
+          "alternateByTurn": false,
+          "sizeStrongest": "LG",
+          "onward": "THE_GROUPS_OWN_LINK_FIRST",
+          "emphasisPerSection": "ONE"
+        },
+        "status": "BUILT",
+        "order": [
+          "RELEASE_HERO",
+          "READ_ARTICLE",
+          "EXPLAIN_DOORS",
+          "COMMON_FOOTER"
+        ]
+      },
+      {
+        "code": "ROADMAP_HOME",
+        "title": "Roadmap",
+        "description": "what the product will do next, by horizon",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "the public plan of a product: what is being built now, next and later, each a short record with its state, and the way to ask for one",
+          "notWhen": [
+            {
+              "condition": "What has shipped, release by release",
+              "instead": "CHANGELOG_HOME"
+            },
+            {
+              "condition": "A piece read for its own sake",
+              "instead": "DOCS_PAGE"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "the category layouts"
+            }
+          }
+        ],
+        "placement": {
+          "level": 2,
+          "records": "BROWSE_RESULTS BY_HORIZON; FEATURE_CTA (suggest an idea) after it",
+          "languageOrder": {
+            "reading": "INTRO_HERO, BROWSE_RESULTS (by horizon: now, next, later), FEATURE_CTA (suggest an idea), COMMON_FOOTER"
+          }
+        },
+        "style": {},
+        "status": "PLANNED",
+        "order": [
+          "INTRO_HERO",
+          {
+            "kind": "BROWSE_RESULTS",
+            "case": "BY_HORIZON"
+          },
+          "COMMON_FOOTER"
+        ]
+      },
+      {
+        "code": "COMMON_POLICY",
+        "title": "Policy",
+        "description": "a doc with no sections of its own, such as a privacy notice or the terms",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "a page read as a doc: a privacy notice, the terms; its head INTRO_HERO with words alone, then READ_ARTICLE",
+          "research": "page-kinds research, 2026-11-24 (work/page-kinds-research.md): the developer, 'think the page purpose and check what kind of info usually used in that page from online'",
+          "notWhen": []
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "the category layouts"
+            }
+          }
+        ],
+        "placement": {
+          "level": "LAST",
+          "languageOrder": {
+            "reading": "INTRO_HERO (words alone), READ_ARTICLE, COMMON_FOOTER"
+          }
+        },
+        "style": {
+          "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
+          "fill": {
+            "default": "BASE",
+            "readingChanges": "DEFAULT",
+            "closingCall": "PRIMARY",
+            "hero": "NONE"
+          },
+          "alternateByTurn": false,
+          "sizeStrongest": "LG",
+          "onward": "THE_GROUPS_OWN_LINK_FIRST",
+          "emphasisPerSection": "ONE"
+        },
+        "status": "BUILT",
+        "order": [
+          {
+            "kind": "INTRO_HERO",
+            "case": "WORDS_ALONE"
+          },
+          "READ_ARTICLE",
+          "COMMON_FOOTER"
+        ]
+      },
+      {
+        "code": "COMMON_NOT_FOUND",
+        "title": "Not found",
+        "description": "the page for an address that leads nowhere",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "an address that leads nowhere: it keeps the site's layout, with a short message, a search on a site that has one, and the way back",
+          "research": "page-kinds research, 2026-11-24 (work/page-kinds-research.md): the developer, 'think the page purpose and check what kind of info usually used in that page from online'",
+          "notWhen": [
+            {
+              "condition": "Something failed on our side",
+              "instead": "COMMON_SERVER_ERROR"
+            },
+            {
+              "condition": "The site is down for a planned time",
+              "instead": "COMMON_MAINTENANCE"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "the category layouts"
+            }
+          }
+        ],
+        "placement": {
+          "level": "LAST",
+          "languageOrder": {
+            "reading": "INTRO_HERO (words alone), EXPLAIN_DOORS, COMMON_FOOTER"
+          }
+        },
+        "style": {
+          "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
+          "fill": {
+            "default": "BASE",
+            "readingChanges": "DEFAULT",
+            "closingCall": "PRIMARY",
+            "hero": "NONE"
+          },
+          "alternateByTurn": false,
+          "sizeStrongest": "LG",
+          "onward": "THE_GROUPS_OWN_LINK_FIRST",
+          "emphasisPerSection": "ONE"
+        },
+        "status": "BUILT",
+        "order": [
+          {
+            "kind": "INTRO_HERO",
+            "case": "WORDS_ALONE"
+          },
+          "EXPLAIN_DOORS",
+          "COMMON_FOOTER"
+        ]
+      },
+      {
+        "code": "COMMON_SERVER_ERROR",
+        "title": "Server error",
+        "description": "the page for a failure that is ours",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "something failed on our side: it keeps the site's layout where the site can still be drawn, says the failure is not the reader's, and offers what to do now and the way back",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.605"
+          ],
+          "notWhen": [
+            {
+              "condition": "The address leads nowhere",
+              "instead": "COMMON_NOT_FOUND"
+            },
+            {
+              "condition": "The site is down for a planned time",
+              "instead": "COMMON_MAINTENANCE"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "the category layouts"
+            }
+          }
+        ],
+        "placement": {
+          "level": "LAST",
+          "languageOrder": {
+            "reading": "INTRO_HERO (words alone), EXPLAIN_DOORS, COMMON_FOOTER"
+          }
+        },
+        "style": {
+          "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
+          "fill": {
+            "default": "BASE",
+            "readingChanges": "DEFAULT",
+            "closingCall": "PRIMARY",
+            "hero": "NONE"
+          },
+          "alternateByTurn": false,
+          "sizeStrongest": "LG",
+          "onward": "THE_GROUPS_OWN_LINK_FIRST",
+          "emphasisPerSection": "ONE"
+        },
+        "status": "BUILT",
+        "order": [
+          {
+            "kind": "INTRO_HERO",
+            "case": "WORDS_ALONE"
+          },
+          "EXPLAIN_DOORS",
+          "COMMON_FOOTER"
+        ]
+      },
+      {
+        "code": "COMMON_MAINTENANCE",
+        "title": "Maintenance",
+        "description": "the page for a planned pause",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "the site is down for a planned time: it stands on CANVAS, says when to come back, and nothing else",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.605"
+          ],
+          "notWhen": [
+            {
+              "condition": "The address leads nowhere",
+              "instead": "COMMON_NOT_FOUND"
+            },
+            {
+              "condition": "Something failed on our side",
+              "instead": "COMMON_SERVER_ERROR"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "the category layouts"
+            }
+          }
+        ],
+        "placement": {
+          "level": "LAST",
+          "languageOrder": {
+            "reading": "INTRO_HERO (words alone), COMMON_FOOTER"
+          }
+        },
+        "style": {
+          "page": "HERO_THEN_SECTIONS_THEN_CLOSING_CALL",
+          "fill": {
+            "default": "BASE",
+            "readingChanges": "DEFAULT",
+            "closingCall": "PRIMARY",
+            "hero": "NONE"
+          },
+          "alternateByTurn": false,
+          "sizeStrongest": "LG",
+          "onward": "THE_GROUPS_OWN_LINK_FIRST",
+          "emphasisPerSection": "ONE"
+        },
+        "status": "BUILT",
+        "order": [
+          {
+            "kind": "INTRO_HERO",
+            "case": "WORDS_ALONE"
+          },
+          "COMMON_FOOTER"
+        ]
+      }
+    ],
+    "CONTAINERS": [
+      {
+        "code": "INTRO_HERO",
+        "title": "Intro hero",
+        "description": "What is this, and is it for me?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "VISITOR",
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "the head of a home, a category or a search: the page's one claim, as its first words. For a page's tree: its search-first form is a DSSearchBar with a tab for each set as its scopes; its search head is DSSearchBar folded, the words kept in the field with the count of what answers them; its category head carries its line",
+          "notWhen": [
+            {
+              "condition": "The section is a slideshow of several claims",
+              "instead": "give each claim its own section"
+            },
+            {
+              "condition": "The media of the hero is a slideshow",
+              "instead": "the case SLIDES, which turns the media only and never the words"
+            },
+            {
+              "condition": "The head of a docs page, a guide, a help answer or a release",
+              "instead": "DOC_HERO, GUIDE_HERO, TOPIC_HERO or RELEASE_HERO"
+            }
+          ],
+          "rules": [
+            "RULE.SUPPORT.SURFACE.371"
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSSectionContainer",
+            "part": "CONTAINER",
+            "role": "container",
+            "props": {
+              "size": "LG",
+              "sizeWhereHeroIsPageEmphasis": "XL",
+              "color": "BASE"
+            }
+          },
+          {
+            "unit": "DSFeature",
+            "part": "COMPONENT",
+            "role": "feature",
+            "props": {
+              "pageLevel": "PAGE",
+              "type": "SPLIT_END",
+              "textAlign": "START",
+              "verticalAlign": "CENTER",
+              "otherTypes": [
+                "BACKDROP",
+                "MEDIA_BOTTOM"
+              ],
+              "centreWordsOnlyWhen": "nothing stands beside or under them"
+            }
+          }
+        ],
+        "placement": {
+          "space": {
+            "section": "LG"
+          },
+          "group": {
+            "position": "FIRST",
+            "fill": "NONE"
+          },
+          "question": "What is this, and is it for me?",
+          "words": "the page's own title, description and actions: a hero says what its page is for, so two pages never share a hero's words"
+        },
+        "style": {
+          "ground": "BASE",
+          "emphasis": {
+            "form": "GROUND",
+            "fill": "NONE"
+          }
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "ON_SCENE",
+            "when": "the page is the site's front door and its scene sets the ground for the whole section, the words standing on it",
+            "units": [
+              {
+                "unit": "DSSectionContainer",
+                "part": "CONTAINER",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSFeature",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "media": "the section's mediaNode, edge to edge, never the feature's",
+              "feature": {
+                "type": "NONE",
+                "media": "NONE"
+              },
+              "narrow": "MEDIA_BOTTOM, the scene's phone form under the words"
+            },
+            "style": {
+              "notes": [
+                {
+                  "on": "size",
+                  "value": "XL"
+                },
+                {
+                  "on": "pattern",
+                  "value": "DOTS"
+                },
+                {
+                  "on": "fadedEdges",
+                  "value": true
+                }
+              ]
+            },
+            "status": "BUILT",
+            "seenOn": "saasplane.ai, the main page (HomePage.tsx: DSSectionContainer XL, BASE, DOTS with faded edges, the scene as its mediaNode; useSiteHeroType gives MEDIA_BOTTOM when narrow)"
+          },
+          {
+            "code": "BESIDE",
+            "when": "one picture the claim names reads at half width beside the words",
+            "units": [],
+            "placement": {
+              "feature": {
+                "type": "SPLIT_END",
+                "phone": "MEDIA_BOTTOM"
+              }
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "UNDER",
+            "when": "a wide scene or a story that needs the page's width, under a short claim",
+            "units": [],
+            "placement": {
+              "feature": {
+                "type": "MEDIA_BOTTOM"
+              }
+            },
+            "style": {},
+            "status": "BUILT",
+            "seenOn": "saasplane.ai, the DevEx agent page"
+          },
+          {
+            "code": "BACKDROP",
+            "when": "a picture of the subject fills the feature and the words stand over it on a scrim",
+            "units": [],
+            "placement": {
+              "feature": {
+                "type": "BACKDROP"
+              }
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "WORDS_ALONE",
+            "when": "nothing to show: a not-found page, a text page",
+            "units": [],
+            "placement": {
+              "feature": {
+                "media": "NONE"
+              }
+            },
+            "style": {
+              "textAlign": "CENTER"
+            },
+            "status": "BUILT"
+          },
+          {
+            "code": "SLIDES",
+            "when": "a slideshow is the section's own ground: the slides fill the section behind the words, as ON_SCENE's scene does, and the feature stands over them with its words alone; only the slides turn, and the claim, its facts and its one main action stay still",
+            "why": "the developer, 2026-11-25, Q63 A: 'Q63 - A, but we should have option of hero with slides as well such one can use slideshow for media and keep DSfaeture without media in left'",
+            "units": [
+              {
+                "unit": "DSSectionContainer",
+                "part": "CONTAINER",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSCarousel",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSFeature",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "media": "the section's mediaNode, edge to edge, never the feature's: a DSCarousel with overlay, its arrows and dots over the slides",
+              "feature": {
+                "type": "NONE",
+                "media": "NONE",
+                "position": "START"
+              },
+              "legible": "the section's mediaScrim (START, CENTER or END) draws BACKDROP's scrim over the slides, and the words keep to three fifths of the width from the tablet up",
+              "narrow": "the page's hero type moves the slides under the words, as ON_SCENE does"
+            },
+            "style": {},
+            "status": "BUILT",
+            "notes": [
+              {
+                "on": "whyGround",
+                "value": "the developer, 2026-11-25: 'so like hero bg goes on container same way slideshow carousel on media goes on bg of conatiner'"
+              },
+              {
+                "on": "whySupport",
+                "value": "Support cb6ee27a6: DSSectionContainer takes mediaScrim beside mediaNode"
+              }
+            ]
+          }
+        ],
+        "defaultCase": "BESIDE"
+      },
+      {
+        "code": "DOC_HERO",
+        "title": "Doc hero",
+        "description": "a docs page's head: title, line, updated",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "a docs page's first words: its title, its line and when it was updated",
+          "notWhen": [
+            {
+              "condition": "The head of a guide",
+              "instead": "GUIDE_HERO"
+            },
+            {
+              "condition": "The head of a help answer",
+              "instead": "TOPIC_HERO"
+            },
+            {
+              "condition": "The head of a home or a search",
+              "instead": "INTRO_HERO"
+            }
+          ],
+          "rules": [],
+          "why": "the developer, 2026-11-26, 2026-11-26T17:05:19Z: the head names its subject, and the subject's own facts stand in it"
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSSectionContainer",
+            "part": "CONTAINER",
+            "role": "container",
+            "props": {}
+          },
+          {
+            "unit": "DSFeature pageLevel PAGE with DSFormatDate for when it was updated",
+            "part": null,
+            "role": "feature",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "position": "FIRST",
+          "space": {
+            "section": "MD"
+          }
+        },
+        "style": {
+          "ground": "BASE",
+          "emphasis": {
+            "form": "GROUND",
+            "fill": "NONE"
+          }
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "GUIDE_HERO",
+        "title": "Guide hero",
+        "description": "a guide's head: title, what you'll build, authors, published, updated, level, time",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "a guide's first words: its title, what you will build, its authors, when it was published and updated, its level and the time it takes",
+          "notWhen": [
+            {
+              "condition": "The head of a docs page",
+              "instead": "DOC_HERO"
+            },
+            {
+              "condition": "The head of a home or a search",
+              "instead": "INTRO_HERO"
+            }
+          ],
+          "rules": [],
+          "why": "the developer, 2026-11-26, 2026-11-26T17:05:19Z: the head names its subject, and the subject's own facts stand in it"
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSSectionContainer",
+            "part": "CONTAINER",
+            "role": "container",
+            "props": {}
+          },
+          {
+            "unit": "DSFeature pageLevel PAGE with DSAvatar for the authors, DSFormatDate for published and updated, DSBadge for the level and the time",
+            "part": null,
+            "role": "feature",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "position": "FIRST",
+          "space": {
+            "section": "MD"
+          }
+        },
+        "style": {
+          "ground": "BASE",
+          "emphasis": {
+            "form": "GROUND",
+            "fill": "NONE"
+          }
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "TOPIC_HERO",
+        "title": "Topic hero",
+        "description": "a help answer's head: title, updated, the plans it applies to",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "a help answer's first words: its title, when it was updated and the plans it applies to",
+          "notWhen": [
+            {
+              "condition": "The head of a docs page",
+              "instead": "DOC_HERO"
+            },
+            {
+              "condition": "The head of a home or a search",
+              "instead": "INTRO_HERO"
+            }
+          ],
+          "rules": [],
+          "why": "the developer, 2026-11-26, 2026-11-26T17:05:19Z: the head names its subject, and the subject's own facts stand in it"
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSSectionContainer",
+            "part": "CONTAINER",
+            "role": "container",
+            "props": {}
+          },
+          {
+            "unit": "DSFeature pageLevel PAGE with DSFormatDate for when it was updated and DSBadge for each plan it applies to",
+            "part": null,
+            "role": "feature",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "position": "FIRST",
+          "space": {
+            "section": "MD"
+          },
+          "breadcrumb": "a help centre always shows its breadcrumb under the bar; the head stands under it"
+        },
+        "style": {
+          "ground": "BASE",
+          "emphasis": {
+            "form": "GROUND",
+            "fill": "NONE"
+          }
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "RELEASE_HERO",
+        "title": "Release hero",
+        "description": "a release's head: date, version, title, its areas",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "a release's first words: its date, its version, its title and the areas it touches",
+          "notWhen": [
+            {
+              "condition": "The page of every release",
+              "instead": "INTRO_HERO"
+            }
+          ],
+          "rules": [],
+          "why": "the developer, 2026-11-26, 2026-11-26T17:05:19Z: the head names its subject, and the subject's own facts stand in it"
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSSectionContainer",
+            "part": "CONTAINER",
+            "role": "container",
+            "props": {}
+          },
+          {
+            "unit": "DSFeature pageLevel PAGE with DSFormatDate for its date and DSBadge for its version and its areas",
+            "part": null,
+            "role": "feature",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "position": "FIRST",
+          "space": {
+            "section": "MD"
+          }
+        },
+        "style": {
+          "ground": "BASE",
+          "emphasis": {
+            "form": "GROUND",
+            "fill": "NONE"
+          }
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "DOC_COMMENTS",
+        "title": "Doc comments",
+        "description": "comments and replies, for a site that picks it",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a Learner who has read the body and has a word to add"
+          },
+          "chooseWhen": "comments and replies under a docs page, for a site that picks them: each a CARD_COMMENT, then FORM_COMMENT",
+          "notWhen": [
+            {
+              "condition": "The site does not take comments on its docs",
+              "instead": "leave it out: the page ends with EXPLAIN_DOORS"
+            },
+            {
+              "condition": "The reader needs a person to answer",
+              "instead": "ACTION_CLOSING"
+            }
+          ],
+          "rules": [],
+          "why": "the developer, 2026-11-26: 'we may need to Q&A or comments on topic, show related topics og help or pages' (2026-11-26T22:21+05:30)"
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSSectionContainer",
+            "part": "CONTAINER",
+            "role": "container",
+            "props": {
+              "width": "NARROW"
+            }
+          },
+          {
+            "unit": "DSFeature",
+            "part": "COMPONENT",
+            "role": "feature",
+            "props": {
+              "pageLevel": "CONTAINER",
+              "textAlign": "START",
+              "contentNode": "a DSList of CARD_COMMENT, each with its replies, then FORM_COMMENT"
+            }
+          }
+        ],
+        "placement": {
+          "position": "AFTER_THE_BODY",
+          "on": [
+            "DOCS_PAGE"
+          ],
+          "space": {
+            "section": "MD"
+          },
+          "width": "READING_MEASURE, drawn by the section's width NARROW",
+          "form": "FORM_COMMENT",
+          "signIn": "a reader writes after signing in; before it, the form asks for sign-in"
+        },
+        "style": {
+          "ground": "BASE",
+          "emphasis": {
+            "form": "GROUND",
+            "fill": "NONE"
+          }
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "GUIDE_COMMENTS",
+        "title": "Guide comments",
+        "description": "comments and replies",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a Learner who has read the body and has a word to add"
+          },
+          "chooseWhen": "comments and replies under a guide, after its related pages: each a CARD_COMMENT, then FORM_COMMENT",
+          "notWhen": [
+            {
+              "condition": "The reader needs a person to answer",
+              "instead": "ACTION_CLOSING"
+            }
+          ],
+          "rules": [],
+          "why": "the developer, 2026-11-26: 'we may need to Q&A or comments on topic, show related topics og help or pages' (2026-11-26T22:21+05:30)"
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSSectionContainer",
+            "part": "CONTAINER",
+            "role": "container",
+            "props": {
+              "width": "NARROW"
+            }
+          },
+          {
+            "unit": "DSFeature",
+            "part": "COMPONENT",
+            "role": "feature",
+            "props": {
+              "pageLevel": "CONTAINER",
+              "textAlign": "START",
+              "contentNode": "a DSList of CARD_COMMENT, each with its replies, then FORM_COMMENT"
+            }
+          }
+        ],
+        "placement": {
+          "position": "AFTER_THE_BODY",
+          "on": [
+            "GUIDE_PAGE"
+          ],
+          "space": {
+            "section": "MD"
+          },
+          "width": "READING_MEASURE, drawn by the section's width NARROW",
+          "form": "FORM_COMMENT",
+          "signIn": "a reader writes after signing in; before it, the form asks for sign-in"
+        },
+        "style": {
+          "ground": "BASE",
+          "emphasis": {
+            "form": "GROUND",
+            "fill": "NONE"
+          }
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "TOPIC_QUESTIONS",
+        "title": "Topic questions",
+        "description": "readers' questions, with staff or community replies, the accepted one first, \"Ask a question\"",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a Learner who has read the body and has a word to add"
+          },
+          "chooseWhen": "readers' questions under a help answer, each with its replies from staff or the community, the accepted answer first, and a way to ask a question: each a CARD_QUESTION, then FORM_QUESTION",
+          "notWhen": [
+            {
+              "condition": "A remark with no question in it",
+              "instead": "TOPIC_COMMENTS"
+            },
+            {
+              "condition": "The reader needs a person to answer",
+              "instead": "ACTION_CLOSING"
+            }
+          ],
+          "rules": [],
+          "why": "the developer, 2026-11-26: 'we may need to Q&A or comments on topic, show related topics og help or pages' (2026-11-26T22:21+05:30)"
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSSectionContainer",
+            "part": "CONTAINER",
+            "role": "container",
+            "props": {
+              "width": "NARROW"
+            }
+          },
+          {
+            "unit": "DSFeature",
+            "part": "COMPONENT",
+            "role": "feature",
+            "props": {
+              "pageLevel": "CONTAINER",
+              "textAlign": "START",
+              "contentNode": "a DSList of CARD_QUESTION, the accepted answer first, then Ask a question with FORM_QUESTION"
+            }
+          }
+        ],
+        "placement": {
+          "position": "AFTER_THE_BODY",
+          "on": [
+            "HELP_TOPIC"
+          ],
+          "space": {
+            "section": "MD"
+          },
+          "width": "READING_MEASURE, drawn by the section's width NARROW",
+          "form": "FORM_QUESTION",
+          "signIn": "a reader writes after signing in; before it, the form asks for sign-in"
+        },
+        "style": {
+          "ground": "BASE",
+          "emphasis": {
+            "form": "GROUND",
+            "fill": "NONE"
+          }
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "TOPIC_COMMENTS",
+        "title": "Topic comments",
+        "description": "comments and replies",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a Learner who has read the body and has a word to add"
+          },
+          "chooseWhen": "comments and replies under a help answer, after its questions: each a CARD_COMMENT, then FORM_COMMENT",
+          "notWhen": [
+            {
+              "condition": "A question that wants an answer",
+              "instead": "TOPIC_QUESTIONS"
+            },
+            {
+              "condition": "The reader needs a person to answer",
+              "instead": "ACTION_CLOSING"
+            }
+          ],
+          "rules": [],
+          "why": "the developer, 2026-11-26: 'we may need to Q&A or comments on topic, show related topics og help or pages' (2026-11-26T22:21+05:30)"
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSSectionContainer",
+            "part": "CONTAINER",
+            "role": "container",
+            "props": {
+              "width": "NARROW"
+            }
+          },
+          {
+            "unit": "DSFeature",
+            "part": "COMPONENT",
+            "role": "feature",
+            "props": {
+              "pageLevel": "CONTAINER",
+              "textAlign": "START",
+              "contentNode": "a DSList of CARD_COMMENT, each with its replies, then FORM_COMMENT"
+            }
+          }
+        ],
+        "placement": {
+          "position": "AFTER_THE_BODY",
+          "on": [
+            "HELP_TOPIC"
+          ],
+          "space": {
+            "section": "MD"
+          },
+          "width": "READING_MEASURE, drawn by the section's width NARROW",
+          "form": "FORM_COMMENT",
+          "signIn": "a reader writes after signing in; before it, the form asks for sign-in"
+        },
+        "style": {
+          "ground": "BASE",
+          "emphasis": {
+            "form": "GROUND",
+            "fill": "NONE"
+          }
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "READ_ARTICLE",
+        "title": "Read article",
+        "description": "the body's slot: the catalogue fixes its width and puts the outline beside it; the content decides everything inside",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a person who reads the whole of a long text, an article, a reference or a changelog"
+          },
+          "chooseWhen": "the body of a long read, in its slot: the catalogue fixes its width and puts CONTENT_OUTLINE beside it, and the content decides its own sections, subsections and blocks; prerequisites, steps, troubleshooting, changes, parameters and callouts are the author's blocks inside it; its forms are a column, and a column with its outline beside",
+          "notWhen": [
+            {
+              "condition": "The text is a claim with parts a reader scans",
+              "instead": "the author's own blocks inside the body"
+            },
+            {
+              "condition": "The page is one title and a column with no other section",
+              "instead": "this kind, case TITLE_AND_COLUMN"
+            }
+          ],
+          "rules": [],
+          "why": "the developer, 2026-11-26: 'but we should not control content body ... each doc, guide and help pages content decide its own structure' (2026-11-26T22:20+05:30)"
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSSectionContainer",
+            "part": "CONTAINER",
+            "role": "container",
+            "props": {
+              "width": "NARROW"
+            }
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "feature",
+            "props": {
+              "value": "none: the content's own blocks (DSText, DSCodeBlockView, DSTable, DSAlert) in the column"
+            }
+          }
+        ],
+        "placement": {
+          "width": "READING_MEASURE, drawn by the section's width NARROW",
+          "space": {
+            "section": "MD"
+          },
+          "headings": "ITS_OWN_HEADINGS_AT_ITS_SIDE_IN_THE_CONTENT",
+          "on": [
+            "DOCS_PAGE",
+            "GUIDE_PAGE",
+            "HELP_TOPIC",
+            "CHANGELOG_ENTRY",
+            "COMMON_POLICY"
+          ],
+          "whyWidth": "the developer, 2026-11-25, Q71 A: 'should we add width to section also for scutom?', 'Q71 - A'",
+          "notes": [
+            {
+              "on": "outline",
+              "value": "CONTENT_OUTLINE beside the body at the end side on a desktop; folded under the head on a phone"
+            }
+          ]
+        },
+        "style": {
+          "ground": "BASE",
+          "emphasis": {
+            "form": "GROUND",
+            "fill": "NONE"
+          }
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "COLUMN",
+            "when": "under a head, as in Docs page, Guide page, Help topic and Changelog entry",
+            "units": [],
+            "placement": {},
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "TITLE_AND_COLUMN",
+            "when": "a Text page: its title and the column, no other section",
+            "units": [],
+            "placement": {},
+            "style": {},
+            "status": "BUILT"
+          }
+        ],
+        "defaultCase": "COLUMN"
+      },
+      {
+        "code": "BROWSE_SEARCH",
+        "title": "Browse search",
+        "description": "Where is the answer?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a Learner who knows what they want and not where it is"
+          },
+          "chooseWhen": "a search first, a DSSearchBar, with the few most asked topics under it",
+          "notWhen": [
+            {
+              "condition": "The reader browses with no question",
+              "instead": "EXPLAIN_DOORS"
+            },
+            {
+              "condition": "The page of a search's results",
+              "instead": "HELP_SEARCH, DOCS_SEARCH or GUIDE_SEARCH"
+            }
+          ],
+          "rules": [],
+          "why": "the developer, 2026-11-25: 'yes go for both 1 and 2' (2: RESOURCES, from the Freshdesk help-centre analysis)"
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSSectionContainer",
+            "part": "CONTAINER",
+            "role": "container",
+            "props": {}
+          },
+          {
+            "unit": "DSFeature head; DSSearchBar, whose AUTOCOMPLETE field (DSAutocomplete) offers what matches as the reader types; DSNavList of topics",
+            "part": null,
+            "role": "feature",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "position": "FIRST",
+          "on": [
+            "RESOURCES_HOME",
+            "HELP_HOME",
+            "HELP_SEARCH"
+          ],
+          "notes": [
+            {
+              "on": "emptyBox",
+              "value": "the searches this reader made last and the most searched, while the box is empty and focused"
+            },
+            {
+              "on": "onSearch",
+              "value": "the words kept in the field, with the count of what answers them"
+            }
+          ]
+        },
+        "style": {
+          "ground": "BASE",
+          "emphasis": {
+            "form": "GROUND",
+            "fill": "NONE"
+          }
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "BROWSE_PROMO",
+        "title": "Browse promo",
+        "description": "one time-bound thing promoted: an offer, a campaign, a new collection, an event",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a Learner on a home"
+          },
+          "chooseWhen": "one time-bound thing a reader is led to: an offer, a campaign, a new collection, an event, under the head of a home",
+          "notWhen": [
+            {
+              "condition": "Several things at once",
+              "instead": "BROWSE_SHELF"
+            },
+            {
+              "condition": "A call that never expires",
+              "instead": "FEATURE_CTA"
+            }
+          ],
+          "rules": [],
+          "why": "the developer, 2026-11-26, 2026-11-26T17:05:19Z: the help home carries one promotion under its search band"
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSSectionContainer",
+            "part": "CONTAINER",
+            "role": "container",
+            "props": {}
+          },
+          {
+            "unit": "DSFeature head with DSBadge for the time-bound mark, DSFormatDate for its end, one DSButton",
+            "part": null,
+            "role": "feature",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "position": "AFTER_THE_HEAD",
+          "on": [
+            "HELP_HOME"
+          ],
+          "space": {
+            "section": "SM"
+          },
+          "notes": [
+            {
+              "on": "perPage",
+              "value": "AT_MOST_ONE"
+            }
+          ]
+        },
+        "style": {
+          "ground": "BASE",
+          "emphasis": {
+            "form": "GROUND",
+            "fill": "NONE"
+          }
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "BROWSE_FEATURED",
+        "title": "Browse featured",
+        "description": "one picked piece led large",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a person browsing many of one thing, such as articles, guides or releases"
+          },
+          "chooseWhen": "one picked piece, or one or two picked records, drawn larger than the rest",
+          "notWhen": [
+            {
+              "condition": "Each item opens another page and the set is small and chosen",
+              "instead": "EXPLAIN_DOORS"
+            },
+            {
+              "condition": "The set is a plan or a comparison",
+              "instead": "PLANS or COMPARE"
+            },
+            {
+              "condition": "One shelf of a group home: a group's name, its first topics and View all N",
+              "instead": "CARD_LIST"
+            },
+            {
+              "condition": "Several short named lists",
+              "instead": "BROWSE_SHELF"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSSectionContainer",
+            "part": "CONTAINER",
+            "role": "container",
+            "props": {}
+          },
+          {
+            "unit": "DSFeature head; DSItemCard grid, DSFilterBar, DSPagination",
+            "part": null,
+            "role": "feature",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "space": {
+            "section": "MD"
+          },
+          "columns": "BY_COUNT, 3_2_1",
+          "paging": "DSPagination when past one screen",
+          "runs": "the cards of the section are one grid in it, a run of cards never a container of its own, so rows stand at the grid's gap"
+        },
+        "style": {
+          "ground": "BASE",
+          "emphasis": {
+            "form": "GROUND",
+            "fill": "NONE"
+          },
+          "item": "THE_DOORS_ITEM_LOOK",
+          "more": "PAGES (DSPagination) or MORE_BUTTON (a DSButton that loads the next page)"
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "FEATURED_FIRST",
+            "when": "a list that starts with one or two picked records drawn larger, then the rest",
+            "units": [
+              {
+                "unit": "DSFeature",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSItemCard",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "widget": {
+                "kind": "CARD_ITEM",
+                "case": "GRID_CELL",
+                "holds": "WITH_PICTURE"
+              }
+            },
+            "style": {},
+            "status": "BUILT"
+          }
+        ]
+      },
+      {
+        "code": "BROWSE_SHELF",
+        "title": "Browse shelf",
+        "description": "a sideways row of one kind",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a person browsing many of one thing, such as articles, guides or releases"
+          },
+          "chooseWhen": "several short named lists of the same records, such as popular and newly added, each a row of one kind with a way to see all",
+          "notWhen": [
+            {
+              "condition": "Each item opens another page and the set is small and chosen",
+              "instead": "EXPLAIN_DOORS"
+            },
+            {
+              "condition": "The set is a plan or a comparison",
+              "instead": "PLANS or COMPARE"
+            },
+            {
+              "condition": "One shelf of a group home: a group's name, its first topics and View all N",
+              "instead": "CARD_LIST"
+            },
+            {
+              "condition": "Every item, narrowed",
+              "instead": "BROWSE_RESULTS"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSSectionContainer",
+            "part": "CONTAINER",
+            "role": "container",
+            "props": {}
+          },
+          {
+            "unit": "DSFeature head; DSItemCard grid, DSFilterBar, DSPagination",
+            "part": null,
+            "role": "feature",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "space": {
+            "section": "MD"
+          },
+          "columns": "BY_COUNT, 3_2_1",
+          "paging": "DSPagination when past one screen",
+          "runs": "the cards of the section are one grid in it, a run of cards never a container of its own, so rows stand at the grid's gap"
+        },
+        "style": {
+          "ground": "BASE",
+          "emphasis": {
+            "form": "GROUND",
+            "fill": "NONE"
+          },
+          "item": "THE_DOORS_ITEM_LOOK",
+          "more": "PAGES (DSPagination) or MORE_BUTTON (a DSButton that loads the next page)"
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "BY_SHELF",
+            "when": "several short named lists of the same records, such as popular and newly added, each with a way to see all; a shelf may be ranked, such as most read; one shelf of a group home is CARD_LIST GRID_CELL",
+            "units": [
+              {
+                "unit": "DSFeature",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSItemCard",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSItemFacts",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSButton",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "widget": {
+                "kind": "CARD_LIST",
+                "case": "GRID_CELL",
+                "holds": "WORDS_ONLY"
+              }
+            },
+            "style": {},
+            "status": "BUILT"
+          }
+        ]
+      },
+      {
+        "code": "BROWSE_RESULTS",
+        "title": "Browse results",
+        "description": "every item, narrowed",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a person browsing many of one thing, such as articles, guides or releases"
+          },
+          "chooseWhen": "every record of one kind stands in the order the reader looks for it, narrowed: a paged list, a dated feed, A to Z or by horizon; its forms also include tabs by kind",
+          "notWhen": [
+            {
+              "condition": "Each item opens another page and the set is small and chosen",
+              "instead": "EXPLAIN_DOORS"
+            },
+            {
+              "condition": "The set is a plan or a comparison",
+              "instead": "PLANS or COMPARE"
+            },
+            {
+              "condition": "One shelf of a group home: a group's name, its first topics and View all N",
+              "instead": "CARD_LIST"
+            },
+            {
+              "condition": "One picked piece led large",
+              "instead": "BROWSE_FEATURED"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSSectionContainer",
+            "part": "CONTAINER",
+            "role": "container",
+            "props": {}
+          },
+          {
+            "unit": "DSFeature head; DSItemCard grid, DSFilterBar, DSPagination",
+            "part": null,
+            "role": "feature",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "space": {
+            "section": "MD"
+          },
+          "columns": "BY_COUNT, 3_2_1",
+          "paging": "DSPagination when past one screen"
+        },
+        "style": {
+          "ground": "BASE",
+          "emphasis": {
+            "form": "GROUND",
+            "fill": "NONE"
+          },
+          "item": "THE_DOORS_ITEM_LOOK",
+          "more": "PAGES (DSPagination) or MORE_BUTTON (a DSButton that loads the next page)"
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "PAGED_LIST",
+            "when": "every record of a group, or every result of a search, one a row and paged: its title as a link, the words that matched or its line, where it lives and when it was updated",
+            "why": "the developer, 2026-11-25: 'yes go for both 1 and 2' (2: RESOURCES, from the Freshdesk help-centre analysis)",
+            "units": [
+              {
+                "unit": "DSFeature",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSItem",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSTabs",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSPagination",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "items": "LIST",
+              "row": "the title as a link, then the snippet with the words that matched, then where it lives (its group) and when it was updated",
+              "paging": "DSPagination under the list",
+              "phone": "one row under another; the tabs scroll sideways",
+              "widget": {
+                "kind": "CARD_ITEM",
+                "case": "LIST_ROW",
+                "holds": "WORDS_ONLY"
+              },
+              "notes": [
+                {
+                  "on": "tabs",
+                  "value": "on a search, a tab for each kind of result, All first, each with its count"
+                }
+              ]
+            },
+            "style": {},
+            "status": "BUILT",
+            "seenOn": "support.freshdesk.com (a folder's articles, the search results)"
+          },
+          {
+            "code": "DATED_FEED",
+            "when": "what changed, newest first, each entry a CARD_RELEASE",
+            "units": [
+              {
+                "unit": "DSSectionContainer",
+                "part": "CONTAINER",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSFeature",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "CARD_RELEASE",
+                "part": null,
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSButton",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "items": "LIST",
+              "notes": [
+                {
+                  "on": "newestFirst",
+                  "value": true
+                }
+              ]
+            },
+            "style": {},
+            "status": "BUILT",
+            "seenOn": "linear.app/changelog, vercel.com/changelog, keepachangelog.com"
+          },
+          {
+            "code": "A_TO_Z",
+            "when": "terms grouped under their first letter, with a letter index to jump",
+            "units": [
+              {
+                "unit": "DSAnchor",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSItemCard",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSSectionContainer",
+                "part": "CONTAINER",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "widget": {
+                "kind": "CARD_ITEM",
+                "case": "GRID_CELL",
+                "holds": "WORDS_ONLY"
+              }
+            },
+            "style": {},
+            "status": "BUILT",
+            "seenOn": "lever.co/glossary"
+          },
+          {
+            "code": "BY_HORIZON",
+            "when": "records by when they come: Now, Next and Later side by side on a desktop, one under another on a phone, each record its title, a line and its state",
+            "why": "the Apex reads, 2026-11-26 (notes/N017/work/apex-help-blog-pricing-1126.md); the developer: 'all approved'",
+            "units": [
+              {
+                "unit": "DSFeatureGridSectionContainer",
+                "part": "CONTAINER",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSFeature",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {},
+            "style": {},
+            "status": "PLANNED"
+          }
+        ]
+      },
+      {
+        "code": "EXPLAIN_DOORS",
+        "title": "Explain doors",
+        "description": "Where do I go next? Where do I start?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "VISITOR",
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "items that each open another page: a hub's sets, groups of links, what is in this section, see also, previous and next, and related pages within the set or across sets, each door naming its set",
+          "notWhen": [
+            {
+              "condition": "The item is read and not pressed",
+              "instead": "the body's own words, in READ_ARTICLE"
+            },
+            {
+              "condition": "The door opens the page ACTION_CLOSING already opens",
+              "instead": "say it once"
+            }
+          ],
+          "rules": [
+            "RULE.SUPPORT.SURFACE.293"
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSSectionContainer",
+            "part": "CONTAINER",
+            "role": "container",
+            "props": {}
+          },
+          {
+            "unit": "DSFeature",
+            "part": "COMPONENT",
+            "role": "feature",
+            "props": {
+              "items": {
+                "surface": {
+                  "color": "DEFAULT",
+                  "raised": true,
+                  "elevation": "MD"
+                },
+                "anchor": true,
+                "media": "MARK",
+                "end": {
+                  "leavesTheSite": "ARROW_UP_RIGHT",
+                  "insideTheSite": "ARROW_RIGHT"
+                }
+              }
+            }
+          }
+        ],
+        "placement": {
+          "group": {
+            "fill": "BASE"
+          },
+          "question": "Where do I go next? Where do I start?"
+        },
+        "style": {
+          "ground": "BASE",
+          "emphasis": {
+            "form": "GROUND",
+            "fill": "NONE"
+          },
+          "item": {
+            "surface": "DEFAULT",
+            "raised": true
+          }
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "DOOR_ROWS",
+            "when": "parts that are many, or that are asked in a reader's own words (a seat, a role, a stage), each a lined row to its page, one under the next: the reader finds their row and opens it",
+            "units": [
+              {
+                "unit": "DSFeature",
+                "part": "COMPONENT",
+                "role": "feature",
+                "props": {
+                  "items": "LIST"
+                }
+              }
+            ],
+            "placement": {
+              "items": {
+                "type": "LIST",
+                "doors": true
+              }
+            },
+            "style": {
+              "item": {
+                "lined": true
+              }
+            },
+            "status": "BUILT",
+            "seenOn": "saasplane.ai, Solutions, For leaders, Five seats (solutions/SolutionsForLeadersPage.tsx: itemsType LIST, doors); Solutions, By team, Every role (solutions/SolutionsByTeamPage.tsx: LIST, doors); Build, Four parts, each building on the one below (build/BuildPage.tsx: numbered LIST of linked rows beside a picture)"
+          },
+          {
+            "code": "DOOR_CARDS",
+            "when": "a few parts of one reason, each a boxed card to its page with a mark, its name and one line, in a grid by count: the parts are weighed side by side and the section needs no picture; a hub's door to a set carries how many pieces it holds as its line",
+            "units": [],
+            "placement": {
+              "items": {
+                "type": "GRID",
+                "columns": "by count: 3 for three, 4 for four or eight, 2 on a tablet, 1 on a phone"
+              }
+            },
+            "style": {},
+            "status": "BUILT",
+            "seenOn": "saasplane.ai, the main page, Trust (home/HomePage.tsx: SiteBand doors, gridColumns 3/3/1, each door carrying a proof as a fact, one onward button); Build, the sample platform (build/BuildPage.tsx: doors to five apps, gridColumns 4/2/1, each leaving the site); Build, Platform, the surfaces (build/BuildPlatformPage.tsx)"
+          },
+          {
+            "code": "PREVIOUS_AND_NEXT",
+            "when": "the page before and the page after, at the end of a guide, a docs page or a changelog entry",
+            "units": [
+              {
+                "unit": "DSSectionContainer",
+                "part": "CONTAINER",
+                "role": "container",
+                "props": {}
+              },
+              {
+                "unit": "DSLink or DSItemCard, two ends",
+                "part": null,
+                "role": "feature",
+                "props": {}
+              }
+            ],
+            "placement": {
+              "position": "LAST",
+              "count": "TWO"
+            },
+            "style": {
+              "ground": "BASE",
+              "emphasis": {
+                "form": "GROUND",
+                "fill": "NONE"
+              }
+            },
+            "status": "BUILT"
+          }
+        ]
+      },
+      {
+        "code": "ACTION_CLOSING",
+        "title": "Action closing",
+        "description": "Who do I ask now?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a Learner the answer did not help"
+          },
+          "chooseWhen": "the end of a help page: one way into the customer's own requests; its forms are still need help, ask a person and chat with a human",
+          "notWhen": [
+            {
+              "condition": "A guide or a docs page",
+              "instead": "EXPLAIN_DOORS, where to go next"
+            },
+            {
+              "condition": "Steps followed end to end",
+              "instead": "GUIDE_PAGE"
+            }
+          ],
+          "rules": [],
+          "why": "the developer, 2026-11-25: 'yes go for both 1 and 2' (2: RESOURCES, from the Freshdesk help-centre analysis)"
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSSectionContainer",
+            "part": "CONTAINER",
+            "role": "container",
+            "props": {
+              "size": "SM",
+              "color": "DEFAULT",
+              "inset": true
+            }
+          },
+          {
+            "unit": "DSFeature",
+            "part": "COMPONENT",
+            "role": "feature",
+            "props": {
+              "textAlign": "CENTER"
+            }
+          }
+        ],
+        "placement": {
+          "space": {
+            "section": "SM"
+          },
+          "group": {
+            "position": "LAST"
+          },
+          "on": [
+            "RESOURCES_HOME",
+            "HELP_HOME",
+            "HELP_TOPIC",
+            "HELP_SEARCH"
+          ]
+        },
+        "style": {
+          "ground": "DEFAULT",
+          "emphasis": {
+            "form": "OWN_FILL",
+            "fill": "TONE"
+          }
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "STILL_NEED_HELP",
+            "when": "a topic's last section: Still need help?, with one action into the customer's own requests",
+            "why": "the developer, 2026-11-25: 'yes go for both 1 and 2' (2: RESOURCES, from the Freshdesk help-centre analysis)",
+            "units": [
+              {
+                "unit": "DSSectionContainer",
+                "part": "CONTAINER",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSFeature",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSButton",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "words": "Still need help?",
+              "action": "one SOLID action that opens the customer's own requests in PORTAL, after sign-in"
+            },
+            "style": {},
+            "status": "BUILT"
+          }
+        ],
+        "defaultCase": "STILL_NEED_HELP"
+      },
+      {
+        "code": "COMMON_FAQ",
+        "title": "FAQ",
+        "description": "What do people ask before they start?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "VISITOR",
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "questions, each with a short answer",
+          "notWhen": [
+            {
+              "condition": "The answers are long reading",
+              "instead": "write a doc page"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSSectionContainer",
+            "part": "CONTAINER",
+            "role": "container",
+            "props": {
+              "width": "NARROW"
+            }
+          },
+          {
+            "unit": "DSFeature",
+            "part": "COMPONENT",
+            "role": "feature",
+            "props": {
+              "pageLevel": "CONTAINER",
+              "textAlign": "CENTER",
+              "contentNode": "bordered DSAccordionGroup, first question open"
+            }
+          }
+        ],
+        "placement": {
+          "group": {
+            "fill": "BASE"
+          },
+          "question": "What do people ask before they start?",
+          "section": "width NARROW (DSSectionContainer width, a DSLayoutWidthType), centred; its ground and media still edge to edge",
+          "feature": "DSFeature draws the head, centred, and the bordered DSAccordionGroup at the section's width, each question's words starting at the start",
+          "width": "READING_MEASURE, drawn by the section's width NARROW",
+          "align": "CENTRED",
+          "why": "the developer, 2026-11-25, Q54 A: the questions are prose, so they take the reading measure, centred, the head centred above them; each question's words start at the start",
+          "whyPlacement": "the developer, 2026-11-25, Q57 C and Q62 C: 'each DSfeature take its full width then we have cusom node … its job of agent to decide how to place in cusotm'",
+          "whyWidth": "the developer, 2026-11-25, Q71 A: 'should we add width to section also for scutom?', 'Q71 - A'"
+        },
+        "style": {
+          "ground": "BASE",
+          "emphasis": {
+            "form": "GROUND",
+            "fill": "NONE"
+          }
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "COMMON_FOOTER",
+        "title": "Footer",
+        "description": "Where is everything else? Who is behind this?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "VISITOR",
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "the brand, the site's links and its legal line, at the foot of every page",
+          "notWhen": [
+            {
+              "condition": "The page is an app's screen or a sign-in step",
+              "instead": "an app's page takes no footer of this kind"
+            }
+          ],
+          "rules": [
+            "RULE.SUPPORT.SURFACE.259",
+            "RULE.SUPPORT.SURFACE.293",
+            "RULE.SUPPORT.SURFACE.341",
+            "RULE.SUPPORT.SURFACE.342",
+            "RULE.SUPPORT.SURFACE.343",
+            "RULE.SUPPORT.SURFACE.346",
+            "RULE.SUPPORT.SURFACE.414",
+            "RULE.SUPPORT.SURFACE.438",
+            "RULE.SUPPORT.SURFACE.439",
+            "RULE.SUPPORT.SURFACE.443",
+            "RULE.SUPPORT.SURFACE.444",
+            "RULE.SUPPORT.SURFACE.588",
+            "RULE.SUPPORT.SURFACE.593"
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSSectionContainer",
+            "part": "CONTAINER",
+            "role": "container",
+            "props": {
+              "size": "XS"
+            }
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "brand",
+            "props": {
+              "value": "the wide logo (wideLogoUrl), linking home; with none set, DSItem with the square logo (logoUrl) as its mark and the product's name; then DSText CONTENT_MD muted (the promise)"
+            }
+          },
+          {
+            "unit": "DSList SM flush for each menu group, its name as plain text, Overview first, then its parts; a Contact list of addresses with the footer's one button, Get in touch, as an outline",
+            "part": null,
+            "role": "columns",
+            "props": {}
+          },
+          {
+            "unit": "DSSeparator, then the legal line (DSText CONTENT_MD muted) and the legal links (DSLink SM)",
+            "part": null,
+            "role": "legal",
+            "props": {}
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "contact",
+            "props": {
+              "value": "the footer's one button, Get in touch, as an outline at size SM, as wide as its words, never the column's width"
+            }
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "social",
+            "props": {
+              "value": "the social links in the legal bar, at its end: today as words (DSLink SM: X, LinkedIn, GitHub, YouTube); as marks when the design system has them (PLANNED: social brand marks)"
+            }
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "brandWhy",
+            "props": {
+              "value": "the developer, 2026-11-25, Q55 A ('Q55 - A'), restating 2026-11-20 ('okay so lets take this'): an organization keeps logoUrl (square) and wideLogoUrl (wide)"
+            }
+          }
+        ],
+        "placement": {
+          "group": {
+            "position": "AFTER_THE_CLOSING_CALL"
+          },
+          "space": {
+            "section": "XS",
+            "why": "the legal bar is the page's last line, so the room under it stays small (the developer, 2026-11-21)"
+          },
+          "columns": {
+            "phone": 2,
+            "tablet": 2,
+            "desktop": 4,
+            "gap": "the layout's space",
+            "cell": "each column is one cell holding whole lists; lists are spread so the columns come out near even in height, two short lists one under another in a column, never three",
+            "why": "the developer, 2026-11-24: 'soemthing wrong with footer reduce one column', 'u can align footer better'",
+            "align": "every list's title stands the same gap above its first link, so the first links of every column share one line"
+          },
+          "order": "the brand row, the columns, a hairline, the legal bar (the legal line and links at the start, the social links at the end; stacked on a narrow window)",
+          "question": "Where is everything else? Who is behind this?",
+          "why2": "the developer, 2026-11-24: 'get in touch footer can be small', 'also what about social media links'"
+        },
+        "style": {
+          "ground": "BASE",
+          "emphasis": {
+            "form": "GROUND",
+            "fill": "NONE"
+          }
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "COLUMNS",
+            "when": "a site with groups of pages: every group's pages one press away, as saasplane.ai's footer",
+            "units": [
+              {
+                "unit": "DSSectionContainer",
+                "part": "CONTAINER",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSItem",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSText",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSList",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSButton",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSSeparator",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSLink",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "parts": "brand row, columns, hairline, legal bar"
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "SHORT",
+            "when": "a landing page on CANVAS, which keeps the reader on its one action: the brand row and the legal bar only",
+            "units": [
+              {
+                "unit": "DSSectionContainer",
+                "part": "CONTAINER",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSItem",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSText",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSSeparator",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSLink",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "parts": "brand row, hairline, legal bar"
+            },
+            "style": {},
+            "status": "BUILT"
+          }
+        ],
+        "defaultCase": "COLUMNS"
+      }
+    ],
+    "WIDGETS": [
+      {
+        "code": "CARD_ITEM",
+        "title": "Item card",
+        "description": "Which one answers me?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a Learner choosing a topic, an article or a guide among many"
+          },
+          "chooseWhen": "one record of a list or a grid, a door to its own page",
+          "notWhen": [
+            {
+              "condition": "A few links under a group's name",
+              "instead": "CARD_LIST"
+            },
+            {
+              "condition": "Items that each open another page, as a section",
+              "instead": "EXPLAIN_DOORS"
+            }
+          ],
+          "rules": [],
+          "why": "the developer, 2026-11-25, Q76 A ('Q76 - A'): 'make sure they cover different scenarios based on surface category', 'like for ex: market place how product can be shown as widget in lisitng vs sidebar list, with image and without iamge etc..', 'such that layouts can be built easliy'"
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSItemCard or DSItem; DSFormatDate",
+            "part": null,
+            "role": null,
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "BROWSE_FEATURED, BROWSE_SHELF and BROWSE_RESULTS"
+        },
+        "style": {},
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "GRID_CELL",
+            "when": "a cell of a grid of articles or guides",
+            "why": "the developer, 2026-11-25, Q76 A ('Q76 - A'): 'make sure they cover different scenarios based on surface category', 'like for ex: market place how product can be shown as widget in lisitng vs sidebar list, with image and without iamge etc..', 'such that layouts can be built easliy'",
+            "units": [
+              {
+                "unit": "DSItemCard",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSImage",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSFormatDate",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "standsIn": "GRID_CELL",
+              "holds": [
+                "WITH_PICTURE",
+                "WORDS_ONLY"
+              ],
+              "withPicture": "the picture on top",
+              "wordsOnly": "a mark, the title and a line"
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "LIST_ROW",
+            "when": "a row of a paged list: a group's own topics, or a search's results",
+            "why": "the developer, 2026-11-25, Q76 A ('Q76 - A'): 'make sure they cover different scenarios based on surface category', 'like for ex: market place how product can be shown as widget in lisitng vs sidebar list, with image and without iamge etc..', 'such that layouts can be built easliy'",
+            "units": [
+              {
+                "unit": "DSItem",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSLink",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSFormatDate",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "standsIn": "LIST_ROW",
+              "holds": [
+                "WORDS_ONLY"
+              ],
+              "notes": [
+                {
+                  "on": "row",
+                  "value": "the title as a link, the words that matched or its line, where it lives and when it was updated"
+                }
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          }
+        ],
+        "defaultCase": "GRID_CELL"
+      },
+      {
+        "code": "CARD_ITEMS",
+        "title": "Item cards",
+        "description": "several items under one head, \"See all\"",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a Learner choosing among items"
+          },
+          "chooseWhen": "a box of several items under one head, each with its own facts or picture, drawn as a small CARD_ITEM, with See all: popular guides, latest releases, related guides, most read",
+          "notWhen": [
+            {
+              "condition": "Each line is just words, a link, a tick or a label with its value",
+              "instead": "CARD_LIST"
+            }
+          ],
+          "rules": [],
+          "why": "the developer, 2026-11-26, 2026-11-26T17:05:39Z: 'why not CARD_ITEMS in resources?': a box whose lines carry a fact or a picture"
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSFeature head; DSItemCard or DSItem for each item; DSFormatDate; DSButton or DSLink for See all",
+            "part": null,
+            "role": null,
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "the side of a long read, beside CONTENT_OUTLINE or under it on a phone, and the homes' boxes"
+        },
+        "style": {
+          "tone": "QUIET"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "CARD_LIST",
+        "title": "Card list",
+        "description": "text lines under one head, \"View all N\"",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a Learner browsing a help centre's groups"
+          },
+          "chooseWhen": "a block that is mostly its head, with a body the widget draws from data; a group's name and a few of its topics as links, with a way to see all of them: each line is words, a link, a tick or a label with its value; the box beside a help answer is its side list",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.221"
+          ],
+          "notWhen": [
+            {
+              "condition": "Each line is an item with its own facts or picture",
+              "instead": "CARD_ITEMS"
+            },
+            {
+              "condition": "Each item needs a line or a picture to be chosen",
+              "instead": "CARD_ITEM"
+            },
+            {
+              "condition": "Many records in shelves, popular or new",
+              "instead": "BROWSE_RESULTS"
+            },
+            {
+              "condition": "Items that each open another page, as a section",
+              "instead": "EXPLAIN_DOORS"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSFeature",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "pageLevel",
+            "props": {
+              "value": "WIDGET"
+            }
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "type",
+            "props": {
+              "value": "MEDIA_TOP"
+            }
+          },
+          {
+            "unit": "DSFeature, DSList, DSLink; DSNavList in the side list",
+            "part": null,
+            "role": "list",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "text": "START",
+          "centredOnlyFor": [
+            "A_STATEMENT",
+            "A_CLOSING_CALL",
+            "A_HERO_WITH_NO_PICTURE",
+            "SHORT_FRAMING_OVER_ONE_CENTREPIECE_MEDIUM"
+          ],
+          "neverCentred": [
+            "A_PARAGRAPH",
+            "AN_ITEM_GRID"
+          ],
+          "claimCarrier": "ITEMS_OR_THE_MEDIUMS_LABELS_NEVER_BOTH",
+          "itemsBesideAMedium": {
+            "words": "START",
+            "items": "ITEMS_SPLIT_END",
+            "medium": "CENTRED_ON_THE_ITEMS"
+          },
+          "gridOfPeers": "NO_DRAWING_BESIDE_IT",
+          "standsIn": "BROWSE_SHELF, and TOPNAV's case SIDE_LIST"
+        },
+        "style": {
+          "surface": {
+            "surface": "DEFAULT",
+            "raised": true
+          },
+          "tone": "QUIET"
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "GRID_CELL",
+            "when": "a shelf of a group home: the smaller group's name, its first five topics and View all N; several shelves of records, popular or new, are BROWSE_SHELF",
+            "why": "the developer, 2026-11-25, Q76 A ('Q76 - A'): 'make sure they cover different scenarios based on surface category', 'like for ex: market place how product can be shown as widget in lisitng vs sidebar list, with image and without iamge etc..', 'such that layouts can be built easliy'",
+            "units": [
+              {
+                "unit": "DSFeature",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSList",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSLink",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "standsIn": "GRID_CELL",
+              "holds": [
+                "WORDS_ONLY"
+              ],
+              "across": "two on a desktop and a tablet, one on a phone",
+              "notes": [
+                {
+                  "on": "links",
+                  "value": "each topic a DSLink with the topic's mark as its startIcon"
+                }
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "SIDE_LIST",
+            "when": "what the side list of TOPNAV SIDE_LIST holds: the group's other topics",
+            "why": "the developer, 2026-11-25, Q76 A ('Q76 - A'): 'make sure they cover different scenarios based on surface category', 'like for ex: market place how product can be shown as widget in lisitng vs sidebar list, with image and without iamge etc..', 'such that layouts can be built easliy'",
+            "units": [
+              {
+                "unit": "DSNavList",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "standsIn": "SIDE_LIST",
+              "holds": [
+                "WORDS_ONLY"
+              ],
+              "phone": "folded into a menu under the bar"
+            },
+            "style": {},
+            "status": "PLANNED",
+            "missing": "no unit folds a side list into a menu under the bar on a phone"
+          }
+        ],
+        "defaultCase": "GRID_CELL"
+      },
+      {
+        "code": "CARD_RELEASE",
+        "title": "Release card",
+        "description": "one release in a feed: date, title, first lines, areas",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a Learner upgrading"
+          },
+          "chooseWhen": "one release in a feed: its date, its title, its first lines and its areas",
+          "notWhen": [
+            {
+              "condition": "The page of every release",
+              "instead": "CHANGELOG_HOME"
+            },
+            {
+              "condition": "One release, read whole",
+              "instead": "CHANGELOG_ENTRY"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSFeature, DSBadge, DSFormatDate, DSList",
+            "part": null,
+            "role": null,
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "BROWSE_RESULTS DATED_FEED on CHANGELOG_HOME",
+          "order": "NEWEST_FIRST"
+        },
+        "style": {
+          "notes": [
+            {
+              "on": "badge",
+              "value": "the release's areas"
+            }
+          ]
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "CARD_QUESTION",
+        "title": "Question card",
+        "description": "one question, its best answer, how many more, \"helpful\"",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a Learner who reads what others asked"
+          },
+          "chooseWhen": "one question under a help answer: the question, its best answer, how many answers more, and a helpful mark",
+          "notWhen": [
+            {
+              "condition": "A remark with no question in it",
+              "instead": "CARD_COMMENT"
+            }
+          ],
+          "rules": [],
+          "why": "the developer, 2026-11-26, 2026-11-26T17:05:39Z: built from the marketplace's question card"
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSItem; DSAvatar; DSFormatDate; DSButton for helpful and for the other answers",
+            "part": null,
+            "role": null,
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "TOPIC_QUESTIONS, one under another",
+          "order": "the accepted answer first"
+        },
+        "style": {
+          "tone": "QUIET"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "CARD_COMMENT",
+        "title": "Comment card",
+        "description": "one comment, its replies, reply",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a Learner who reads what others said"
+          },
+          "chooseWhen": "one comment under a long read: who wrote it, when, its words, its replies and a way to reply",
+          "notWhen": [
+            {
+              "condition": "A question that wants an answer",
+              "instead": "CARD_QUESTION"
+            }
+          ],
+          "rules": [],
+          "why": "the developer, 2026-11-26, 2026-11-26T17:05:39Z: built from the marketplace's comment card"
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSItem; DSAvatar; DSFormatDate; DSButton for reply",
+            "part": null,
+            "role": null,
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "DOC_COMMENTS, GUIDE_COMMENTS and TOPIC_COMMENTS, one under another",
+          "notes": [
+            {
+              "on": "replies",
+              "value": "indented under the comment they answer"
+            }
+          ]
+        },
+        "style": {
+          "tone": "QUIET"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "CONTENT_OUTLINE",
+        "title": "Content outline",
+        "description": "the long read's headings, the current one marked",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a Learner in a long page"
+          },
+          "chooseWhen": "the long read's headings, the one being read marked; its forms are beside the body, and folded under the head on a phone",
+          "notWhen": [
+            {
+              "condition": "The page is short",
+              "instead": "none"
+            }
+          ],
+          "rules": [],
+          "why": "the developer, 2026-11-26: 'lets just keep CONTENT_OUTLINE' (2026-11-26T22:34+05:30): it stands alone in its content family"
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSAnchorContainer, DSNavList",
+            "part": null,
+            "role": null,
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "the layout's content, at its side, beside READ_ARTICLE"
+        },
+        "style": {
+          "marker": "the heading in view"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "FORM_FEEDBACK",
+        "title": "Was this useful?",
+        "description": "\"Was this useful?\": two answers and an optional word",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a Learner at the end of a page"
+          },
+          "chooseWhen": "two answers and an optional word, said once at the end",
+          "notWhen": [
+            {
+              "condition": "The page needs a long survey",
+              "instead": "a form page"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSButtonGroup, DSTextarea, DSToast",
+            "part": null,
+            "role": null,
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "after READ_ARTICLE, on a docs page, a guide page and a help topic"
+        },
+        "style": {
+          "tone": "QUIET"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "FORM_QUESTION",
+        "title": "Question form",
+        "description": "the question, after sign-in",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a Learner with a question"
+          },
+          "chooseWhen": "the form a signed-in reader asks a question with, under a help answer: the question, one button",
+          "notWhen": [
+            {
+              "condition": "A remark with no question in it",
+              "instead": "FORM_COMMENT"
+            }
+          ],
+          "rules": [],
+          "why": "the developer, 2026-11-26, 2026-11-26T17:05:39Z: built from the marketplace's question form"
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSForm with DSTextarea and one DSButton",
+            "part": null,
+            "role": null,
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "TOPIC_QUESTIONS, after its questions",
+          "notes": [
+            {
+              "on": "signIn",
+              "value": "after sign-in; before it, a line asks the reader to sign in"
+            }
+          ]
+        },
+        "style": {
+          "frame": "flat inside its section"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "FORM_COMMENT",
+        "title": "Comment form",
+        "description": "the comment, after sign-in",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a Learner with a word to add"
+          },
+          "chooseWhen": "the form a signed-in reader comments with, under a long read: the comment, one button",
+          "notWhen": [
+            {
+              "condition": "A question that wants an answer",
+              "instead": "FORM_QUESTION"
+            }
+          ],
+          "rules": [],
+          "why": "the developer, 2026-11-26, 2026-11-26T17:05:39Z: built from the marketplace's comment form"
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSForm with DSTextarea and one DSButton",
+            "part": null,
+            "role": null,
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "DOC_COMMENTS, GUIDE_COMMENTS and TOPIC_COMMENTS, after their comments",
+          "notes": [
+            {
+              "on": "signIn",
+              "value": "after sign-in; before it, a line asks the reader to sign in"
+            }
+          ]
+        },
+        "style": {
+          "frame": "flat inside its section"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "FORM_SUBSCRIBE",
+        "title": "Subscribe form",
+        "description": "email only",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a Learner who wants to hear of the next release"
+          },
+          "chooseWhen": "one email field and one button on one line: subscribe to the changelog or to what is new",
+          "notWhen": [
+            {
+              "condition": "The reader gives more than an email",
+              "instead": "FORM_DEFAULT"
+            }
+          ],
+          "rules": [],
+          "why": "the developer, 2026-11-26, 2026-11-26T17:05:39Z"
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSForm with DSInput and one DSButton",
+            "part": null,
+            "role": null,
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "the changelog, in FEATURE_CTA",
+          "line": "the field and the button side by side; stacked on a phone"
+        },
+        "style": {
+          "frame": "flat inside a band"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "FORM_DEFAULT",
+        "title": "Default form",
+        "description": "the page's own fields",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a Learner who fills a few fields"
+          },
+          "chooseWhen": "a short set of fields a page asks for that no other form names: the page's own fields, one main button",
+          "notWhen": [
+            {
+              "condition": "One email alone",
+              "instead": "FORM_SUBSCRIBE"
+            },
+            {
+              "condition": "A question under a help answer",
+              "instead": "FORM_QUESTION"
+            },
+            {
+              "condition": "A comment under a long read",
+              "instead": "FORM_COMMENT"
+            }
+          ],
+          "rules": [],
+          "why": "the developer, 2026-11-26, 2026-11-26T17:05:39Z"
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSForm with DSInput, DSSelect, DSTextarea and one DSButton",
+            "part": null,
+            "role": null,
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "a section that asks for the page's own fields"
+        },
+        "style": {
+          "frame": "raised where it stands beside words, flat inside a band"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "FEATURE_CTA",
+        "title": "Call to action",
+        "description": "a raised card with a background effect: title, line, actions, a picture or slideshow",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a Learner who is asked to do one thing"
+          },
+          "chooseWhen": "one call the page makes: a raised card with a background effect, its title, its line, its actions and a picture or slideshow; subscribe on the changelog, suggest an idea on the roadmap",
+          "notWhen": [
+            {
+              "condition": "One thing on the page matters more than the rest, shown whole",
+              "instead": "FEATURE_HIGHLIGHT"
+            },
+            {
+              "condition": "The end of a help answer",
+              "instead": "ACTION_CLOSING"
+            }
+          ],
+          "rules": [],
+          "why": "the developer, 2026-11-26, 2026-11-26T17:05:39Z"
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSSectionContainer",
+            "part": "CONTAINER",
+            "role": "container",
+            "props": {}
+          },
+          {
+            "unit": "DSFeature framed raised, full, with DSButton and an optional DSImage or DSCarousel",
+            "part": null,
+            "role": "feature",
+            "props": {}
+          },
+          {
+            "unit": "DSSurface raised",
+            "part": null,
+            "role": "surface",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "perPage": "AT_MOST_ONE",
+          "standsIn": "CHANGELOG_HOME and ROADMAP_HOME, before COMMON_FOOTER"
+        },
+        "style": {
+          "frame": "RAISED",
+          "notes": [
+            {
+              "on": "backdrop",
+              "value": "a background effect behind the words, as a pattern"
+            }
+          ]
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "FEATURE_HIGHLIGHT",
+        "title": "Feature highlight",
+        "description": "What matters most here?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "one thing the page wants remembered, or a call to one page"
+          },
+          "chooseWhen": "one thing on the page matters more than the rest, shown whole in a lit frame at a container's end, pointing at one thing; it can hold stats",
+          "notWhen": [
+            {
+              "condition": "It is the first section or the hero",
+              "instead": "INTRO_HERO"
+            },
+            {
+              "condition": "The section is plain content",
+              "instead": "the kind that reads it"
+            },
+            {
+              "condition": "A second thing also matters most",
+              "instead": "choose one; at most one per page"
+            },
+            {
+              "condition": "A note that interrupts the reading",
+              "instead": "a callout block in READ_ARTICLE's body"
+            }
+          ],
+          "rules": [
+            "RULE.SUPPORT.SURFACE.438"
+          ],
+          "why": "the developer, 2026-11-26: 'CTA and FEATURE_HIGHLIGHT are widgets, FEATURE_CTA and FEATURE_HIGHLIGHT' (2026-11-26T21:08+05:30)"
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSSectionContainer",
+            "part": "CONTAINER",
+            "role": "container",
+            "props": {}
+          },
+          {
+            "unit": "DSFeature framed raised, full",
+            "part": null,
+            "role": "feature",
+            "props": {}
+          },
+          {
+            "unit": "DSSurface raised",
+            "part": null,
+            "role": "surface",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "perPage": "AT_MOST_ONE",
+          "notes": [
+            {
+              "on": "never",
+              "value": [
+                "FIRST",
+                "INTRO_HERO",
+                "A_PLAIN_SECTION"
+              ]
+            },
+            {
+              "on": "space",
+              "value": {
+                "section": "MD"
+              }
+            },
+            {
+              "on": "mayStandAs",
+              "value": "the closing band's first feature"
+            }
+          ]
+        },
+        "style": {
+          "frame": "RAISED",
+          "emphasis": {
+            "form": "GROUND",
+            "fill": "NONE"
+          },
+          "notes": [
+            {
+              "on": "inside",
+              "value": "FLAT"
+            },
+            {
+              "on": "gradient",
+              "value": false
+            },
+            {
+              "on": "toOnePage",
+              "value": {
+                "band": "BRANDED",
+                "solidAction": "View the Showcase"
+              }
+            }
+          ]
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "THE_PROOF",
+            "when": "one fact on the page proves the rest, a number, a quote or a result: shown whole in one lit frame, read in place, with no action of its own",
+            "units": [],
+            "placement": {},
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "A_CALL_TO_ONE_PAGE",
+            "when": "a call to one page: a branded band, a solid action",
+            "units": [],
+            "placement": {},
+            "style": {},
+            "status": "BUILT"
+          }
+        ]
+      }
+    ],
+    "THEME": [
+      {
+        "code": "ITEM_LOOK",
+        "title": "Item look",
+        "description": "How is an item or a door drawn by default?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "the site's author"
+          },
+          "chooseWhen": "the surface of a door, a point and a plan",
+          "notWhen": [
+            {
+              "condition": "One item differs",
+              "instead": "its kind"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "THEME"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "sets",
+            "props": {
+              "value": "theme.component.card"
+            }
+          }
+        ],
+        "placement": {},
+        "style": {
+          "door": {
+            "surface": "DEFAULT",
+            "raised": true
+          },
+          "point": {
+            "surface": "NONE",
+            "raised": false
+          },
+          "radius": "MEDIUM",
+          "spacing": "NORMAL"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "DARK_MODE_LOOK",
+        "title": "Dark mode look",
+        "description": "How does it read in the dark?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "the site's reader"
+          },
+          "chooseWhen": "the tokens, shadow and backdrop in dark",
+          "notWhen": [
+            {
+              "condition": "The page is light only",
+              "instead": "its own mode on DSSectionContainer.painted"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "THEME"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "sets",
+            "props": {
+              "value": "theme.app.mode"
+            }
+          }
+        ],
+        "placement": {},
+        "style": {
+          "tokens": "FOLLOW_THEME_MODE",
+          "shadow": "NONE_IN_DARK",
+          "backdrop": "STILL_UNDER_REDUCED_MOTION"
+        },
+        "status": "BUILT"
+      }
+    ],
+    "MEDIA": [
+      {
+        "code": "ART_DRAWING",
+        "title": "Drawing",
+        "description": "a drawn medium made on the whole drawing scale: its lines in three weights and three styles, its tiles and plates, their spacing and its labels",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "a thing the words point at, as the feature's media beside or under the words, with a list of steps or layers numbered beside it; never beside a grid of peers",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.527",
+            "RULE.SUPPORT.SURFACE.536",
+            "RULE.SUPPORT.SURFACE.542",
+            "RULE.SUPPORT.SURFACE.544",
+            "RULE.SUPPORT.SURFACE.547",
+            "RULE.SUPPORT.SURFACE.548",
+            "RULE.SUPPORT.SURFACE.557",
+            "RULE.SUPPORT.SURFACE.558",
+            "RULE.SUPPORT.SURFACE.565",
+            "RULE.SUPPORT.SURFACE.567",
+            "RULE.SUPPORT.SURFACE.569",
+            "RULE.SUPPORT.SURFACE.589"
+          ],
+          "notWhen": []
+        },
+        "config": {
+          "mtype": "MEDIA"
+        },
+        "units": [
+          {
+            "unit": "DSImage (a drawn SVG)",
+            "part": null,
+            "role": "carrier",
+            "props": {}
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "drawn_by",
+            "props": {
+              "value": "the DRAWING shared part"
+            }
+          }
+        ],
+        "placement": {
+          "placedOn": "FEATURE",
+          "through": "media",
+          "type": "SPLIT_END or MEDIA_BOTTOM",
+          "notes": [
+            {
+              "on": "withList",
+              "value": "a numbered list beside it"
+            },
+            {
+              "on": "neverBeside",
+              "value": "a grid of peers"
+            }
+          ]
+        },
+        "style": {
+          "framing": "FLAT",
+          "kindValue": "diagram: FLAT"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "ART_ILLUSTRATION",
+        "title": "Illustration",
+        "description": "a picture drawn flat on its section, such as a scene, a desk or a person, whose lines are the drawing itself and take the ink at full",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "a landing hero's scene behind its words, one to a page, and never behind a section whose feature also has media",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.552",
+            "RULE.SUPPORT.SURFACE.559",
+            "RULE.SUPPORT.SURFACE.560",
+            "RULE.SUPPORT.SURFACE.561",
+            "RULE.SUPPORT.SURFACE.562",
+            "RULE.SUPPORT.SURFACE.563",
+            "RULE.SUPPORT.SURFACE.564"
+          ],
+          "notWhen": []
+        },
+        "config": {
+          "mtype": "MEDIA"
+        },
+        "units": [
+          {
+            "unit": "DSImage on DSSectionContainer.mediaNode",
+            "part": null,
+            "role": "carrier",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "placedOn": "SECTION",
+          "through": "mediaNode, edge to edge",
+          "type": "BACKDROP",
+          "ratio": "1:1",
+          "notes": [
+            {
+              "on": "perPage",
+              "value": 1
+            },
+            {
+              "on": "landWidth",
+              "value": 2560
+            },
+            {
+              "on": "landEnds",
+              "value": "FADE"
+            },
+            {
+              "on": "subjects",
+              "value": "INSIDE_CONTENT_BOX"
+            },
+            {
+              "on": "behindFeatureMedia",
+              "value": false
+            },
+            {
+              "on": "onPhone",
+              "value": "UNDER_THE_WORDS"
+            }
+          ]
+        },
+        "style": {
+          "framing": "FLAT",
+          "kindValue": "illustration: FLAT"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "VIEW_PRODUCT",
+        "title": "Product view",
+        "description": "the product itself, drawn or captured: a screenshot is captured at 2x and framed raised at the scale's radius, with its callouts on the scale's text and lines",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "a demo, or a section about the live product, with the product view under the words; a screenshot inside a drawn window crops to the top of its page; its forms: phone, tablet and bare, besides the browser or app window",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.293",
+            "RULE.SUPPORT.SURFACE.548",
+            "RULE.SUPPORT.SURFACE.566"
+          ],
+          "notWhen": []
+        },
+        "config": {
+          "mtype": "MEDIA"
+        },
+        "units": [
+          {
+            "unit": "DSImage",
+            "part": "COMPONENT",
+            "role": "carrier",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "placedOn": "FEATURE",
+          "through": "media",
+          "type": "SPLIT_END or MEDIA_BOTTOM",
+          "notes": [
+            {
+              "on": "screenshotInDrawnWindow",
+              "value": "CROP_TO_TOP_OF_PAGE"
+            }
+          ]
+        },
+        "style": {
+          "framing": "FRAMED_RAISED",
+          "kindValue": "product: FRAMED_RAISED"
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "IN_A_WINDOW",
+            "when": "a screen of the product shown as a person sees it: in a window with its bar, so the reader knows it is the product and not a drawing",
+            "units": [
+              {
+                "unit": "DSWindowFrame",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSImage",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "placedOn": "FEATURE"
+            },
+            "style": {
+              "framing": "FRAMED_RAISED"
+            },
+            "status": "PLANNED",
+            "missing": "DSWindowFrame is on the design system's develop branch, not in the release the render draws with"
+          }
+        ]
+      },
+      {
+        "code": "ART_PHOTO",
+        "title": "Photo",
+        "description": "a captured picture, framed flush and rounded, at an aspect ratio for each placement and with no words baked into the image",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "the one picture a feature's words introduce, or the one picture of the person in a quote",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.293",
+            "RULE.SUPPORT.SURFACE.541",
+            "RULE.SUPPORT.SURFACE.548"
+          ],
+          "notWhen": []
+        },
+        "config": {
+          "mtype": "MEDIA"
+        },
+        "units": [
+          {
+            "unit": "DSImage in DSAspectRatio",
+            "part": null,
+            "role": "carrier",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "placedOn": "FEATURE or SECTION",
+          "through": "media or mediaNode"
+        },
+        "style": {
+          "framing": "FLUSH_ROUNDED",
+          "kindValue": "photo: FLUSH_ROUNDED"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "ICON_MARK",
+        "title": "Icon and mark",
+        "description": "a mark, a picture or an icon that stands for a thing or a person, and a bare icon, the small picture of a line a person reads",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "an item's own small picture: a door and a thing of its own take a mark (DSMark), and a point, a title and one line with no link and no order, takes a bare icon (DSIcon); icons go on all of a group's items or on none; its forms: a bare icon and a mark",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.287",
+            "RULE.SUPPORT.SURFACE.344"
+          ],
+          "notWhen": []
+        },
+        "config": {
+          "mtype": "MEDIA"
+        },
+        "units": [
+          {
+            "unit": "DSMark, DSIcon, DSAvatar through DSItemMediaType",
+            "part": null,
+            "role": "carrier",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "placedOn": "ITEM",
+          "through": "item media"
+        },
+        "style": {
+          "thingOfItsOwn": {
+            "media": "MARK"
+          },
+          "lineAPersonReads": {
+            "media": "ICON"
+          },
+          "door": {
+            "media": "MARK"
+          },
+          "point": {
+            "media": "BARE_ICON"
+          },
+          "navigationEntry": "BARE_ICON",
+          "action": "ICON_INSIDE_THE_CONTROL",
+          "oneGroupHoldsOne": true,
+          "iconsOnAllOrNone": true
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "DATA_CHART",
+        "title": "Chart",
+        "description": "the figures a page draws, such as a chart or a row of numbers, whose axis labels take the scale's text levels and whose grid takes its lines",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "a wide table or a chart standing under the words, or a stats section whose numbers carry the claim with no picture beside them",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.536",
+            "RULE.SUPPORT.SURFACE.542"
+          ],
+          "notWhen": []
+        },
+        "config": {
+          "mtype": "MEDIA"
+        },
+        "units": [
+          {
+            "unit": "DSFeature items type STATS; DSTable",
+            "part": null,
+            "role": "carrier",
+            "props": {}
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "chart",
+            "props": {
+              "value": "no unit: DSChart is missing"
+            }
+          }
+        ],
+        "placement": {
+          "placedOn": "FEATURE",
+          "through": "items or media",
+          "type": "under the words, or a stats section with no picture"
+        },
+        "style": {
+          "framing": "the drawing scale: axis text levels, grid lines"
+        },
+        "status": "PLANNED",
+        "missing": "DSChart"
+      },
+      {
+        "code": "MOTION_VIDEO",
+        "title": "Video",
+        "description": "a medium that moves or plays, such as a video, framed at 16:9 on a page",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "a video in its frame on the page or as the art behind a section's words, edge to edge; a moving backdrop stands still for a visitor who asked for reduced motion; its forms: a player and edge to edge",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.444"
+          ],
+          "notWhen": []
+        },
+        "config": {
+          "mtype": "MEDIA"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "carrier",
+            "props": {
+              "value": "a node on mediaNode or media; no video unit: DSVideo is missing"
+            }
+          }
+        ],
+        "placement": {
+          "placedOn": "SECTION (edge to edge) or FEATURE (16:9)",
+          "through": "mediaNode or media"
+        },
+        "style": {
+          "framing": "16:9 in a frame",
+          "notes": [
+            {
+              "on": "reducedMotion",
+              "value": "a moving backdrop stands still"
+            }
+          ]
+        },
+        "status": "PLANNED",
+        "missing": "DSVideo"
+      },
+      {
+        "code": "ART_3D",
+        "title": "3D",
+        "description": "a three-dimensional picture; the book states no property of its own for it",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "where its size fits, on the section, the feature or the item, in the design system's tokens only, as every medium is placed",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.526"
+          ],
+          "notWhen": []
+        },
+        "config": {
+          "mtype": "MEDIA"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "carrier",
+            "props": {
+              "value": "none: no unit draws it"
+            }
+          }
+        ],
+        "placement": {
+          "placedOn": "SECTION, FEATURE or ITEM, where its size fits"
+        },
+        "style": {
+          "framing": "design system tokens only",
+          "notes": [
+            {
+              "on": "properties",
+              "value": "the book states none"
+            }
+          ]
+        },
+        "status": "PLANNED",
+        "missing": "a three-dimensional view unit"
+      },
+      {
+        "code": "VIEW_CODE",
+        "title": "Code view",
+        "description": "Show me the real code.",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a reader who trusts source over words"
+          },
+          "chooseWhen": "code in its frame, with a copy; its forms: an editor with tabs and a terminal",
+          "notWhen": [
+            {
+              "condition": "The code is two things compared",
+              "instead": "two code blocks in READ_ARTICLE's body, the author's"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "MEDIA"
+        },
+        "units": [
+          {
+            "unit": "DSCodeBlockView",
+            "part": "COMPONENT",
+            "role": "carrier",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "placedOn": "FEATURE",
+          "through": "media",
+          "type": "MEDIA_BOTTOM when a line runs past about 70 characters, else SPLIT_END"
+        },
+        "style": {
+          "framing": "CODE_FRAME_FLAT",
+          "kindValue": "code: CODE_FRAME_FLAT"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "VIEW_EMBED",
+        "title": "Embed",
+        "description": "Let me try it here.",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a reader who wants to use it before they leave"
+          },
+          "chooseWhen": "a live page of its own, in a frame; its forms: a browser window and bare",
+          "notWhen": [
+            {
+              "condition": "A picture of it is enough",
+              "instead": "VIEW_PRODUCT"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "MEDIA"
+        },
+        "units": [
+          {
+            "unit": "DSEmbed",
+            "part": "COMPONENT",
+            "role": "carrier",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "placedOn": "FEATURE",
+          "through": "media",
+          "notes": [
+            {
+              "on": "height",
+              "value": "GIVEN"
+            },
+            {
+              "on": "title",
+              "value": "REQUIRED"
+            }
+          ]
+        },
+        "style": {
+          "framing": "FRAMED_RAISED",
+          "notes": [
+            {
+              "on": "sandbox",
+              "value": "srcDoc runs with nothing allowed"
+            }
+          ]
+        },
+        "status": "BUILT"
+      }
+    ],
+    "MOTION": [
+      {
+        "code": "ARRIVAL",
+        "title": "Arrival",
+        "description": "Did a section arrive?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a Visitor scrolling"
+          },
+          "chooseWhen": "a section's text rises as it enters the view, once",
+          "notWhen": [
+            {
+              "condition": "Reduced motion is asked",
+              "instead": "stand still"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "MOTION"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "hook",
+            "props": {
+              "value": "useDSReveal"
+            }
+          }
+        ],
+        "placement": {
+          "on": "a STATEMENT and a feature's words"
+        },
+        "style": {
+          "speed": "the shared motion tokens",
+          "notes": [
+            {
+              "on": "text",
+              "value": "RISE"
+            },
+            {
+              "on": "angle",
+              "value": "NONE_SET"
+            }
+          ]
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "COUNT_UP",
+            "when": "a measured number counts up from zero as it arrives, once",
+            "units": [
+              {
+                "unit": "useDSReveal",
+                "part": null,
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {},
+            "style": {},
+            "status": "PLANNED",
+            "missing": "a count motion: the reveal fades, rises or zooms a number, never counts it"
+          }
+        ]
+      },
+      {
+        "code": "HOVER",
+        "title": "Hover",
+        "description": "What can I press?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a reader with a pointer"
+          },
+          "chooseWhen": "a door lights as one target; its arrow moves only while hovered or pressed",
+          "notWhen": [
+            {
+              "condition": "A phone",
+              "instead": "reads the same with no hover"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "MOTION"
+        },
+        "units": [
+          {
+            "unit": "DSItem anchor, DSFeature items",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "on": "EXPLAIN_DOORS"
+        },
+        "style": {
+          "door": "LIT_AS_ONE_TARGET_UNDER_THE_POINTER",
+          "arrow": "MOVES_ONLY_WHILE_HOVERED_OR_PRESSED"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "MOVING_BACKDROP",
+        "title": "Moving backdrop",
+        "description": "Is the scene alive?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a Visitor on a landing hero"
+          },
+          "chooseWhen": "art behind the words that moves slowly",
+          "notWhen": [
+            {
+              "condition": "Reduced motion is asked",
+              "instead": "it stands still"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "MOTION"
+        },
+        "units": [
+          {
+            "unit": "DSSectionContainer.mediaNode",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "on": "a hero, one per page"
+        },
+        "style": {
+          "speed": "the shared motion tokens",
+          "notes": [
+            {
+              "on": "reducedMotion",
+              "value": "STILL"
+            }
+          ]
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "PRODUCT_AT_WORK",
+            "when": "a product view drawn from the design system's own units plays a short scripted run: a reply types, a feed ticks",
+            "units": [
+              {
+                "unit": "the design system's units",
+                "part": null,
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "useDSReveal",
+                "part": null,
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {},
+            "style": {},
+            "status": "PLANNED",
+            "missing": "a scripted run for a drawn product view"
+          }
+        ]
+      }
+    ],
+    "WORDS": [
+      {
+        "code": "PARAGRAPH",
+        "title": "Paragraph",
+        "description": "a paragraph a person reads",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "standing the content of a page or of a part; the page writes the step",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.103"
+          ]
+        },
+        "config": {
+          "mtype": "WORDS"
+        },
+        "units": [
+          {
+            "unit": "DSText",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "text of a section, a feature, an item or a row; the page writes the step"
+        },
+        "style": {
+          "typography": "CONTENT_MD",
+          "unitValue": {
+            "unit": "DSText",
+            "typography": "CONTENT_MD"
+          },
+          "length": {
+            "words": {
+              "max": 60,
+              "forAReason": true
+            },
+            "sentenceWords": {
+              "max": 25
+            }
+          },
+          "lengthSource": "the book's docs rules: a heading below a section's at most five words with no comma (RULE.DEVEX.WORKSPACE.451); a page's short name at most three words (05-pages.md, the short name); a paragraph gives a reason in at most 60 words and a list holds at most 7 items each under 25 words (06-blocks.md); one clause per sentence, none past twenty-five words (RULE.DEVEX.WORKSPACE.106)"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "ROW",
+        "title": "Row",
+        "description": "words a person scans down a list: a line of a row, a cell, a card's body",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "standing a row, a cell, a card; the page writes the step",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.103"
+          ]
+        },
+        "config": {
+          "mtype": "WORDS"
+        },
+        "units": [
+          {
+            "unit": "DSText",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "text of a section, a feature, an item or a row; the page writes the step"
+        },
+        "style": {
+          "typography": "CONTENT_SM",
+          "unitValue": {
+            "typography": "CONTENT_SM"
+          },
+          "length": {
+            "clausesPerSentence": 1,
+            "sentenceWords": {
+              "max": 25
+            }
+          },
+          "lengthSource": "the book's docs rules: a heading below a section's at most five words with no comma (RULE.DEVEX.WORKSPACE.451); a page's short name at most three words (05-pages.md, the short name); a paragraph gives a reason in at most 60 words and a list holds at most 7 items each under 25 words (06-blocks.md); one clause per sentence, none past twenty-five words (RULE.DEVEX.WORKSPACE.106)"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "LABEL",
+        "title": "Label",
+        "description": "a label a person reads to learn what a value is, or a fact",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "standing beside its value, among facts; the page writes the step and the tone",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.166"
+          ]
+        },
+        "config": {
+          "mtype": "WORDS"
+        },
+        "units": [
+          {
+            "unit": "DSText",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "text of a section, a feature, an item or a row; the page writes the step"
+        },
+        "style": {
+          "typography": {
+            "typography": "CONTENT_SM",
+            "tone": "MUTED"
+          },
+          "unitValue": {
+            "typography": "CONTENT_SM",
+            "tone": "MUTED"
+          },
+          "length": {
+            "words": {
+              "min": 1,
+              "max": 3
+            }
+          },
+          "lengthSource": "the book's docs rules: a heading below a section's at most five words with no comma (RULE.DEVEX.WORKSPACE.451); a page's short name at most three words (05-pages.md, the short name); a paragraph gives a reason in at most 60 words and a list holds at most 7 items each under 25 words (06-blocks.md); one clause per sentence, none past twenty-five words (RULE.DEVEX.WORKSPACE.106)"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "DESCRIPTION",
+        "title": "Description",
+        "description": "a description that stands a step back under a title the page draws itself",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "standing under the title; the page writes the step and the tone",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.143"
+          ]
+        },
+        "config": {
+          "mtype": "WORDS"
+        },
+        "units": [
+          {
+            "unit": "DSText",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "text of a section, a feature, an item or a row; the page writes the step"
+        },
+        "style": {
+          "typography": {
+            "tone": "QUIET"
+          },
+          "length": {
+            "pageLine": {
+              "sentences": {
+                "max": 2
+              },
+              "sentenceWords": {
+                "max": 25
+              }
+            },
+            "itemLine": {
+              "words": {
+                "max": 25
+              }
+            }
+          },
+          "lengthSource": "the book's docs rules: a heading below a section's at most five words with no comma (RULE.DEVEX.WORKSPACE.451); a page's short name at most three words (05-pages.md, the short name); a paragraph gives a reason in at most 60 words and a list holds at most 7 items each under 25 words (06-blocks.md); one clause per sentence, none past twenty-five words (RULE.DEVEX.WORKSPACE.106)"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "NOTE",
+        "title": "Note",
+        "description": "a note that stands back from what it notes: a line under a list, the time or the person beside an entry, a site's fine print",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "standing under or beside what it notes; the page writes the step and the tone",
+          "notWhen": [
+            {
+              "condition": "A note that interrupts the reading: mind this, a warning or a tip",
+              "instead": "a callout block in READ_ARTICLE's body"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "WORDS"
+        },
+        "units": [
+          {
+            "unit": "DSText",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "text of a section, a feature, an item or a row; the page writes the step"
+        },
+        "style": {
+          "typography": {
+            "typography": "CONTENT_SM",
+            "tone": "SUBTLE"
+          },
+          "unitValue": {
+            "tone": "SUBTLE"
+          }
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "FINE_PRINT",
+            "when": "a site's fine print, at CONTENT_XS",
+            "why": "the developer, 2026-11-25: 'I am not looking at each groups and kinds its too much so u only manage it better', 'and make sure they are not overallping' (the overlap check, notes/N017/work/catalogue-overlap-check.md)",
+            "units": [
+              {
+                "unit": "DSText",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {},
+            "style": {
+              "size": "CONTENT_XS"
+            },
+            "status": "BUILT"
+          }
+        ]
+      },
+      {
+        "code": "TITLE",
+        "title": "Title",
+        "description": "a title the page draws itself, where no box gives one: a group of a form, a name in a step",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "standing over what it names; the page writes the step",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.103"
+          ]
+        },
+        "config": {
+          "mtype": "WORDS"
+        },
+        "units": [
+          {
+            "unit": "DSText",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "text of a section, a feature, an item or a row; the page writes the step"
+        },
+        "style": {
+          "typography": "TITLE_SM..TITLE_LG by level",
+          "length": {
+            "pageTitle": {
+              "words": {
+                "max": 3
+              }
+            },
+            "sectionTitle": {
+              "words": {
+                "max": 5
+              },
+              "comma": false
+            },
+            "itemTitle": {
+              "words": {
+                "max": 5
+              },
+              "comma": false
+            }
+          },
+          "lengthSource": "the book's docs rules: a heading below a section's at most five words with no comma (RULE.DEVEX.WORKSPACE.451); a page's short name at most three words (05-pages.md, the short name); a paragraph gives a reason in at most 60 words and a list holds at most 7 items each under 25 words (06-blocks.md); one clause per sentence, none past twenty-five words (RULE.DEVEX.WORKSPACE.106)"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "DISPLAY_HEADING",
+        "title": "Display heading",
+        "description": "a display heading: a site's band, a home's greeting",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "standing the head of a band; the page writes the step",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.103"
+          ]
+        },
+        "config": {
+          "mtype": "WORDS"
+        },
+        "units": [
+          {
+            "unit": "DSText",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "text of a section, a feature, an item or a row; the page writes the step"
+        },
+        "style": {
+          "typography": "HEADING_LG and up as the container kinds give it",
+          "length": {
+            "heroTitle": {
+              "words": {
+                "max": 8
+              },
+              "lines": {
+                "max": 2
+              }
+            }
+          },
+          "lengthSource": "the book's docs rules: a heading below a section's at most five words with no comma (RULE.DEVEX.WORKSPACE.451); a page's short name at most three words (05-pages.md, the short name); a paragraph gives a reason in at most 60 words and a list holds at most 7 items each under 25 words (06-blocks.md); one clause per sentence, none past twenty-five words (RULE.DEVEX.WORKSPACE.106)"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "STATE_SENTENCE",
+        "title": "State sentence",
+        "description": "a sentence that reports a state: a count gone wrong, a check that passed",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "standing in the part it reports on; the page writes the step and the colour",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.369"
+          ]
+        },
+        "config": {
+          "mtype": "WORDS"
+        },
+        "units": [
+          {
+            "unit": "DSText",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "text of a section, a feature, an item or a row; the page writes the step"
+        },
+        "style": {},
+        "status": "BUILT"
+      },
+      {
+        "code": "EYEBROW",
+        "title": "Eyebrow",
+        "description": "a short label over a title that the site's look sets in capitals",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "standing over the title; the page writes the step, the tone and the format"
+        },
+        "config": {
+          "mtype": "WORDS"
+        },
+        "units": [
+          {
+            "unit": "DSText",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "text of a section, a feature, an item or a row; the page writes the step"
+        },
+        "style": {
+          "typography": {
+            "typography": "CONTENT_XS",
+            "tone": "MUTED",
+            "format": "UPPERCASE"
+          },
+          "unitValue": {
+            "typography": "CONTENT_XS",
+            "tone": "MUTED",
+            "format": "UPPERCASE"
+          },
+          "length": {
+            "words": {
+              "min": 1,
+              "max": 3
+            }
+          },
+          "lengthSource": "the book's docs rules: a heading below a section's at most five words with no comma (RULE.DEVEX.WORKSPACE.451); a page's short name at most three words (05-pages.md, the short name); a paragraph gives a reason in at most 60 words and a list holds at most 7 items each under 25 words (06-blocks.md); one clause per sentence, none past twenty-five words (RULE.DEVEX.WORKSPACE.106)"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "TERM",
+        "title": "Term",
+        "description": "a word a tooltip explains: a term, an abbreviation",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ]
+          },
+          "chooseWhen": "standing in a line of words; the page writes the underline"
+        },
+        "config": {
+          "mtype": "WORDS"
+        },
+        "units": [
+          {
+            "unit": "DSText",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "text of a section, a feature, an item or a row; the page writes the step"
+        },
+        "style": {},
+        "status": "BUILT"
+      },
+      {
+        "code": "KEYS",
+        "title": "Keys",
+        "description": "Which key?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "LEARNER"
+            ],
+            "reason": "a person doing a task with the keyboard"
+          },
+          "chooseWhen": "a key or a short command, as it is pressed",
+          "notWhen": [
+            {
+              "condition": "A command that is a line of code",
+              "instead": "code view"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "WORDS"
+        },
+        "units": [
+          {
+            "unit": "DSKbd",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "a row, a note, a tooltip"
+        },
+        "style": {
+          "typography": "CONTENT_XS",
+          "look": "keycap"
+        },
+        "status": "BUILT"
+      }
+    ]
+  }
+}

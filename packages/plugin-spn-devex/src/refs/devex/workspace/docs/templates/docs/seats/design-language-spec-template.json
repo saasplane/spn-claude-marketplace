@@ -1,16 +1,15 @@
 {
   "$comment": [
     "RESTATES: spn-foundation docs/02-constructs/02-support/01-surface/12-language-design-language.md § The spec file",
-    "A DESIGN LANGUAGE SPEC, one typed file at docs/specs/surface/languages/<language>/<language>.spdl.json, beside its data/ folder, in the repository that owns the language. It holds only the language's decisions, and its keys are the ones of the catalogue, docs/specs/surface/catalogue.json (03 Surface Catalogue).",
-    "A language depends on no app and names none. An app keeps its own typed theme setting, which names the language and version it was written from.",
-    "shared holds BRAND, DRAWING, MOTION and VOICE. categories holds MARKETING, MARKETPLACE, RESOURCES, DASHBOARD and PORTAL, each with LAYOUTS, PAGES, CONTAINERS and WIDGETS (Structure) and THEME, MEDIA, MOTION and WORDS (Style); a language keeps the categories it states and inherits the rest from its parent. A category of its own is NEW and carries family, person and from.",
+    "A DESIGN LANGUAGE SPEC, spdl.json in the language's folder, docs/specs/surface/languages/<language>/, beside types.json, samples.json, data/ and assets/ when samples are drawn, in the repository that owns the language; its name matches the folder. It holds only the language's decisions, and its keys are the ones of the catalogue, the folder docs/specs/surface/catalogue/ (03 Surface Catalogue).",
+    "A language depends on no app and names none. A web app names it in its spsurface.json and keeps its own theme in src/spn.surface.json, never written from the language: a language holds no colour or theme value. A language has no version: it only grows.",
+    "shared holds BRAND, DRAWING, MOTION and VOICE. categories holds MARKETING, MARKETPLACE, RESOURCES, DASHBOARD and PORTAL, each with LAYOUTS, PAGES, CONTAINERS and WIDGETS (Structure) and MEDIA, MOTION and WORDS (Style); a category holds no THEME part; a language keeps the categories it states and inherits the rest from its parent. A category of its own is NEW and carries family, person and from.",
     "A decision is source (OWN, INHERITED or NONE), pick (ALL, the codes, each a KIND or a KIND.CASE, or each kind with its cases), customise, add, notUsed, values and why, which is one or two sentences saying why the language decided this and never repeats a value, a rule's words or the developer's words. customise and add work on the catalogue's kinds and cases and nothing else: a customisation never changes a kind's meaning, an added kind or case is built from units and never reuses a code or changes the kind's reason, an added kind carries for and chooseWhen, a page kind's order may name another case for a section, and the floor is never customised. A page's own departure is stated in the page's tree as departs[] (proposed), never here. values holds the language's own settings, with mtype naming the part.",
     "A child states only what differs: a part it leaves out is INHERITED, and its values merge with its parent's key by key. A parent never lists the languages that extend it.",
     "Delete this $comment in the copy."
   ],
   "name": "{{language}}",
-  "version": "{{1.0.0}}",
-  "extends": "{{parent@major, or null for the root language}}",
+  "extends": "{{base, for every product language; null only for base itself}}",
   "domain": {
     "product": "{{The product this language draws, in one phrase}}",
     "records": [
@@ -182,18 +181,6 @@
         "notUsed": [],
         "values": {
           "mtype": "WIDGETS",
-          "{{a value key of the part}}": "{{The value, in the design system's own names}}"
-        },
-        "why": "{{One or two sentences: why this language decided this, or why it leaves it out. Never the values, which `values` holds; never a rule's words, which its id links; never the developer's words, which the decisions register holds.}}"
-      },
-      "THEME": {
-        "source": "{{OWN | INHERITED | NONE}}",
-        "pick": "{{ALL | [the codes of the catalogue's kinds it uses as they are, each KIND or KIND.CASE] | {KIND: [CASE, ...] | ALL}}}",
-        "customise": [],
-        "add": [],
-        "notUsed": [],
-        "values": {
-          "mtype": "THEME",
           "{{a value key of the part}}": "{{The value, in the design system's own names}}"
         },
         "why": "{{One or two sentences: why this language decided this, or why it leaves it out. Never the values, which `values` holds; never a rule's words, which its id links; never the developer's words, which the decisions register holds.}}"

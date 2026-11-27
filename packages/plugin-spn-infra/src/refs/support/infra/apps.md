@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/05-apps.md",
-      "seen": "551ec2ed"
+      "seen": "dc1b9a8f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/05-apps/",
@@ -151,7 +151,7 @@ export interface SPInfraEstateAppDeploymentWeb extends SPInfraEstateAppDeploymen
 
 **A publicly exposed web deployment is a bundle** — assets behind an edge, no process of its own, no port, no workload. **A privately exposed one is not** — it is a process serving files behind the internal zone and needs a workload like anything else. A server-rendered application binds a port in every environment exactly as a service does; without a declared port, local port discovery falls back to pattern-matching the application's own configuration, which stops matching the moment the number becomes a constant or the key gets renamed, and the first sign is an error naming nothing.
 
-A background worker (`SPInfraEstateAppDeploymentProcessor`) declares its scale and nothing else — **the absence of a subdomain is the statement**: it has no inbound surface to name, and resolve refuses anything but `INTERNAL` exposure on it.
+A background worker (a `PROCESSOR` deployment) declares its scale and nothing else — **the absence of a subdomain is the statement**: it has no inbound surface to name, and resolve refuses anything but `INTERNAL` exposure on it.
 
 **Every port a deployment declares sits inside the five hundred local ports its platform declares** (`RULE.SUPPORT.INFRA.062` · MUST · skill:spn-infra/implement). The offsets count from the range's first port.
 

@@ -42,6 +42,10 @@
       "signature": "spnutils apps gen-validators [options] <package>"
     },
     {
+      "command": "apps installed",
+      "signature": "spnutils apps installed [options] [action] [name]"
+    },
+    {
       "command": "apps migrate",
       "signature": "spnutils apps migrate [options] <operation> <package>"
     },

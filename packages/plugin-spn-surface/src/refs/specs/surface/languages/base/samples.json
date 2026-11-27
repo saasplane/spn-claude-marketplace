@@ -1,0 +1,2286 @@
+{
+ "categories": {
+  "MARKETING": {
+   "person": {
+    "type": "VISITOR",
+    "who": "a teacher or an academy thinking of teaching on Atelier",
+    "comes": "from a search or a teacher friend’s link",
+    "asks": "what it costs, how I am paid, and whether my learners will find me",
+    "sees": "Atelier's own site for teachers"
+   },
+   "navigation": {
+    "nav": [
+     [
+      "Teach",
+      "teach"
+     ],
+     [
+      "Workshops",
+      "workshops"
+     ],
+     [
+      "Academies",
+      "academies"
+     ],
+     [
+      "Pricing",
+      "pricing"
+     ],
+     [
+      "Blog",
+      "blog"
+     ]
+    ],
+    "groups": [
+     [
+      "teach",
+      "Teach",
+      [
+       "Courses",
+       "Live workshops",
+       "Payouts"
+      ]
+     ],
+     [
+      "workshops",
+      "Workshops",
+      [
+       "Run a workshop",
+       "Seats and waitlists",
+       "Online workshops"
+      ]
+     ],
+     [
+      "academies",
+      "Academies",
+      [
+       "Academy pages",
+       "Teams of teachers",
+       "Shared payouts"
+      ]
+     ],
+     [
+      "pricing",
+      "Pricing",
+      [
+       "Plans",
+       "Compare plans"
+      ]
+     ],
+     [
+      "blog",
+      "Company",
+      [
+       "About",
+       "Blog",
+       "Careers"
+      ]
+     ]
+    ],
+    "action": [
+     "Start teaching",
+     "MAIN_LANDING"
+    ]
+   },
+   "words": {
+    "org": "Atelier",
+    "promise": "Teach what you know, to people who want to learn it.",
+    "legal": "© 2026 Atelier Learning Pvt. Ltd., Pune. All rights reserved.",
+    "emails": [
+     "teach@atelier.example",
+     "support@atelier.example",
+     "press@atelier.example"
+    ],
+    "claim": "Teach your craft online and in the room",
+    "claim2": "Publish a course, run a live workshop and get paid every month, from one studio built for teachers.",
+    "problem": "Teaching online means five tools and a spreadsheet",
+    "problem2": "A video host, a payment page, a booking form, a mailing list and a sheet of who paid. Atelier is all of it, and your learners see one place.",
+    "facts": [
+     "Courses",
+     "Live workshops",
+     "Payouts",
+     "Academies"
+    ],
+    "heroCta": [
+     "Start teaching",
+     "See how it works"
+    ],
+    "doors": [
+     [
+      "teach",
+      "Teach on Atelier",
+      "Publish a self-paced course with lessons, notes and previews.",
+      "BOOK"
+     ],
+     [
+      "workshops",
+      "Live workshops",
+      "Sell seats for a class in your studio or online, with a waitlist.",
+      "CALENDAR"
+     ],
+     [
+      "academies",
+      "For academies",
+      "One page for your school, a team of teachers and shared payouts.",
+      "USERS"
+     ]
+    ],
+    "points": [
+     [
+      "p1",
+      "Publish in an afternoon",
+      "Upload lessons, mark previews and set a price. Learners can buy the same day.",
+      "UPLOAD"
+     ],
+     [
+      "p2",
+      "Fill every seat",
+      "A workshop page shows the seats left and opens a waitlist when it is full.",
+      "TICKET"
+     ],
+     [
+      "p3",
+      "Paid on the 5th",
+      "Every sale of the month lands in your bank on the 5th, less Atelier’s share.",
+      "WALLET"
+     ]
+    ],
+    "steps": [
+     [
+      "s1",
+      "Create your studio",
+      "Your name, your craft and a photo of where you teach.",
+      ""
+     ],
+     [
+      "s2",
+      "Add a workshop",
+      "Pick a date, a place and the number of seats.",
+      ""
+     ],
+     [
+      "s3",
+      "Open booking",
+      "Share the page; each booking takes a seat and sends a ticket.",
+      ""
+     ],
+     [
+      "s4",
+      "Teach, then get paid",
+      "Mark the workshop done, and the payout joins the month’s.",
+      ""
+     ]
+    ],
+    "qa": [
+     [
+      "What does it cost to teach on Atelier?",
+      "Nothing to start. On Starter you keep 70% of each sale; Pro is ₹1,999 a month and you keep 90%. There is no fee for a free course."
+     ],
+     [
+      "Can I teach live and self-paced?",
+      "Yes. A course is self-paced lessons; a workshop is a dated class with seats, in your studio or online. Most teachers run both."
+     ],
+     [
+      "When am I paid?",
+      "On the 5th of each month, for every sale of the month before, straight to your bank account, with a statement of each sale and refund."
+     ],
+     [
+      "Who owns my course?",
+      "You do. You can export your lessons and your learners’ emails at any time, and take them wherever you teach next."
+     ],
+     [
+      "Can my academy have one page?",
+      "Yes. An academy page lists every teacher and course of your school, and payouts can be shared between your teachers."
+     ],
+     [
+      "What if a learner asks for a refund?",
+      "Courses can be refunded within 14 days if under a third is watched; workshops up to 48 hours before. You see every refund on your statement."
+     ]
+    ],
+    "code": {
+     "file": "embed.html",
+     "language": "HTML",
+     "text": "<atelier-course\n  course=\"product-design\"\n  teacher=\"mira\"\n  theme=\"light\">\n</atelier-course>"
+    },
+    "records": [
+     [
+      "How Mira filled a weekend workshop in two days",
+      "A waitlist, a reminder and a price that ended in nine.",
+      "24 November 2026"
+     ],
+     [
+      "Pricing your first course",
+      "What learners pay for, and what they skip.",
+      "18 November 2026"
+     ],
+     [
+      "Filming lessons on a phone",
+      "Light, sound and one tripod.",
+      "10 November 2026"
+     ],
+     [
+      "Running a workshop online",
+      "What to send before, during and after.",
+      "2 November 2026"
+     ],
+     [
+      "Academy pages, explained",
+      "One school, many teachers, one payout.",
+      "24 October 2026"
+     ],
+     [
+      "A month of payouts",
+      "How a statement reads, line by line.",
+      "15 October 2026"
+     ]
+    ],
+    "quotes": [
+     [
+      "I sold out my first pottery weekend in two days, and the waitlist filled the next one.",
+      "Hana Sato",
+      "Kiln & Co, Pune"
+     ],
+     [
+      "My course used to live in four tools. Now my learners see one page and I see one statement.",
+      "Mira Okafor",
+      "Studio Mira, Bengaluru"
+     ],
+     [
+      "Our six teachers share one academy page and the payouts split themselves.",
+      "Arjun Mehta",
+      "Byte School, Pune"
+     ]
+    ],
+    "people": [
+     [
+      "Devika Rao",
+      "Head of learning"
+     ],
+     [
+      "Sam Okoye",
+      "Support"
+     ],
+     [
+      "Nikhil Bose",
+      "Engineering"
+     ],
+     [
+      "Aisha Khan",
+      "Design"
+     ],
+     [
+      "Joao Costa",
+      "Teacher success"
+     ],
+     [
+      "Mei Tan",
+      "Payments"
+     ],
+     [
+      "Ravi Shah",
+      "Founder"
+     ],
+     [
+      "Sofia Rossi",
+      "Finance"
+     ]
+    ],
+    "plans": [
+     {
+      "name": "Starter",
+      "price": 0,
+      "line": "Publish your first course and keep 70% of each sale.",
+      "feats": [
+       "One course",
+       "Your own teacher page",
+       "Payouts every month"
+      ]
+     },
+     {
+      "name": "Pro",
+      "price": 1999,
+      "line": "For a teacher with courses and workshops, keeping 90%.",
+      "feats": [
+       "Unlimited courses",
+       "Live workshops with seats",
+       "Coupons and bundles"
+      ],
+      "recommended": true
+     },
+     {
+      "name": "Academy",
+      "price": 5999,
+      "line": "For a school with a team of teachers and one page.",
+      "feats": [
+       "Everything in Pro",
+       "Up to 10 teachers",
+       "Shared payouts"
+      ]
+     }
+    ],
+    "planTable": [
+     [
+      "Teaching",
+      [
+       [
+        "Courses",
+        "text",
+        [
+         "1",
+         "Unlimited",
+         "Unlimited"
+        ]
+       ],
+       [
+        "Live workshops",
+        "tick",
+        [
+         "no",
+         "yes",
+         "yes"
+        ]
+       ],
+       [
+        "Teachers",
+        "text",
+        [
+         "1",
+         "1",
+         "Up to 10"
+        ]
+       ]
+      ]
+     ],
+     [
+      "Selling",
+      [
+       [
+        "Your share of a sale",
+        "text",
+        [
+         "70%",
+         "90%",
+         "90%"
+        ]
+       ],
+       [
+        "Coupons and bundles",
+        "tick",
+        [
+         "no",
+         "yes",
+         "yes"
+        ]
+       ],
+       [
+        "Academy page",
+        "tick",
+        [
+         "no",
+         "no",
+         "yes"
+        ]
+       ]
+      ]
+     ],
+     [
+      "Payouts",
+      [
+       [
+        "Payout day",
+        "text",
+        [
+         "The 5th",
+         "The 5th",
+         "The 5th"
+        ]
+       ],
+       [
+        "Shared payouts",
+        "tick",
+        [
+         "no",
+         "no",
+         "yes"
+        ]
+       ]
+      ]
+     ]
+    ],
+    "listings": [],
+    "numbers": [
+     [
+      "1,200+",
+      "teachers"
+     ],
+     [
+      "48,000",
+      "learners"
+     ],
+     [
+      "₹3.1 crore",
+      "paid out last month"
+     ]
+    ],
+    "closing": {
+     "title": "Open your studio today",
+     "description": "Make your teacher page, add a course or a workshop, and share it. Your first learner can book tonight.",
+     "cta": "Start teaching",
+     "second": "Read the teacher guides"
+    },
+    "article": {
+     "title": "How Mira filled a weekend workshop in two days",
+     "lede": "A waitlist, a reminder and a price that ended in nine: what worked, in her own words.",
+     "by": "Mira Okafor",
+     "date": "24 November 2026"
+    },
+    "choose": [
+     [
+      "I teach on my own",
+      "What a teacher’s studio shows first"
+     ],
+     [
+      "I run an academy",
+      "What an academy page shows first"
+     ]
+    ],
+    "marks": [
+     "Studio Mira",
+     "Byte School",
+     "Northlight Academy",
+     "Kiln & Co",
+     "Crumb Collective",
+     "Brightpath Learning"
+    ],
+    "logosLine": "More than 1,200 teachers and 40 academies teach on Atelier, from home studios to schools of twenty.",
+    "places": [
+     [
+      "Pune",
+      "Koregaon Park, 2nd floor"
+     ],
+     [
+      "Bengaluru",
+      "Indiranagar, 100 Feet Road"
+     ]
+    ],
+    "picture": {
+     "hero": "A teacher's studio: a wheel, shelves of pots and a phone on a tripod",
+     "show": "The teacher's studio in Atelier: courses, seats and this month's payout",
+     "proof": "A month's statement, every sale and refund"
+    },
+    "heads": {
+     "popular": [
+      "Live workshops",
+      "Payouts",
+      "Academy pages",
+      "Pricing",
+      "Filming tips"
+     ]
+    },
+    "pageHeroes": {
+     "MAIN_GROUP": [
+      "Everything a teacher needs, in one studio",
+      "Courses, live workshops, payouts and your own page, each explained on its own, so you read the part you need first.",
+      "Start teaching",
+      "See pricing"
+     ],
+     "MAIN_TOPIC": [
+      "Run a live workshop, start to finish",
+      "Pick a date and a place, set the seats, and Atelier sells them, reminds your learners and pays you after.",
+      "Add a workshop",
+      "Read the guide"
+     ],
+     "MAIN_AUDIENCE": [
+      "For academies with a team of teachers",
+      "One page for your school, every teacher’s courses on it, and payouts that split between your teachers by themselves.",
+      "See the Academy plan",
+      "Talk to us"
+     ],
+     "MAIN_PRICING": [
+      "Plans that grow with your teaching",
+      "Start free with one course, move to Pro when you run workshops, and to Academy when you teach as a team.",
+      "Start free",
+      "Compare plans"
+     ],
+     "MAIN_LANDING": [
+      "Run your first workshop this month",
+      "Tell us your craft and your city, and we will help you set the date, the seats and the price in one call.",
+      "Book a call",
+      "See an example"
+     ],
+     "COMPANY_ABOUT": [
+      "We build the studio we wanted as teachers",
+      "Atelier began in Pune in 2022, when two teachers tired of running classes from a spreadsheet. Forty-two of us now build it.",
+      "Meet the team",
+      "Read our values"
+     ],
+     "COMPANY_VALUES": [
+      "What we hold to",
+      "Four values guide what we build for teachers and learners, each with a decision we made because of it.",
+      "Read the values",
+      "See open roles"
+     ],
+     "COMPANY_CONTACT": [
+      "Talk to a person",
+      "Write to teacher success, support or the press team, or visit us in Pune or Bengaluru. We reply within one working day.",
+      "Send a message",
+      "See our offices"
+     ],
+     "COMPANY_TEAM": [
+      "Forty-two people, two cities",
+      "Meet the engineers, designers and teacher-success team behind Atelier, and what each of them works on.",
+      "Meet the team",
+      "See open roles"
+     ],
+     "COMPANY_PRESS": [
+      "Atelier in the news",
+      "Coverage and talks from the last year, each linked to the original, with a press kit and a contact.",
+      "Read the coverage",
+      "Get the press kit"
+     ],
+     "BLOG_HOME": [
+      "Notes for teachers",
+      "Short reads on pricing, filming, workshops and payouts, written by teachers on Atelier and our own team.",
+      "Read the latest",
+      "Subscribe"
+     ],
+     "BLOG_CATEGORY": [
+      "Everything on live workshops",
+      "Eleven notes on running a workshop: dates, seats, waitlists, reminders and what to send after.",
+      "Read the newest",
+      "Subscribe"
+     ],
+     "BLOG_ARTICLE": [
+      "How Mira filled a weekend workshop in two days",
+      "A waitlist, a reminder and a price that ended in nine: what worked, in her own words.",
+      "Read the story",
+      "Share it"
+     ],
+     "BLOG_SEARCH": [
+      "Search the notes",
+      "Find a note by its title, its author or a word in it. Try a craft, a city or a month.",
+      "Search",
+      "Browse all notes"
+     ],
+     "CAREER_HOME": [
+      "Build Atelier with us",
+      "We are forty-two people and hiring three more: an engineer, a designer and a teacher-success lead.",
+      "See open roles",
+      "Read our culture"
+     ],
+     "CAREER_CULTURE": [
+      "How we work",
+      "Written decisions, a weekly demo, and every one of us teaches one class a year on Atelier.",
+      "See open roles",
+      "Meet the team"
+     ],
+     "CAREER_JOBS": [
+      "Three open roles, Pune and Bengaluru",
+      "An engineer, a designer and a teacher-success lead. Read what each does and apply in ten minutes.",
+      "See all roles",
+      "Read our culture"
+     ],
+     "CAREER_JOB": [
+      "Senior engineer, payouts",
+      "Own how every sale becomes a teacher’s payout on the 5th. Full time in Pune, ₹38 to ₹52 lakh and equity.",
+      "Apply now",
+      "Save this role"
+     ],
+     "COMMON_POLICY": [
+      "Teacher terms",
+      "What you agree to when you teach on Atelier: your share, refunds, payouts and who owns your lessons. Last changed 1 October 2026.",
+      "Contact us",
+      "Back to home"
+     ],
+     "COMMON_NOT_FOUND": [
+      "We could not find that page",
+      "The course or page may have moved, or the address may have a typo. Start again from the home page, or search for what you wanted.",
+      "Back to home",
+      "Search Atelier"
+     ],
+     "COMMON_SERVER_ERROR": [
+      "Something went wrong on our side",
+      "We have been told and someone is looking at it now. Your purchases and progress are safe. Try again in a minute.",
+      "Try again",
+      "See status"
+     ],
+     "COMMON_MAINTENANCE": [
+      "Back in about twenty minutes",
+      "We are updating Atelier tonight, 27 November 2026, from 23:30 to 23:50 IST. Lessons you have downloaded keep playing.",
+      "See status",
+      "Contact support"
+     ]
+    }
+   },
+   "pages": [
+    {
+     "page": "MAIN_HOME",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "MAIN_GROUP",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "MAIN_TOPIC",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "MAIN_AUDIENCE",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "MAIN_PRICING",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "MAIN_LANDING",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "COMPANY_ABOUT",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "COMPANY_VALUES",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "COMPANY_CONTACT",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "COMPANY_TEAM",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "COMPANY_PRESS",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "BLOG_HOME",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "BLOG_CATEGORY",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "BLOG_ARTICLE",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "BLOG_SEARCH",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "CAREER_HOME",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "CAREER_CULTURE",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "CAREER_JOBS",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "CAREER_JOB",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "COMMON_POLICY",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "COMMON_NOT_FOUND",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "COMMON_SERVER_ERROR",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "COMMON_MAINTENANCE",
+     "record": null,
+     "as": null
+    }
+   ],
+   "flows": [
+    {
+     "key": "START_TEACHING",
+     "pages": [
+      "MAIN_HOME",
+      "MAIN_PRICING",
+      "MAIN_LANDING"
+     ],
+     "crosses": "DASHBOARD AUTH_FLOW"
+    }
+   ]
+  },
+  "MARKETPLACE": {
+   "person": {
+    "type": "SEEKER",
+    "who": "a learner looking for a course or a workshop",
+    "comes": "from a search, a teacher’s page or a friend",
+    "asks": "is this teacher good, what will I learn, and what does it cost",
+    "sees": "Atelier's catalogue of courses and workshops"
+   },
+   "navigation": {
+    "nav": [
+     [
+      "Courses",
+      "courses"
+     ],
+     [
+      "Workshops",
+      "workshops"
+     ],
+     [
+      "Teachers",
+      "teachers"
+     ],
+     [
+      "Plus",
+      "plus"
+     ]
+    ],
+    "groups": [
+     [
+      "courses",
+      "Courses",
+      [
+       "Design",
+       "Development",
+       "Business",
+       "Photo and video",
+       "Arts and crafts",
+       "Food and drink"
+      ]
+     ],
+     [
+      "workshops",
+      "Workshops",
+      [
+       "This weekend",
+       "Pune",
+       "Bengaluru",
+       "Mumbai",
+       "Online"
+      ]
+     ],
+     [
+      "teachers",
+      "Teachers",
+      [
+       "Mira Okafor",
+       "Arjun Mehta",
+       "Hana Sato"
+      ]
+     ],
+     [
+      "plus",
+      "Plus",
+      [
+       "Atelier Plus",
+       "Teams"
+      ]
+     ]
+    ],
+    "action": [
+     "Cart",
+     "MARKET_CART"
+    ]
+   },
+   "words": {
+    "org": "Atelier",
+    "promise": "Courses and live workshops from teachers who do the work.",
+    "legal": "© 2026 Atelier Learning Pvt. Ltd., Pune. Prices include GST.",
+    "emails": [
+     "hello@atelier.example",
+     "support@atelier.example",
+     "press@atelier.example"
+    ],
+    "claim": "Learn a craft from someone who practises it",
+    "claim2": "Self-paced courses and live workshops in design, code, photography, pottery and food, from independent teachers and academies.",
+    "problem": "A good teacher is hard to find",
+    "problem2": "Every course has a rating, real reviews, a preview lesson and its teacher’s page, so you can choose before you pay.",
+    "facts": [
+     "Courses",
+     "Workshops",
+     "Teachers",
+     "Academies"
+    ],
+    "heroCta": [
+     "Browse courses",
+     "Find a workshop"
+    ],
+    "doors": [
+     [
+      "courses",
+      "Self-paced courses",
+      "Lessons you take at your own pace, yours for life.",
+      "PLAY"
+     ],
+     [
+      "workshops",
+      "Live workshops",
+      "A dated class in a studio or online, with a few seats.",
+      "CALENDAR"
+     ],
+     [
+      "plus",
+      "Atelier Plus",
+      "Every self-paced course for one monthly price.",
+      "STAR"
+     ]
+    ],
+    "points": [
+     [
+      "p1",
+      "Preview before you pay",
+      "Every course opens its first lessons free.",
+      "EYE"
+     ],
+     [
+      "p2",
+      "Refunds in 14 days",
+      "If a course is not for you, get your money back.",
+      "REFRESH"
+     ],
+     [
+      "p3",
+      "A certificate when you finish",
+      "Each course ends with a certificate you can share.",
+      "AWARD"
+     ]
+    ],
+    "steps": [
+     [
+      "s1",
+      "Pick a course or a workshop",
+      "Filter by subject, level, price and city.",
+      ""
+     ],
+     [
+      "s2",
+      "Preview it",
+      "Watch the free lessons, read the reviews.",
+      ""
+     ],
+     [
+      "s3",
+      "Buy or book",
+      "Pay by UPI or card; a workshop sends a ticket.",
+      ""
+     ],
+     [
+      "s4",
+      "Learn",
+      "Pick up where you stopped, on any device.",
+      ""
+     ]
+    ],
+    "qa": [
+     [
+      "How long do I keep a course?",
+      "For life. A course you buy stays in your learning, with every update its teacher makes."
+     ],
+     [
+      "Can I get a refund?",
+      "Within 14 days for a course if you have watched under a third of it; for a workshop, up to 48 hours before it starts."
+     ],
+     [
+      "What is Atelier Plus?",
+      "Every self-paced course for ₹799 a month, 10% off workshops and certificates. Cancel any month."
+     ],
+     [
+      "Do workshops happen online?",
+      "Some do. Each workshop says whether it is in a studio, with its address, or online, with the link sent the day before."
+     ],
+     [
+      "Can my company buy seats?",
+      "Yes. Teams gives a company seats to assign, at ₹1,299 a seat a month, with progress reports."
+     ],
+     [
+      "How do I pay?",
+      "UPI, any card or net banking. Every price includes GST, and the receipt comes by email."
+     ]
+    ],
+    "code": {
+     "file": "order.json",
+     "language": "JSON",
+     "text": "{\n  \"order\": \"ATL-20461\",\n  \"lines\": 3,\n  \"paidWith\": \"UPI\"\n}"
+    },
+    "records": [
+     [
+      "Product design, from brief to handoff",
+      "Mira Okafor · 6 hours · Intermediate",
+      "21 November 2026"
+     ],
+     [
+      "Python for data, the first steps",
+      "Arjun Mehta · 8 hours · Beginner",
+      "18 November 2026"
+     ],
+     [
+      "Wheel-throwing weekend",
+      "Hana Sato · Pune · 6 and 7 December",
+      "15 November 2026"
+     ],
+     [
+      "Sourdough at home",
+      "Ines Varga · 3 hours · All levels",
+      "12 November 2026"
+     ],
+     [
+      "Street photography walk",
+      "Leo Brandt · Mumbai · 13 December",
+      "8 November 2026"
+     ],
+     [
+      "Watercolour landscapes",
+      "Tomas Reyes · 5 hours · Beginner",
+      "1 November 2026"
+     ]
+    ],
+    "quotes": [
+     [
+      "The handoff module alone changed how my team works with engineering.",
+      "Ananya Patel",
+      "Learner, Pune"
+     ],
+     [
+      "Six of us booked Hana’s weekend. We came home with twelve bowls and a plan for more.",
+      "Kabir Shah",
+      "Learner, Delhi"
+     ],
+     [
+      "Arjun explains pandas like a friend who has the time.",
+      "Rohan Iyer",
+      "Learner, Chennai"
+     ]
+    ],
+    "people": [
+     [
+      "Mira Okafor",
+      "Product design"
+     ],
+     [
+      "Arjun Mehta",
+      "Code"
+     ],
+     [
+      "Leo Brandt",
+      "Photography"
+     ],
+     [
+      "Hana Sato",
+      "Pottery"
+     ],
+     [
+      "Ines Varga",
+      "Baking"
+     ],
+     [
+      "Tomas Reyes",
+      "Watercolour"
+     ]
+    ],
+    "plans": [
+     {
+      "name": "Free",
+      "price": 0,
+      "line": "Buy courses one at a time.",
+      "feats": [
+       "Lifetime access to what you buy",
+       "Preview lessons of every course"
+      ]
+     },
+     {
+      "name": "Atelier Plus",
+      "price": 799,
+      "line": "Every self-paced course, for one monthly price.",
+      "feats": [
+       "Every self-paced course",
+       "10% off workshops",
+       "Certificates"
+      ],
+      "recommended": true
+     },
+     {
+      "name": "Teams",
+      "price": 1299,
+      "line": "Per seat, for a company that learns together.",
+      "feats": [
+       "Everything in Plus",
+       "Seats you assign",
+       "Progress reports"
+      ]
+     }
+    ],
+    "planTable": [
+     [
+      "Learning",
+      [
+       [
+        "Self-paced courses",
+        "text",
+        [
+         "Each one you buy",
+         "Every one",
+         "Every one"
+        ]
+       ],
+       [
+        "Workshops",
+        "text",
+        [
+         "Full price",
+         "10% off",
+         "10% off"
+        ]
+       ],
+       [
+        "Certificates",
+        "tick",
+        [
+         "no",
+         "yes",
+         "yes"
+        ]
+       ]
+      ]
+     ],
+     [
+      "For a team",
+      [
+       [
+        "Seats you assign",
+        "tick",
+        [
+         "no",
+         "no",
+         "yes"
+        ]
+       ],
+       [
+        "Progress reports",
+        "tick",
+        [
+         "no",
+         "no",
+         "yes"
+        ]
+       ]
+      ]
+     ]
+    ],
+    "listings": [
+     {
+      "title": "Product design, from brief to handoff",
+      "price": "₹1,499",
+      "facts": {
+       "Teacher": "Mira Okafor",
+       "Level": "Intermediate",
+       "Length": "6 hours",
+       "Rating": "4.8"
+      }
+     },
+     {
+      "title": "Figma for teams",
+      "price": "₹999",
+      "facts": {
+       "Teacher": "Mira Okafor",
+       "Level": "Beginner",
+       "Length": "4 hours",
+       "Rating": "4.6"
+      }
+     },
+     {
+      "title": "Interface typography",
+      "price": "₹1,199",
+      "facts": {
+       "Teacher": "Tomas Reyes",
+       "Level": "All levels",
+       "Length": "3 hours",
+       "Rating": "4.7"
+      }
+     }
+    ],
+    "numbers": [
+     [
+      "48,000",
+      "learners"
+     ],
+     [
+      "1,200+",
+      "teachers"
+     ],
+     [
+      "4.7",
+      "average rating"
+     ]
+    ],
+    "closing": {
+     "title": "Start with a free lesson",
+     "description": "Every course opens its first lessons free. Pick one tonight and see if the teacher is for you.",
+     "cta": "Browse courses",
+     "second": "Find a workshop"
+    },
+    "article": {
+     "title": "Five courses for your first month in design",
+     "lede": "From a first screen to a portfolio review, in the order our teachers suggest.",
+     "by": "Mira Okafor",
+     "date": "20 November 2026"
+    },
+    "choose": [
+     [
+      "I want to learn at my pace",
+      "Self-paced courses"
+     ],
+     [
+      "I want a teacher in the room",
+      "Live workshops"
+     ]
+    ],
+    "marks": [
+     "Studio Mira",
+     "Byte School",
+     "Northlight Academy",
+     "Kiln & Co",
+     "Crumb Collective",
+     "Tomas Reyes Studio"
+    ],
+    "logosLine": "Courses from 1,200 teachers and 40 academies, each with its own page and reviews.",
+    "places": [
+     [
+      "Pune",
+      "Workshops in 6 studios"
+     ],
+     [
+      "Bengaluru",
+      "Workshops in 4 studios"
+     ],
+     [
+      "Mumbai",
+      "Workshops in 3 studios"
+     ]
+    ],
+    "picture": {
+     "hero": "A learner at a kitchen table, a laptop open on a lesson",
+     "show": "A course page with its outline and preview lessons",
+     "proof": "A certificate of completion"
+    },
+    "heads": {
+     "records": [
+      "New this month",
+      "Courses and workshops added by teachers in the last four weeks, each with its first lessons free to preview."
+     ],
+     "points": [
+      "Why learners choose Atelier",
+      "A preview before you pay, a refund if it is not for you, and a certificate when you finish."
+     ],
+     "doors": [
+      "Learn your way",
+      "A course at your own pace, a workshop with a teacher in the room, or Plus for everything."
+     ],
+     "popular": [
+      "Product design",
+      "Python",
+      "Pottery",
+      "Sourdough",
+      "Street photography"
+     ],
+     "heroTag": "1,200 teachers",
+     "shelves": [
+      "Most bought this month",
+      "Workshops this month"
+     ]
+    },
+    "pageHeroes": {
+     "MARKET_CATEGORY": [
+      "Design",
+      "Product, interface and brand design, taught by people who ship.",
+      "Browse design",
+      "Find a workshop"
+     ],
+     "MARKET_SEARCH": [
+      "Results for “design”",
+      "Courses and workshops whose title, teacher or outline say design.",
+      "Refine",
+      "Clear the search"
+     ],
+     "MARKET_COMPARE": [
+      "Compare three design courses",
+      "Price, length, level and rating side by side, so you can pick one.",
+      "Choose a course",
+      "Back to design"
+     ],
+     "MARKET_CART": [
+      "Your cart",
+      "Three items, with GST shown on each line before you pay.",
+      "Check out",
+      "Keep browsing"
+     ],
+     "MARKET_PRICING": [
+      "Learn on your terms",
+      "Buy one course at a time, take every course with Plus, or give your team seats.",
+      "Start Plus",
+      "Compare plans"
+     ],
+     "COMMON_POLICY": [
+      "Refunds and cancellations",
+      "When a course or a workshop can be refunded, and how the money comes back. Last changed 1 October 2026.",
+      "Contact support",
+      "Back to home"
+     ],
+     "COMMON_NOT_FOUND": [
+      "We could not find that page",
+      "The course or page may have moved, or the address may have a typo. Start again from the home page, or search for what you wanted.",
+      "Back to home",
+      "Search Atelier"
+     ],
+     "COMMON_SERVER_ERROR": [
+      "Something went wrong on our side",
+      "We have been told and someone is looking at it now. Your purchases and progress are safe. Try again in a minute.",
+      "Try again",
+      "See status"
+     ],
+     "COMMON_MAINTENANCE": [
+      "Back in about twenty minutes",
+      "We are updating Atelier tonight, 27 November 2026, from 23:30 to 23:50 IST. Lessons you have downloaded keep playing.",
+      "See status",
+      "Contact support"
+     ]
+    }
+   },
+   "pages": [
+    {
+     "page": "MARKET_HOME",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "MARKET_CATEGORY",
+     "record": "subjects/design",
+     "as": null
+    },
+    {
+     "page": "MARKET_BRAND",
+     "record": "orgs/studio-mira",
+     "as": null
+    },
+    {
+     "page": "MARKET_SELLER",
+     "record": "people/mira",
+     "as": null
+    },
+    {
+     "page": "MARKET_SEARCH",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "MARKET_ITEM",
+     "record": "items/product-design",
+     "as": null
+    },
+    {
+     "page": "MARKET_COMPARE",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "MARKET_CART",
+     "record": "orgs/ananya",
+     "as": null
+    },
+    {
+     "page": "MARKET_CHECKOUT",
+     "record": "orgs/ananya",
+     "as": null
+    },
+    {
+     "page": "MARKET_CONFIRMATION",
+     "record": "orgs/ananya",
+     "as": null
+    },
+    {
+     "page": "MARKET_PRICING",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "COMMON_POLICY",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "COMMON_NOT_FOUND",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "COMMON_SERVER_ERROR",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "COMMON_MAINTENANCE",
+     "record": null,
+     "as": null
+    }
+   ],
+   "flows": [
+    {
+     "key": "BUY_A_COURSE",
+     "pages": [
+      "MARKET_HOME",
+      "MARKET_CATEGORY",
+      "MARKET_ITEM",
+      "MARKET_CART",
+      "MARKET_CHECKOUT",
+      "MARKET_CONFIRMATION"
+     ],
+     "record": "items/product-design"
+    }
+   ]
+  },
+  "RESOURCES": {
+   "person": {
+    "type": "LEARNER",
+    "who": "a learner or a teacher with a question",
+    "comes": "from the help link in the app or a search",
+    "asks": "how do I do this, and what changed",
+    "sees": "the help centre, the teacher guides, the docs and the changelog"
+   },
+   "navigation": {
+    "nav": [
+     [
+      "Help",
+      "help"
+     ],
+     [
+      "Guides",
+      "guides"
+     ],
+     [
+      "Docs",
+      "docs"
+     ],
+     [
+      "Changelog",
+      "changelog"
+     ]
+    ],
+    "groups": [
+     [
+      "help",
+      "Help",
+      [
+       "Buying",
+       "Booking",
+       "Refunds",
+       "Payouts"
+      ]
+     ],
+     [
+      "guides",
+      "Guides",
+      [
+       "First course",
+       "First workshop",
+       "First payout"
+      ]
+     ],
+     [
+      "docs",
+      "Docs",
+      [
+       "Embed",
+       "Webhooks",
+       "API"
+      ]
+     ],
+     [
+      "changelog",
+      "Changelog",
+      [
+       "What changed",
+       "Roadmap"
+      ]
+     ]
+    ],
+    "action": [
+     "Contact support",
+     "COMMON_CONTACT"
+    ]
+   },
+   "words": {
+    "org": "Atelier",
+    "promise": "Help for learners and teachers, in plain words.",
+    "legal": "© 2026 Atelier Learning Pvt. Ltd., Pune.",
+    "emails": [
+     "support@atelier.example",
+     "teach@atelier.example",
+     "docs@atelier.example"
+    ],
+    "claim": "How can we help?",
+    "claim2": "Answers for learners and teachers, guides for your first course, docs for the embed and the API, and what changed.",
+    "problem": "Stuck on a booking or a payout?",
+    "problem2": "Search the help, or open the guide for the task in front of you. A person answers every message within a day.",
+    "facts": [
+     "Help",
+     "Guides",
+     "Docs",
+     "Changelog"
+    ],
+    "heroCta": [
+     "Search the help",
+     "Contact support"
+    ],
+    "doors": [
+     [
+      "help",
+      "Help centre",
+      "Answers on buying, booking, refunds and payouts.",
+      "HELP"
+     ],
+     [
+      "guides",
+      "Teacher guides",
+      "Step-by-step guides for your first course and workshop.",
+      "BOOK"
+     ],
+     [
+      "docs",
+      "Docs",
+      "Embed a course on your site, or read the API.",
+      "CODE"
+     ]
+    ],
+    "points": [
+     [
+      "p1",
+      "Publish your first course",
+      "Lessons, previews and a price in under an hour.",
+      "UPLOAD"
+     ],
+     [
+      "p2",
+      "Add a workshop",
+      "A date, a place and the seats, then open booking.",
+      "CALENDAR"
+     ],
+     [
+      "p3",
+      "Read your statement",
+      "Every sale and refund of the month, line by line.",
+      "FILE"
+     ]
+    ],
+    "steps": [
+     [
+      "s1",
+      "Open your studio",
+      "Settings, then Payouts.",
+      ""
+     ],
+     [
+      "s2",
+      "Add your bank",
+      "Account number and IFSC.",
+      ""
+     ],
+     [
+      "s3",
+      "Verify it",
+      "A one-rupee deposit arrives within a day.",
+      ""
+     ],
+     [
+      "s4",
+      "Get paid",
+      "Payouts land on the 5th.",
+      ""
+     ]
+    ],
+    "qa": [
+     [
+      "Can I get a refund for Wheel-throwing weekend?",
+      "Yes, up to 48 hours before it starts, on 6 December. After that your seat can pass to a friend."
+     ],
+     [
+      "How do mentor reviews work?",
+      "In Portfolio review, Mira reviews your work live, in a group of eight. You book a slot when you buy."
+     ],
+     [
+      "Where is my certificate?",
+      "In My learning, under Certificates, once every lesson is marked done."
+     ],
+     [
+      "When does my payout arrive?",
+      "On the 5th, for the month before, in the bank account you verified."
+     ],
+     [
+      "Can I move my course from another site?",
+      "Yes. Upload your videos, or link them, and import your learners by email."
+     ],
+     [
+      "How do I embed a course?",
+      "Paste the atelier-course tag on your site; the docs show each option."
+     ]
+    ],
+    "code": {
+     "file": "embed.html",
+     "language": "HTML",
+     "text": "<script src=\"https://atelier.example/embed.js\"></script>\n<atelier-course course=\"product-design\"></atelier-course>"
+    },
+    "records": [
+     [
+      "Your first course in a week",
+      "A seven-day path from idea to published.",
+      "22 November 2026"
+     ],
+     [
+      "Pricing a workshop",
+      "Seats, early birds and a waitlist.",
+      "17 November 2026"
+     ],
+     [
+      "Filming with a phone",
+      "Light, sound and a tripod.",
+      "11 November 2026"
+     ],
+     [
+      "Writing a course outline",
+      "Sections, lessons and previews.",
+      "4 November 2026"
+     ],
+     [
+      "Coupons and bundles",
+      "When to discount and when not to.",
+      "28 October 2026"
+     ],
+     [
+      "Reading your statement",
+      "Sales, refunds and Atelier’s share.",
+      "20 October 2026"
+     ]
+    ],
+    "quotes": [
+     [
+      "The first-course guide took me from nothing to published in five evenings.",
+      "Tomas Reyes",
+      "Teacher, Goa"
+     ],
+     [
+      "I found my refund answer in ten seconds.",
+      "Ananya Patel",
+      "Learner, Pune"
+     ],
+     [
+      "The embed docs are the shortest I have read, and they work.",
+      "Farid Khan",
+      "Brightpath Learning"
+     ]
+    ],
+    "people": [
+     [
+      "Sam Okoye",
+      "Support lead"
+     ],
+     [
+      "Joao Costa",
+      "Teacher success"
+     ],
+     [
+      "Nikhil Bose",
+      "Docs"
+     ]
+    ],
+    "plans": [
+     {
+      "name": "Free",
+      "price": 0,
+      "line": "Buy courses one at a time.",
+      "feats": [
+       "Lifetime access to what you buy",
+       "Preview lessons of every course"
+      ]
+     },
+     {
+      "name": "Atelier Plus",
+      "price": 799,
+      "line": "Every self-paced course, for one monthly price.",
+      "feats": [
+       "Every self-paced course",
+       "10% off workshops",
+       "Certificates"
+      ],
+      "recommended": true
+     },
+     {
+      "name": "Teams",
+      "price": 1299,
+      "line": "Per seat, for a company that learns together.",
+      "feats": [
+       "Everything in Plus",
+       "Seats you assign",
+       "Progress reports"
+      ]
+     }
+    ],
+    "planTable": [
+     [
+      "Learning",
+      [
+       [
+        "Self-paced courses",
+        "text",
+        [
+         "Each one you buy",
+         "Every one",
+         "Every one"
+        ]
+       ],
+       [
+        "Workshops",
+        "text",
+        [
+         "Full price",
+         "10% off",
+         "10% off"
+        ]
+       ],
+       [
+        "Certificates",
+        "tick",
+        [
+         "no",
+         "yes",
+         "yes"
+        ]
+       ]
+      ]
+     ],
+     [
+      "For a team",
+      [
+       [
+        "Seats you assign",
+        "tick",
+        [
+         "no",
+         "no",
+         "yes"
+        ]
+       ],
+       [
+        "Progress reports",
+        "tick",
+        [
+         "no",
+         "no",
+         "yes"
+        ]
+       ]
+      ]
+     ]
+    ],
+    "listings": [],
+    "numbers": [
+     [
+      "24",
+      "help topics"
+     ],
+     [
+      "8",
+      "teacher guides"
+     ],
+     [
+      "< 1 day",
+      "to a person’s answer"
+     ]
+    ],
+    "closing": {
+     "title": "Still stuck?",
+     "description": "Write to us. A person on the support team reads every message and answers within one working day.",
+     "cta": "Contact support",
+     "second": "Search the help"
+    },
+    "article": {
+     "title": "Your first course in a week",
+     "lede": "Seven evenings, one step each, from an idea to a published course with previews.",
+     "by": "Joao Costa",
+     "date": "22 November 2026"
+    },
+    "choose": [
+     [
+      "I am learning",
+      "Help for learners"
+     ],
+     [
+      "I am teaching",
+      "Help for teachers"
+     ]
+    ],
+    "marks": [],
+    "logosLine": "",
+    "places": [
+     [
+      "Pune",
+      "Support, 9:00 to 21:00 IST"
+     ],
+     [
+      "Bengaluru",
+      "Teacher success, 10:00 to 19:00 IST"
+     ]
+    ],
+    "picture": {
+     "hero": "A support desk with a headset and a cup of chai",
+     "show": "A guide page with its steps",
+     "proof": "A changelog entry"
+    },
+    "heads": {
+     "records": [
+      "Every guide, newest first",
+      "Step-by-step guides for teachers, each checked against Atelier as it is today."
+     ],
+     "points": [
+      "Three things to do in your first week",
+      "Publish a course, add a workshop and read your first statement. Each takes under an hour."
+     ],
+     "doors": [
+      "Start with what you need",
+      "Search the help for an answer, open a guide for a task, or read the docs to embed a course."
+     ],
+     "popular": [
+      "Refunds",
+      "Payouts",
+      "Certificates",
+      "Embed a course",
+      "Waitlists"
+     ],
+     "heroTag": "Updated 26 November 2026"
+    },
+    "pageHeroes": {
+     "DOCS_HOME": [
+      "Atelier docs",
+      "Embed a course on your site, listen for bookings with webhooks, and read the API.",
+      "Embed a course",
+      "Read the API"
+     ],
+     "DOCS_SEARCH": [
+      "Search the docs",
+      "Find a tag, an option, an endpoint or a webhook by its name.",
+      "Search",
+      "Browse the docs"
+     ],
+     "GUIDE_HOME": [
+      "Teacher guides",
+      "Step-by-step guides for your first course, your first workshop and your first payout.",
+      "Start the path",
+      "Browse guides"
+     ],
+     "GUIDE_SEARCH": [
+      "Search the guides",
+      "Find a guide by its task: publish, price, film, book or get paid.",
+      "Search",
+      "Browse guides"
+     ],
+     "HELP_HOME": [
+      "How can we help?",
+      "Answers on buying, booking, refunds, certificates and payouts, for learners and teachers.",
+      "Search the help",
+      "Contact support"
+     ],
+     "HELP_CATEGORY": [
+      "Refunds and cancellations",
+      "When a course or a workshop can be refunded, and how the money comes back.",
+      "Ask a question",
+      "Back to help"
+     ],
+     "HELP_SEARCH": [
+      "Results for “refund”",
+      "Help topics that answer refund, for learners and teachers.",
+      "Refine",
+      "Contact support"
+     ],
+     "CHANGELOG_HOME": [
+      "What changed",
+      "Every change to Atelier, dated, newest first: new features, fixes and what to do about them.",
+      "Subscribe",
+      "See the roadmap"
+     ],
+     "ROADMAP_HOME": [
+      "What we are building next",
+      "What is in progress, what is next and what we have heard most from teachers and learners.",
+      "Suggest an idea",
+      "See what changed"
+     ],
+     "COMMON_POLICY": [
+      "Privacy",
+      "What Atelier collects, why we keep it and who can read it. Last changed 1 October 2026.",
+      "Contact privacy",
+      "Back to help"
+     ],
+     "COMMON_NOT_FOUND": [
+      "We could not find that page",
+      "The course or page may have moved, or the address may have a typo. Start again from the home page, or search for what you wanted.",
+      "Back to home",
+      "Search Atelier"
+     ],
+     "COMMON_SERVER_ERROR": [
+      "Something went wrong on our side",
+      "We have been told and someone is looking at it now. Your purchases and progress are safe. Try again in a minute.",
+      "Try again",
+      "See status"
+     ],
+     "COMMON_MAINTENANCE": [
+      "Back in about twenty minutes",
+      "We are updating Atelier tonight, 27 November 2026, from 23:30 to 23:50 IST. Lessons you have downloaded keep playing.",
+      "See status",
+      "Contact support"
+     ]
+    }
+   },
+   "pages": [
+    {
+     "page": "RESOURCES_HOME",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "DOCS_HOME",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "DOCS_PAGE",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "DOCS_SEARCH",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "GUIDE_HOME",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "GUIDE_PAGE",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "GUIDE_SEARCH",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "HELP_HOME",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "HELP_CATEGORY",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "HELP_TOPIC",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "HELP_SEARCH",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "CHANGELOG_HOME",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "CHANGELOG_ENTRY",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "ROADMAP_HOME",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "COMMON_POLICY",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "COMMON_NOT_FOUND",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "COMMON_SERVER_ERROR",
+     "record": null,
+     "as": null
+    },
+    {
+     "page": "COMMON_MAINTENANCE",
+     "record": null,
+     "as": null
+    }
+   ],
+   "flows": [
+    {
+     "key": "FIND_AN_ANSWER",
+     "pages": [
+      "HELP_HOME",
+      "HELP_SEARCH",
+      "HELP_TOPIC"
+     ]
+    }
+   ]
+  },
+  "DASHBOARD": {
+   "person": {
+    "type": "TEAM",
+    "who": "Mira Okafor and the teachers of Studio Mira",
+    "comes": "every morning, to their studio",
+    "asks": "what waits for me today, and how are my courses selling",
+    "sees": "Studio Mira's studio"
+   },
+   "navigation": {
+    "selected": "courses",
+    "nav": [
+     [
+      "home",
+      "Home",
+      "HOME"
+     ],
+     [
+      "courses",
+      "Courses",
+      "BOOK"
+     ],
+     [
+      "workshops",
+      "Workshops",
+      "CALENDAR"
+     ],
+     [
+      "learners",
+      "Learners",
+      "USERS"
+     ],
+     [
+      "sales",
+      "Sales",
+      "WALLET"
+     ],
+     [
+      "reviews",
+      "Reviews",
+      "STAR"
+     ],
+     [
+      "messages",
+      "Messages",
+      "MAIL"
+     ],
+     [
+      "settings",
+      "Settings",
+      "SETTINGS"
+     ]
+    ],
+    "dock": [
+     [
+      "studio",
+      "Studio",
+      "SETTINGS"
+     ],
+     [
+      "payouts",
+      "Payouts",
+      "CREDIT_CARD"
+     ],
+     [
+      "team",
+      "Team",
+      "USERS"
+     ]
+    ]
+   },
+   "words": {
+    "org": "Studio Mira"
+   },
+   "pages": [
+    {
+     "page": "HOME_APP",
+     "record": null,
+     "as": "members/mira@studio-mira",
+     "cases": {
+      "FIRST_USE": {
+       "record": "orgs/noor-studio",
+       "as": "members/noor@noor-studio"
+      }
+     }
+    },
+    {
+     "page": "ANALYTICS_HOME",
+     "record": null,
+     "as": "members/mira@studio-mira"
+    },
+    {
+     "page": "ANALYTICS_REPORT",
+     "record": null,
+     "as": "members/mira@studio-mira"
+    },
+    {
+     "page": "RECORD_HOME",
+     "record": "items",
+     "as": "members/mira@studio-mira"
+    },
+    {
+     "page": "RECORD_VIEW",
+     "record": "items/product-design",
+     "as": "members/mira@studio-mira"
+    },
+    {
+     "page": "RECORD_ENTRY",
+     "record": "items/product-design",
+     "as": "members/mira@studio-mira"
+    },
+    {
+     "page": "SETUP_COMPARE",
+     "record": "plans",
+     "as": "members/mira@studio-mira"
+    },
+    {
+     "page": "SETUP_HOME",
+     "record": "orgs/studio-mira",
+     "as": "members/mira@studio-mira"
+    },
+    {
+     "page": "AUTH_FLOW",
+     "record": null,
+     "as": "members/mira@studio-mira",
+     "cases": {
+      "INVITE": {
+       "record": "invitations/zara-to-studio-mira",
+       "as": null
+      },
+      "VERIFY": {
+       "record": "signups/karan-pending",
+       "as": null
+      }
+     }
+    },
+    {
+     "page": "COMMON_NOT_FOUND",
+     "record": null,
+     "as": "members/mira@studio-mira"
+    },
+    {
+     "page": "COMMON_NO_ACCESS",
+     "record": null,
+     "as": "members/mira@studio-mira"
+    },
+    {
+     "page": "COMMON_SERVER_ERROR",
+     "record": null,
+     "as": "members/mira@studio-mira"
+    },
+    {
+     "page": "COMMON_MAINTENANCE",
+     "record": null,
+     "as": "members/mira@studio-mira"
+    },
+    {
+     "page": "COMMON_LOCK_SCREEN",
+     "record": null,
+     "as": "members/mira@studio-mira"
+    }
+   ],
+   "flows": [
+    {
+     "key": "PUBLISH_A_COURSE",
+     "pages": [
+      "RECORD_HOME",
+      "RECORD_ENTRY",
+      "RECORD_VIEW"
+     ],
+     "record": "items/product-design"
+    }
+   ]
+  },
+  "PORTAL": {
+   "person": {
+    "type": "INDIVIDUAL",
+    "who": "Ananya Patel, a learner",
+    "comes": "to continue a course or find a booking",
+    "asks": "where was I, and when is my next workshop",
+    "sees": "Ananya's own account"
+   },
+   "navigation": {
+    "selected": "learning",
+    "nav": [
+     [
+      "learning",
+      "My learning",
+      "PLAY"
+     ],
+     [
+      "bookings",
+      "Bookings",
+      "CALENDAR"
+     ],
+     [
+      "orders",
+      "Orders",
+      "STORE"
+     ],
+     [
+      "certificates",
+      "Certificates",
+      "AWARD"
+     ],
+     [
+      "messages",
+      "Messages",
+      "MAIL"
+     ]
+    ],
+    "dock": [
+     [
+      "profile",
+      "Profile",
+      "USER"
+     ],
+     [
+      "signin",
+      "Sign-in",
+      "KEY"
+     ],
+     [
+      "notifications",
+      "Notifications",
+      "BELL"
+     ]
+    ]
+   },
+   "words": {
+    "org": "Atelier"
+   },
+   "pages": [
+    {
+     "page": "HOME_APP",
+     "record": null,
+     "as": "members/ananya@ananya"
+    },
+    {
+     "page": "RECORD_HOME",
+     "record": "members/ananya@ananya",
+     "as": "members/ananya@ananya"
+    },
+    {
+     "page": "RECORD_VIEW",
+     "record": "items/python-data",
+     "as": "members/ananya@ananya"
+    },
+    {
+     "page": "RECORD_ENTRY",
+     "record": "people/ananya",
+     "as": "members/ananya@ananya"
+    },
+    {
+     "page": "SETUP_COMPARE",
+     "record": "plans",
+     "as": "members/ananya@ananya"
+    },
+    {
+     "page": "SETUP_HOME",
+     "record": "people/ananya",
+     "as": "members/ananya@ananya"
+    },
+    {
+     "page": "AUTH_FLOW",
+     "record": null,
+     "as": "members/ananya@ananya",
+     "cases": {
+      "VERIFY": {
+       "record": "signups/karan-pending",
+       "as": null
+      }
+     }
+    },
+    {
+     "page": "COMMON_NOT_FOUND",
+     "record": null,
+     "as": "members/ananya@ananya"
+    },
+    {
+     "page": "COMMON_NO_ACCESS",
+     "record": null,
+     "as": "members/ananya@ananya"
+    },
+    {
+     "page": "COMMON_SERVER_ERROR",
+     "record": null,
+     "as": "members/ananya@ananya"
+    },
+    {
+     "page": "COMMON_MAINTENANCE",
+     "record": null,
+     "as": "members/ananya@ananya"
+    },
+    {
+     "page": "COMMON_LOCK_SCREEN",
+     "record": null,
+     "as": "members/ananya@ananya"
+    }
+   ],
+   "flows": [
+    {
+     "key": "CONTINUE_LEARNING",
+     "pages": [
+      "HOME_APP",
+      "RECORD_VIEW"
+     ],
+     "record": "items/python-data"
+    }
+   ]
+  }
+ }
+}

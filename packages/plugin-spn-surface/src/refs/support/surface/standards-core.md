@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/01-surface-types.md",
-      "seen": "af00aa2b"
+      "seen": "0b9304cb"
     }
   ]
 }

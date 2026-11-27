@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/14-delivery-library.md",
-      "seen": "6feb372e"
+      "seen": "b0335594"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/14-delivery-library/",
-      "seen": "69d93853"
+      "seen": "2e4543be"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/16-delivery-providers/01-figma/",
@@ -85,6 +85,8 @@ A person who wants to know where the library and a stack differ should not have 
 
 **spn-surface carries the catalogue too, and the design skill reads it one slice at a time** (`RULE.SUPPORT.SURFACE.601` · MUST · skill:spn-surface/design). The plugins build copies the book's catalogue folder, `docs/specs/surface/catalogue/`, and `base`'s language folder into `refs/specs/surface/`, exact copies checked against their contract states, as it copies the templates. `spn-surface catalogue show <CATEGORY> [<PART>] [<KIND>]` returns one category, one part of it, or one kind with its cases, in words or as `--json`. The design skill calls it for the slice the page in hand needs, and a restate keeps only the rules, never a copy of the kinds.
 
+The closed lists a snapshot and its readers are written in sit in the contract's library state, and each is closed because a snapshot is compared by a program, and a comparison can only be as exact as the words it compares. A stack writes the same `WEB` or `NATIVE` file, and the plugin builds from the `CONSTRUCT` one alone, so neither side ever depends on a design tool's name.
+
 A snapshot has four parts and three levels:
 
 | Key | Level | What it holds |
@@ -111,7 +113,7 @@ The comparison asks two questions, each of one side and the side before it: does
 | `TOKEN_ABSENT` | a token that the library holds and the stack does not |
 | `NAME_UNMAPPED` | a name the naming map does not know, so no comparison was possible |
 
-One gap is a record with the keys `kind`, `level`, `path`, `lacks`, `library` and `stack`. `lacks` is `LIBRARY` for a gap of the library against the book and `STACK` for a gap of a stack against the library, and it is null for `VALUE_DIFFERS` and `NAME_UNMAPPED`, the two kinds that lack nothing on one side. The view prints a dash for it. The record is JSON, named by its package, and it also holds what the gaps were compared from and a count of what could not be compared. It holds `rulesApplied` too, the count of gaps each rule of the comparison left out, and `accepted`, the count of gaps an accepted difference left out. A view of one line for each gap is written from the record and is never edited.
+One gap is a record with the keys `kind`, `level`, `path`, `lacks`, `library` and `stack`. `lacks` is `LIBRARY` for a gap of the library against the book and `STACK` for a gap of a stack against the library, and it is null for `VALUE_DIFFERS` and `NAME_UNMAPPED`, the two kinds that lack nothing on one side. The view prints a dash for it. The record is JSON, named by its package, and it also holds what the gaps were compared from and a count of what could not be compared. It holds `rulesApplied` too, the count of gaps each rule of the comparison left out, and `accepted`, the count of gaps an accepted difference left out. A later run must be told from this one, so `comparedFrom` says what was read, and what the stack holds beyond the library is kept apart in `stackHoldsMore`, where it is counted and never a gap. A view of one line for each gap is written from the record and is never edited.
 
 The view stays short by five rules. A `UNIT_ABSENT` line replaces every line under that unit. Many `VALUE_ABSENT` gaps on one prop become one line with a list. What could not be compared is a count in the footer and never a line. Level 3 is written only for the units that levels 1 and 2 flagged. **A person and a model read the gaps, and never the library.**
 

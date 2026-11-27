@@ -16,7 +16,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/02-organizations.md",
-      "seen": "1a4e4fd3"
+      "seen": "1e8791bd"
     }
   ],
   "decisions": []

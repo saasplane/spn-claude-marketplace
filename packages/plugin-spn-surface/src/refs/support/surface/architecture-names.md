@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/05-standards-names.md",
-      "seen": "0ebd5808"
+      "seen": "4df7827a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/05-standards-names/",
@@ -47,6 +47,8 @@ One name is used in the book, in the design library and in every stack. The book
 | `variant` | the surface treatment, by its strength | `SOLID` · `QUIET` · `SUBTLE` · `SUBTLE_OUTLINE` · `OUTLINE` · `OUTLINE_DASHED` · `GHOST` · `LINK` | `DSVariantType` |
 | `color` | the hue | `DEFAULT` · `CUSTOM` · `PRIMARY` · `INFO` · `SUCCESS` · `WARNING` · `ERROR` | `DSColorType` |
 | `size` | the density step, read smallest to largest | `XS` · `SM` · `MD` · `LG` · `XL` | `DSSizeType` |
+
+The density step is the one of these lists a theme also names, so the contract states it once, for the theme, as `SPSurfaceSizeType`; a theme sets the app's default size and the depth of a raised surface from it, a block's own `size` still wins, and the design system re-exports the list as `DSSizeType`, so the two lists are one.
 
 **The five values of `size` are read smallest to largest, `XS` to `XL`, wherever they are listed** — in the book, in the design library and in every stack — **and `SM` is the default size a theme sets**; a block told no size takes it. `color` has no order, because a hue is no scale. **The values of `variant` are named by their strength, as the tones are, and read from the strongest to the faintest** (`RULE.SUPPORT.SURFACE.154` · MUST · skill:spn-surface/design): `SOLID` the hue's full colour, `QUIET` a medium tint, `SUBTLE` a light tint with no edge, `SUBTLE_OUTLINE` the light tint with a line, `OUTLINE` a line and no fill, `GHOST` no fill until the pointer, `LINK` text alone. Every variant of every hue keeps its text at 4.5 to 1, at rest and under the pointer; the line of an outline is a decoration, not held to 3 to 1. `architecture-core.md` gives the shades.
 

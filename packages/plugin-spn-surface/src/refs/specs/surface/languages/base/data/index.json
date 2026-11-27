@@ -1,0 +1,60 @@
+{
+ "domain": "Atelier",
+ "line": "A platform of courses and live workshops from independent teachers and academies.",
+ "today": "2026-11-27",
+ "currency": "INR",
+ "models": {
+  "MARKETPLACE": {
+   "orgs": [
+    "studio-mira",
+    "byte-school",
+    "northlight",
+    "kiln-co",
+    "crumb",
+    "tomas-studio",
+    "ananya"
+   ],
+   "reads": "teachers' studios and academies sell as merchants; Ananya buys from all of them as one shopper"
+  },
+  "B2B2C": {
+   "orgs": [
+    "brightpath",
+    "rohan"
+   ],
+   "reads": "Brightpath Learning runs its own school on Atelier; Rohan learns there, as Brightpath's own learner"
+  },
+  "B2B2B": {
+   "orgs": [
+    "brightpath",
+    "kestrel"
+   ],
+   "reads": "Brightpath trains Kestrel Insurance’s data team, a company under it"
+  },
+  "B2B": {
+   "orgs": [
+    "pinecone"
+   ],
+   "reads": "Pinecone Labs subscribes to Teams for its designers"
+  },
+  "B2C": {
+   "orgs": [
+    "kabir"
+   ],
+   "reads": "Kabir Shah's own account, on Atelier Plus"
+  }
+ },
+ "files": [
+  "categories",
+  "subjects",
+  "orgs",
+  "people",
+  "members",
+  "items",
+  "bundles",
+  "plans",
+  "reviews",
+  "questions",
+  "invitations",
+  "signups"
+ ]
+}

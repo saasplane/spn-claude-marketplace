@@ -11,7 +11,7 @@ description: The contract-first build loop - the order work is done in, what eac
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
-      "seen": "1e3741bc"
+      "seen": "98c39c23"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
@@ -171,3 +171,4 @@ A change is not done when it compiles. It is done when three things hold. The do
 - **The plugins keep a copy of the contract's telemetry values beside the writer, in the contract's structure, and `toolchain-ts` holds it to the contract enum for enum** (`RULE.DEVEX.WORKSPACE.482` · MUST · skill:spn-devex/develop)
 - **`spndesk/` at the workspace root is that place, with one folder for each app that takes a file, and the first command that writes into it makes it** (`RULE.DEVEX.WORKSPACE.506` · MUST · skill:spn-devex/develop)
 - **A domain with several reading paths names, in its face's block, the one overview that carries its generated glossary** (`RULE.DEVEX.WORKSPACE.582` · MUST · skill:spn-devex/develop)
+- **A construct declares the contract it names, as code copied from the contract** (`RULE.DEVEX.WORKSPACE.583` · MUST · skill:spn-devex/develop)

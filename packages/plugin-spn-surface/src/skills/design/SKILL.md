@@ -11,11 +11,11 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
-      "seen": "5c03b954"
+      "seen": "d4e2fa97"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "82bac52b"
+      "seen": "2cb3f0d9"
     }
   ]
 }
@@ -322,7 +322,7 @@ Take each block from the tree by layer of the app page kind, and from the list i
 - **Write no `variant` or `color` to make a mark, an avatar or a badge lighter on a coloured navigation or band.** A unit that is shown takes the lighter tints of the ground it stands on by itself, and a status badge keeps its hue (`architecture-core.md`).
 - **Write no duration, ease or animation.** Each unit enters and leaves by its role, at the theme's `motionSpeed` (`standards-core.md`, *Motion*). An icon moves only through what holds it: write `motion` and `hoverNode` on `DSIcon`, `startIconMotion` or `endIconMotion` on `DSButton`, or `iconMotion` on `DSMark`, where the movement says something, such as `NUDGE_START` on a way back.
 - **Give `DSDataTable` the layout that step 2 chose, and the `LIST` layout for a phone** (`RULE.SUPPORT.SURFACE.068` · GUIDE). Give `DSFilterBar` its fields, and say which stay in view. Never rearrange the bar (`RULE.SUPPORT.SURFACE.073` · MUST · skill:spn-surface/design).
-- **A search that starts the finding is `DSSearchBar`, and one that narrows a list is `DSFilterBar`.** The bar takes its fields as data and, where the search has verticals, its tabs as `scopes`; the head of a page of results is the same bar `folded`. It takes one corner, `radius`, of `DSRadiusType`, and a page writes none unless its design language asks for one.
+- **A search that starts the finding is `DSSearchBar`, and one that narrows a list is `DSFilterBar`.** The bar takes its fields as data and, where the search has verticals, its tabs as `scopes`; the head of a page of results is the same bar `folded`. It takes the shape of a mark, `shape`, of `DSMarkShapeType` (`CIRCLE`, `ROUNDED` or `SQUARE`), and a page writes none unless its design language asks for one.
 - **Where a ref says a unit does not do a thing yet, name it under *Missing*.** `architecture-components.md` says so plainly, under *Not there yet*. Write the tree as the pattern asks, and say which line waits for the unit.
 
 - **`variant`, `color` and `size` each mean one thing on every block.** `variant` is the surface treatment, `color` is the hue and `size` is the density step, read smallest to largest, `XS` to `XL`, with `SM` the default a theme sets. Every value comes from the vocabulary of its prop. `CUSTOM` is a value of `color` that means the caller owns the colour: a page sets a colour outside the theme only through it, as `customColor` on a block that takes it.
@@ -676,9 +676,9 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **The content of a dialog, a drawer and a sheet stacks its parts one under another, the size's gap apart, and a page passes it no flex or gap class** (`RULE.SUPPORT.SURFACE.534` · MUST · skill:spn-surface/design)
 - **The media tokens are what any kind of picture needs, and a kind's own roles map onto them** (`RULE.SUPPORT.SURFACE.535` · MUST · skill:spn-surface/design)
 - **Two or more features stacked in one section stand the section's stack apart, two thirds of its room on the 8 grid** (`RULE.SUPPORT.SURFACE.549` · MUST · skill:spn-surface/design)
-- **`spnutils apps surface render` draws a tree in an app's design language, and its three choices are always given** (`RULE.SUPPORT.SURFACE.579` · MUST · skill:spn-surface/design)
-- **The app's theme setting is the one source of the look, and no field of the look is written in a tree file** (`RULE.SUPPORT.SURFACE.580` · MUST · skill:spn-surface/design)
-- **A tree has `treeVersion` at its top, and a version the render does not read is refused** (`RULE.SUPPORT.SURFACE.581` · MUST · skill:spn-surface/design)
+- **`spnutils apps surface render` draws a tree in the theme it is given, and its modes and devices are always given** (`RULE.SUPPORT.SURFACE.579` · MUST · skill:spn-surface/design)
+- **The theme comes from the call, and no field of the look is written in a tree file** (`RULE.SUPPORT.SURFACE.580` · MUST · skill:spn-surface/design)
+- **A tree carries its surface category, and a tree with none is refused** (`RULE.SUPPORT.SURFACE.581` · MUST · skill:spn-surface/design)
 - **A tree holds units, placements, slots and text, and no raw element** (`RULE.SUPPORT.SURFACE.582` · MUST · skill:spn-surface/design)
 - **The render prints the HTML of the tree, keyed by mode and then by device, and no document around it** (`RULE.SUPPORT.SURFACE.583` · MUST · skill:spn-surface/design)
 - **The render is stateless: it writes no file, keeps no cache of a page and reads no state of an earlier run** (`RULE.SUPPORT.SURFACE.584` · MUST · skill:spn-surface/design)
@@ -690,7 +690,7 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **The render returns markup only, and a page that shows a copy builds the page around it** (`RULE.SUPPORT.SURFACE.597` · MUST · skill:spn-surface/design)
 - **A help centre always draws `DSBreadcrumb` under the bar, one link for each level above the page and the page itself unlinked, and so does any site whose bar does not list its groups or that runs deeper than three levels** (`RULE.SUPPORT.SURFACE.598` · MUST · skill:spn-surface/design)
 - **spn-surface carries the catalogue too, and the design skill reads it one slice at a time** (`RULE.SUPPORT.SURFACE.601` · MUST · skill:spn-surface/design)
-- **`DSApp` takes the app's theme setting as `dsContext.themes`, applies the main category's theme at the root, and holds the setting for the pages below** (`RULE.SUPPORT.SURFACE.602` · MUST · skill:spn-surface/design)
+- **`DSApp` takes the app's themes, `src/spn.surface.json`'s `themes`, as `dsContext.themes`, applies the main category's theme at the root, and holds the setting for the pages below** (`RULE.SUPPORT.SURFACE.602` · MUST · skill:spn-surface/design)
 - **`DSPageCategory` gives a surface category to what it holds, and renders nothing** (`RULE.SUPPORT.SURFACE.603` · MUST · skill:spn-surface/design)
 - **`DSSitePage` and `DSLayout` apply the category on the root they already render** (`RULE.SUPPORT.SURFACE.604` · MUST · skill:spn-surface/design)
 - **`DSPage*` names the units that work across a page's content, and a `DSPageFrame*` unit places a page's parts in slots and draws no box and no navigation** (`RULE.SUPPORT.SURFACE.613` · MUST · skill:spn-surface/design)
@@ -702,3 +702,4 @@ Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the 
 - **A page sets at most two containers side by side, one taking the larger share** (`RULE.SUPPORT.SURFACE.625` · MUST · skill:spn-surface/design)
 - **`DSPageLevel` gives a level, a part and `flush` to what it holds, and lays out nothing** (`RULE.SUPPORT.SURFACE.626` · MUST · skill:spn-surface/design)
 - **A new unit's props start from its nearest units' props: a field a neighbour already has is reused whole, with its name, its type and its meaning, and a proposal lists the neighbours it read and names each new field it could not reuse** (`RULE.SUPPORT.SURFACE.627` · MUST · skill:spn-surface/design)
+- **A slot names its picture by the language and the path in that language's `assets/`, and the render writes it unchanged** (`RULE.SUPPORT.SURFACE.644` · MUST · skill:spn-surface/design)

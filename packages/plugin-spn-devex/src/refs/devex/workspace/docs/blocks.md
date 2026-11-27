@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
       "section": "The blocks — what a page reaches for instead of prose",
-      "seen": "6a7ae035"
+      "seen": "92cfde71"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/06-blocks.md",
@@ -339,12 +339,12 @@ The web's way.
 - **A list in a group draws Plan-style rows** (`RULE.DEVEX.WORKSPACE.566` · GUIDE): the title, its description, one small line of facts, and one closed-set fact `[CODE]` as a badge at the row's end.
 - **An item's `For:`, `Choose when:`, `Not when:` (`condition → instead`) and `Rules:` lines are one closed Guidance fold under the row** (`RULE.DEVEX.WORKSPACE.567` · GUIDE).
 - **A fact drawn with its item has one look** (`RULE.DEVEX.WORKSPACE.568` · GUIDE): the text font, the key in the fact colour at medium weight, the value in the card title colour. Only a fact in a column of its own (`facts=END`, a table) keeps the column's look.
-- **A fact whose value is a JSON object or list draws as a chip and opens in a popover** (`RULE.DEVEX.WORKSPACE.580` · GUIDE): write `Value: `{...}``; the chip names its first keys in words (a list, its item count), and a native popover lists each key in words with its value, an enum code in code font, a nested value indented, and a copy of the JSON. A value that is not a JSON object or list draws as written.
+- **A fact whose value is a JSON object or list draws as a chip and opens in a dialog of two panels** (`RULE.DEVEX.WORKSPACE.580` · GUIDE): write `Value: `{...}``; the chip shows a tree icon and its first keys in words, and a native dialog opens with two panels, one that lists each key in words with its value, an enum code in code font and a nested value indented, and one that holds the formatted JSON with a copy button. A value that is not a JSON object or list draws as written.
 - **A numbered table reads its number and title on one line** (`RULE.DEVEX.WORKSPACE.569` · GUIDE): a table whose first column is only a number draws the number and the title, the second column, on one line, the sentence under it.
 - **A Terms table with no contract term draws no Contract term column** (`RULE.DEVEX.WORKSPACE.574` · GUIDE): when every cell of that column is empty or a dash.
 - **A long table folds** (`RULE.DEVEX.WORKSPACE.575` · GUIDE): write it inside `~~~fold <summary>` ... `~~~`; the page draws it shut.
 - **The writer holds a list to what it can draw** (`RULE.DEVEX.WORKSPACE.576` · GUIDE): a `LIST` with four or more fact keys stops the write; `facts=END` with no fact is a finding; bare tags never get the `facts=END` advice; `docs look` reads a `TABLE` catalog's pinned key column in dark.
 - **A glossary, a Terms table and a Binds table stay tables** (`RULE.DEVEX.WORKSPACE.577` · GUIDE): the catalog check skips a table whose first column is `Term` or `Rule`.
 - **A group's name and description are the construct's own words** (`RULE.DEVEX.WORKSPACE.570` · GUIDE).
-- **The Surface Catalogue and a language's whole spec are generated blocks** (`RULE.DEVEX.WORKSPACE.578` · GUIDE): `docs face write --block surface-catalogue` writes 03's Foundation Catalogue from `docs/specs/surface/catalogue.json`; `--block surface-design-language` writes the spec its marker names (`spec=<path from docs/>`), resolved against the catalogue and its parents, each kind tagged PICKED, INHERITED, CUSTOMISED, NEW or NOT_USED. Never edit inside the markers: change the JSON and write again. `docs face check` reports a block that no longer matches its source and exits 1 on it, so a commit or a CI step can hold on the exit alone.
+- **The Surface Catalogue and a language's whole spec are generated blocks** (`RULE.DEVEX.WORKSPACE.578` · GUIDE): `docs face write --block surface-catalogue` writes 03's Foundation Catalogue from `docs/specs/surface/catalogue/`, its outline `spcatalogue.json` and each category's kinds; `--block surface-design-language` writes the spec its marker names (`spec=<path from docs/>`), resolved against the catalogue and its parents, each kind tagged PICKED, INHERITED, CUSTOMISED, NEW or NOT_USED. Never edit inside the markers: change the JSON and write again. `docs face check` reports a block that no longer matches its source and exits 1 on it, so a commit or a CI step can hold on the exit alone.
 - **Every box on a page opens and closes once** (`RULE.DEVEX.WORKSPACE.579` · MUST · check:doc-check): a `section` or `div` closed twice drops every block after it out of its section; `docs page check` and the write check name the line.

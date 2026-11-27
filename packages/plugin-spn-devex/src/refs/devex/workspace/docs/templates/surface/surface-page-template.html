@@ -1,12 +1,15 @@
 <!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-pages.md § The surface preview
      and docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc carries its specification, or names the note that holds it
-     This file holds the structure of a surface page and states no rule: the bar with the page's title and its three switches,
-     the frame, the badges layer above it, the notes panel beside it, the page's own markup in one template for each device and mode that was rendered
-     (`page-LIGHT-DESKTOP`, `page-DARK-PHONE` and so on), the notes in one JSON list outside the page, the two metas that name
+     This file holds the structure of a surface page and states no rule: the bar with the page's title, the Case switch as labelled
+     tabs where the page is a whole screen with cases (a layout or a page kind, the default case first), and the Width, Mode and
+     Notes switches as icon buttons, each named by its aria-label and title, the frame, the badges layer above it, the notes panel
+     beside it, the page's own markup in one template for each case, device and mode that was rendered (`page-LIGHT-DESKTOP`,
+     `page-DARK-PHONE` and so on for the default case, `page-<CASE>-LIGHT-DESKTOP` for each other case, opened by `#case-<case>` in
+     lower case with hyphens), the notes in JSON outside the page, the two metas that name
      the design system's version and the app's stylesheet, and the two lines that load the shared stylesheet and script. The script
      builds the frame's document from the template the switches pick: it links design-system.css from the folder it was served from,
      the cut of the design system the first meta names, and the app's stylesheet at the path the second names, sets data-mode from
-     the Light and Dark switch, and sizes the frame by the width switch. Where no markup was rendered for a device and mode it uses
+     the Light and Dark switch, sizes the frame by the width switch, and swaps in the case the Case switch picks. Where no markup was rendered for a device and mode it uses
      the nearest one and restyles only. The frame holds the markup `spnutils apps surface render` prints, or a copy of a running
      page's body, and nothing else: no wrapper, no aside, no attribute added. A `#<id>` in the page's address scrolls the frame to
      that element. -->
@@ -14,8 +17,9 @@
      {{DS-VERSION}} the design system version the markup was drawn with, the `ds` the render prints, such as 11.21.0
      {{APP-CSS}} the app's stylesheet, a relative path, or empty for Surface's own look with no brand
      {{NAME}} the page's short name, at most three words (RULE.DEVEX.WORKSPACE.517): the block's title, written in the `<title>`, the outline's title, the eyebrow's last segment, the breadcrumb of a page below it and the page's entry in an index
-     {{MARKUP}} the page's markup: replace the sample page between a template's tags with what `spnutils apps surface render` prints for that device and mode, untouched. Write one `<template id="page-<MODE>-<DEVICE>">` for each device (DESKTOP, TABLET, PHONE) and mode (LIGHT, DARK) that was rendered, and no more
-     {{NOTES}} the JSON list in `<script type="application/json" id="sample-notes">`: one `{ "n", "kind", "case", "text" }` for each top-level section, `n` its place among the page's top-level sections counted from 0, `kind` the kind's name and `case` its case in words where that matters (the note's short title), `text` one plain sentence (why the section is there, or "Planned: needs <unit>"). A note is its number, a short title and that sentence: no status, no link -->
+     {{CASES}} the Case switch: one `<button role="tab" data-surface="case" data-value="<CASE>">` for each case of the screen, its words as its label, the default first; leave the whole group out on a page with no cases, such as a family page of containers or widgets, which draws every kind and every case at once
+     {{MARKUP}} the page's markup: replace the sample page between a template's tags with what `spnutils apps surface render` prints for that case, device and mode, untouched. Write one `<template id="page-<MODE>-<DEVICE>">` for each device (DESKTOP, TABLET, PHONE) and mode (LIGHT, DARK) that was rendered, one `<template id="page-<CASE>-<MODE>-<DEVICE>">` for each other case, and no more
+     {{NOTES}} the JSON in `<script type="application/json" id="sample-notes">`: a list on a page with no cases, or an object holding a list for each case code on a page with cases; one `{ "n", "kind", "case", "text" }` for each top-level section, `n` its place among the page's top-level sections counted from 0, `kind` the kind's name and `case` its case in words where that matters (the note's short title), `text` one plain sentence (why the section is there, or "Planned: needs <unit>"). A note is its number, a short title and that sentence: no status, no link -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="surface-ds" content="11.21.0">
@@ -28,17 +32,21 @@
 <div class="sds-surface" data-width="desktop">
   <header class="sds-surface-bar">
     <h1 class="sds-surface-title">{{NAME}}</h1>
+    <div class="sds-surface-switch sds-surface-cases" role="tablist" aria-label="Case">
+      <button type="button" role="tab" data-surface="case" data-value="DEFAULT">Default</button>
+      <button type="button" role="tab" data-surface="case" data-value="WITH_STATS">With stats</button>
+    </div>
     <div class="sds-surface-switch" role="group" aria-label="Width">
-      <button type="button" data-surface="width" data-value="desktop">Desktop</button>
-      <button type="button" data-surface="width" data-value="tablet">Tablet</button>
-      <button type="button" data-surface="width" data-value="phone">Phone</button>
+      <button type="button" class="sds-surface-icon" data-surface="width" data-value="desktop" aria-label="Desktop" title="Desktop"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></button>
+      <button type="button" class="sds-surface-icon" data-surface="width" data-value="tablet" aria-label="Tablet" title="Tablet"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg></button>
+      <button type="button" class="sds-surface-icon" data-surface="width" data-value="phone" aria-label="Phone" title="Phone"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M12 18h.01"/></svg></button>
     </div>
     <div class="sds-surface-switch" role="group" aria-label="Mode">
-      <button type="button" data-surface="mode" data-value="light">Light</button>
-      <button type="button" data-surface="mode" data-value="dark">Dark</button>
+      <button type="button" class="sds-surface-icon" data-surface="mode" data-value="light" aria-label="Light" title="Light"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+      <button type="button" class="sds-surface-icon" data-surface="mode" data-value="dark" aria-label="Dark" title="Dark"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
     </div>
     <div class="sds-surface-switch" role="group" aria-label="Notes">
-      <button type="button" data-surface="notes">Notes</button>
+      <button type="button" class="sds-surface-icon" data-surface="notes" aria-label="Notes" title="Notes"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg></button>
     </div>
   </header>
   <div class="sds-surface-body">

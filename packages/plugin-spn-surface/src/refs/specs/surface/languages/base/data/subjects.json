@@ -1,0 +1,149 @@
+{
+ "type": "Subject",
+ "records": [
+  {
+   "key": "design",
+   "name": "Design",
+   "line": "Product, interface and brand design, taught by people who ship.",
+   "icon": "PENCIL",
+   "picture": {
+    "caption": "A designer's desk: sketches beside a laptop showing a phone screen",
+    "ratio": "4:3"
+   },
+   "subs": [
+    {
+     "key": "product",
+     "name": "Product and UI design"
+    },
+    {
+     "key": "illustration",
+     "name": "Illustration"
+    },
+    {
+     "key": "typography",
+     "name": "Typography"
+    }
+   ]
+  },
+  {
+   "key": "development",
+   "name": "Development",
+   "line": "Web, data and AI, from your first script to production.",
+   "icon": "CODE",
+   "picture": {
+    "caption": "Two screens of code and a terminal, warm desk light",
+    "ratio": "4:3"
+   },
+   "subs": [
+    {
+     "key": "web",
+     "name": "Web"
+    },
+    {
+     "key": "data-ai",
+     "name": "Data and AI"
+    },
+    {
+     "key": "mobile",
+     "name": "Mobile"
+    }
+   ]
+  },
+  {
+   "key": "business",
+   "name": "Business",
+   "line": "Marketing, product management and the money side, made plain.",
+   "icon": "HANDSHAKE",
+   "picture": {
+    "caption": "A team at a whiteboard covered in sticky notes",
+    "ratio": "4:3"
+   },
+   "subs": [
+    {
+     "key": "marketing",
+     "name": "Marketing"
+    },
+    {
+     "key": "product-management",
+     "name": "Product management"
+    },
+    {
+     "key": "finance",
+     "name": "Finance basics"
+    }
+   ]
+  },
+  {
+   "key": "photo-video",
+   "name": "Photography and video",
+   "line": "Light, framing and editing, on any camera you own.",
+   "icon": "EYE",
+   "picture": {
+    "caption": "A camera on a strap against an evening street",
+    "ratio": "4:3"
+   },
+   "subs": [
+    {
+     "key": "photography",
+     "name": "Photography"
+    },
+    {
+     "key": "video",
+     "name": "Video editing"
+    },
+    {
+     "key": "lighting",
+     "name": "Lighting"
+    }
+   ]
+  },
+  {
+   "key": "arts-crafts",
+   "name": "Arts and crafts",
+   "line": "Paint, clay and lettering, with a teacher at your side.",
+   "icon": "PALETTE",
+   "picture": {
+    "caption": "Hands shaping clay on a potter's wheel",
+    "ratio": "4:3"
+   },
+   "subs": [
+    {
+     "key": "watercolour",
+     "name": "Watercolour"
+    },
+    {
+     "key": "ceramics",
+     "name": "Ceramics"
+    },
+    {
+     "key": "calligraphy",
+     "name": "Calligraphy"
+    }
+   ]
+  },
+  {
+   "key": "food-drink",
+   "name": "Food and drink",
+   "line": "Bread, coffee and home cooking, step by step.",
+   "icon": "STORE",
+   "picture": {
+    "caption": "A sourdough loaf cut open on a wooden board",
+    "ratio": "4:3"
+   },
+   "subs": [
+    {
+     "key": "baking",
+     "name": "Baking"
+    },
+    {
+     "key": "coffee",
+     "name": "Coffee"
+    },
+    {
+     "key": "cooking",
+     "name": "Cooking"
+    }
+   ]
+  }
+ ]
+}

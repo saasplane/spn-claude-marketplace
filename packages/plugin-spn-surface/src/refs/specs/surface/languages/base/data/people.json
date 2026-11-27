@@ -1,0 +1,173 @@
+{
+ "type": "Person",
+ "records": [
+  {
+   "key": "mira",
+   "name": "Mira Okafor",
+   "initials": "MO",
+   "headline": "Product designer, founder of Studio Mira",
+   "city": "Bengaluru",
+   "since": "2023-02-14",
+   "bio": "Mira has designed banking and travel apps for twelve years and now runs Studio Mira, where she teaches the work behind a good handoff.",
+   "responds": "within a day"
+  },
+  {
+   "key": "arjun",
+   "name": "Arjun Mehta",
+   "initials": "AM",
+   "headline": "Data engineer at a payments company, teaches at Byte School",
+   "city": "Pune",
+   "since": "2022-09-01",
+   "bio": "Arjun builds data pipelines by day and teaches Python to people who have never written a line of it.",
+   "responds": "within a few hours"
+  },
+  {
+   "key": "leo",
+   "name": "Leo Brandt",
+   "initials": "LB",
+   "headline": "Street photographer, Northlight Academy",
+   "city": "Mumbai",
+   "since": "2023-06-20",
+   "bio": "Leo shoots for magazines and teaches people to see light first and reach for settings second.",
+   "responds": "within a day"
+  },
+  {
+   "key": "hana",
+   "name": "Hana Sato",
+   "initials": "HS",
+   "headline": "Potter, runs the wheel classes at Kiln & Co",
+   "city": "Pune",
+   "since": "2024-01-10",
+   "bio": "Hana trained in Mashiko and has taught wheel-throwing to more than a thousand beginners.",
+   "responds": "within two days"
+  },
+  {
+   "key": "ines",
+   "name": "Ines Varga",
+   "initials": "IV",
+   "headline": "Baker, Crumb Collective",
+   "city": "Bengaluru",
+   "since": "2024-03-05",
+   "bio": "Ines ran a neighbourhood bakery for six years before teaching sourdough to home bakers.",
+   "responds": "within a day"
+  },
+  {
+   "key": "tomas",
+   "name": "Tomas Reyes",
+   "initials": "TR",
+   "headline": "Watercolour painter, teaches on his own",
+   "city": "Goa",
+   "since": "2023-11-02",
+   "bio": "Tomas paints the coast of Goa and teaches watercolour the way he learned it: loose, light and every day.",
+   "responds": "within a day"
+  },
+  {
+   "key": "ananya",
+   "name": "Ananya Patel",
+   "initials": "AP",
+   "email": "ananya.patel@example.com",
+   "city": "Pune",
+   "since": "2025-04-18"
+  },
+  {
+   "key": "devika",
+   "name": "Devika Rao",
+   "initials": "DR",
+   "headline": "Head of learning, Atelier",
+   "city": "Pune",
+   "since": "2022-06-01"
+  },
+  {
+   "key": "sam",
+   "name": "Sam Okoye",
+   "initials": "SO",
+   "headline": "Support lead, Atelier",
+   "city": "Pune",
+   "since": "2023-01-09"
+  },
+  {
+   "key": "priya",
+   "name": "Priya Nair",
+   "initials": "PN",
+   "headline": "Founder, Brightpath Learning",
+   "city": "Hyderabad",
+   "since": "2024-08-12"
+  },
+  {
+   "key": "farid",
+   "name": "Farid Khan",
+   "initials": "FK",
+   "headline": "Data teacher at Brightpath",
+   "city": "Hyderabad",
+   "since": "2024-09-01"
+  },
+  {
+   "key": "rohan",
+   "name": "Rohan Iyer",
+   "initials": "RI",
+   "headline": "Learner in Brightpath's school",
+   "city": "Chennai",
+   "since": "2025-10-02"
+  },
+  {
+   "key": "meera",
+   "name": "Meera Joshi",
+   "initials": "MJ",
+   "headline": "Analytics lead, Kestrel Insurance",
+   "city": "Mumbai",
+   "since": "2025-06-30"
+  },
+  {
+   "key": "vikram",
+   "name": "Vikram Das",
+   "initials": "VD",
+   "headline": "Analyst, Kestrel Insurance",
+   "city": "Mumbai",
+   "since": "2025-07-04"
+  },
+  {
+   "key": "lena",
+   "name": "Lena Fischer",
+   "initials": "LF",
+   "headline": "Design manager, Pinecone Labs",
+   "city": "Bengaluru",
+   "since": "2025-01-20"
+  },
+  {
+   "key": "omar",
+   "name": "Omar Siddiqui",
+   "initials": "OS",
+   "headline": "Product designer, Pinecone Labs",
+   "city": "Bengaluru",
+   "since": "2025-02-03"
+  },
+  {
+   "key": "kabir",
+   "name": "Kabir Shah",
+   "initials": "KS",
+   "headline": "Learning photography on Plus",
+   "city": "Delhi",
+   "since": "2025-09-14"
+  },
+  {
+   "key": "noor",
+   "name": "Noor Haddad",
+   "initials": "NH",
+   "headline": "Ceramicist, opening her studio on Atelier",
+   "city": "Kochi",
+   "since": "2026-11-26",
+   "bio": "Noor throws stoneware and has taught evening classes for six years; her studio on Atelier is two days old and holds nothing yet.",
+   "responds": "within a day"
+  },
+  {
+   "key": "zara",
+   "name": "Zara Mehta",
+   "initials": "ZM",
+   "headline": "Workshop host, joining Studio Mira",
+   "city": "Mumbai",
+   "since": "2026-11-27",
+   "bio": "Zara runs Studio Mira's live critiques and was invited to the studio on Atelier this week.",
+   "responds": "within a day"
+  }
+ ]
+}

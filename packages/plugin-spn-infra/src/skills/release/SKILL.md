@@ -11,7 +11,7 @@ description: Publishing an estate package - bump the version field in spinfrapkg
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/07-deliver.md",
-      "seen": "be4e9978"
+      "seen": "8ac74c9d"
     }
   ]
 }

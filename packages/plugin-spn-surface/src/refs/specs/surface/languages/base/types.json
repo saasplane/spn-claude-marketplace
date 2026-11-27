@@ -1,0 +1,286 @@
+{
+ "types": [
+  {
+   "type": "OrgCategory",
+   "file": "categories",
+   "medium": "NONE",
+   "roles": {
+    "title": "label",
+    "line": "line"
+   },
+   "required": [
+    "code",
+    "label",
+    "pluralLabel",
+    "orgType"
+   ],
+   "derived": [
+    "the orgs of each category"
+   ],
+   "neededBy": [
+    "the platform console",
+    "SETUP_COMPARE of org types",
+    "every sample whose org names its category"
+   ]
+  },
+  {
+   "type": "Subject",
+   "file": "subjects",
+   "medium": "PICTURE",
+   "roles": {
+    "title": "name",
+    "line": "line",
+    "picture": "picture"
+   },
+   "required": [
+    "key",
+    "name"
+   ],
+   "derived": [
+    "the items in each subject and sub-subject"
+   ],
+   "neededBy": [
+    "MARKETPLACE category pages, tiles and facets"
+   ]
+  },
+  {
+   "type": "Org",
+   "file": "orgs",
+   "medium": "LOGO",
+   "roles": {
+    "title": "name",
+    "line": "knownFor",
+    "picture": "banner",
+    "date": "since",
+    "place": "city"
+   },
+   "required": [
+    "key",
+    "name",
+    "category"
+   ],
+   "derived": [
+    "a merchant’s course count, learners and rating",
+    "cart and order totals",
+    "a studio’s payout"
+   ],
+   "neededBy": [
+    "MARKETPLACE brand pages",
+    "DASHBOARD the studio",
+    "PORTAL the learner’s orders"
+   ]
+  },
+  {
+   "type": "Person",
+   "file": "people",
+   "medium": "AVATAR",
+   "roles": {
+    "title": "name",
+    "line": "headline",
+    "date": "since",
+    "place": "city"
+   },
+   "required": [
+    "key",
+    "name"
+   ],
+   "derived": [
+    "a teacher’s learners and rating"
+   ],
+   "neededBy": [
+    "MARKETPLACE seller pages",
+    "every avatar"
+   ]
+  },
+  {
+   "type": "Member",
+   "file": "members",
+   "medium": "NONE",
+   "roles": {
+    "owner": "org",
+    "title": "person",
+    "state": "role"
+   },
+   "required": [
+    "key",
+    "person",
+    "org",
+    "role"
+   ],
+   "derived": [
+    "progress from lessons done",
+    "seats left from bookings"
+   ],
+   "neededBy": [
+    "DASHBOARD members and learners",
+    "PORTAL my learning, bookings and certificates"
+   ]
+  },
+  {
+   "type": "Item",
+   "file": "items",
+   "medium": "PICTURE",
+   "roles": {
+    "title": "title",
+    "line": "line",
+    "picture": "cover",
+    "price": "price",
+    "previousPrice": "listPrice",
+    "owner": "teacher",
+    "ratingSource": "reviews.rating",
+    "date": "updated",
+    "state": "badge",
+    "place": "city"
+   },
+   "required": [
+    "key",
+    "kind",
+    "title",
+    "teacher",
+    "subject"
+   ],
+   "derived": [
+    "rating and count from reviews",
+    "seats left",
+    "minutes and lessons from the outline"
+   ],
+   "neededBy": [
+    "every MARKETPLACE page",
+    "DASHBOARD records",
+    "PORTAL my courses"
+   ]
+  },
+  {
+   "type": "Bundle",
+   "file": "bundles",
+   "medium": "PICTURE",
+   "roles": {
+    "title": "title",
+    "line": "line",
+    "picture": "cover",
+    "price": "price"
+   },
+   "required": [
+    "key",
+    "title",
+    "items"
+   ],
+   "derived": [
+    "its saving against its items"
+   ],
+   "neededBy": [
+    "MARKETPLACE home promo and item page"
+   ]
+  },
+  {
+   "type": "Plan",
+   "file": "plans",
+   "medium": "NONE",
+   "roles": {
+    "title": "name",
+    "line": "line",
+    "price": "price",
+    "state": "recommended"
+   },
+   "required": [
+    "key",
+    "name",
+    "price"
+   ],
+   "derived": [],
+   "neededBy": [
+    "MARKETING and MARKETPLACE pricing",
+    "SETUP_COMPARE in DASHBOARD and PORTAL"
+   ]
+  },
+  {
+   "type": "Review",
+   "file": "reviews",
+   "medium": "AVATAR",
+   "roles": {
+    "title": "by",
+    "line": "words",
+    "owner": "item",
+    "ratingSource": "rating",
+    "date": "date"
+   },
+   "required": [
+    "item",
+    "by",
+    "rating",
+    "date"
+   ],
+   "derived": [
+    "the rating breakdown"
+   ],
+   "neededBy": [
+    "MARKETPLACE item and seller pages",
+    "DASHBOARD reviews"
+   ]
+  },
+  {
+   "type": "Question",
+   "file": "questions",
+   "medium": "NONE",
+   "roles": {
+    "title": "question",
+    "line": "answer",
+    "owner": "item"
+   },
+   "required": [
+    "item",
+    "question"
+   ],
+   "derived": [],
+   "neededBy": [
+    "MARKETPLACE item page",
+    "DASHBOARD what waits"
+   ]
+  },
+  {
+   "type": "Invitation",
+   "file": "invitations",
+   "medium": "NONE",
+   "roles": {
+    "owner": "org",
+    "title": "email",
+    "state": "state",
+    "date": "sentAt"
+   },
+   "required": [
+    "key",
+    "org",
+    "email",
+    "role",
+    "state"
+   ],
+   "derived": [
+    "days left before it expires"
+   ],
+   "neededBy": [
+    "DASHBOARD AUTH_FLOW Invite case",
+    "DASHBOARD members"
+   ]
+  },
+  {
+   "type": "SignUp",
+   "file": "signups",
+   "medium": "NONE",
+   "roles": {
+    "title": "email",
+    "line": "name",
+    "state": "state",
+    "date": "sentAt"
+   },
+   "required": [
+    "key",
+    "email",
+    "state"
+   ],
+   "derived": [],
+   "neededBy": [
+    "DASHBOARD and PORTAL AUTH_FLOW Verify case"
+   ]
+  }
+ ]
+}
