@@ -37,7 +37,7 @@ ok("SUPPORT_SERVER owes UNIT only — it carries INTEGRATION where it fronts a r
 
 if (existsSync(FACTS) && existsSync(CONTRACT)) {
   const { KIND_FACTS } = await import(pathToFileURL(FACTS).href);
-  const { SPAppsKindType, SPAppsTestTierType } = await import(pathToFileURL(CONTRACT).href);
+  const { SPAppsKindType, SPTestTierType } = await import(pathToFileURL(CONTRACT).href);
   ok("the copy names every kind the toolchain names, and no other",
      JSON.stringify(Object.keys(OWED_TIERS).sort()) === JSON.stringify(Object.keys(KIND_FACTS).sort()),
      `${Object.keys(OWED_TIERS)} vs ${Object.keys(KIND_FACTS)}`);
@@ -45,7 +45,7 @@ if (existsSync(FACTS) && existsSync(CONTRACT)) {
     ok(`${kind} owes the tiers the toolchain says it owes`,
        JSON.stringify(OWED_TIERS[kind]) === JSON.stringify(KIND_FACTS[kind]?.tiers), `${OWED_TIERS[kind]} vs ${KIND_FACTS[kind]?.tiers}`);
   }
-  ok("the ladder is the toolchain contract's SPAppsTestTierType", JSON.stringify([...TIERS].sort()) === JSON.stringify(Object.values(SPAppsTestTierType).sort()));
+  ok("the ladder is the toolchain contract's SPTestTierType", JSON.stringify([...TIERS].sort()) === JSON.stringify(Object.values(SPTestTierType).sort()));
 } else {
   console.log("  ·     no toolchain checkout beside this one — the copy is held to the book's table alone");
 }
