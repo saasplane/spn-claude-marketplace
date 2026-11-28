@@ -6,6 +6,7 @@ import { LINKS, ROLES, recordsOf } from "../_folder.ts";
 import type { LanguageData } from "../_folder.ts";
 import { U, badge, col, feat, muted, quote as quoteCard, row, sec, slot, table, txt } from "./kit.ts";
 import { personCard, questionCard } from "./site.ts";
+import { heldPicture, logoOf, picture as filePicture, bannerOf } from "./media.ts";
 import { sentence, slugOf, words } from "./notes.ts";
 import type { Entry, Page, Tree } from "./types.ts";
 
@@ -21,6 +22,8 @@ export const unnamedTypes = (data: LanguageData | null): string[] => Object.keys
 
 const text = (value: Json): string => (value === null || value === undefined ? "" : typeof value === "string" ? value : typeof value === "number" || typeof value === "boolean" ? String(value) : "");
 const capital = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);
+/** A record type in words: `OrgCategory` is `org category`. */
+const typeWords = (type: string): string => type.replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase();
 const humanKey = (key: string): string => capital(key.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/_/g, " ").toLowerCase());
 
 /** Where a record's roles point: its type's roles over a data file, a linked key shown as the linked record's title. */
@@ -56,7 +59,7 @@ function fieldsEntry(type: string, data: LanguageData): Entry {
   const mediumRole = one.medium === "PICTURE" ? "picture" : one.medium === "NONE" ? "" : "title";
   const rows = ROLES.filter((role) => one.roles[role]).map((role) => [humanKey(role), one.roles[role], role === mediumRole ? medium : ""]);
   const description = `${type} holds ${recordsFor(type, data).length} records here. Its medium is ${one.medium === "NONE" ? "none" : medium.toLowerCase()}.`;
-  return { kind: "Fields", case: "", note: sentence(`The fields ${type} names for each role`), node: sec([feat({ title: `${words(type)} fields`, description }), table(["Role", "Field", "Medium"], rows)], "MD"), planned: false };
+  return { kind: "Fields", case: "", note: sentence(`The fields ${type} names for each role`), node: sec([feat({ title: `${capital(typeWords(type))} fields`, description }), table(["Role", "Field", "Medium"], rows)], "MD"), planned: false };
 }
 
 /** A type's records in the file's order; a Plan file groups its records, and each carries its group. */
@@ -75,6 +78,8 @@ function cardOf(type: string, record: Rec & { __group?: string }, data: Language
   const currency = text((data.index ?? {}).currency) || "USD";
   const picture = (key: string, fallback: string, ratio: string): Tree => {
     const value = record[key];
+    const held = heldPicture(`${data.types[type].file}/${text(record.key)}`, key);
+    if (held) return filePicture(held, isObj(value) && text(value.caption) ? text(value.caption) : fallback, isObj(value) && text(value.ratio) ? text(value.ratio) : ratio);
     return slot(isObj(value) && text(value.caption) ? text(value.caption) : fallback, isObj(value) && text(value.ratio) ? text(value.ratio) : ratio);
   };
   const money = (value: Json): Tree => U("DSFormatCurrency", { value: Number(value), currencyCode: currency });
@@ -89,7 +94,9 @@ function cardOf(type: string, record: Rec & { __group?: string }, data: Language
     case "Subject": return U("DSCardWidget", { parts: [{ mtype: "MEDIA", key: "cover", node: picture("picture", say("title"), "4:3") }, { mtype: "FREE", key: "name", node: U("DSItem", { pageLevel: "WIDGET", title: say("title"), description: say("line") }) }] });
     case "Org": {
       const mark = isObj(record.mark) && text(record.mark.icon) ? { mtype: "MARK", icon: text(record.mark.icon) } : { mtype: "MARK", text: say("title").slice(0, 2).toUpperCase() };
-      return U("DSCardWidget", { parts: [{ mtype: "FREE", key: "org", node: U("DSItem", { pageLevel: "WIDGET", title: say("title"), description: say("line") || read.field(type, record, "category"), media: mark, facts: [say("place"), say("date") ? `Since ${say("date")}` : ""].filter(Boolean) }) }] });
+      const logo = logoOf(record, 40);
+      const banner = bannerOf(record, "21:9");
+      return U("DSCardWidget", { parts: [...(banner ? [{ mtype: "MEDIA", key: "banner", node: banner }] : []), { mtype: "FREE", key: "org", node: U("DSItem", { pageLevel: "WIDGET", title: say("title"), description: say("line") || read.field(type, record, "category"), media: logo ? { mtype: "CUSTOM", node: logo } : mark, facts: [say("place"), say("date") ? `Since ${say("date")}` : ""].filter(Boolean) }) }] });
     }
     case "Person": return personCard(say("title"), say("line"));
     case "Review": return quoteCard(say("line"), say("title"), [`${text(record.rating)} out of 5`, say("owner"), say("date")].filter(Boolean).join(" · "), true);
@@ -110,7 +117,7 @@ function tableEntry(type: string, records: Rec[], data: LanguageData, read: Retu
   const columns = [...new Set([...named, ...one.required.filter((name) => !named.includes(name))])].slice(0, 6);
   const rows = records.map((record) => columns.map((name) => read.field(type, record, name)));
   const head = columns.map(humanKey);
-  return { kind: "Records", case: "", note: sentence(`Every ${words(type)} record, one row each, in a table`), node: sec([feat({ title: `Every ${words(type)} record`, description: `No catalogue widget names ${words(type)}, so its records stand as one table, a row each.` }), ...(rows.length ? [table(head, rows)] : [muted(`The language holds no ${words(type)} record.`)])], "MD"), planned: false };
+  return { kind: "Records", case: "", note: sentence(`Every ${typeWords(type)} record, one row each, in a table`), node: sec([feat({ title: `Every ${typeWords(type)} record`, description: `No catalogue widget names ${typeWords(type)}, so its records stand as one table, a row each.` }), ...(rows.length ? [table(head, rows)] : [muted(`The language holds no ${typeWords(type)} record.`)])], "MD"), planned: false };
 }
 
 /** The Data pages of a language, one for each type its types.json holds, in that order; none for a language with no types. */
@@ -126,11 +133,11 @@ export function dataPages(data: LanguageData | null): Page[] {
         if (!card) continue;
         const label = read.say(type, record, "title") || text(record.key);
         const heading = record.__group ? `${label} · ${text(record.__group)}` : label;
-        entries.push({ kind: heading, case: "", note: sentence(`${words(type)} record ${text(record.key) || label}, drawn as ${WIDGET_OF[type].toLowerCase().replace(/_/g, " ")}`), node: sec([txt(heading, "TITLE_SM", { tone: "MUTED" }), card], "SM"), planned: false });
+        entries.push({ kind: heading, case: "", note: sentence(`${typeWords(type)} record ${text(record.key) || label}, drawn as ${WIDGET_OF[type].toLowerCase().replace(/_/g, " ")}`), node: sec([txt(heading, "TITLE_SM", { tone: "MUTED" }), card], "SM"), planned: false });
       }
-      if (!records.length) entries.push({ kind: "Records", case: "", note: sentence(`The language holds no ${words(type)} record`), node: sec([muted(`The language holds no ${words(type)} record.`)], "SM"), planned: false });
+      if (!records.length) entries.push({ kind: "Records", case: "", note: sentence(`The language holds no ${typeWords(type)} record`), node: sec([muted(`The language holds no ${typeWords(type)} record.`)], "SM"), planned: false });
     } else entries.push(tableEntry(type, records, data, read));
-    const title = capital(words(type));
-    return { file: `01-shared/05-data/${String(at + 1).padStart(2, "0")}-${slugOf(type)}.html`, title, category: "SHARED", part: "DATA", kinds: [], entries, ask: sentence(`What ${words(type)} records the language holds, and how they are drawn`), layout: "CANVAS" };
+    const title = capital(typeWords(type));
+    return { file: `01-shared/05-data/${String(at + 1).padStart(2, "0")}-${slugOf(type)}.html`, title, category: "SHARED", part: "DATA", kinds: [], entries, ask: sentence(`What ${typeWords(type)} records the language holds, and how they are drawn`), layout: "CANVAS" };
   });
 }

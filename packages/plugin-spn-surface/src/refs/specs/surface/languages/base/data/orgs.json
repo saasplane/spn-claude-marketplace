@@ -9,8 +9,20 @@
    "city": "Pune",
    "since": "2022-06-01",
    "mark": {
-    "icon": "BRUSH",
+    "icon": "PALETTE",
     "color": "PRIMARY"
+   },
+   "logo": {
+    "caption": "Atelier's brush mark in plum",
+    "ratio": "1:1"
+   },
+   "wide": {
+    "caption": "Atelier's wide logo: the brush mark and the name",
+    "ratio": "5:1"
+   },
+   "banner": {
+    "caption": "A bright studio: an easel, a potter's wheel and a phone on a tripod",
+    "ratio": "21:9"
    }
   },
   {
@@ -47,7 +59,15 @@
      "refunds": 0
     }
    ],
-   "share": 0.1
+   "share": 0.1,
+   "logo": {
+    "caption": "Studio Mira's pencil mark in terracotta",
+    "ratio": "1:1"
+   },
+   "wide": {
+    "caption": "Studio Mira's wide logo",
+    "ratio": "5:1"
+   }
   },
   {
    "key": "byte-school",
@@ -65,7 +85,15 @@
    },
    "about": "Engineers from product teams teach the code they use at work, with projects you can show an employer.",
    "category": "MERCHANT",
-   "parent": "atelier"
+   "parent": "atelier",
+   "logo": {
+    "caption": "Byte School's code brackets in indigo",
+    "ratio": "1:1"
+   },
+   "wide": {
+    "caption": "Byte School's wide logo",
+    "ratio": "5:1"
+   }
   },
   {
    "key": "northlight",
@@ -83,7 +111,15 @@
    },
    "about": "Working photographers teach light and framing on the camera you already own, then walk the streets with you.",
    "category": "MERCHANT",
-   "parent": "atelier"
+   "parent": "atelier",
+   "logo": {
+    "caption": "Northlight Academy's eye mark in amber",
+    "ratio": "1:1"
+   },
+   "wide": {
+    "caption": "Northlight Academy's wide logo",
+    "ratio": "5:1"
+   }
   },
   {
    "key": "kiln-co",
@@ -101,7 +137,15 @@
    },
    "about": "A ceramics studio in Koregaon Park with eight wheels, a gas kiln and weekend classes for every level.",
    "category": "MERCHANT",
-   "parent": "atelier"
+   "parent": "atelier",
+   "logo": {
+    "caption": "Kiln & Co's bowl mark in clay",
+    "ratio": "1:1"
+   },
+   "wide": {
+    "caption": "Kiln & Co's wide logo",
+    "ratio": "5:1"
+   }
   },
   {
    "key": "crumb",
@@ -114,12 +158,20 @@
     "color": "SUCCESS"
    },
    "banner": {
-    "caption": "Loaves cooling on a rack in a small bakery",
+    "caption": "A bakery counter with loaves and a cup of tea",
     "ratio": "21:9"
    },
    "about": "Three bakers who teach bread at home, from your first starter to a loaf you are proud to share.",
    "category": "MERCHANT",
-   "parent": "atelier"
+   "parent": "atelier",
+   "logo": {
+    "caption": "Crumb Collective's wheat mark in green",
+    "ratio": "1:1"
+   },
+   "wide": {
+    "caption": "Crumb Collective's wide logo",
+    "ratio": "5:1"
+   }
   },
   {
    "key": "tomas-studio",
@@ -132,6 +184,18 @@
    "mark": {
     "icon": "PALETTE",
     "color": "DEFAULT"
+   },
+   "logo": {
+    "caption": "Tomas Reyes Studio's wave mark in teal",
+    "ratio": "1:1"
+   },
+   "wide": {
+    "caption": "Tomas Reyes Studio's wide logo",
+    "ratio": "5:1"
+   },
+   "banner": {
+    "caption": "A watercolour coast with a sailboat at sunset",
+    "ratio": "21:9"
    }
   },
   {
@@ -192,8 +256,20 @@
    "knownFor": "Data and analytics, taught in its own school",
    "plan": "teams",
    "mark": {
-    "icon": "CHART",
+    "icon": "ACTIVITY",
     "color": "PRIMARY"
+   },
+   "logo": {
+    "caption": "Brightpath Learning's bar mark in blue",
+    "ratio": "1:1"
+   },
+   "wide": {
+    "caption": "Brightpath Learning's wide logo",
+    "ratio": "5:1"
+   },
+   "banner": {
+    "caption": "Charts, a laptop and code on a school's screens",
+    "ratio": "21:9"
    }
   },
   {
@@ -211,7 +287,19 @@
    "parent": "brightpath",
    "city": "Mumbai",
    "since": "2025-06-30",
-   "seats": 12
+   "seats": 12,
+   "logo": {
+    "caption": "Kestrel Insurance's bird mark in navy",
+    "ratio": "1:1"
+   },
+   "wide": {
+    "caption": "Kestrel Insurance's wide logo",
+    "ratio": "5:1"
+   },
+   "banner": {
+    "caption": "An office tower and a claims chart",
+    "ratio": "21:9"
+   }
   },
   {
    "key": "pinecone",
@@ -223,8 +311,20 @@
    "plan": "teams",
    "seats": 8,
    "mark": {
-    "icon": "TREE",
+    "icon": "GLOBE",
     "color": "DEFAULT"
+   },
+   "logo": {
+    "caption": "Pinecone Labs' pine mark in green",
+    "ratio": "1:1"
+   },
+   "wide": {
+    "caption": "Pinecone Labs' wide logo",
+    "ratio": "5:1"
+   },
+   "banner": {
+    "caption": "A phone and a dashboard beside a plant in a design team's room",
+    "ratio": "21:9"
    }
   },
   {
@@ -247,6 +347,18 @@
    "mark": {
     "icon": "PALETTE",
     "color": "PRIMARY"
+   },
+   "logo": {
+    "caption": "Noor Clay Studio's bowl mark in plum",
+    "ratio": "1:1"
+   },
+   "wide": {
+    "caption": "Noor Clay Studio's wide logo",
+    "ratio": "5:1"
+   },
+   "banner": {
+    "caption": "Shelves of vases and a wheel in a warm clay studio",
+    "ratio": "21:9"
    }
   }
  ]

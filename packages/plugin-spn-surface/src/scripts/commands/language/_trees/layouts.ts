@@ -1,6 +1,7 @@
 // The layouts a sample stands in: a site's DSLayout (TOPNAV with the brand's wide logo, RAIL, CANVAS) around a DSSiteLayout, and an app's
 // layouts (RAIL, TOPNAV, DOCK, CANVAS) around its page. A layout holds a page's entries, and the entries are what a note counts.
 import { U, slot, txt } from "./kit.ts";
+import { brandOrg, orgNamed, wideOf } from "./media.ts";
 import type { Brief } from "./words.ts";
 import type { Tree } from "./types.ts";
 
@@ -8,7 +9,7 @@ export function siteLayout(b: Brief, kind: string, children: Tree[], selected?: 
   const config: Tree = { mtype: kind, body: { width: "XWIDE" } };
   if (kind === "TOPNAV" || kind === "RAIL") {
     config.nav = b.nav.map(([label, key]) => ({ type: "ITEM", key, label, anchor: { href: `#${key}` }, ...(key === selected ? { selected: true } : {}) }));
-    config.startNode = slot(`${b.org} wide logo`, "4:1");
+    config.startNode = wideOf(orgNamed(b.org) ?? brandOrg(), 40) ?? slot(`${b.org} wide logo`, "4:1");
   }
   if (kind === "RAIL") { config.collapsible = false; config.defaultOpen = true; }
   return U("DSLayout", { size: "SM", config }, [U("DSSiteLayout", {}, children)]);

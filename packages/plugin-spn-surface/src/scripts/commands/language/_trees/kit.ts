@@ -3,6 +3,7 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 // The tree vocabulary the sample recipes write in: a node is `{ unit, props, children }` as `spnutils apps surface render` reads it, and a placement
 // is `{ place, … }`. Nothing here draws; a recipe builds a tree and the render draws it.
+import { faceMedia } from "./media.ts";
 import type { Tree } from "./types.ts";
 
 export const U = (unit: string, props: Tree = {}, children?: unknown[]): Tree => (children === undefined ? { unit, props } : { unit, props, children });
@@ -92,7 +93,7 @@ export function sweep<T>(node: T): T {
 
 /** A quote: a person's words, who said them and the role they hold, framed as a card where `card` is set. */
 export const quote = (words: string, name: string, role: string, card = false, level = "WIDGET"): Tree =>
-  U("DSQuote", { quote: words, speaker: { title: name, description: role, media: { mtype: "AVATAR", title: name } }, pageLevel: level, ...(card ? { surface: { raised: true, elevation: "MD" } } : {}) });
+  U("DSQuote", { quote: words, speaker: { title: name, description: role, media: faceMedia(name) ?? { mtype: "AVATAR", title: name } }, pageLevel: level, ...(card ? { surface: { raised: true, elevation: "MD" } } : {}) });
 
 /** A keyboard key combination. */
 export const kbd = (keys: string[]): Tree => U("DSKbd", { keys });
@@ -122,4 +123,26 @@ export function dsAtLeast(version: string): boolean {
   const [a, b] = [n(dsVersion), n(version)];
   for (let i = 0; i < 3; i++) { if ((a[i] ?? 0) !== (b[i] ?? 0)) return (a[i] ?? 0) > (b[i] ?? 0); }
   return true;
+}
+
+/** The icon names the design system draws, read from the installed package's `DSIconType`, or from SPN_SURFACE_DS_ICONS (a list with a comma between) where a test names them; null where none can be read. */
+export function dsIcons(): Set<string> | null {
+  if (process.env.SPN_SURFACE_DS_ICONS !== undefined) return new Set(process.env.SPN_SURFACE_DS_ICONS.split(","));
+  const file = join(homedir(), ".saasplane", "cache", "design-system", dsVersion, "node_modules", "@saasplane", "support-web-ds-ts", "ui", "core", "icon.d.ts");
+  if (!existsSync(file)) return null;
+  return new Set(readFileSync(file, "utf8").match(/\b[A-Z][A-Z0-9_]{2,}\b/g) ?? []);
+}
+
+/** The icon names a tree draws that the design system does not hold: the cause of a section the render will not draw, named here before the render says only that the unit would not render. */
+export function unknownIcons(node: unknown): string[] {
+  const known = dsIcons();
+  if (!known) return [];
+  const found = new Set<string>();
+  const walk = (one: unknown, key = ""): void => {
+    if (Array.isArray(one)) { one.forEach((x) => walk(x, key)); return; }
+    if (one && typeof one === "object") { for (const [name, value] of Object.entries(one as Record<string, unknown>)) walk(value, name); return; }
+    if (typeof one === "string" && /^(icon|startIcon|endIcon|node)$/.test(key) && /^[A-Z][A-Z0-9_]{2,}$/.test(one) && !known.has(one)) found.add(one);
+  };
+  walk(node);
+  return [...found];
 }

@@ -39,13 +39,13 @@ export function templatesOf(html: Record<Mode, Record<Device, string>>, prefix =
  * left as the render wrote it, and said.
  */
 export function placeAssets(markup: string, here: string, opts: PageOptions): string {
-  return markup.replace(/src="asset:([a-z][a-z0-9-]*)\/([^"]+)"/g, (whole, language: string, path: string) => {
+  return markup.replace(/(src|href)="asset:([a-z][a-z0-9-]*)\/([^"]+)"/g, (whole, attribute: string, language: string, path: string) => {
     const from = opts.assetFile ? opts.assetFile(language, path) : null;
     if (!from || !existsSync(from)) { opts.log?.(`asset not found: ${language}/${path}`); return whole; }
     const to = join(opts.out, "assets", language, path);
     mkdirSync(dirname(to), { recursive: true });
     copyFileSync(from, to);
-    return `src="${relative(dirname(here), to).split("\\").join("/")}"`;
+    return `${attribute}="${relative(dirname(here), to).split("\\").join("/")}"`;
   });
 }
 

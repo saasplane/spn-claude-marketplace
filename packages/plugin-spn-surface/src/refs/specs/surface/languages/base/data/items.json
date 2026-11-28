@@ -122,7 +122,11 @@
      "price": 1899
     }
    ],
-   "subject": "design"
+   "subject": "design",
+   "banner": {
+    "caption": "Phone screens of a travel app laid out on a desk",
+    "ratio": "21:9"
+   }
   },
   {
    "kind": "COURSE",
@@ -193,7 +197,11 @@
      "price": 349
     }
    ],
-   "subject": "design"
+   "subject": "design",
+   "banner": {
+    "caption": "A Figma library of buttons and colour swatches",
+    "ratio": "21:9"
+   }
   },
   {
    "kind": "COURSE",
@@ -288,7 +296,11 @@
      "price": 1499
     }
    ],
-   "subject": "development"
+   "subject": "development",
+   "banner": {
+    "caption": "A notebook of Python code beside a bar chart",
+    "ratio": "21:9"
+   }
   },
   {
    "kind": "COURSE",
@@ -373,7 +385,11 @@
      "price": 649
     }
    ],
-   "subject": "development"
+   "subject": "development",
+   "banner": {
+    "caption": "A chat window answering a question from a PDF",
+    "ratio": "21:9"
+   }
   },
   {
    "kind": "COURSE",
@@ -448,7 +464,11 @@
      "price": 349
     }
    ],
-   "subject": "arts-crafts"
+   "subject": "arts-crafts",
+   "banner": {
+    "caption": "A watercolour of a fishing boat on a Goan beach",
+    "ratio": "21:9"
+   }
   },
   {
    "kind": "COURSE",
@@ -517,7 +537,11 @@
      "price": 299
     }
    ],
-   "subject": "arts-crafts"
+   "subject": "arts-crafts",
+   "banner": {
+    "caption": "A brush pen lettering the word Hello",
+    "ratio": "21:9"
+   }
   },
   {
    "kind": "COURSE",
@@ -592,7 +616,11 @@
      "price": 299
     }
    ],
-   "subject": "food-drink"
+   "subject": "food-drink",
+   "banner": {
+    "caption": "A sourdough loaf with a deep ear on a cooling rack",
+    "ratio": "21:9"
+   }
   },
   {
    "kind": "COURSE",
@@ -671,7 +699,11 @@
      "price": 399
     }
    ],
-   "subject": "photo-video"
+   "subject": "photo-video",
+   "banner": {
+    "caption": "A man crossing a Mumbai street through a beam of light",
+    "ratio": "21:9"
+   }
   },
   {
    "kind": "WORKSHOP",
@@ -724,7 +756,11 @@
     "Ceramics",
     "Weekend"
    ],
-   "subject": "arts-crafts"
+   "subject": "arts-crafts",
+   "banner": {
+    "caption": "A row of freshly thrown bowls on a wooden board",
+    "ratio": "21:9"
+   }
   },
   {
    "kind": "WORKSHOP",
@@ -775,7 +811,11 @@
     "Portfolio",
     "Careers"
    ],
-   "subject": "design"
+   "subject": "design",
+   "banner": {
+    "caption": "A video call with a portfolio shared on screen",
+    "ratio": "21:9"
+   }
   },
   {
    "kind": "WORKSHOP",
@@ -825,7 +865,11 @@
    "tags": [
     "Coffee"
    ],
-   "subject": "food-drink"
+   "subject": "food-drink",
+   "banner": {
+    "caption": "Pour-over coffee dripping into a glass server",
+    "ratio": "21:9"
+   }
   },
   {
    "kind": "WORKSHOP",
@@ -877,7 +921,11 @@
     "Photography",
     "Night"
    ],
-   "subject": "photo-video"
+   "subject": "photo-video",
+   "banner": {
+    "caption": "Neon signs reflected in a wet Colaba street",
+    "ratio": "21:9"
+   }
   }
  ]
 }

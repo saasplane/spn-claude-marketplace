@@ -41,6 +41,12 @@
    ],
    "neededBy": [
     "MARKETPLACE category pages, tiles and facets"
+   ],
+   "media": [
+    {
+     "field": "picture",
+     "ratio": "4:3"
+    }
    ]
   },
   {
@@ -68,6 +74,20 @@
     "MARKETPLACE brand pages",
     "DASHBOARD the studio",
     "PORTAL the learner’s orders"
+   ],
+   "media": [
+    {
+     "field": "logo",
+     "ratio": "1:1"
+    },
+    {
+     "field": "wide",
+     "ratio": "5:1"
+    },
+    {
+     "field": "banner",
+     "ratio": "21:9"
+    }
    ]
   },
   {
@@ -90,6 +110,12 @@
    "neededBy": [
     "MARKETPLACE seller pages",
     "every avatar"
+   ],
+   "media": [
+    {
+     "field": "avatar",
+     "ratio": "1:1"
+    }
    ]
   },
   {
@@ -148,6 +174,16 @@
     "every MARKETPLACE page",
     "DASHBOARD records",
     "PORTAL my courses"
+   ],
+   "media": [
+    {
+     "field": "cover",
+     "ratio": "16:9"
+    },
+    {
+     "field": "banner",
+     "ratio": "21:9"
+    }
    ]
   },
   {
@@ -208,7 +244,8 @@
     "item",
     "by",
     "rating",
-    "date"
+    "date",
+    "key"
    ],
    "derived": [
     "the rating breakdown"
@@ -216,6 +253,12 @@
    "neededBy": [
     "MARKETPLACE item and seller pages",
     "DASHBOARD reviews"
+   ],
+   "media": [
+    {
+     "field": "avatar",
+     "ratio": "1:1"
+    }
    ]
   },
   {
@@ -280,6 +323,38 @@
    "derived": [],
    "neededBy": [
     "DASHBOARD and PORTAL AUTH_FLOW Verify case"
+   ]
+  },
+  {
+   "type": "Post",
+   "file": "posts",
+   "medium": "PICTURE",
+   "roles": {
+    "title": "title",
+    "line": "line",
+    "picture": "cover",
+    "owner": "person",
+    "date": "date",
+    "state": "category"
+   },
+   "required": [
+    "key",
+    "title",
+    "person",
+    "date"
+   ],
+   "derived": [
+    "the posts of each category"
+   ],
+   "neededBy": [
+    "MARKETING blog home and category",
+    "RESOURCES guides"
+   ],
+   "media": [
+    {
+     "field": "cover",
+     "ratio": "16:9"
+    }
    ]
   }
  ]

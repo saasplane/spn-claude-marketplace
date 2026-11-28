@@ -95,6 +95,11 @@
 - **A web package says what it ships: `shippedLanguages` in its `spsurface.json` names each language its build carries for whoever installs it** (`RULE.SUPPORT.SURFACE.641` · MUST · skill:spn-surface/design)
 - **A language is described for each surface category it states, in the same seven parts, in the groups Structure and Style, beside one Shared group** (`RULE.SUPPORT.SURFACE.642` · MUST · skill:spn-surface/design)
 - **A language's samples home is laid out in one shape for every language: Shared, then each category's Layouts, Pages, Containers, Widgets, Media, Motion and Words** (`RULE.SUPPORT.SURFACE.643` · MUST · skill:spn-surface/design)
+- **A record carries the media its type has, as pictures listed in `assets/sources.json`, and a proof strip draws a logo image or a wide logo alone** (`RULE.SUPPORT.SURFACE.645` · MUST · skill:spn-surface/design)
+- **A language's samples carry the record counts that make a page read as real** (`RULE.SUPPORT.SURFACE.646` · MUST · skill:spn-surface/design)
+- **A language's samples carry the marketing words by section, each item with its icon, picture and link** (`RULE.SUPPORT.SURFACE.647` · MUST · skill:spn-surface/design)
+- **A samples home's pages, containers and widgets draw from the language's data and never from placeholder words, and a section is composed from design-system components where no one unit fits** (`RULE.SUPPORT.SURFACE.648` · MUST · skill:spn-surface/design)
+- **A language's samples show none of the gaps of a thin page** (`RULE.SUPPORT.SURFACE.649` · MUST · skill:spn-surface/design)
 
 Read this before a page of a site or an app is drawn, and while a partner's design language is being made. 
 

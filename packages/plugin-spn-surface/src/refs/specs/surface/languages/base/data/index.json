@@ -55,6 +55,7 @@
   "reviews",
   "questions",
   "invitations",
-  "signups"
+  "signups",
+  "posts"
  ]
 }

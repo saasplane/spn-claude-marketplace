@@ -9,7 +9,11 @@
    "city": "Bengaluru",
    "since": "2023-02-14",
    "bio": "Mira has designed banking and travel apps for twelve years and now runs Studio Mira, where she teaches the work behind a good handoff.",
-   "responds": "within a day"
+   "responds": "within a day",
+   "avatar": {
+    "caption": "Mira Okafor, a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   },
   {
    "key": "arjun",
@@ -19,7 +23,11 @@
    "city": "Pune",
    "since": "2022-09-01",
    "bio": "Arjun builds data pipelines by day and teaches Python to people who have never written a line of it.",
-   "responds": "within a few hours"
+   "responds": "within a few hours",
+   "avatar": {
+    "caption": "Arjun Mehta, a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   },
   {
    "key": "leo",
@@ -29,7 +37,11 @@
    "city": "Mumbai",
    "since": "2023-06-20",
    "bio": "Leo shoots for magazines and teaches people to see light first and reach for settings second.",
-   "responds": "within a day"
+   "responds": "within a day",
+   "avatar": {
+    "caption": "Leo Brandt, a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   },
   {
    "key": "hana",
@@ -39,7 +51,11 @@
    "city": "Pune",
    "since": "2024-01-10",
    "bio": "Hana trained in Mashiko and has taught wheel-throwing to more than a thousand beginners.",
-   "responds": "within two days"
+   "responds": "within two days",
+   "avatar": {
+    "caption": "Hana Sato, a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   },
   {
    "key": "ines",
@@ -49,7 +65,11 @@
    "city": "Bengaluru",
    "since": "2024-03-05",
    "bio": "Ines ran a neighbourhood bakery for six years before teaching sourdough to home bakers.",
-   "responds": "within a day"
+   "responds": "within a day",
+   "avatar": {
+    "caption": "Ines Varga, a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   },
   {
    "key": "tomas",
@@ -59,7 +79,11 @@
    "city": "Goa",
    "since": "2023-11-02",
    "bio": "Tomas paints the coast of Goa and teaches watercolour the way he learned it: loose, light and every day.",
-   "responds": "within a day"
+   "responds": "within a day",
+   "avatar": {
+    "caption": "Tomas Reyes, a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   },
   {
    "key": "ananya",
@@ -67,7 +91,11 @@
    "initials": "AP",
    "email": "ananya.patel@example.com",
    "city": "Pune",
-   "since": "2025-04-18"
+   "since": "2025-04-18",
+   "avatar": {
+    "caption": "Ananya Patel, a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   },
   {
    "key": "devika",
@@ -75,7 +103,11 @@
    "initials": "DR",
    "headline": "Head of learning, Atelier",
    "city": "Pune",
-   "since": "2022-06-01"
+   "since": "2022-06-01",
+   "avatar": {
+    "caption": "Devika Rao, a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   },
   {
    "key": "sam",
@@ -83,7 +115,11 @@
    "initials": "SO",
    "headline": "Support lead, Atelier",
    "city": "Pune",
-   "since": "2023-01-09"
+   "since": "2023-01-09",
+   "avatar": {
+    "caption": "Sam Okoye, a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   },
   {
    "key": "priya",
@@ -91,7 +127,11 @@
    "initials": "PN",
    "headline": "Founder, Brightpath Learning",
    "city": "Hyderabad",
-   "since": "2024-08-12"
+   "since": "2024-08-12",
+   "avatar": {
+    "caption": "Priya Nair, a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   },
   {
    "key": "farid",
@@ -99,7 +139,11 @@
    "initials": "FK",
    "headline": "Data teacher at Brightpath",
    "city": "Hyderabad",
-   "since": "2024-09-01"
+   "since": "2024-09-01",
+   "avatar": {
+    "caption": "Farid Khan, a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   },
   {
    "key": "rohan",
@@ -107,7 +151,11 @@
    "initials": "RI",
    "headline": "Learner in Brightpath's school",
    "city": "Chennai",
-   "since": "2025-10-02"
+   "since": "2025-10-02",
+   "avatar": {
+    "caption": "Rohan Iyer, a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   },
   {
    "key": "meera",
@@ -115,7 +163,11 @@
    "initials": "MJ",
    "headline": "Analytics lead, Kestrel Insurance",
    "city": "Mumbai",
-   "since": "2025-06-30"
+   "since": "2025-06-30",
+   "avatar": {
+    "caption": "Meera Joshi, a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   },
   {
    "key": "vikram",
@@ -123,7 +175,11 @@
    "initials": "VD",
    "headline": "Analyst, Kestrel Insurance",
    "city": "Mumbai",
-   "since": "2025-07-04"
+   "since": "2025-07-04",
+   "avatar": {
+    "caption": "Vikram Das, a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   },
   {
    "key": "lena",
@@ -131,7 +187,11 @@
    "initials": "LF",
    "headline": "Design manager, Pinecone Labs",
    "city": "Bengaluru",
-   "since": "2025-01-20"
+   "since": "2025-01-20",
+   "avatar": {
+    "caption": "Lena Fischer, a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   },
   {
    "key": "omar",
@@ -139,7 +199,11 @@
    "initials": "OS",
    "headline": "Product designer, Pinecone Labs",
    "city": "Bengaluru",
-   "since": "2025-02-03"
+   "since": "2025-02-03",
+   "avatar": {
+    "caption": "Omar Siddiqui, a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   },
   {
    "key": "kabir",
@@ -147,7 +211,11 @@
    "initials": "KS",
    "headline": "Learning photography on Plus",
    "city": "Delhi",
-   "since": "2025-09-14"
+   "since": "2025-09-14",
+   "avatar": {
+    "caption": "Kabir Shah, a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   },
   {
    "key": "noor",
@@ -157,7 +225,11 @@
    "city": "Kochi",
    "since": "2026-11-26",
    "bio": "Noor throws stoneware and has taught evening classes for six years; her studio on Atelier is two days old and holds nothing yet.",
-   "responds": "within a day"
+   "responds": "within a day",
+   "avatar": {
+    "caption": "Noor Haddad, a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   },
   {
    "key": "zara",
@@ -167,7 +239,83 @@
    "city": "Mumbai",
    "since": "2026-11-27",
    "bio": "Zara runs Studio Mira's live critiques and was invited to the studio on Atelier this week.",
-   "responds": "within a day"
+   "responds": "within a day",
+   "avatar": {
+    "caption": "Zara Mehta, a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
+  },
+  {
+   "key": "nikhil",
+   "name": "Nikhil Bose",
+   "initials": "NB",
+   "headline": "Engineering lead, Atelier",
+   "city": "Pune",
+   "since": "2022-09-12",
+   "avatar": {
+    "caption": "Nikhil Bose, a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
+  },
+  {
+   "key": "aisha",
+   "name": "Aisha Khan",
+   "initials": "AK",
+   "headline": "Head of design, Atelier",
+   "city": "Pune",
+   "since": "2022-11-01",
+   "avatar": {
+    "caption": "Aisha Khan, a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
+  },
+  {
+   "key": "joao",
+   "name": "Joao Costa",
+   "initials": "JC",
+   "headline": "Teacher success, Atelier",
+   "city": "Bengaluru",
+   "since": "2023-03-15",
+   "avatar": {
+    "caption": "Joao Costa, a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
+  },
+  {
+   "key": "mei",
+   "name": "Mei Tan",
+   "initials": "MT",
+   "headline": "Payments engineer, Atelier",
+   "city": "Bengaluru",
+   "since": "2023-05-02",
+   "avatar": {
+    "caption": "Mei Tan, a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
+  },
+  {
+   "key": "ravi",
+   "name": "Ravi Shah",
+   "initials": "RS",
+   "headline": "Founder, Atelier",
+   "city": "Pune",
+   "since": "2022-06-01",
+   "avatar": {
+    "caption": "Ravi Shah, a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
+  },
+  {
+   "key": "sofia",
+   "name": "Sofia Rossi",
+   "initials": "SR",
+   "headline": "Finance and operations, Atelier",
+   "city": "Pune",
+   "since": "2023-08-21",
+   "avatar": {
+    "caption": "Sofia Rossi, a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   }
  ]
 }

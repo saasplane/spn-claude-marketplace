@@ -21,14 +21,14 @@ Read the first two before anything else. The plugin is the container, and the ho
 
 | Construct | What it is |
 | --- | --- |
-| [The Plugin — Delivery Unit of the Marketplace](01-plugin.md) | A plugin carries one of this repository's standards into a running session, in one folder: its manifest, its entry in the marketplace list, the installed copy a session actually reads, and the version field that names which bytes those are. |
-| [Hooks — Code the Runtime Calls on Your Behalf](02-hooks.md) | A hook is code a plugin wires to a moment a session offers, so the runtime calls it and the rule is asked again on every single call. |
-| [Refs — A Chapter, Restated and Stamped](06-refs.md) | A ref is a markdown restatement of one or more foundation chapters, carrying a hash of the exact text it last read. |
-| [Agents — The Personas a Session Convenes, and the Viewpoints They Are Handed](03-agents.md) | An agent here is a named persona a session can call in the middle of a turn, for a second, independent read on a change. |
-| [Skills — A Stage's Steps, Loaded on Match](04-skills.md) | A skill is a named unit of work a session can be asked for — a folder holding a description that is matched against the work at hand, and the instructions that load only once that description matches. |
-| [Scripts — The Code a Plugin Ships, Wired or Reached by Name](05-scripts.md) | Scripts is the one folder that holds everything a plugin can execute — the checks a hook composes, the tools a person reaches by typing their path, and the library code both sides read. |
-| [Providers — How a Plugin Is Extended Per Instance](07-providers.md) | A provider is one folder per instance — one stack, or one cloud — holding everything about that instance that varies, inside a plugin that otherwise stays the same for every one of them. |
-| [Tests — How This Plugin Proves Itself](08-tests.md) | Tests is the folder a plugin proves itself from, arranged so a reader can find the suite that covers a script just by following that script's own path. |
+| [The Plugin](01-plugin.md) | A plugin carries one of this repository's standards into a running session, in one folder: its manifest, its entry in the marketplace list, the installed copy a session actually reads, and the version field that names which bytes those are. |
+| [Hooks](02-hooks.md) | A hook is code a plugin wires to a moment a session offers, so the runtime calls it and the rule is asked again on every single call. |
+| [Refs](06-refs.md) | A ref is a markdown restatement of one or more foundation chapters, carrying a hash of the exact text it last read. |
+| [Agents](03-agents.md) | An agent here is a named persona a session can call in the middle of a turn, for a second, independent read on a change. |
+| [Skills](04-skills.md) | A skill is a named unit of work a session can be asked for — a folder holding a description that is matched against the work at hand, and the instructions that load only once that description matches. |
+| [Scripts](05-scripts.md) | Scripts is the one folder that holds everything a plugin can execute — the checks a hook composes, the tools a person reaches by typing their path, and the library code both sides read. |
+| [Providers](07-providers.md) | A provider is one folder per instance — one stack, or one cloud — holding everything about that instance that varies, inside a plugin that otherwise stays the same for every one of them. |
+| [Tests](08-tests.md) | Tests is the folder a plugin proves itself from, arranged so a reader can find the suite that covers a script just by following that script's own path. |
 <!-- /spn:generated -->
 
 <!-- spn:generated glossary — do not edit inside these markers; `docs.ts face` writes it -->

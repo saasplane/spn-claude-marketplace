@@ -163,6 +163,83 @@ console.log("\n=== language samples write — the Data group of Shared");
   ok("[MKT.SCRIPTS.726] the home holds 01-shared/05-data with a page for each type of types.json in its order; each page holds a fields table and every record under its own heading, and a type with no widget is one table of its records, said as unnamed", drawn.code === 0 && subjectNotes.length === 3 && subjectNotes[0].kind === "Fields" && subjectNotes[1].kind === "Design" && subjectNotes[2].kind === "Code" && (memberPage ? JSON.parse(/<script type="application\/json" id="sample-notes">\n([\s\S]*?)\n<\/script>/.exec(memberPage)[1]).map((n) => n.kind).join() === "Fields,Records" : false) && drawn.out.includes("unnamed: Member") && JSON.parse(readFileSync(join(dataOut, "samples.json"), "utf8")).samples.some((s) => s.file === "01-shared/05-data/02-member.html" && s.part === "DATA"), drawn.out + subjectNotes.map((n) => n.kind).join(","));
 }
 
+console.log("\n=== language samples write — the media a language's data holds");
+{
+  const media = await import("../../../../../src/scripts/commands/language/_trees/media.ts");
+  const siteMod = await import("../../../../../src/scripts/commands/language/_trees/site.ts");
+  const { loadData } = await import("../../../../../src/scripts/commands/language/_folder.ts");
+  const layouts = await import("../../../../../src/scripts/commands/language/_trees/layouts.ts");
+  const kit = await import("../../../../../src/scripts/commands/language/_trees/kit.ts");
+  kit.setDs("11.30.0");
+  const lang = join(dir, "media-lang");
+  const put = (file, data) => { mkdirSync(join(lang, file, ".."), { recursive: true }); writeFileSync(join(lang, file), typeof data === "string" ? data : JSON.stringify(data)); };
+  const picture = (caption, ratio) => ({ caption, ratio });
+  put("data/index.json", { domain: "Sample", currency: "USD" });
+  put("data/orgs.json", { type: "Org", records: [
+    { key: "atelier", name: "Atelier", category: "PLATFORM", parent: null, logo: picture("Atelier", "1:1"), wide: picture("Atelier wide", "5:1") },
+    { key: "kiln-co", name: "Kiln & Co", category: "MERCHANT", parent: "atelier", about: "A ceramics studio.", logo: picture("Kiln", "1:1"), wide: picture("Kiln wide", "5:1"), banner: picture("Kiln banner", "21:9") },
+    { key: "byte-school", name: "Byte School", category: "MERCHANT", parent: "atelier", logo: picture("Byte", "1:1"), wide: picture("Byte wide", "5:1") },
+  ] });
+  put("data/people.json", { type: "Person", records: [{ key: "hana", name: "Hana Sato", avatar: picture("Hana", "1:1") }, { key: "mira", name: "Mira Okafor", avatar: picture("Mira", "1:1") }] });
+  put("data/subjects.json", { type: "Subject", records: [{ key: "design", name: "Design", line: "Design taught by people who ship.", picture: picture("A desk", "4:3") }, { key: "food", name: "Food and drink", line: "Bread and coffee.", picture: picture("A loaf", "4:3") }] });
+  put("data/posts.json", { type: "Post", records: [{ key: "first-post", title: "A first post", line: "Its line.", category: "Workshops", person: "mira", date: "2026-11-24", minutes: 6, cover: picture("A cover", "16:9") }] });
+  const pics = [["orgs/atelier", "logo"], ["orgs/atelier", "wide"], ["orgs/kiln-co", "logo"], ["orgs/kiln-co", "wide"], ["orgs/kiln-co", "banner"], ["orgs/byte-school", "logo"], ["orgs/byte-school", "wide"], ["people/hana", "avatar"], ["people/mira", "avatar"], ["subjects/design", "picture"], ["subjects/food", "picture"], ["posts/first-post", "cover"]];
+  put("assets/sources.json", { brand: {}, pictures: pics.map(([record, field]) => ({ record, field, file: `pictures/${record}-${field}.svg`, caption: "x", state: "HELD" })), drawings: [], note: null });
+  for (const [record, field] of pics) put(`assets/pictures/${record}-${field}.svg`, "<svg/>");
+  put("assets/drawings/door-teach.svg", "<svg/>");
+  put("types.json", { types: [{ type: "Org", file: "orgs", medium: "LOGO", roles: { title: "name", line: "knownFor" }, required: ["key", "name"], derived: [], neededBy: [] }] });
+  const data = loadData(lang).data;
+  media.setMedia("sample", lang, data);
+  const { dataPages: pagesOfData } = await import("../../../../../src/scripts/commands/language/_trees/data.ts");
+  const orgPage = JSON.stringify(pagesOfData(data)[0].entries);
+  ok("[MKT.SCRIPTS.742] an org of the Data folder is drawn with its banner and its logo, the files the data holds, and not a mark of its initials", orgPage.includes('"path":"pictures/orgs/kiln-co-banner.svg"') && orgPage.includes('"path":"pictures/orgs/kiln-co-logo.svg"'), orgPage.slice(0, 300));
+  const plan = (name, price, recommended) => ({ name, price, line: `${name} line`, feats: [`${name} one`, `${name} two`, `${name} three`], ...(recommended ? { recommended: true } : {}) });
+  const brief = {
+    org: "Atelier", promise: "p", legal: "l", emails: ["a@x"], nav: [["Teach", "teach"]], groups: [], claim: "c", claim2: "c2", problem: "p", problem2: "p2", facts: [], heroCta: ["Go", "More"],
+    doors: [["teach", "Teach on Atelier", "Publish a course.", "PENCIL"]], points: [], steps: [], qa: [], code: { file: "a", language: "HTML", text: "x" },
+    records: [["A first post", "Its line.", "24 November 2026", "first-post"]],
+    quotes: [["I sold out in two days.", "Hana Sato", "Teacher, Kiln & Co"], ["One page, one statement.", "Mira Okafor", "Founder, Studio Mira"], ["Seats and a waitlist.", "Nobody Known", "Teacher"]],
+    people: [["Hana Sato", "Potter"], ["Mira Okafor", "Founder"]], plans: [plan("Starter", 0), plan("Pro", 1999, true), plan("Academy", 5999)], numbers: [], closing: { title: "t", description: "d", cta: "c", second: "s" },
+    article: { title: "t", lede: "l", by: "b", date: "d" }, choose: [], marks: ["Kiln & Co", "Byte School", "Nowhere Ltd"], logosLine: "Teachers on Atelier.", places: [], picture: { hero: "h", show: "s", proof: "p" }, planTable: [], listings: [],
+    pictures: { doors: { teach: "drawings/door-teach.svg" } },
+  };
+  const json = (tree) => JSON.stringify(tree);
+  const strip = json(siteMod.siteContainer("PROOF_LOGOS", "CUSTOMER_MARKS", brief));
+  ok("[MKT.SCRIPTS.730] the proof strip draws each org's wide logo image, and a name no org holds keeps its lockup, never a bare initial of an org that has a logo", strip.includes('"path":"pictures/orgs/kiln-co-wide.svg"') && strip.includes('"path":"pictures/orgs/byte-school-wide.svg"') && !/"text":"KI"|"text":"K"/.test(strip), strip.slice(0, 600));
+  const quotes = json(siteMod.siteContainer("PROOF_TESTIMONIALS", "WALL", brief));
+  ok("[MKT.SCRIPTS.731] a testimonial draws the speaker's face and the org's logo, from the people and the orgs the data holds", quotes.includes('"path":"pictures/people/hana-avatar.svg"') && quotes.includes('"path":"pictures/orgs/kiln-co-logo.svg"') && quotes.includes('"path":"pictures/people/mira-avatar.svg"'), quotes.slice(0, 600));
+  const team = json(siteMod.siteContainer("ABOUT_TEAM", "", brief));
+  ok("[MKT.SCRIPTS.732] a team card draws the person's face from the data in place of a labelled box", team.includes('"path":"pictures/people/hana-avatar.svg"') && !team.includes("portrait, head and shoulders"), team.slice(0, 400));
+  const posts = json(siteMod.siteContainer("BROWSE_FEATURED", "", brief));
+  ok("[MKT.SCRIPTS.733] a record named by its key draws its cover, with its category and read time from the data", posts.includes('"path":"pictures/posts/first-post-cover.svg"') && posts.includes("6 min read"), posts.slice(0, 500));
+  const tiles = json(siteMod.siteContainer("BROWSE_TILES", "", { ...brief, pictures: undefined }));
+  ok("[MKT.SCRIPTS.734] the category tiles of a marketplace draw each subject with its picture, its name and its line", tiles.includes('"path":"pictures/subjects/design-picture.svg"') && tiles.includes("Bread and coffee."), tiles.slice(0, 400));
+  const doors = json(siteMod.siteContainer("EXPLAIN_DOORS", "", brief));
+  ok("[MKT.SCRIPTS.735] a door draws its picture, its icon, its title and line, and a link", doors.includes('"path":"drawings/door-teach.svg"') && doors.includes('"PENCIL"') && doors.includes("Teach on Atelier") && doors.includes('"DSLink"'), doors.slice(0, 500));
+  const cards = json(siteMod.siteContainer("PRICE_PLANS", "", brief));
+  ok("[MKT.SCRIPTS.736] the plan cards come as a pricing page draws them: Monthly and Annual tabs with the saving, the recommended plan raised with its badge, a big price with a period, a tick list of the things themselves and one full-width button each", cards.includes('"DSTabs"') && cards.includes("Annual") && /Save \d+%/i.test(cards) && /Most popular/i.test(cards) && cards.includes("/ month") && cards.includes('"CHECK"') && !cards.includes("Included in the plan.") && (cards.match(/"fullWidth":true/g) ?? []).length === 3, cards.slice(0, 700));
+  const header = json(layouts.siteLayout(brief, "TOPNAV", [], "teach"));
+  ok("[MKT.SCRIPTS.737] the header carries the platform org's wide logo as a picture", header.includes('"path":"pictures/orgs/atelier-wide.svg"'), header.slice(0, 300));
+  const hero = json(siteMod.siteContainer("ITEM_HERO", "", brief)) + json(siteMod.siteContainer("SELLER_HERO", "", brief));
+  ok("[MKT.SCRIPTS.738] a seller or brand head names the org of the data, with its banner, and not a seller of the writer's own", hero.includes("Kiln & Co") && hero.includes('"path":"pictures/orgs/kiln-co-banner.svg"') && !hero.includes("Kite Studio"), hero.slice(0, 400));
+  process.env.SPN_SURFACE_DS_ICONS = "PENCIL,CALENDAR,CHECK";
+  const bad = kit.unknownIcons(siteMod.siteContainer("EXPLAIN_DOORS", "", { ...brief, pictures: undefined, doors: [["a", "A", "line", "BOOK"], ["b", "B", "line", "PENCIL"]] }));
+  delete process.env.SPN_SURFACE_DS_ICONS;
+  ok("[MKT.SCRIPTS.739] an icon the design system does not hold is named, so a section the render will not draw says why and not only that it would not render", bad.length === 1 && bad[0] === "BOOK", JSON.stringify(bad));
+  media.setMedia("sample", null, null);
+}
+
+{
+  const { dataPages } = await import("../../../../../src/scripts/commands/language/_trees/data.ts");
+  const pages = dataPages({ folder: "", index: null, samples: null, assets: null, sources: null, types: { OrgCategory: { type: "OrgCategory", file: "categories", medium: "NONE", roles: { title: "label" }, required: [], derived: [], neededBy: [] } }, files: { categories: { type: "OrgCategory", records: [{ code: "A", label: "Alpha" }] } } });
+  ok("[MKT.SCRIPTS.741] a record type named in camel case reads as words in the Data folder: Org category, never Orgcategory", pages[0].title === "Org category" && JSON.stringify(pages[0].entries).includes("Org category fields") && !JSON.stringify(pages[0].entries).includes("Orgcategory"), JSON.stringify([pages[0].title, pages[0].entries.map((e) => e.kind)]));
+}
+{
+  const { windowsOf } = await import("../../../../../src/scripts/commands/language/_trees/render.ts");
+  const drawn = windowsOf('<link rel="preload" as="image" href="asset:base/pictures/a.svg"/><section><img src="asset:base/pictures/a.svg"/></section><section>two</section>');
+  ok("[MKT.SCRIPTS.740] the preload link the render writes before a section that holds a picture is no window of its own, so a section with a picture is still one window", drawn.length === 2 && drawn[0].startsWith("<section>"), JSON.stringify(drawn));
+}
+
 console.log("\n=== language samples write — what it refuses");
 const none = run("nosuch", "--book", book, "--catalogue", catalogue, "--out", join(dir, "out3"), "--quiet");
 ok("[MKT.SCRIPTS.709] a language with no spec is refused naming `--spec` and the book, and nothing is written", none.code === 2 && none.out.includes("--spec") && !existsSync(join(dir, "out3")), none.out);
