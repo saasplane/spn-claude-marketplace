@@ -1991,7 +1991,7 @@
      [
       "courses",
       "Courses",
-      "BOOK"
+      "FILE"
      ],
      [
       "workshops",
@@ -2006,17 +2006,17 @@
      [
       "sales",
       "Sales",
-      "WALLET"
+      "CREDIT_CARD"
      ],
      [
       "reviews",
       "Reviews",
-      "STAR"
+      "MESSAGE_CIRCLE"
      ],
      [
       "messages",
       "Messages",
-      "MAIL"
+      "MAIL_OPEN"
      ],
      [
       "settings",
@@ -2159,7 +2159,7 @@
      [
       "learning",
       "My learning",
-      "PLAY"
+      "LIST"
      ],
      [
       "bookings",
@@ -2174,12 +2174,12 @@
      [
       "certificates",
       "Certificates",
-      "AWARD"
+      "SHIELD"
      ],
      [
       "messages",
       "Messages",
-      "MAIL"
+      "MAIL_OPEN"
      ]
     ],
     "dock": [
