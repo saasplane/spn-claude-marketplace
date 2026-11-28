@@ -60,6 +60,8 @@ export function windowsOf(html: string): string[] {
     const name = /^[A-Za-z][\w:-]*/.exec(tag)?.[0].toLowerCase() ?? "";
     if (name === "script" || name === "style") { at = html.indexOf(`</${name}`, at); at = html.indexOf(">", at) + 1; if (depth === 0) out.push(html.slice(open, at)); continue; }
     const selfClosed = tag.endsWith("/") || VOID.has(name);
+    // the render writes a preload link ahead of a section that holds a picture: it is no section of its own
+    if (depth === 0 && name === "link") continue;
     if (depth === 0) from = open;
     if (selfClosed) { if (depth === 0) { out.push(html.slice(from, at)); from = -1; } continue; }
     depth += 1;

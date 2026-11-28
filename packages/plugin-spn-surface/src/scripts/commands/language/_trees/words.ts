@@ -11,7 +11,7 @@ export type Brief = {
   heroCta: [main: string, second: string];
   doors: Line[]; points: Line[]; steps: Line[]; qa: Array<[string, string]>;
   code: { file: string; language: string; text: string };
-  records: Array<[title: string, description: string, date: string]>;
+  records: Array<[title: string, description: string, date: string, key?: string]>;
   quotes: Array<[text: string, name: string, role: string]>;
   people: Array<[string, string]>;
   plans: Array<{ name: string; price: number; line: string; feats: string[]; recommended?: boolean }>;
@@ -21,14 +21,20 @@ export type Brief = {
   choose: Array<[string, string]>;
   marks: string[];
   logosLine: string;
-  places: Array<[string, string]>;
+  places: Array<[string, string, string?, string?]>;
   picture: { hero: string; show: string; proof: string };
   /** The rows of the plan comparison, grouped by theme: a label, the kind of cell and one value for each plan. A tick cell holds "yes" or "no", a text cell its words. */
   planTable: Array<[group: string, rows: Array<[label: string, kind: "tick" | "text", values: string[]]>]>;
+  /** The six parts a product is made of, as lines with an icon, and the head over them. */
+  features?: Line[]; featuresHead?: [string, string];
+  /** Pictures a page draws, by their path under the language's assets/: the hero, the product shown, the proof, the closing, and one for each door, feature, screen and place. */
+  pictures?: { hero?: string; scene?: string; show?: string; proof?: string; closing?: string; culture?: string; story?: string; doors?: Record<string, string>; features?: Record<string, string>; showcase?: Record<string, string>; places?: Record<string, string> };
+  /** The press that wrote about the product: key, name, headline, date; the partners it works with: key, name; the open roles: title, team, place, type; the story: year, title, line; the screens: key, title, line. */
+  press?: Array<[string, string, string, string]>; partners?: Array<[string, string]>; jobs?: Array<[string, string, string, string]>; story?: Array<[string, string, string]>; showcase?: Array<[string, string, string]>;
   /** The listings of the item comparison, each a column of facts. */
   listings: Array<{ title: string; price: string; facts: Record<string, string> }>;
   /** The words a category says differently from the marketing site: a head over a run of records, over the three points and over the doors, the searches people make most and the tag on the hero. */
-  heads?: { records?: [string, string]; points?: [string, string]; doors?: [string, string]; popular?: string[]; heroTag?: string; shelves?: [string, string] };
+  heads?: { show?: [string, string]; quotes?: [string, string]; numbers?: [string, string, string]; steps?: [string, string]; sample?: [string, string]; records?: [string, string]; points?: [string, string]; doors?: [string, string]; popular?: string[]; heroTag?: string; shelves?: [string, string] };
   /** What a page says in its own hero, where it is not the home page: the page kind's code, then its title, its description and its two actions. */
   pageHeroes?: Record<string, [title: string, description: string, main: string, second: string]>;
 };
