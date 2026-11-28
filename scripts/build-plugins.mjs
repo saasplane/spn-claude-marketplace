@@ -233,23 +233,86 @@ function copyTemplates(book) {
   return { written, pluginOnly: filesUnder(PLUGIN_TEMPLATES).filter((file) => !held.has(file)) };
 }
 
-/** The book's surface catalogue, and where spn-surface carries its copy (RULE.SUPPORT.SURFACE.601). */
-const BOOK_CATALOGUE = join("docs", "specs", "surface", "catalogue.json");
-const PLUGIN_CATALOGUE = join(PACKAGES, "plugin-spn-surface", "src", "refs", "support", "surface", "catalogue.json");
+/** The book's surface specs, and where spn-surface carries their exact copies (RULE.SUPPORT.SURFACE.601): the catalogue's folder and base's. */
+const BOOK_SPECS = join("docs", "specs", "surface");
+const PLUGIN_SPECS = join(PACKAGES, "plugin-spn-surface", "src", "refs", "specs", "surface");
+const SPEC_FOLDERS = ["catalogue", join("languages", "base")];
 
 /**
- * THE CATALOGUE IS COPIED HERE, byte for byte, from the same book as the rules and the templates, so
- * `spn-surface catalogue show` reads the release's own catalogue and nothing else. Returns whether it
- * was written, or null where there is no book beside the checkout.
+ * Each spec file against the contract's state for it, with the validators of @saasplane/support-contract-ts this build bundles,
+ * so a spec the contract refuses fails the build and never reaches a plugin. Returns the problems, or null where the
+ * contract is not installed beside the plugins (its pin is a step after each Support release).
  */
-function copyCatalogue(book) {
-  if (book === null) return null;
-  const from = join(book, BOOK_CATALOGUE);
-  if (!isFile(from)) return null;
-  const source = readFileSync(from);
-  if (isFile(PLUGIN_CATALOGUE) && readFileSync(PLUGIN_CATALOGUE).equals(source)) return false;
-  mkdirSync(dirname(PLUGIN_CATALOGUE), { recursive: true });
-  writeFileSync(PLUGIN_CATALOGUE, source);
+async function specProblems(folder, files) {
+  let contract, support;
+  try { contract = await import("@saasplane/support-contract-ts"); support = await import("@saasplane/support-ts"); } catch { return null; }
+  const schemaOf = (file) => {
+    const name = file.split("/").pop();
+    if (file.startsWith("catalogue/")) return name === "spcatalogue.json" ? contract.SPSurfaceCatalogueSchema : contract.SPSurfaceCatalogueCategoryFileSchema;
+    if (name === "spdl.json") return contract.SPSurfaceLanguageSchema;
+    if (name === "types.json") return contract.SPSurfaceDataTypesSchema;
+    if (name === "samples.json") return contract.SPSurfaceSamplesSchema;
+    if (name === "sources.json") return contract.SPSurfaceDataSourcesSchema;
+    if (name === "index.json") return contract.SPSurfaceDataIndexSchema;
+    return contract.SPSurfaceDataFileSchema;
+  };
+  const problems = [];
+  for (const file of files.filter((one) => one.endsWith(".json"))) {
+    const parsed = support.prepareZodDocument(JSON.parse(readFileSync(join(folder, file), "utf8")), schemaOf(file));
+    if (!parsed.success) problems.push(`${file}: ${parsed.error.issues.slice(0, 3).map((issue) => `${issue.path.join(".")} ${issue.message}`).join("; ")}`);
+  }
+  return problems;
+}
+
+/**
+ * THE SPECS ARE COPIED HERE, byte for byte and subfolders kept, from the same book as the rules and the templates, once
+ * each reads against the contract, so `spn-surface catalogue show` and `language resolve base` read the release's own
+ * specs and nothing else. Returns the files written, or null where there is no book beside the checkout.
+ */
+async function copySpecs(book) {
+  if (book === null || !existsSync(join(book, BOOK_SPECS, "catalogue"))) return null;
+  const files = SPEC_FOLDERS.flatMap((folder) => (existsSync(join(book, BOOK_SPECS, folder)) ? filesUnder(join(book, BOOK_SPECS, folder)).map((file) => join(folder, file)) : []));
+  const problems = await specProblems(join(book, BOOK_SPECS), files);
+  if (problems === null) console.log("  note  the specs were copied unchecked: @saasplane/support-contract-ts is not installed beside the plugins");
+  else if (problems.length) throw new Error(`the book's surface specs do not read against the contract:\n  ${problems.join("\n  ")}`);
+  const written = [];
+  for (const file of files) {
+    const source = readFileSync(join(book, BOOK_SPECS, file));
+    const target = join(PLUGIN_SPECS, file);
+    if (isFile(target) && readFileSync(target).equals(source)) continue;
+    mkdirSync(dirname(target), { recursive: true });
+    writeFileSync(target, source);
+    written.push(file);
+  }
+  return written;
+}
+
+/** The languages spn-surface can reach before any repository installs them, and the list the build writes of them (rule 640). */
+const LANGUAGES_SOURCE = join("scripts", "surface-languages.json");
+const LANGUAGES_LIST = join(PACKAGES, "plugin-spn-surface", "src", "languages.json");
+
+/**
+ * THE LANGUAGE LIST IS WRITTEN HERE, never by hand: base, which the plugin carries at refs/specs/surface/languages/base, and each
+ * language a published package ships, as scripts/surface-languages.json names it ({ name, package, version }, the package an
+ * `@scope/name` that `language resolve` fetches once at that version). It reads against the contract where it is installed.
+ */
+async function writeLanguages() {
+  if (!existsSync(dirname(LANGUAGES_LIST))) return false;
+  const listed = existsSync(LANGUAGES_SOURCE) ? JSON.parse(readFileSync(LANGUAGES_SOURCE, "utf8")).languages ?? [] : [];
+  const list = { languages: [{ name: "base", package: "refs/specs/surface/languages/base", version: null }, ...listed] };
+  const names = list.languages.map((one) => one.name);
+  if (new Set(names).size !== names.length) throw new Error(`${LANGUAGES_SOURCE} names a language twice: ${names.join(", ")}`);
+  try {
+    const contract = await import("@saasplane/support-contract-ts");
+    const support = await import("@saasplane/support-ts");
+    const parsed = support.prepareZodDocument(list, contract.SPSurfaceLanguageListSchema);
+    if (!parsed.success) throw new Error(`the language list does not read against the contract: ${parsed.error.issues.slice(0, 3).map((issue) => `${issue.path.join(".")} ${issue.message}`).join("; ")}`);
+  } catch (error) {
+    if (String(error).includes("does not read")) throw error;
+  }
+  const text = `${JSON.stringify(list, null, 2)}\n`;
+  if (isFile(LANGUAGES_LIST) && readFileSync(LANGUAGES_LIST, "utf8") === text) return false;
+  writeFileSync(LANGUAGES_LIST, text);
   return true;
 }
 
@@ -296,9 +359,10 @@ async function buildOnce() {
     for (const file of copied.written) console.log(`          ${file}`);
     for (const file of copied.pluginOnly) console.log(`  note  ${file} is only in the plugin's templates, so it is kept`);
   }
-  const catalogue = copyCatalogue(rules?.book ?? null);
-  if (catalogue === null) console.log("  keep  plugin-spn-surface refs/support/surface/catalogue.json — no book catalogue beside this checkout");
-  else console.log(`  ok    catalogue  (${catalogue ? "copied from the book" : "unchanged"})`);
+  const specs = await copySpecs(rules?.book ?? null);
+  if (specs === null) console.log("  keep  plugin-spn-surface refs/specs/surface — no book specs beside this checkout");
+  else console.log(`  ok    surface specs  (${specs.length} file(s) copied from the book)`);
+  if (existsSync(dirname(LANGUAGES_LIST))) console.log(`  ${(await writeLanguages()) ? "ok  " : "keep"}  plugin-spn-surface languages.json`);
   return builtAny;
 }
 

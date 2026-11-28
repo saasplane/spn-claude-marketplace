@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/03-app-page-kinds.md",
-      "seen": "85fe6878"
+      "seen": "6404bed1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-surface-catalogue/02-web/01-app-page-kinds.md",
@@ -253,7 +253,7 @@ The rule adds no unit and no prop. A card that opens its fold grows taller, and 
 
 ## The specs a screen starts from — 🔮
 
-**This plugin carries one or more specs for each app page kind, in `refs/support/surface/app-patterns/`.** A spec is a skeleton: a file that shows where the parts of a page sit, and nothing about how they look. The folder holds 23 specs: 22 for the app page kinds of a dashboard and a portal, and one for a rule of content. `ANALYTICS_HOME`, `ANALYTICS_REPORT`, the floor pages and `AUTH_FLOW` have no spec yet. Its `README.md` lists them. The specs of the site container kinds are a second folder beside it, `refs/support/surface/site-patterns/`, which `site-patterns.md` names. A flow is drawn as the skeletons of its pages, each started from the spec of the pattern it follows, and a flow file that puts them in order.
+**This plugin carries one or more specs for each app page kind, in `refs/support/surface/app-patterns/`.** A spec is a skeleton: a file that shows where the parts of a page sit, and nothing about how they look. The folder holds 23 specs: 22 for the app page kinds of a dashboard and a portal, and one for a rule of content. `ANALYTICS_HOME`, `ANALYTICS_REPORT`, the floor pages and `AUTH_FLOW` have no spec yet. The spec of `SETUP_HOME` is planned, and it is `PLANNED` in the catalogue until its drawing stands. Its `README.md` lists them. The specs of the site container kinds are a second folder beside it, `refs/support/surface/site-patterns/`, which `site-patterns.md` names. A flow is drawn as the skeletons of its pages, each started from the spec of the pattern it follows, and a flow file that puts them in order.
 
 - **A page starts from the spec of its page kind.** Copy the spec, and change the sample values to the page's own. Never start a page from an empty file.
 - **The values in a spec are samples.** They show what kind of data a part holds: a title and a line under it, a picture, a state, an action at the end. Which unit shows that data on a real page is the choice of step 2.

@@ -6855,6 +6855,25 @@
     background: var(--surface);
     box-shadow: 0 0 0 1px var(--surface-border);
   }
+  .sds-surface-cases {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .sds-surface-cases button {
+    white-space: nowrap;
+  }
+  .sds-surface-icon {
+    display: inline-grid;
+    place-items: center;
+    padding: .3rem .45rem !important;
+  }
+  .sds-surface-icon svg {
+    display: block;
+    width: 16px;
+    height: 16px;
+  }
   .sds-surface-stage {
     flex: 1;
     min-width: 0;
@@ -6880,6 +6899,9 @@
       padding-inline: 16px;
     }
     .sds-surface-title {
+      flex-basis: 100%;
+    }
+    .sds-surface-cases {
       flex-basis: 100%;
     }
   }

@@ -11,7 +11,7 @@ description: How infrastructure appears for development - the layer order, what 
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/06-provision.md",
-      "seen": "c900f2b8"
+      "seen": "06dd18c2"
     }
   ]
 }

@@ -12,6 +12,8 @@
     "test": "node scripts/test-all.mjs"
   },
   "devDependencies": {
+    "@saasplane/support-contract-ts": "11.30.0",
+    "@saasplane/support-ts": "11.30.0",
     "@tailwindcss/cli": "4.3.3",
     "esbuild": "0.25.12",
     "tailwindcss": "4.3.3"

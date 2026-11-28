@@ -49,7 +49,7 @@ import { randomBytes } from "node:crypto";
 import { appendLog, readSwitch, sessionDir, telemetryFolder } from "./debug-store.ts";
 import { isWorkspaceDevex, workstreamPrefixSource } from "./docs-tree.ts";
 import {
-  ARC_PATTERN, CHECK_PATTERN, NODE_PATTERN, PART_PATTERN, SPDocBehaviourStatusType, SPTestTierType, WORKSTREAM_PATTERN, SPDevExAgentHookVerdictType, SPDevExAgentSkillType,
+  ARC_PATTERN, CHECK_PATTERN, NODE_PATTERN, PART_PATTERN, SPAppsTestBehaviourStatusType, SPAppsTestTierType, WORKSTREAM_PATTERN, SPDevExAgentHookVerdictType, SPDevExAgentSkillType,
   SPDevExAgentLensType, SPDevExAgentPanelVerdictType, SPDevExWorkspaceTelemetryEventType, SPDevExWorkspaceTelemetryRowType,
   SPDevExWorkspaceTelemetryVersionType, SPDevExWorkstreamWorkType, SPDevExStageType, held, known, stageOf,
 } from "./telemetry-values.ts";
@@ -496,7 +496,7 @@ export function writeTest(root: string | null, facts: Facts, row: {
   try {
     const dir = telemetryDir(root);
     if (!root || !dir) return;
-    const tier = known(SPTestTierType, row.test.tier);
+    const tier = known(SPAppsTestTierType, row.test.tier);
     const node = held(row.test.node, NODE_PATTERN);
     const run = held(row.test.run, /^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$/);
     if (!tier || !node || !run) return;
@@ -511,7 +511,7 @@ export function writeTest(root: string | null, facts: Facts, row: {
       workstream: held(work.workstream, WORKSTREAM_PATTERN), arc: held(work.arc, ARC_PATTERN), part: held(work.part, PART_PATTERN),
       skill: known(SPDevExAgentSkillType, work.skill), stage: known(SPDevExStageType, work.stage),
       work: SPDevExWorkstreamWorkType.TEST, retryOf: null,
-      call: row.call, status: row.status === "SUCCESS" ? SPDocBehaviourStatusType.SUCCESS : SPDocBehaviourStatusType.FAILED,
+      call: row.call, status: row.status === "SUCCESS" ? SPAppsTestBehaviourStatusType.SUCCESS : SPAppsTestBehaviourStatusType.FAILED,
       test: { node, run, tier, tests: { passed: count(row.test.tests.passed), failed: count(row.test.tests.failed), skipped: count(row.test.tests.skipped) } },
     };
     appendLog(join(dir, LOG), JSON.stringify(out));

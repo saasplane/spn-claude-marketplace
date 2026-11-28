@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/05-standards-names.md",
-      "seen": "0ebd5808"
+      "seen": "4df7827a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/05-standards-names/",
@@ -32,7 +32,7 @@ Read this before you name a new block, a new prop or a new layer of the design s
 | Declared prop | a property the caller sets, under the same name on every stack |
 | Shown state | a state the platform produces itself, such as hover or focus. It has a picture and no prop |
 | Shared state | `REST` · `HOVER` · `FOCUS` · `PRESSED` · `DISABLED` · `ERROR` · `SELECTED` — a state most blocks share, with one picture on every block and every platform |
-| Surface name | `SPSurface…Type` · `SPSurfaceCatalogue` · `SPDesignLanguageSpec` — one of the names the surface domain sets for its categories, persons, parts and catalogue |
+| Surface name | `SPSurface…Type` · `SPSurfaceCatalogue` · `SPSurfaceLanguage` — one of the names the surface domain sets for its categories, persons, parts and catalogue |
 
 ## A name is the contract — ✅
 
@@ -47,6 +47,8 @@ One name is used in the book, in the design library and in every stack. The book
 | `variant` | the surface treatment, by its strength | `SOLID` · `QUIET` · `SUBTLE` · `SUBTLE_OUTLINE` · `OUTLINE` · `OUTLINE_DASHED` · `GHOST` · `LINK` | `DSVariantType` |
 | `color` | the hue | `DEFAULT` · `CUSTOM` · `PRIMARY` · `INFO` · `SUCCESS` · `WARNING` · `ERROR` | `DSColorType` |
 | `size` | the density step, read smallest to largest | `XS` · `SM` · `MD` · `LG` · `XL` | `DSSizeType` |
+
+The density step is the one of these lists a theme also names, so the contract states it once, for the theme, as `SPSurfaceSizeType`; a theme sets the app's default size and the depth of a raised surface from it, a block's own `size` still wins, and the design system re-exports the list as `DSSizeType`, so the two lists are one.
 
 **The five values of `size` are read smallest to largest, `XS` to `XL`, wherever they are listed** — in the book, in the design library and in every stack — **and `SM` is the default size a theme sets**; a block told no size takes it. `color` has no order, because a hue is no scale. **The values of `variant` are named by their strength, as the tones are, and read from the strongest to the faintest** (`RULE.SUPPORT.SURFACE.154` · MUST · skill:spn-surface/design): `SOLID` the hue's full colour, `QUIET` a medium tint, `SUBTLE` a light tint with no edge, `SUBTLE_OUTLINE` the light tint with a line, `OUTLINE` a line and no fill, `GHOST` no fill until the pointer, `LINK` text alone. Every variant of every hue keeps its text at 4.5 to 1, at rest and under the pointer; the line of an outline is a decoration, not held to 3 to 1. `architecture-core.md` gives the shades.
 
@@ -268,11 +270,11 @@ The surface domain sets ten names of its own, and each is built under the same r
 | `SPSurfacePersonType` | who a category is for | `VISITOR` · `LEARNER` · `SEEKER` · `TEAM` · `INDIVIDUAL` |
 | `SPSurfaceGroupType` | the three groups the parts of a category stand in | `SHARED` · `STRUCTURE` · `STYLE` |
 | `SPSurfacePartType` | one of the twelve parts, read as its group and its code, because `MOTION` stands in two groups | Shared: `BRAND` · `DRAWING` · `MOTION` · `VOICE`. Structure: `LAYOUTS` · `PAGES` · `CONTAINERS` · `WIDGETS`. Style: `THEME` · `MEDIA` · `MOTION` · `WORDS` |
-| `SPDesignLanguageSourceType` | who fills a part in a design language. It takes the language's own prefix, as `SPDesignLanguageSpec` does, because `SPSurfaceSourceType` already names a snapshot's source in the contract | `OWN` · `INHERITED` · `NONE` |
+| `SPSurfaceLanguageSourceType` | who fills a part in a design language. It takes the language's own prefix, as `SPSurfaceLanguage` does, because `SPSurfaceLibrarySourceType` already names a snapshot's source in the contract | `OWN` · `INHERITED` · `NONE` |
 | `SPSurfaceItemStateType` | where a kind stands in a design language | `CORE` · `PICKED` · `INHERITED` · `CUSTOMISED` · `NEW` · `NOT_USED` |
 | `SPSurfacePlatformType` | where a surface runs | `WEB` · `NATIVE` |
 | `SPSurfaceCatalogue` | the kinds the foundation defines and a language can extend: a version, and for each category and each part its kinds | no vocabulary: a structure, drawn in the Surface Catalogue |
-| `SPDesignLanguageSpec` | a design language, holding only its own decisions | no vocabulary: a structure, stated in the Design Language |
+| `SPSurfaceLanguage` | a design language, holding only its own decisions | no vocabulary: a structure, stated in the Design Language |
 
 **A page kind's code is the name a reader sees in a site's navigation, in capitals, with no `PAGE` suffix.** A code opens with the set the page belongs to, such as `MAIN_`, `BLOG_` or `MARKET_`. The home is `MAIN_HOME`, and a topic is `MAIN_TOPIC`. The suffixed names, such as `SITE_HOME` and `CONTACT_PAGE`, are not used. A name of two words keeps an underscore, as `MAIN_GROUP` does. A title in a site's navigation, such as Privacy or Terms, names a page of a kind and never a kind. `site-patterns.md` lists each kind with its code.
 

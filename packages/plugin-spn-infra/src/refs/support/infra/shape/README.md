@@ -3,15 +3,15 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/01-shape.md",
-      "seen": "e16ec837"
+      "seen": "59177238"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "6a7b4b59"
+      "seen": "74fef39c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/03-blueprints/01-layers.md",
-      "seen": "b8dfd7ed"
+      "seen": "0529d72e"
     }
   ]
 }
@@ -46,9 +46,9 @@ A declaration asks four different questions, and each has its own group of facts
 
 Two lists sit at the top of every declaration, because a declaration has to say two things about itself.
 
-`SPEstateType` says **what kind of package you are holding**, so a tool can pick the right rules before reading a field: `SUPPORT` is the shared baseline every estate reads, `ORGANIZATION` is one company with its providers, regions and billing, `PLATFORM` is one product and the environments it runs, and `MODULE` is an attachable thing. **A `MODULE` carries identity alone and no usage**, because the same module is used differently by every platform that attaches it — putting the usage inside would give one fact as many sources as it has users.
+`SPInfraEstateType` says **what kind of package you are holding**, so a tool can pick the right rules before reading a field: `SUPPORT` is the shared baseline every estate reads, `ORGANIZATION` is one company with its providers, regions and billing, `PLATFORM` is one product and the environments it runs, and `MODULE` is an attachable thing. **A `MODULE` carries identity alone and no usage**, because the same module is used differently by every platform that attaches it — putting the usage inside would give one fact as many sources as it has users.
 
-`SPEstateScopeType` says **which rung a fact sits on** — `ORGANIZATION`, `PLATFORM`, `ENVIRONMENT`. Every fact in an estate belongs to exactly one, the coordinates are built from them, and the configuration plane spells its paths the same way, so a path says which rung it belongs to and nothing else.
+`SPInfraEstateScopeType` says **which rung a fact sits on** — `ORGANIZATION`, `PLATFORM`, `ENVIRONMENT`. Every fact in an estate belongs to exactly one, the coordinates are built from them, and the configuration plane spells its paths the same way, so a path says which rung it belongs to and nothing else.
 
 ### What an environment's row writes
 

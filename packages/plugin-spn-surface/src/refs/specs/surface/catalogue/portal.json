@@ -1,0 +1,5628 @@
+{
+  "category": "PORTAL",
+  "parts": {
+    "LAYOUTS": [
+      {
+        "code": "TOPNAV",
+        "title": "Top nav",
+        "description": "a bar across the top, with the content below it",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "the app, the few entries that fit on one line",
+          "notWhen": [
+            {
+              "condition": "COMMON_NOT_FOUND or COMMON_NO_ACCESS",
+              "instead": "the app's own layout, its navigation kept, as for COMMON_NO_ACCESS"
+            },
+            {
+              "condition": "Settings, a column of their own groups",
+              "instead": "DOCK"
+            },
+            {
+              "condition": "A page that stands alone, with no navigation",
+              "instead": "CANVAS"
+            }
+          ],
+          "rules": [
+            "RULE.SUPPORT.SURFACE.139",
+            "RULE.SUPPORT.SURFACE.156",
+            "RULE.SUPPORT.SURFACE.161",
+            "RULE.SUPPORT.SURFACE.173",
+            "RULE.SUPPORT.SURFACE.200",
+            "RULE.SUPPORT.SURFACE.255",
+            "RULE.SUPPORT.SURFACE.257",
+            "RULE.SUPPORT.SURFACE.410"
+          ]
+        },
+        "config": {
+          "mtype": "LAYOUTS"
+        },
+        "units": [
+          {
+            "unit": "DSLayoutTopNav",
+            "part": "LAYOUT",
+            "role": "unit",
+            "props": {}
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "navigation",
+            "props": {
+              "value": "TOPNAV"
+            }
+          }
+        ],
+        "placement": {
+          "usedFor": "the app, the few entries that fit on one line",
+          "boxWidth": {
+            "writes": "--layout-box-width",
+            "inThePlaces": "prepareLayoutBoxWidth(body, false) on a place that is not the content; prepareLayoutBoxWidth(body, isContentFloating) on the content; 100cqw in the content part",
+            "source": "packages/support-web-ds-ts/src/ui/layouts/_layout/DSLayoutTopNav.tsx",
+            "rule": {
+              "prepareLayoutBoxWidth": "the body's widest, or the place's whole width (100cqw) at FULL; where the box floats, min(widest, 100cqw - 2 * --layout-space)",
+              "source": "packages/support-web-ds-ts/src/ui/layouts/_layout/utils.ts"
+            }
+          },
+          "sideRoom": {
+            "decidedBy": "--layout-space, which follows the device and the layout's size (set on the layout's root as data-layout-size)",
+            "desktop": "32px at every size",
+            "tablet": "24px at XS, SM and MD, 32px at LG and XL",
+            "phone": "16px at every size",
+            "sectionWordsStartAt": "--section-box-inset: the box's edge plus the layout's space, less the content's line (--layout-content-line)",
+            "sources": [
+              "packages/support-web-ds-ts/src/assets/styles/_variables.css",
+              "packages/support-web-ds-ts/src/assets/styles/_tailwind.css"
+            ]
+          }
+        },
+        "style": {
+          "look": "THEME.LAYOUT_LOOK",
+          "body": "read from the theme's layout look; the layout fixes none"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "DOCK",
+        "title": "Dock",
+        "description": "a bar across the top, and the entries in a column beside one page",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "a person's own account",
+          "notWhen": [
+            {
+              "condition": "COMMON_NOT_FOUND or COMMON_NO_ACCESS",
+              "instead": "the app's own layout, its navigation kept, as for COMMON_NO_ACCESS"
+            },
+            {
+              "condition": "A page that stands alone, with no navigation",
+              "instead": "CANVAS"
+            },
+            {
+              "condition": "A few entries along a bar",
+              "instead": "TOPNAV"
+            }
+          ],
+          "rules": [
+            "RULE.SUPPORT.SURFACE.139",
+            "RULE.SUPPORT.SURFACE.156",
+            "RULE.SUPPORT.SURFACE.161",
+            "RULE.SUPPORT.SURFACE.173",
+            "RULE.SUPPORT.SURFACE.200",
+            "RULE.SUPPORT.SURFACE.206",
+            "RULE.SUPPORT.SURFACE.255",
+            "RULE.SUPPORT.SURFACE.257",
+            "RULE.SUPPORT.SURFACE.410"
+          ]
+        },
+        "config": {
+          "mtype": "LAYOUTS"
+        },
+        "units": [
+          {
+            "unit": "DSLayoutDock",
+            "part": "LAYOUT",
+            "role": "unit",
+            "props": {}
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "navigation",
+            "props": {
+              "value": "DOCK"
+            }
+          }
+        ],
+        "placement": {
+          "usedFor": "a person's own account",
+          "boxWidth": {
+            "writes": "--layout-box-width",
+            "inThePlaces": "prepareLayoutBoxWidth(body, isContentFloating); 100cqw in the content part",
+            "source": "packages/support-web-ds-ts/src/ui/layouts/_layout/DSLayoutDock.tsx",
+            "rule": {
+              "prepareLayoutBoxWidth": "the body's widest, or the place's whole width (100cqw) at FULL; where the box floats, min(widest, 100cqw - 2 * --layout-space)",
+              "source": "packages/support-web-ds-ts/src/ui/layouts/_layout/utils.ts"
+            }
+          },
+          "sideRoom": {
+            "decidedBy": "--layout-space, which follows the device and the layout's size (set on the layout's root as data-layout-size)",
+            "desktop": "32px at every size",
+            "tablet": "24px at XS, SM and MD, 32px at LG and XL",
+            "phone": "16px at every size",
+            "sectionWordsStartAt": "--section-box-inset: the box's edge plus the layout's space, less the content's line (--layout-content-line)",
+            "sources": [
+              "packages/support-web-ds-ts/src/assets/styles/_variables.css",
+              "packages/support-web-ds-ts/src/assets/styles/_tailwind.css"
+            ]
+          }
+        },
+        "style": {
+          "look": "THEME.LAYOUT_LOOK",
+          "body": "read from the theme's layout look; the layout fixes none"
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "GROUPED_ENTRIES",
+            "when": "more than about eight settings: the entry column holds them under headings, such as Account, Workspace and Billing",
+            "why": "the Apex reads, 2026-11-26 (notes/N017/work/apex-help-blog-pricing-1126.md); the developer: 'all approved'",
+            "units": [
+              {
+                "unit": "DSNavList",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {},
+            "style": {},
+            "status": "PLANNED"
+          }
+        ]
+      },
+      {
+        "code": "CANVAS",
+        "title": "Canvas",
+        "description": "none: the body alone, for a landing page, a sign-in, an app that cannot start, or a tool that fills the window",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "sign-in, an app that cannot start, or a tool that fills the window, such as a drawing board or an editor",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.206",
+            "RULE.SUPPORT.SURFACE.255",
+            "RULE.SUPPORT.SURFACE.410"
+          ],
+          "notWhen": [
+            {
+              "condition": "Settings, a column of their own groups",
+              "instead": "DOCK"
+            },
+            {
+              "condition": "A few entries along a bar",
+              "instead": "TOPNAV"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "LAYOUTS"
+        },
+        "units": [
+          {
+            "unit": "DSLayoutCanvas",
+            "part": "LAYOUT",
+            "role": "unit",
+            "props": {}
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "navigation",
+            "props": {
+              "value": "CANVAS"
+            }
+          }
+        ],
+        "placement": {
+          "usedFor": "sign-in, an app that cannot start, or a tool that fills the window, such as a drawing board or an editor",
+          "boxWidth": {
+            "writes": "--layout-box-width",
+            "inThePlaces": "prepareLayoutBoxWidth(body, false)",
+            "source": "packages/support-web-ds-ts/src/ui/layouts/_layout/DSLayoutCanvas.tsx",
+            "rule": {
+              "prepareLayoutBoxWidth": "the body's widest, or the place's whole width (100cqw) at FULL; where the box floats, min(widest, 100cqw - 2 * --layout-space)",
+              "source": "packages/support-web-ds-ts/src/ui/layouts/_layout/utils.ts"
+            }
+          },
+          "sideRoom": {
+            "decidedBy": "--layout-space, which follows the device and the layout's size (set on the layout's root as data-layout-size)",
+            "desktop": "32px at every size",
+            "tablet": "24px at XS, SM and MD, 32px at LG and XL",
+            "phone": "16px at every size",
+            "sectionWordsStartAt": "--section-box-inset: the box's edge plus the layout's space, less the content's line (--layout-content-line)",
+            "sources": [
+              "packages/support-web-ds-ts/src/assets/styles/_variables.css",
+              "packages/support-web-ds-ts/src/assets/styles/_tailwind.css"
+            ]
+          }
+        },
+        "style": {
+          "look": "THEME.LAYOUT_LOOK",
+          "body": "read from the theme's layout look; the layout fixes none"
+        },
+        "status": "BUILT"
+      }
+    ],
+    "PAGES": [
+      {
+        "code": "HOME_APP",
+        "title": "App home",
+        "description": "counts, and what waits for a person, on the home page of an app",
+        "guidance": {
+          "for": {
+            "persons": [
+              "TEAM",
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "The data is counts and what waits for a person, and the person has just arrived",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.365"
+          ],
+          "examples": "in a marketplace, after sign-in: the account's home, with what is on its way and the latest orders",
+          "whyExamples": "the developer, 2026-11-25, Q64 A: 'SO we have to consider Brand, Category, Prodct Lisitng, Product Details, Cart, Checkout etc..', 'and portal will be used after login for such cases corrrect', 'Q64 - A'",
+          "notWhen": [
+            {
+              "condition": "The person comes often, to find one record",
+              "instead": "RECORD_HOME"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "the category layouts"
+            }
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "tree",
+            "props": {
+              "value": "refs/support/surface/app-patterns/home-app.dg.json"
+            }
+          }
+        ],
+        "placement": {
+          "order": [
+            "HEAD_GREETING",
+            "HOME_WAITING",
+            "MEASURE_TILES",
+            "HOME_AREAS",
+            "HOME_SETUP"
+          ]
+        },
+        "style": {},
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "INDIVIDUAL",
+            "when": "the person is one individual who uses the app for themselves or for their family: the page shows what waits for them and the areas of their account",
+            "units": [
+              {
+                "unit": "DSCardWidget",
+                "part": "WIDGET",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSItem",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "first": "HOME_WAITING",
+              "notes": [
+                {
+                  "on": "areas",
+                  "value": "HOME_AREAS"
+                }
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "FIRST_USE",
+            "when": "nothing has been done yet: the page opens with HOME_SETUP, the steps left to get started, and shows no figures of nothing",
+            "units": [
+              {
+                "unit": "DSCardWidget",
+                "part": "WIDGET",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSProgress",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSItem",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "first": "HOME_SETUP"
+            },
+            "style": {},
+            "status": "BUILT"
+          }
+        ]
+      },
+      {
+        "code": "RECORD_HOME",
+        "title": "Record home",
+        "description": "a set of records, found, grouped, ticked, changed in place or read as a story",
+        "guidance": {
+          "for": {
+            "persons": [
+              "TEAM",
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "The data is a set that grows as people work, or a set held in groups, or many things to tick, or many small values of one kind, or events read in order; a person comes to find one record, to see the whole and open one item, to tick several, to change them in the list, or to read what happened",
+          "notWhen": [
+            {
+              "condition": "The person has just arrived, to see how much there is and what waits",
+              "instead": "HOME_APP"
+            },
+            {
+              "condition": "The container that holds the records with their search and paging",
+              "instead": "LISTING_TABLE"
+            },
+            {
+              "condition": "About one screen of fields, with the page it belongs to kept beneath",
+              "instead": "RECORD_ENTRY"
+            },
+            {
+              "condition": "Sections, or a part that repeats, filled in one sitting",
+              "instead": "RECORD_ENTRY"
+            },
+            {
+              "condition": "One record's fields",
+              "instead": "RECORD_VIEW"
+            },
+            {
+              "condition": "The events of one record, beside it",
+              "instead": "LISTING_TIMELINE"
+            },
+            {
+              "condition": "A fixed set of kinds, each with its own few records, connected or set up on its own",
+              "instead": "LISTING_GROUPS, a card for each kind, inside this page"
+            },
+            {
+              "condition": "The groups, the list and the detail of the chosen item as three panes",
+              "instead": "not offered in PORTAL: RECORD_HOME LIST_DETAIL holds a list and a detail"
+            }
+          ],
+          "rules": [
+            "RULE.SUPPORT.SURFACE.069",
+            "RULE.SUPPORT.SURFACE.079",
+            "RULE.SUPPORT.SURFACE.080",
+            "RULE.SUPPORT.SURFACE.055"
+          ]
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "the category layouts"
+            }
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "trees",
+            "props": {
+              "value": [
+                "refs/support/surface/app-patterns/record-home.dg.json",
+                "refs/support/surface/app-patterns/record-home-stack.dg.json",
+                "to be drawn: refs/support/surface/app-patterns/record-home.dg.json"
+              ]
+            }
+          }
+        ],
+        "placement": {
+          "frame": "STACK, one part under another, is the default; ASIDE, LIST_DETAIL and GROUPS are cases that name their unit, their parts and the order of each part",
+          "order": [
+            "HEAD_PAGE",
+            "BROWSE_FILTERS",
+            "LISTING_TABLE | LISTING_LIST | LISTING_GRID | LISTING_GROUPS | LISTING_TIMELINE"
+          ],
+          "combine": "cases combine when they do not conflict",
+          "notes": [
+            {
+              "on": "cards",
+              "value": "a set split by a fixed list of kinds holding records is cards on this one page, up to 4 kinds of up to 6 records each; past that, the GROUPS case with LISTING_LIST"
+            }
+          ]
+        },
+        "style": {},
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "WITH_STATS",
+            "when": "count tiles above the records, each a state of them: pressing one narrows the list to it",
+            "units": [
+              {
+                "unit": "DSCardWidget",
+                "part": "WIDGET",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSFormatNumber",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "above": "the records",
+              "tiles": "CARD_STAT AS_STATE_FILTER; about six states at most"
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "SAVED",
+            "when": "the person's usual cuts of the list kept by name, one press away above the records",
+            "units": [
+              {
+                "unit": "DSFilterBar",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSTabs",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSDropdownMenu",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "above": "the records",
+              "notes": [
+                {
+                  "on": "uses",
+                  "value": "BROWSE_FILTERS SAVED_VIEWS"
+                }
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "ASIDE",
+            "when": "the records with a short column of their own facts beside them: the main part holds the listing, the aside the figures and the short lists that go with it",
+            "units": [
+              {
+                "unit": "DSPageFrameAside",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "parts": [
+                "MAIN",
+                "ASIDE"
+              ],
+              "order": {
+                "MAIN": [
+                  "BROWSE_FILTERS",
+                  "LISTING_TABLE or LISTING_LIST or LISTING_GRID"
+                ],
+                "ASIDE": [
+                  "CARD_STAT",
+                  "LINE_RECORD SIDE_LIST"
+                ]
+              },
+              "limit": "never more than two containers side by side (RULE.SUPPORT.SURFACE.625)",
+              "onPhone": "the aside follows the main part"
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "LIST_DETAIL",
+            "when": "a list at the start and the picked record beside it, for a person who moves through many records in a row",
+            "why": "RULE.SUPPORT.SURFACE.611",
+            "units": [
+              {
+                "unit": "DSPageFrameListDetail",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "parts": [
+                "LIST",
+                "DETAIL"
+              ],
+              "order": {
+                "LIST": [
+                  "BROWSE_SEARCH",
+                  "BROWSE_FILTERS",
+                  "LISTING_LIST"
+                ],
+                "DETAIL": [
+                  "HEAD_RECORD",
+                  "RECORD_FACTS",
+                  "RECORD_RELATED"
+                ]
+              },
+              "emptyDetail": "shown where no row is chosen",
+              "onPhone": "the detail replaces the list, with its way back"
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "DATED_EVENTS",
+            "when": "the records are events searched and filtered like a log: a table with the time range as the first filter, newest first, a row opening its detail; never read as a story",
+            "units": [],
+            "placement": {},
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "BY_DAY",
+            "when": "events grouped under a heading for each day with its count, newest first; each row the actor's avatar, the kind as a badge, what was done to what with its time on the same line, a line of detail, then its chips",
+            "why": "the developer, 2026-11-25: 'check https://flux.dashboardpack.com/feature-flags https://flux.dashboardpack.com/deployments https://flux.dashboardpack.com/activity to uderstand list view for datatble or list with items and more'",
+            "units": [
+              {
+                "unit": "DSList",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSItem",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSAvatar",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSBadge",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSFormatDate",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "notes": [
+                {
+                  "on": "heading",
+                  "value": "the day, with its count of events"
+                },
+                {
+                  "on": "time",
+                  "value": "relative within a day, then Yesterday, then the date"
+                }
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          }
+        ]
+      },
+      {
+        "code": "RECORD_VIEW",
+        "title": "Record view",
+        "description": "one record, with what belongs to it, its steps or its setup",
+        "guidance": {
+          "for": {
+            "persons": [
+              "TEAM",
+              "INDIVIDUAL"
+            ],
+            "reason": "a person reading or tending one record"
+          },
+          "chooseWhen": "The data is one record, with lists of other records attached to it, or a few things set up for it, or known steps it moves through, and a person comes to attach or remove, to see where things stand, or to move it on",
+          "notWhen": [
+            {
+              "condition": "The strip of the record's steps on that page",
+              "instead": "PROGRESS_STEPS"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "the category layouts"
+            }
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "trees",
+            "props": {
+              "value": [
+                "refs/support/surface/app-patterns/record-view-steps.dg.json",
+                "refs/support/surface/app-patterns/record-view-aside.dg.json"
+              ]
+            }
+          }
+        ],
+        "placement": {
+          "frame": "STACK, one part under another, is the default; ASIDE, LIST_DETAIL, TABS and SUB_PAGES are cases that name their unit, their parts and the order of each part",
+          "order": [
+            "HEAD_RECORD",
+            "RECORD_STEPS",
+            "RECORD_FACTS",
+            "RECORD_RELATED",
+            "RECORD_EDIT",
+            "RECORD_DISCUSSION",
+            "RECORD_DANGER"
+          ],
+          "combine": "cases combine when they do not conflict",
+          "notes": [
+            {
+              "on": "last",
+              "value": "RECORD_DANGER, where the record has actions that cannot be undone"
+            }
+          ]
+        },
+        "style": {},
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "ASIDE",
+            "when": "the record has small facts of its own to keep in view beside the lists: the lists stand in the main part, the facts as card widgets in the aside",
+            "units": [
+              {
+                "unit": "DSPageFrameAside",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSCardWidget",
+                "part": "WIDGET",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "parts": [
+                "MAIN",
+                "ASIDE"
+              ],
+              "order": {
+                "MAIN": [
+                  "RECORD_RELATED",
+                  "RECORD_FACTS"
+                ],
+                "ASIDE": [
+                  "CARD_DEFAULT",
+                  "VALUE_STATE",
+                  "VALUE_READ"
+                ]
+              },
+              "limit": "never more than two containers side by side (RULE.SUPPORT.SURFACE.625)",
+              "onPhone": "the aside follows the main part"
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "TABS",
+            "when": "more than three parts of one record: line tabs under the record's head, one part at a time, the first tab the one used most; the tab chosen is in the address, so a link opens it",
+            "units": [
+              {
+                "unit": "DSTabs",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "parts": [
+                "HEAD",
+                "TABS",
+                "BODY"
+              ],
+              "order": {
+                "HEAD": [
+                  "HEAD_RECORD"
+                ],
+                "TABS": [
+                  "one tab for each attached list, the one used most first"
+                ],
+                "BODY": [
+                  "RECORD_RELATED",
+                  "LISTING_TABLE | LISTING_LIST"
+                ]
+              },
+              "onPhone": "the tabs stay in view as a strip",
+              "notes": [
+                {
+                  "on": "rule",
+                  "value": "tabs are for the parts of one record; a strip whose tabs are different kinds of page is navigation, not TABS"
+                }
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "SUB_PAGES",
+            "when": "each part is a page of its own, with its own address, under the record's compact head; under DOCK the dock's entries are the record's sub-pages",
+            "units": [
+              {
+                "unit": "DSLayoutDock",
+                "part": "LAYOUT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "parts": [
+                "HEAD",
+                "DOCK",
+                "BODY"
+              ],
+              "order": {
+                "HEAD": [
+                  "HEAD_RECORD"
+                ],
+                "DOCK": [
+                  "one entry for each sub-page"
+                ],
+                "BODY": [
+                  "HEAD_PAGE",
+                  "the containers of the sub-page"
+                ]
+              },
+              "notes": [
+                {
+                  "on": "account",
+                  "value": [
+                    "the account's sub-pages, in the dock's order: Profile, Sign-in and security, Two-step methods, Sessions and devices, Security activity, Notifications, Privacy, Preferences, Organizations, Members, Plan and billing"
+                  ]
+                },
+                {
+                  "on": "members",
+                  "value": "Members is a sub-page of the account that holds a household's members; each member is a record page, and each signs in with their own account"
+                }
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "OWN",
+            "when": "one record the person or the team holds itself, reached with no list to choose it from; the plan a team or a person pays for is the example: its name, price and renewal as the header, what it uses against its limits, the plans it may move to as plan cards with the current one marked, how it is paid and its invoices, and ending the plan last behind a confirm",
+            "why": "the developer, 2026-11-25: 'scope is clear' (Q79 A)",
+            "units": [
+              {
+                "unit": "DSPageLevel",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSPanelContainer",
+                "part": "CONTAINER",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSCardWidget",
+                "part": "WIDGET",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSProgress",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSDataTable",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSConfirmDialog",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "order": [
+                "THE_PLAN",
+                "USAGE_AGAINST_LIMITS",
+                "PLANS_TO_MOVE_TO",
+                "PAYMENT_AND_INVOICES",
+                "END_THE_PLAN"
+              ],
+              "notes": [
+                {
+                  "on": "moving",
+                  "value": {
+                    "periodSwitch": "a Monthly and Yearly switch above the plans to move to, with the saving, where the plans price both",
+                    "effectLine": "under the title, when a change takes effect, such as at the start of the next cycle",
+                    "cardActions": "the plan in force says Current plan and has no action; every other card says Switch to <plan>; a plan priced on request says Contact sales",
+                    "beforeEnding": "the confirm that ends or lowers the plan says what the person loses and when, before its button",
+                    "help": "Need help choosing? Get in touch, closing the plans",
+                    "ownPage": "the plans stay on the billing page; they take a page of their own, RECORD_ENTRY, past four plans or where they are compared row by row"
+                  }
+                }
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          }
+        ]
+      },
+      {
+        "code": "RECORD_ENTRY",
+        "title": "Record entry",
+        "description": "a form a person fills in and sends, as a page, a dialog or a sheet",
+        "guidance": {
+          "for": {
+            "persons": [
+              "TEAM",
+              "INDIVIDUAL"
+            ],
+            "reason": "a person giving values"
+          },
+          "chooseWhen": "The data is a form a person fills in and sends: a small or a medium one over the page it belongs to, a large one in sections or with a part that repeats, or content written beside what it becomes",
+          "notWhen": [
+            {
+              "condition": "Many things to tick, and nothing else entered",
+              "instead": "RECORD_HOME, with CHOOSE on LISTING_TABLE or LISTING_LIST"
+            },
+            {
+              "condition": "The entry is sent and its record made: what happened in one sentence, the record's name as a link, and the two next steps, such as Add another and Back to the list",
+              "instead": "the end of a RECORD_ENTRY page, drawn in the page's tree as it was before (units DSPanelContainer, DSEmpty, DSButton)"
+            }
+          ],
+          "rules": [
+            "RULE.SUPPORT.SURFACE.366"
+          ]
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "the category layouts"
+            }
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "trees",
+            "props": {
+              "value": [
+                "refs/support/surface/app-patterns/record-entry-sheet.dg.json",
+                "refs/support/surface/app-patterns/record-entry-page.dg.json"
+              ]
+            }
+          }
+        ],
+        "placement": {
+          "frame": "a dialog or a sheet takes 1 to 4 fields in a dialog, and groups or a growing list in a sheet, both at their own address; a page takes the rest",
+          "order": [
+            "HEAD_PAGE",
+            "ENTRY_STEPS",
+            "ENTRY_FORM",
+            "ENTRY_PREVIEW",
+            "ENTRY_REVEAL",
+            "ENTRY_STEP_UP"
+          ],
+          "combine": "cases combine when they do not conflict"
+        },
+        "style": {},
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "PAGE",
+            "when": "a large form, with sections or a part that repeats, filled in one sitting: one form in a full-page panel, its sections as titled parts, a sticky footer",
+            "units": [
+              {
+                "unit": "DSForm",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSPanelContainer",
+                "part": "CONTAINER",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "order": [
+                "HEAD_PAGE",
+                "ENTRY_FORM"
+              ],
+              "notes": [
+                {
+                  "on": "actions",
+                  "value": "the sticky footer holds the actions"
+                }
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "DIALOG",
+            "when": "a small form of 1 to 4 fields, in a dialog over the page it belongs to, which stays beneath; the dialog has its own address",
+            "units": [
+              {
+                "unit": "DSDialog",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSForm",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "order": [
+                "ENTRY_FORM"
+              ],
+              "notes": [
+                {
+                  "on": "fields",
+                  "value": "1 to 4"
+                },
+                {
+                  "on": "invite",
+                  "value": "Invite a member is this case: a dialog, with a role chosen from the default roles only, one role for each member; no role is made on the way"
+                }
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "SHEET",
+            "when": "a medium form for groups of fields or a growing list, in a sheet over the page it belongs to, which stays beside; the sheet has its own address",
+            "units": [
+              {
+                "unit": "DSSheet",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSForm",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "order": [
+                "ENTRY_FORM"
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "STEPS",
+            "when": "a form in known steps, one step at a time with its stepper",
+            "units": [
+              {
+                "unit": "DSStepper",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSForm",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "order": [
+                "HEAD_PAGE",
+                "ENTRY_STEPS",
+                "ENTRY_FORM"
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "RESUMABLE",
+            "when": "a long entry the person may leave and come back to: what was entered is kept, and the page opens where it was left",
+            "units": [
+              {
+                "unit": "DSForm",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "order": [
+                "ENTRY_FORM"
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "REVEAL",
+            "when": "something shown once after the entry is saved, such as an API key or recovery codes: the person copies it, and it is not shown again",
+            "units": [
+              {
+                "unit": "DSDialog",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSCodeBlockView",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSButton",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "order": [
+                "ENTRY_REVEAL"
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "STEP_UP",
+            "when": "a sensitive entry that asks the person to prove who they are again before it is sent",
+            "units": [
+              {
+                "unit": "DSDialog",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSForm",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "order": [
+                "ENTRY_STEP_UP",
+                "ENTRY_FORM"
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          }
+        ]
+      },
+      {
+        "code": "SETUP_COMPARE",
+        "title": "Setup compare",
+        "description": "one fixed set of choices, for a fixed set of kinds",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ],
+            "reason": "a person checking or changing choices across kinds"
+          },
+          "chooseWhen": "The data is one fixed set of choices for a fixed set of kinds, such as the way each kind of notice reaches the person, and a person comes rarely, to check or change them",
+          "notWhen": [
+            {
+              "condition": "One record and a few things set up for it",
+              "instead": "RECORD_VIEW"
+            },
+            {
+              "condition": "A fixed set of kinds, each connected or set up on its own",
+              "instead": "RECORD_HOME with LISTING_GROUPS"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "the category layouts"
+            }
+          }
+        ],
+        "placement": {
+          "order": [
+            "HEAD_PAGE",
+            "SETUP_COMPARISON"
+          ]
+        },
+        "style": {},
+        "status": "BUILT"
+      },
+      {
+        "code": "SETUP_HOME",
+        "title": "Setup home",
+        "description": "Where do I set up my account, and what is left to do?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "a person's own account has several areas to set up (profile, security, notifications, billing) and they need to find one",
+          "notWhen": [
+            {
+              "condition": "One area to set up",
+              "instead": "that area's own page"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": "DSPageLevel",
+            "part": "COMPONENT",
+            "role": "layout",
+            "props": {}
+          },
+          {
+            "unit": "DSSearchBar",
+            "part": "COMPONENT",
+            "role": "search",
+            "props": {}
+          },
+          {
+            "unit": "DSCardWidget",
+            "part": "WIDGET",
+            "role": "cards",
+            "props": {
+              "media": "ICON"
+            }
+          }
+        ],
+        "placement": {
+          "level": "GROUP",
+          "notes": [
+            {
+              "on": "groups",
+              "value": "the account's areas in their groups, each group a titled grid of cards; the areas are the dock's entries"
+            },
+            {
+              "on": "card",
+              "value": "each area a card: its icon, one line, its state where it has one, and the way into it"
+            },
+            {
+              "on": "search",
+              "value": "one search over every area, at the head of the page"
+            }
+          ]
+        },
+        "style": {},
+        "status": "PLANNED"
+      },
+      {
+        "code": "AUTH_FLOW",
+        "title": "Auth flow",
+        "description": "the sign-in flow: one step at a time in a small panel",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ],
+            "reason": "a person getting in"
+          },
+          "chooseWhen": "The person is not signed in yet, or signs in again: one step at a time in a small panel on its own canvas, with a legal footer",
+          "notWhen": [
+            {
+              "condition": "The session was paused while the person was away, and one field resumes it",
+              "instead": "COMMON_LOCK_SCREEN"
+            },
+            {
+              "condition": "The person may not see what they asked for",
+              "instead": "COMMON_NO_ACCESS"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "CANVAS"
+            }
+          }
+        ],
+        "placement": {
+          "order": [
+            "AUTH_PANEL",
+            "COMMON_FOOTER"
+          ],
+          "notes": [
+            {
+              "on": "layout",
+              "value": "CANVAS"
+            }
+          ]
+        },
+        "style": {},
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "SIGN_IN",
+            "when": "the person proves who they are, one step at a time",
+            "units": [
+              {
+                "unit": "DSLayoutCanvas",
+                "part": "LAYOUT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSForm",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "order": [
+                "AUTH_PANEL",
+                "COMMON_FOOTER"
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "SIGN_UP",
+            "when": "a new person makes an account, one step at a time",
+            "units": [
+              {
+                "unit": "DSLayoutCanvas",
+                "part": "LAYOUT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSForm",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "order": [
+                "AUTH_PANEL",
+                "COMMON_FOOTER"
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "RESET",
+            "when": "a person who lost their way in gets back in",
+            "units": [
+              {
+                "unit": "DSLayoutCanvas",
+                "part": "LAYOUT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSForm",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "order": [
+                "AUTH_PANEL",
+                "COMMON_FOOTER"
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "INVITE",
+            "when": "a person accepts an invitation and also joins a household",
+            "units": [
+              {
+                "unit": "DSLayoutCanvas",
+                "part": "LAYOUT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSForm",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "order": [
+                "AUTH_PANEL",
+                "COMMON_FOOTER"
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "VERIFY",
+            "when": "a person proves an address or a code they were sent",
+            "units": [
+              {
+                "unit": "DSLayoutCanvas",
+                "part": "LAYOUT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSForm",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "order": [
+                "AUTH_PANEL",
+                "COMMON_FOOTER"
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "CALLBACK",
+            "when": "the page a provider sends the person back to, with its working, failed and finished states",
+            "units": [
+              {
+                "unit": "DSLayoutCanvas",
+                "part": "LAYOUT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSEmpty",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "order": [
+                "AUTH_PANEL",
+                "COMMON_FOOTER"
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          }
+        ]
+      },
+      {
+        "code": "COMMON_NOT_FOUND",
+        "title": "Not found",
+        "description": "the page for an address that leads nowhere",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "an address that leads nowhere: it keeps the app's layout, its navigation beside a short message and the way back",
+          "notWhen": [
+            {
+              "condition": "The person may not see what the address leads to",
+              "instead": "COMMON_NO_ACCESS"
+            },
+            {
+              "condition": "Something failed on our side, and nothing the person did",
+              "instead": "COMMON_SERVER_ERROR"
+            },
+            {
+              "condition": "The app is down for a planned time",
+              "instead": "COMMON_MAINTENANCE"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "the category layouts"
+            }
+          }
+        ],
+        "placement": {
+          "level": "LAST"
+        },
+        "style": {},
+        "status": "BUILT",
+        "level": "LAST"
+      },
+      {
+        "code": "COMMON_NO_ACCESS",
+        "title": "No access",
+        "description": "the page for a person who may not see what they asked for",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "an address the person may not open: it keeps the app's layout, says whose permission is missing and who can give it, and the way back",
+          "notWhen": [
+            {
+              "condition": "The address leads nowhere",
+              "instead": "COMMON_NOT_FOUND"
+            },
+            {
+              "condition": "Something failed on our side, and nothing the person did",
+              "instead": "COMMON_SERVER_ERROR"
+            },
+            {
+              "condition": "The app is down for a planned time",
+              "instead": "COMMON_MAINTENANCE"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "the category layouts"
+            }
+          }
+        ],
+        "placement": {
+          "level": "LAST"
+        },
+        "style": {},
+        "status": "BUILT",
+        "level": "LAST"
+      },
+      {
+        "code": "COMMON_SERVER_ERROR",
+        "title": "Server error",
+        "description": "the page for a 500, where something failed on our side",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "it says that the failure is ours and not the person's, what the person can do now, and a way back; it keeps the layout of its app where the app can still be drawn",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.605"
+          ],
+          "notWhen": [
+            {
+              "condition": "The address leads nowhere",
+              "instead": "COMMON_NOT_FOUND"
+            },
+            {
+              "condition": "The person may not see what the address leads to",
+              "instead": "COMMON_NO_ACCESS"
+            },
+            {
+              "condition": "The app is down for a planned time",
+              "instead": "COMMON_MAINTENANCE"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "the category layouts"
+            }
+          }
+        ],
+        "placement": {
+          "level": "LAST"
+        },
+        "style": {},
+        "status": "BUILT",
+        "level": "LAST"
+      },
+      {
+        "code": "COMMON_MAINTENANCE",
+        "title": "Maintenance",
+        "description": "the page for a 503 or planned downtime",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "it says that the app is down for a time and when to come back; it stands on a CANVAS, because the app is down",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.605"
+          ],
+          "notWhen": [
+            {
+              "condition": "The address leads nowhere",
+              "instead": "COMMON_NOT_FOUND"
+            },
+            {
+              "condition": "The person may not see what the address leads to",
+              "instead": "COMMON_NO_ACCESS"
+            },
+            {
+              "condition": "Something failed on our side, and nothing the person did",
+              "instead": "COMMON_SERVER_ERROR"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "CANVAS"
+            }
+          }
+        ],
+        "placement": {
+          "level": "LAST"
+        },
+        "style": {},
+        "status": "BUILT",
+        "level": "LAST"
+      },
+      {
+        "code": "COMMON_LOCK_SCREEN",
+        "title": "Lock screen",
+        "description": "the page for a session paused while the person was away",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "a session the app paused after a time without use: who is signed in, the one field that resumes it, and the way to sign in as someone else; nothing of the app shows behind it",
+          "notWhen": [
+            {
+              "condition": "The person may not see what they asked for",
+              "instead": "COMMON_NO_ACCESS"
+            },
+            {
+              "condition": "The session has ended and the person signs in again",
+              "instead": "AUTH_FLOW SIGN_IN"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "PAGES"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "layoutKinds",
+            "props": {
+              "value": "CANVAS"
+            }
+          }
+        ],
+        "placement": {
+          "level": "LAST",
+          "notes": [
+            {
+              "on": "floor",
+              "value": true
+            }
+          ]
+        },
+        "style": {},
+        "status": "PLANNED",
+        "level": "LAST"
+      }
+    ],
+    "CONTAINERS": [
+      {
+        "code": "HEAD_PAGE",
+        "title": "Head page",
+        "description": "the head of a page: its title, a line under it and its main action",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "the head of a page that stands in no box: the page's title, a line under it, its main action",
+          "notWhen": [
+            {
+              "condition": "A record's head, with its way back and its state",
+              "instead": "HEAD_RECORD"
+            },
+            {
+              "condition": "The home page, greeting the person",
+              "instead": "HEAD_GREETING"
+            },
+            {
+              "condition": "The title of a part inside the page",
+              "instead": "HEAD_PART"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSPageHead",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "the top of a page",
+          "notes": [
+            {
+              "on": "first",
+              "value": "the first container of a page"
+            }
+          ]
+        },
+        "style": {},
+        "status": "BUILT"
+      },
+      {
+        "code": "HEAD_RECORD",
+        "title": "Head record",
+        "description": "the head of one record: its way back, its name, its state and up to two actions",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "the head of a record's page: the way back, the record as an item with its state, and up to two actions, such as activate or deactivate behind a confirm",
+          "notWhen": [
+            {
+              "condition": "The head of a page that is no record's",
+              "instead": "HEAD_PAGE"
+            },
+            {
+              "condition": "The title of a part inside the page",
+              "instead": "HEAD_PART"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSPageHead, DSItem",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "the top of a record page",
+          "actions": "two at most"
+        },
+        "style": {},
+        "status": "BUILT"
+      },
+      {
+        "code": "HEAD_GREETING",
+        "title": "Head greeting",
+        "description": "the head of the home page: a greeting to the person",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "the home page opens by greeting the person by name, before what waits for them",
+          "notWhen": [
+            {
+              "condition": "The head of any other page",
+              "instead": "HEAD_PAGE"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSPageHead, DSText",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "the top of HOME_APP"
+        },
+        "style": {},
+        "status": "BUILT"
+      },
+      {
+        "code": "HOME_WAITING",
+        "title": "Home waiting",
+        "description": "what waits for the person, as counts and the items that need them",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "what waits for the person on the home page: the counts and the few items that ask for them",
+          "notWhen": [
+            {
+              "condition": "Figures the person watches over time",
+              "instead": "MEASURE_TILES"
+            },
+            {
+              "condition": "The steps left to get started",
+              "instead": "HOME_SETUP"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSCardWidget, DSItem",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "HOME_APP",
+          "order": "the first part after the greeting"
+        },
+        "style": {},
+        "status": "BUILT"
+      },
+      {
+        "code": "HOME_AREAS",
+        "title": "Home areas",
+        "description": "the areas of the app, each a card that opens it",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "the areas of the app on the home page: one card for each, with its mark, its name and a line",
+          "notWhen": [
+            {
+              "condition": "What waits for the person",
+              "instead": "HOME_WAITING"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSCardWidget",
+            "part": "WIDGET",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "HOME_APP",
+          "uses": "CARD_DEFAULT AREA"
+        },
+        "style": {},
+        "status": "BUILT"
+      },
+      {
+        "code": "HOME_SETUP",
+        "title": "Home setup",
+        "description": "the steps left to get started, until they are done",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "a new place with a few steps to finish: each step a row that opens, a count of steps done, a dismiss",
+          "notWhen": [
+            {
+              "condition": "The steps of a record, not of the person",
+              "instead": "RECORD_STEPS"
+            },
+            {
+              "condition": "What waits for the person once set up",
+              "instead": "HOME_WAITING"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSCardWidget, DSProgress, DSItem, DSButton",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "HOME_APP",
+          "uses": "PROGRESS_CHECKLIST"
+        },
+        "style": {},
+        "status": "BUILT"
+      },
+      {
+        "code": "MEASURE_TILES",
+        "title": "Measure tiles",
+        "description": "a row of figures, each with its label and its change",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "a few figures read at once, each one tile with its label and its change",
+          "notWhen": [
+            {
+              "condition": "A trend over time",
+              "instead": "MEASURE_CHART"
+            },
+            {
+              "condition": "Counts that also switch the state of a list",
+              "instead": "RECORD_HOME WITH_STATS"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSCardWidget, DSFormatNumber",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "HOME_APP, ANALYTICS_HOME or ANALYTICS_REPORT",
+          "uses": "CARD_STAT"
+        },
+        "style": {},
+        "status": "BUILT"
+      },
+      {
+        "code": "LISTING_TABLE",
+        "title": "Listing table",
+        "description": "many records, compared across three or more facts, in a data table",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "a listing: the page title and actions in its header, a filter bar and a data table in its content, the paging of the records in its footer; many records, searched and filtered on the server, compared across three or more facts",
+          "notWhen": [
+            {
+              "condition": "A few records inside another part of the page, with no search or paging of its own",
+              "instead": "LISTING_LIST"
+            },
+            {
+              "condition": "A few to a few dozen things each holding more than a line, chosen by looking",
+              "instead": "LISTING_GRID"
+            },
+            {
+              "condition": "Events read in order as a story",
+              "instead": "LISTING_TIMELINE"
+            },
+            {
+              "condition": "Records placed on the days they fall on",
+              "instead": "LISTING_CALENDAR"
+            },
+            {
+              "condition": "Records moved between states by drag",
+              "instead": "LISTING_BOARD"
+            }
+          ],
+          "rules": [
+            "RULE.SUPPORT.SURFACE.231",
+            "RULE.SUPPORT.SURFACE.606",
+            "RULE.SUPPORT.SURFACE.614",
+            "RULE.SUPPORT.SURFACE.615",
+            "RULE.SUPPORT.SURFACE.056"
+          ],
+          "why": "the developer, 2026-11-25: 'check https://flux.dashboardpack.com/feature-flags https://flux.dashboardpack.com/deployments https://flux.dashboardpack.com/activity to uderstand list view for datatble or list with items and more'"
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSDataTablePanelContainer, in its TABLE layout",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "parts": [
+            "HEADER",
+            "CONTENT",
+            "FOOTER"
+          ],
+          "onePanelPer": "THING_READ_OR_SAVED_WHOLE",
+          "readAndEditPages": "SAME_PARTS_SAME_ORDER",
+          "actions": "FOOTER_START",
+          "sectionsAre": "TITLED_PARTS_NEVER_PANELS",
+          "also": [
+            "SECONDARY_ACTIONS: the header holds Export and Import beside the main action, never in the rows"
+          ],
+          "layoutGuide": {
+            "TABLE": "the records are many, compared across three or more facts: orders, customers, invoices",
+            "TABLE_TWO_LINE_LEAD": "people or organizations told apart by a second fact: the lead cell is the name over an email, a handle or an address; every other cell one line (RULE.SUPPORT.SURFACE.614)",
+            "example": "the Platform app's workspaces: GRID to choose which to enter, TABLE for an admin managing many, one DSDataTable listing both layouts",
+            "rowActions": "an action on a row shows only where the row's state allows it, such as Visit on a deployment that is ready",
+            "time": "relative within a day, then Yesterday, then the date",
+            "seen": "flux.dashboardpack.com feature-flags, deployments and activity (fact f541)"
+          }
+        },
+        "style": {
+          "look": "THEME.PANEL_LOOK",
+          "firstCell": "leads with an avatar only where the record is a person or an organization, with a mark only where the rows are of mixed kinds, and with its text alone for a table of one kind (RULE.SUPPORT.SURFACE.606)"
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "PHONE_PAIRS",
+            "when": "on a phone, a record with more than four facts a person still needs keeps them as label and value pairs under its lead",
+            "why": "Q77 A, 2026-11-25 (RULE.SUPPORT.SURFACE.608)",
+            "units": [
+              {
+                "unit": "DSDataTable",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "onPhone": "the LIST layout, with the facts as label and value pairs under the lead"
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "PINNED_COLUMNS",
+            "when": "a column that stays in place while the others scroll, and cannot be hidden; the column set a person chose is kept by BROWSE_FILTERS SAVED_VIEWS",
+            "units": [
+              {
+                "unit": "DSDataTable",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {},
+            "style": {},
+            "status": "PLANNED",
+            "missing": "a person's own column set is not stated; pinned columns are stickyLeftColumns"
+          },
+          {
+            "code": "SECOND_SORT",
+            "when": "sort by several columns, the second added by a modified press",
+            "units": [
+              {
+                "unit": "DSDataTable",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {},
+            "style": {},
+            "status": "PLANNED",
+            "missing": "sort is one pair of keys: a second sort is not stated"
+          },
+          {
+            "code": "ROW_VERB",
+            "when": "a table narrowed by a state tab, such as Pending: each row ends in the one action that state asks for, as words, such as Approve; the rest stand in the row's menu",
+            "why": "the Apex reads, 2026-11-26 (notes/N017/work/apex-help-blog-pricing-1126.md); the developer: 'all approved'",
+            "units": [
+              {
+                "unit": "DSDataTable",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSButton",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {},
+            "style": {},
+            "status": "PLANNED"
+          },
+          {
+            "code": "DENSITY_BY_READING",
+            "when": "the rows' height follows how they are read: a log of many events compact, a table of money or of people comfortable",
+            "why": "the Apex reads, 2026-11-26 (notes/N017/work/apex-help-blog-pricing-1126.md); the developer: 'all approved'",
+            "units": [
+              {
+                "unit": "DSDataTable",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {},
+            "style": {},
+            "status": "PLANNED"
+          }
+        ]
+      },
+      {
+        "code": "LISTING_LIST",
+        "title": "Listing list",
+        "description": "records read by name and one or two facts, opened one at a time",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "records read by name and one or two facts, opened one at a time; a few records inside another part of the page, or a page of its own on a phone in place of a table",
+          "notWhen": [
+            {
+              "condition": "Many records compared across three or more facts",
+              "instead": "LISTING_TABLE"
+            },
+            {
+              "condition": "Things each holding more than a line, chosen by looking",
+              "instead": "LISTING_GRID"
+            }
+          ],
+          "rules": [
+            "RULE.SUPPORT.SURFACE.231",
+            "RULE.SUPPORT.SURFACE.606",
+            "RULE.SUPPORT.SURFACE.614",
+            "RULE.SUPPORT.SURFACE.615",
+            "RULE.SUPPORT.SURFACE.056"
+          ],
+          "why": "the developer, 2026-11-25: 'check https://flux.dashboardpack.com/feature-flags https://flux.dashboardpack.com/deployments https://flux.dashboardpack.com/activity to uderstand list view for datatble or list with items and more'"
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSDataTablePanelContainer, in its LIST layout",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          },
+          {
+            "unit": "DSDataTable, for a list inside a part of a page",
+            "part": null,
+            "role": "also",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "parts": [
+            "HEADER",
+            "CONTENT",
+            "FOOTER"
+          ],
+          "onePanelPer": "THING_READ_OR_SAVED_WHOLE",
+          "readAndEditPages": "SAME_PARTS_SAME_ORDER",
+          "actions": "FOOTER_START",
+          "sectionsAre": "TITLED_PARTS_NEVER_PANELS",
+          "also": [
+            "SECONDARY_ACTIONS: the header holds Export and Import beside the main action, never in the rows"
+          ],
+          "layoutGuide": {
+            "LIST": "read by name and one or two facts, opened one at a time; and on a phone, in place of TABLE",
+            "LIST_RICH": "a row of up to four lines, for facts read per record and not compared across rows: the title with its badges, one line under it (a key in code type, a commit, a description), a line of facts (chips, a progress), then the people and the time at its end",
+            "time": "relative within a day, then Yesterday, then the date"
+          }
+        },
+        "style": {
+          "look": "THEME.PANEL_LOOK",
+          "firstCell": "leads with an avatar only where the record is a person or an organization, with a mark only where the rows are of mixed kinds, and with its text alone for a table of one kind (RULE.SUPPORT.SURFACE.606)"
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "UNREAD",
+            "when": "a list of items not yet read: the unread ones marked as LINE_RECORD UNREAD marks them",
+            "units": [
+              {
+                "unit": "DSItem",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "rows": "LINE_RECORD UNREAD"
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "RECENT",
+            "when": "the latest few records, newest first, with a link to see all",
+            "units": [
+              {
+                "unit": "DSItem",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "rows": "LINE_RECORD SIDE_LIST",
+              "count": "five at most, then a link to see all"
+            },
+            "style": {},
+            "status": "BUILT"
+          }
+        ]
+      },
+      {
+        "code": "LISTING_GRID",
+        "title": "Listing grid",
+        "description": "a few to a few dozen things, each holding more than a line, chosen by looking",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "a few to a few dozen things each holding more than a line, chosen by looking; one card across on a phone",
+          "notWhen": [
+            {
+              "condition": "Many records compared across three or more facts",
+              "instead": "LISTING_TABLE"
+            },
+            {
+              "condition": "Records read by name and one or two facts",
+              "instead": "LISTING_LIST"
+            },
+            {
+              "condition": "A fixed set of kinds, each with its own growing records",
+              "instead": "LISTING_GROUPS"
+            }
+          ],
+          "rules": [
+            "RULE.SUPPORT.SURFACE.231",
+            "RULE.SUPPORT.SURFACE.606",
+            "RULE.SUPPORT.SURFACE.614",
+            "RULE.SUPPORT.SURFACE.615"
+          ],
+          "why": "the developer, 2026-11-25: 'check https://flux.dashboardpack.com/feature-flags https://flux.dashboardpack.com/deployments https://flux.dashboardpack.com/activity to uderstand list view for datatble or list with items and more'"
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSDataTablePanelContainer, in its GRID layout",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "parts": [
+            "HEADER",
+            "CONTENT",
+            "FOOTER"
+          ],
+          "onePanelPer": "THING_READ_OR_SAVED_WHOLE",
+          "readAndEditPages": "SAME_PARTS_SAME_ORDER",
+          "actions": "FOOTER_START",
+          "sectionsAre": "TITLED_PARTS_NEVER_PANELS",
+          "also": [
+            "SECONDARY_ACTIONS: the header holds Export and Import beside the main action, never in the rows"
+          ],
+          "layoutGuide": {
+            "GRID": "a few to a few dozen things each holding more than a line, chosen by looking; one card across on a phone"
+          }
+        },
+        "style": {
+          "look": "THEME.PANEL_LOOK",
+          "firstCell": "leads with an avatar only where the record is a person or an organization, with a mark only where the rows are of mixed kinds, and with its text alone for a table of one kind (RULE.SUPPORT.SURFACE.606)"
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "BY_PICTURE",
+            "when": "records chosen by looking at them: each a card led by its picture",
+            "units": [
+              {
+                "unit": "DSItemCard",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSImage",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "cell": "CARD_RECORD GRID_CELL",
+              "picture": "FILE_ATTACHED COVER, across the top of the card"
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "BY_TEXT",
+            "when": "records chosen by what they say: each a card of words, with its facts",
+            "units": [
+              {
+                "unit": "DSItemCard",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "cell": "CARD_RECORD GRID_CELL"
+            },
+            "style": {},
+            "status": "BUILT"
+          }
+        ]
+      },
+      {
+        "code": "LISTING_GROUPS",
+        "title": "Listing groups",
+        "description": "a fixed set of kinds, each with its own growing records",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ],
+            "reason": "a person seeing the whole set of kinds and opening one"
+          },
+          "chooseWhen": "a fixed set of kinds, each with its own growing records: a card for each kind, with its mark, its name and Add in its head, and its records as lines under it",
+          "notWhen": [
+            {
+              "condition": "More than 4 kinds, or more than 6 records in a kind",
+              "instead": "RECORD_HOME GROUPS with LISTING_LIST"
+            },
+            {
+              "condition": "Records of one kind, found by search",
+              "instead": "LISTING_TABLE"
+            },
+            {
+              "condition": "One record and a few things set up for it",
+              "instead": "RECORD_VIEW"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSCardWidget, one for each kind (CARD_DEFAULT ITEMS)",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "records",
+            "props": {
+              "value": "LINE_RECORD LIST_ROW"
+            }
+          }
+        ],
+        "placement": {
+          "grid": "3 across on a desktop, 2 on a tablet, 1 on a phone",
+          "notes": [
+            {
+              "on": "default",
+              "value": "a card for each kind: CARD_DEFAULT ITEMS, the mark, the name and Add in its head, the records as lines"
+            },
+            {
+              "on": "covers",
+              "value": [
+                "Notifications: Templates, Integrations",
+                "Two-step methods",
+                "Organization: Sign-in",
+                "Orgs: Overview",
+                "Apps"
+              ]
+            },
+            {
+              "on": "limit",
+              "value": "up to 4 kinds of up to 6 records each; past that, RECORD_HOME GROUPS with LISTING_LIST (Notifications Actions, Orgs Fields, tags and custom fields by record type)"
+            }
+          ]
+        },
+        "style": {},
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "ALL_KINDS",
+            "when": "every kind a card even when it has no record, the kinds in use first, such as the two-step methods or an organization's sign-in for each category",
+            "units": [
+              {
+                "unit": "DSCardWidget",
+                "part": "WIDGET",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "order": [
+                "the kinds in use",
+                "the kinds with none"
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          }
+        ]
+      },
+      {
+        "code": "LISTING_TIMELINE",
+        "title": "Listing timeline",
+        "description": "What happened to this, and when?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "events of one record in time order, each with who, what and when, on a record page",
+          "notWhen": [
+            {
+              "condition": "The events of many records, as a page of their own",
+              "instead": "RECORD_HOME, for the events of many records as a page of their own"
+            },
+            {
+              "condition": "Events searched and filtered like a log",
+              "instead": "LISTING_TABLE"
+            }
+          ],
+          "rules": [],
+          "sources": [
+            "https://help.shopify.com/en/manual/fulfillment/managing-orders/order-details",
+            "https://www.lightningdesignsystem.com/2e1ef8501/p/3664ed-record-page",
+            "https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/creating-an-issue"
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSList, DSActorView, DSFormatDateTime, DSTextarea for the comment box",
+            "part": null,
+            "role": null,
+            "props": {}
+          }
+        ],
+        "placement": {},
+        "style": {},
+        "status": "PLANNED",
+        "cases": [
+          {
+            "code": "WITH_COMMENT_BOX",
+            "when": "a person may add a comment at the foot, and comments stand in the same order as events",
+            "units": [],
+            "placement": {},
+            "style": {},
+            "status": "PLANNED",
+            "missing": "DSTimeline, as the kind"
+          }
+        ],
+        "missing": "DSTimeline: a line with a dot per event"
+      },
+      {
+        "code": "RECORD_FACTS",
+        "title": "Record facts",
+        "description": "the facts of one record, read: their labels and their values",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "a record's own facts, read in a titled panel: the record item, its actions, and its values as label and value pairs",
+          "notWhen": [
+            {
+              "condition": "One thing drawn from data, mostly its head",
+              "instead": "CARD_DEFAULT"
+            },
+            {
+              "condition": "One value, one line or one state",
+              "instead": "VALUE_READ"
+            },
+            {
+              "condition": "A record's facts that a person changes where they stand",
+              "instead": "RECORD_EDIT"
+            },
+            {
+              "condition": "Lists of other records attached to the record",
+              "instead": "RECORD_RELATED"
+            },
+            {
+              "condition": "Actions that cannot be undone",
+              "instead": "RECORD_DANGER"
+            }
+          ],
+          "rules": [
+            "RULE.SUPPORT.SURFACE.231",
+            "RULE.SUPPORT.SURFACE.312"
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSPanelContainer, DSDataUnitGroup",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "parts": [
+            "HEADER",
+            "CONTENT",
+            "FOOTER"
+          ],
+          "onePanelPer": "THING_READ_OR_SAVED_WHOLE",
+          "readAndEditPages": "SAME_PARTS_SAME_ORDER",
+          "actions": "FOOTER_START",
+          "sectionsAre": "TITLED_PARTS_NEVER_PANELS",
+          "standsIn": "a record's page, or the main part of RECORD_VIEW",
+          "holds": "VALUE_READ and VALUE_STATE"
+        },
+        "style": {
+          "look": "THEME.PANEL_LOOK"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "RECORD_RELATED",
+        "title": "Record related",
+        "description": "a list of other records attached to this one, with an add in its header",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "other records attached to the record: a header with its add, a flush divided list in the content, an empty state where none is attached",
+          "notWhen": [
+            {
+              "condition": "One thing drawn from data, mostly its head",
+              "instead": "CARD_DEFAULT"
+            },
+            {
+              "condition": "One value, one line or one state",
+              "instead": "VALUE_READ"
+            },
+            {
+              "condition": "The record's own facts",
+              "instead": "RECORD_FACTS"
+            },
+            {
+              "condition": "Many records to find one in, with search and paging",
+              "instead": "LISTING_TABLE"
+            }
+          ],
+          "rules": [
+            "RULE.SUPPORT.SURFACE.231",
+            "RULE.SUPPORT.SURFACE.312"
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSPanelContainer, DSList, DSItem, DSEmpty",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "parts": [
+            "HEADER",
+            "CONTENT",
+            "FOOTER"
+          ],
+          "onePanelPer": "THING_READ_OR_SAVED_WHOLE",
+          "readAndEditPages": "SAME_PARTS_SAME_ORDER",
+          "actions": "FOOTER_START",
+          "sectionsAre": "TITLED_PARTS_NEVER_PANELS",
+          "standsIn": "a record's page, in the main part",
+          "holds": "LINE_RECORD rows, NOTICE_EMPTY"
+        },
+        "style": {
+          "look": "THEME.PANEL_LOOK"
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "FIND_AND_ADD",
+            "when": "a box over the list that finds a record and attaches it, where the records to attach are many",
+            "units": [
+              {
+                "unit": "DSAutocomplete",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSList",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "order": [
+                "the find box",
+                "the attached list"
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          }
+        ]
+      },
+      {
+        "code": "RECORD_EDIT",
+        "title": "Record edit",
+        "description": "a record's fields, read and changed in place",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "a record's own fields that a person changes: read in the panel, changed where they stand, and saved as one",
+          "notWhen": [
+            {
+              "condition": "A record's facts only read",
+              "instead": "RECORD_FACTS"
+            },
+            {
+              "condition": "A large form filled in one sitting",
+              "instead": "RECORD_ENTRY PAGE"
+            }
+          ],
+          "rules": [
+            "RULE.SUPPORT.SURFACE.231",
+            "RULE.SUPPORT.SURFACE.312"
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSPanelContainer, DSForm",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "parts": [
+            "HEADER",
+            "CONTENT",
+            "FOOTER"
+          ],
+          "onePanelPer": "THING_READ_OR_SAVED_WHOLE",
+          "readAndEditPages": "SAME_PARTS_SAME_ORDER",
+          "actions": "FOOTER_START",
+          "sectionsAre": "TITLED_PARTS_NEVER_PANELS"
+        },
+        "style": {
+          "look": "THEME.PANEL_LOOK"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "RECORD_STEPS",
+        "title": "Record steps",
+        "description": "the steps of one record, with the current one marked",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "one record that moves through known steps: the strip of its steps, and the action that moves it on for a person with the right role",
+          "notWhen": [
+            {
+              "condition": "The steps the person has left to finish in a new place",
+              "instead": "HOME_SETUP"
+            },
+            {
+              "condition": "Many records seen at once, one column for each step",
+              "instead": "LISTING_BOARD"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSPanelContainer, DSStepper",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "a record's page, under its head",
+          "uses": "PROGRESS_STEPS"
+        },
+        "style": {},
+        "status": "BUILT"
+      },
+      {
+        "code": "RECORD_THREAD",
+        "title": "Record thread",
+        "description": "a conversation of messages, one answering another",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "a thread of messages in the order they were sent, with a box to reply",
+          "notWhen": [
+            {
+              "condition": "Comments on a record, read and added",
+              "instead": "RECORD_DISCUSSION"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSPanelContainer, DSChatMessage, DSTextarea",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "a record's page"
+        },
+        "style": {},
+        "status": "BUILT"
+      },
+      {
+        "code": "RECORD_DANGER",
+        "title": "Record danger",
+        "description": "the actions on a record that cannot be undone, set apart",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "a settings page holds actions that cannot be undone: they stand in its last titled panel, set apart from the others, each behind a confirm",
+          "notWhen": [
+            {
+              "condition": "One thing drawn from data, mostly its head",
+              "instead": "CARD_DEFAULT"
+            },
+            {
+              "condition": "One value, one line or one state",
+              "instead": "VALUE_READ"
+            },
+            {
+              "condition": "A record's facts, read",
+              "instead": "RECORD_FACTS"
+            }
+          ],
+          "rules": [
+            "RULE.SUPPORT.SURFACE.231",
+            "RULE.SUPPORT.SURFACE.312",
+            "RULE.SUPPORT.SURFACE.612"
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSPanelContainer",
+            "part": "CONTAINER",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "parts": [
+            "HEADER",
+            "CONTENT",
+            "FOOTER"
+          ],
+          "onePanelPer": "THING_READ_OR_SAVED_WHOLE",
+          "readAndEditPages": "SAME_PARTS_SAME_ORDER",
+          "actions": "FOOTER_START",
+          "sectionsAre": "TITLED_PARTS_NEVER_PANELS",
+          "standsIn": "the last titled panel of a settings page",
+          "holds": "only the actions that cannot be undone"
+        },
+        "style": {
+          "look": "THEME.PANEL_LOOK"
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "DANGER_ZONE",
+            "when": "a settings page holds actions that cannot be undone: they stand in its last titled panel, set apart from the others, each behind a confirm",
+            "why": "Q77 A, 2026-11-25 (RULE.SUPPORT.SURFACE.612)",
+            "units": [
+              {
+                "unit": "DSPanelContainer",
+                "part": "CONTAINER",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "standsIn": "the last titled panel of a settings page",
+              "holds": "only the actions that cannot be undone",
+              "notes": [
+                {
+                  "on": "eachAction",
+                  "value": "opens a confirm before it runs"
+                }
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          }
+        ]
+      },
+      {
+        "code": "SETUP_SECTION",
+        "title": "Setup section",
+        "description": "a section of settings, with each value read or changed",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "a section of a setup page, titled: its values, each read or changed where it stands",
+          "notWhen": [
+            {
+              "condition": "One thing drawn from data, mostly its head",
+              "instead": "CARD_DEFAULT"
+            },
+            {
+              "condition": "One value, one line or one state",
+              "instead": "VALUE_READ"
+            },
+            {
+              "condition": "One set of settings read across a fixed set of kinds, as a matrix",
+              "instead": "SETUP_COMPARISON"
+            }
+          ],
+          "rules": [
+            "RULE.SUPPORT.SURFACE.231",
+            "RULE.SUPPORT.SURFACE.312"
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSPanelContainer",
+            "part": "CONTAINER",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "parts": [
+            "HEADER",
+            "CONTENT",
+            "FOOTER"
+          ],
+          "onePanelPer": "THING_READ_OR_SAVED_WHOLE",
+          "readAndEditPages": "SAME_PARTS_SAME_ORDER",
+          "actions": "FOOTER_START",
+          "sectionsAre": "TITLED_PARTS_NEVER_PANELS",
+          "standsIn": "RECORD_VIEW, or a setup page",
+          "holds": "VALUE_READ and VALUE_ENTERED"
+        },
+        "style": {
+          "look": "THEME.PANEL_LOOK"
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "INHERITED",
+            "when": "a value that follows a default until someone sets their own: the default is shown beside it, and the person can go back to it",
+            "why": "the two setup page kinds that held an inherited value are now this container, inside RECORD_VIEW",
+            "units": [
+              {
+                "unit": "DSPanelContainer",
+                "part": "CONTAINER",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSDataUnit",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSButton",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "uses": "VALUE_READ INHERITED"
+            },
+            "style": {},
+            "status": "BUILT"
+          }
+        ]
+      },
+      {
+        "code": "SETUP_COMPARISON",
+        "title": "Setup comparison",
+        "description": "How do these differ?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ],
+            "reason": "a person weighing subjects against the same settings"
+          },
+          "chooseWhen": "subjects side by side across the same rows",
+          "notWhen": [
+            {
+              "condition": "Two values only",
+              "instead": "DSDataUnit"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSComparison in DSPanelContainer",
+            "part": "CONTAINER",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "parts": "HEADER, CONTENT, FOOTER"
+        },
+        "style": {
+          "look": "THEME.PANEL_LOOK"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "ENTRY_FORM",
+        "title": "Entry form",
+        "description": "the form of an entry, in its panel or its dialog",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "the fields a person fills in to make or change a record: one form, its sections as titled parts, its actions in the footer",
+          "notWhen": [
+            {
+              "condition": "A form in steps, one at a time",
+              "instead": "ENTRY_STEPS"
+            },
+            {
+              "condition": "A record's fields changed where they stand",
+              "instead": "RECORD_EDIT"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSForm in DSPanelContainer",
+            "part": "CONTAINER",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "parts": [
+            "HEADER",
+            "CONTENT",
+            "FOOTER"
+          ],
+          "actions": "FOOTER_START"
+        },
+        "style": {},
+        "status": "BUILT"
+      },
+      {
+        "code": "ENTRY_STEPS",
+        "title": "Entry steps",
+        "description": "the steps of an entry, one at a time",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "an entry in known steps: its stepper above, one step of the form at a time, back and next in the footer",
+          "notWhen": [
+            {
+              "condition": "The steps of a record that already exists",
+              "instead": "RECORD_STEPS"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSStepper, DSForm",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "RECORD_ENTRY STEPS"
+        },
+        "style": {},
+        "status": "BUILT"
+      },
+      {
+        "code": "ENTRY_REVEAL",
+        "title": "Entry reveal",
+        "description": "what the entry made, shown once with a copy",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "something made by the entry that is shown once, such as an API key or recovery codes, with a copy and a warning that it is not shown again",
+          "notWhen": [
+            {
+              "condition": "A value read again and again",
+              "instead": "VALUE_READ CODE"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSDialog, DSCodeBlockView, DSButton",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "RECORD_ENTRY REVEAL, after the save"
+        },
+        "style": {},
+        "status": "BUILT"
+      },
+      {
+        "code": "ENTRY_STEP_UP",
+        "title": "Entry step up",
+        "description": "a second proof of who the person is, before a sensitive entry",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "a sensitive entry that asks the person to prove who they are again before it is sent",
+          "notWhen": [
+            {
+              "condition": "Signing in at the start of a session",
+              "instead": "AUTH_FLOW SIGN_IN"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSDialog, DSForm",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "RECORD_ENTRY STEP_UP, before the send"
+        },
+        "style": {},
+        "status": "BUILT"
+      },
+      {
+        "code": "AUTH_PANEL",
+        "title": "Auth panel",
+        "description": "the small panel that holds one step of the sign-in flow",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "one step of AUTH_FLOW at a time, in a small panel on its own canvas",
+          "notWhen": [
+            {
+              "condition": "A form of the app, over or as a page",
+              "instead": "ENTRY_FORM"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSPanelContainer",
+            "part": "CONTAINER",
+            "role": "unit",
+            "props": {}
+          },
+          {
+            "unit": "DSLayoutCanvas",
+            "part": "LAYOUT",
+            "role": "layout",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "AUTH_FLOW",
+          "order": [
+            "the step",
+            "COMMON_FOOTER"
+          ]
+        },
+        "style": {},
+        "status": "BUILT"
+      },
+      {
+        "code": "COMMON_FLOOR",
+        "title": "Floor",
+        "description": "the message of a floor page, with the way back",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "the floor pages (not found, no access, server error, maintenance, lock screen): a short message and the way back",
+          "notWhen": [
+            {
+              "condition": "A part with nothing in it, inside a page",
+              "instead": "NOTICE_EMPTY"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": "DSEmpty, DSButton",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "the five COMMON_ pages"
+        },
+        "style": {},
+        "status": "BUILT"
+      },
+      {
+        "code": "COMMON_FOOTER",
+        "title": "Footer",
+        "description": "the brand, then link groups",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "the brand, then the links in groups, at the foot of a page, as the sites' COMMON_FOOTER",
+          "notWhen": [
+            {
+              "condition": "The page is an app page with navigation",
+              "instead": "the app's layout navigation"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "CONTAINERS"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "unit",
+            "props": {
+              "value": "the sites' footer: DSSectionContainer at size XS"
+            }
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "brand",
+            "props": {
+              "value": "the wide logo linking home, else DSItem with the square logo and the product name"
+            }
+          },
+          {
+            "unit": "DSList SM, one for each link group",
+            "part": null,
+            "role": "columns",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "AUTH_FLOW, under the panel",
+          "order": [
+            "the brand",
+            "the link groups"
+          ]
+        },
+        "style": {},
+        "status": "BUILT"
+      }
+    ],
+    "WIDGETS": [
+      {
+        "code": "CARD_DEFAULT",
+        "title": "Card default",
+        "description": "shows one thing as a card, from its head, its parts and its footer",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "a block that is mostly its head, with a body the widget draws from data",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.221"
+          ],
+          "notWhen": [
+            {
+              "condition": "A frame for any part of a page, with a header, content and a footer",
+              "instead": "RECORD_FACTS, RECORD_RELATED, SETUP_SECTION or RECORD_DANGER, by the part's job"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSDataTable, its search and filters on the server",
+            "part": null,
+            "role": "list",
+            "props": {}
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "line",
+            "props": {
+              "value": "the end holds actions, a badge or both"
+            }
+          },
+          {
+            "unit": null,
+            "part": null,
+            "role": "state",
+            "props": {
+              "value": "a badge; the normal state shows none"
+            }
+          },
+          {
+            "unit": "DSForm.Field",
+            "part": null,
+            "role": "entered",
+            "props": {}
+          },
+          {
+            "unit": "DSDataUnit",
+            "part": "COMPONENT",
+            "role": "read",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "parts": "ITEMS | LIST | FREE"
+        },
+        "style": {
+          "notes": [
+            {
+              "on": "look",
+              "value": "THEME.CARD_WIDGET_LOOK"
+            }
+          ]
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "ITEMS",
+            "when": "a card whose body is items: its mark and name, Add in its head, and its records as lines under it",
+            "units": [
+              {
+                "unit": "DSCardWidget",
+                "part": "WIDGET",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSItem",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "parts": "ITEMS",
+              "notes": [
+                {
+                  "on": "head",
+                  "value": "the mark, the name and Add"
+                },
+                {
+                  "on": "records",
+                  "value": "LINE_RECORD LIST_ROW"
+                }
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "AREA",
+            "when": "a card that opens one area of the app: its mark, its name and a line about it",
+            "units": [
+              {
+                "unit": "DSCardWidget",
+                "part": "WIDGET",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "parts": "FREE",
+              "standsIn": "HOME_AREAS"
+            },
+            "style": {},
+            "status": "BUILT"
+          }
+        ]
+      },
+      {
+        "code": "CARD_RECORD",
+        "title": "Card record",
+        "description": "Which one, by looking?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ],
+            "reason": "a person choosing one of a few dozen things, each holding more than a line"
+          },
+          "chooseWhen": "one record of a GRID: a project with its progress and its people, a workspace, an app",
+          "notWhen": [
+            {
+              "condition": "A Seeker choosing among records by their picture",
+              "instead": "MARKETPLACE WIDGETS.CARD_ITEM"
+            },
+            {
+              "condition": "Many records compared across three or more facts",
+              "instead": "LISTING_TABLE"
+            }
+          ],
+          "rules": [
+            "RULE.SUPPORT.SURFACE.615"
+          ],
+          "why": "the developer, 2026-11-25, Q76 A ('Q76 - A'): 'make sure they cover different scenarios based on surface category', 'like for ex: market place how product can be shown as widget in lisitng vs sidebar list, with image and without iamge etc..', 'such that layouts can be built easliy'"
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSCardWidget; DSAvatarGroup, DSProgress, DSBadge, DSFormatDate",
+            "part": null,
+            "role": null,
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "LISTING_GRID"
+        },
+        "style": {},
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "GRID_CELL",
+            "when": "a card of a record with progress and people",
+            "why": "the developer, 2026-11-25: 'scope is clear' (Q79 A)",
+            "units": [
+              {
+                "unit": "DSCardWidget",
+                "part": "WIDGET",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSAvatarGroup",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSProgress",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSBadge",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSFormatDate",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "order": [
+                "TITLE_AND_ONE_FLAG_AT_THE_TOP",
+                "ONE_LINE",
+                "PROGRESS",
+                "PEOPLE_STATE_AND_DATE_ALONG_THE_FOOT"
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          }
+        ],
+        "defaultCase": "GRID_CELL"
+      },
+      {
+        "code": "CARD_STAT",
+        "title": "Card stat",
+        "description": "How many, how much?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ],
+            "reason": "a person watching a figure"
+          },
+          "chooseWhen": "one figure with its label and its change",
+          "notWhen": [
+            {
+              "condition": "A trend over time",
+              "instead": "DATA_CHART"
+            },
+            {
+              "condition": "More than about six states",
+              "instead": "BROWSE_FILTERS"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSCardWidget, DSFormatNumber",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "HOME_APP",
+          "also": [
+            "LINKS_TO_ITS_LIST: a tile is a link: pressing it opens the list the figure counts, already filtered"
+          ]
+        },
+        "style": {},
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "GRID_CELL",
+            "when": "a tile of a row of figures, read only and not pressed as a filter",
+            "why": "the developer, 2026-11-25, Q76 A ('Q76 - A'): 'make sure they cover different scenarios based on surface category', 'like for ex: market place how product can be shown as widget in lisitng vs sidebar list, with image and without iamge etc..', 'such that layouts can be built easliy'",
+            "units": [
+              {
+                "unit": "DSCardWidget",
+                "part": "WIDGET",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSFormatNumber",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "standsIn": "GRID_CELL",
+              "holds": [
+                "WORDS_ONLY"
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "WITH_SPARKLINE",
+            "when": "a tile of a figure with a small trend line beside it",
+            "units": [
+              {
+                "unit": "DSCardWidget",
+                "part": "WIDGET",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSFormatNumber",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {},
+            "style": {},
+            "status": "PLANNED",
+            "missing": "a sparkline in DSCardWidget"
+          },
+          {
+            "code": "AS_STATE_FILTER",
+            "when": "count tiles above a list that are also its state switch: one state each with its count, one chosen at a time and drawn as chosen, choosing it filters the list; about six states at most, else BROWSE_FILTERS QUICK_PILLS; where the counts are not read as figures of their own, QUICK_PILLS alone",
+            "why": "the developer, 2026-11-25: 'scope is clear' (Q79 A)",
+            "units": [
+              {
+                "unit": "DSCardWidget",
+                "part": "WIDGET",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSFormatNumber",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "standsIn": "RECORD_HOME",
+              "notes": [
+                {
+                  "on": "above",
+                  "value": "the records"
+                }
+              ]
+            },
+            "style": {
+              "notes": [
+                {
+                  "on": "chosen",
+                  "value": "SELECTED"
+                }
+              ]
+            },
+            "status": "BUILT"
+          }
+        ],
+        "defaultCase": "GRID_CELL"
+      },
+      {
+        "code": "CARD_PLAN",
+        "title": "Card plan",
+        "description": "Which plan am I on, and which can I move to?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ],
+            "reason": "a customer who already pays, changing plan"
+          },
+          "chooseWhen": "one plan of RECORD_VIEW OWN: its name, price and what it holds; the plan in force marked",
+          "notWhen": [
+            {
+              "condition": "A Visitor choosing a plan before paying",
+              "instead": "MARKETING WIDGETS.CARD_PLAN"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSCardWidget parts ITEMS and FREE; DSFormatCurrency, DSBadge, DSButton",
+            "part": null,
+            "role": null,
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "RECORD_VIEW",
+          "alignment": "START"
+        },
+        "style": {
+          "surface": "DEFAULT",
+          "raised": true
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "CURRENT_PLAN",
+            "when": "the plan in force, marked; its action left out, and every other card's action changes the plan, never buys",
+            "why": "the developer, 2026-11-25: 'scope is clear' (Q79 A)",
+            "units": [
+              {
+                "unit": "DSCardWidget",
+                "part": "WIDGET",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSBadge",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSButton",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {},
+            "style": {},
+            "status": "BUILT"
+          }
+        ]
+      },
+      {
+        "code": "LINE_RECORD",
+        "title": "Line record",
+        "description": "What is this item?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ],
+            "reason": "a person scanning"
+          },
+          "chooseWhen": "one thing as a line, its end holding actions, a badge or both",
+          "notWhen": [
+            {
+              "condition": "Many values",
+              "instead": "a panel's content"
+            },
+            {
+              "condition": "Which layout a record takes, by what it holds",
+              "instead": "LISTING_TABLE"
+            }
+          ],
+          "rules": [
+            "RULE.SUPPORT.SURFACE.056"
+          ]
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSItem",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "a panel's content, a row, a header"
+        },
+        "style": {
+          "rule": "RULE.SUPPORT.SURFACE.056 to 063: line"
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "LIST_ROW",
+            "when": "a row of a list in a panel",
+            "why": "the developer, 2026-11-25, Q76 A ('Q76 - A'): 'make sure they cover different scenarios based on surface category', 'like for ex: market place how product can be shown as widget in lisitng vs sidebar list, with image and without iamge etc..', 'such that layouts can be built easliy'",
+            "units": [
+              {
+                "unit": "DSItem",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "standsIn": "LIST_ROW",
+              "holds": [
+                "WITH_PICTURE",
+                "WORDS_ONLY"
+              ],
+              "withPicture": "an avatar, a mark or an icon at the start",
+              "wordsOnly": "the title and a line"
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "UNREAD",
+            "when": "a row not yet read: a bar at its start edge and a heavier title, never a tint of the whole row",
+            "why": "Q77 A, 2026-11-25 (RULE.SUPPORT.SURFACE.607)",
+            "units": [
+              {
+                "unit": "DSItem",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "standsIn": "LIST_ROW",
+              "notes": [
+                {
+                  "on": "mark",
+                  "value": "a bar at the start edge"
+                },
+                {
+                  "on": "title",
+                  "value": "heavier"
+                }
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "EVENT",
+            "when": "one event as a line: what happened, to what, and when",
+            "units": [
+              {
+                "unit": "DSItem",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSFormatDateTime",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "standsIn": "LISTING_LIST, LISTING_TIMELINE",
+              "notes": [
+                {
+                  "on": "end",
+                  "value": "the time"
+                }
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "SIDE_LIST",
+            "when": "an entry of a short list in a side panel, such as the people on a record or the ones seen last",
+            "why": "the developer, 2026-11-25, Q76 A ('Q76 - A'): 'make sure they cover different scenarios based on surface category', 'like for ex: market place how product can be shown as widget in lisitng vs sidebar list, with image and without iamge etc..', 'such that layouts can be built easliy'",
+            "units": [
+              {
+                "unit": "DSItem",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "standsIn": "SIDE_LIST",
+              "holds": [
+                "WITH_PICTURE",
+                "WORDS_ONLY"
+              ],
+              "count": "five at most, then a link to see all",
+              "notes": [
+                {
+                  "on": "size",
+                  "value": "one step smaller than the panel's rows"
+                }
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "ACTOR_LED",
+            "when": "an event row: it leads with who did it, a person's avatar, or the kind's mark where the system did it, then what happened and when",
+            "why": "the Apex reads, 2026-11-26 (notes/N017/work/apex-help-blog-pricing-1126.md); the developer: 'all approved'",
+            "units": [
+              {
+                "unit": "DSItem",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSAvatar",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSMark",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {},
+            "style": {},
+            "status": "PLANNED"
+          }
+        ],
+        "defaultCase": "LIST_ROW"
+      },
+      {
+        "code": "VALUE_READ",
+        "title": "Value read",
+        "description": "What is its value?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ],
+            "reason": "a person reading"
+          },
+          "chooseWhen": "one value a person reads",
+          "notWhen": [
+            {
+              "condition": "Many values",
+              "instead": "a panel's content"
+            },
+            {
+              "condition": "The person enters or changes the value",
+              "instead": "VALUE_ENTERED"
+            }
+          ],
+          "rules": [
+            "RULE.SUPPORT.SURFACE.056"
+          ]
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSDataUnit",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "a panel's content, a row, a header"
+        },
+        "style": {
+          "rule": "RULE.SUPPORT.SURFACE.056 to 063: read"
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "CODE",
+            "when": "a value read as code: a key, an address or a token in code type, with a copy",
+            "units": [
+              {
+                "unit": "DSCodeBlockView",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {},
+            "style": {},
+            "status": "BUILT"
+          }
+        ]
+      },
+      {
+        "code": "VALUE_ENTERED",
+        "title": "Value entered",
+        "description": "What do I give?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ],
+            "reason": "a person entering"
+          },
+          "chooseWhen": "one value a person gives",
+          "notWhen": [
+            {
+              "condition": "Many values",
+              "instead": "a panel's content"
+            },
+            {
+              "condition": "The value is only read",
+              "instead": "VALUE_READ"
+            }
+          ],
+          "rules": [
+            "RULE.SUPPORT.SURFACE.056"
+          ]
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSForm.Field",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "a panel's content, a row, a header"
+        },
+        "style": {
+          "rule": "RULE.SUPPORT.SURFACE.056 to 063: entered"
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "SWITCH",
+            "when": "a value that is on or off, changed with one press",
+            "units": [
+              {
+                "unit": "DSSwitch",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {},
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "RICH_TEXT",
+            "when": "formatted prose: a reply, a note, an article",
+            "units": [
+              {
+                "unit": "a rich-text editor",
+                "part": null,
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {},
+            "style": {},
+            "status": "PLANNED",
+            "missing": "a rich-text editor: DSTextarea takes plain text only"
+          }
+        ]
+      },
+      {
+        "code": "VALUE_STATE",
+        "title": "Value state",
+        "description": "What state is it in?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ],
+            "reason": "a person reading a record"
+          },
+          "chooseWhen": "a state shown as a badge; the normal state shows none",
+          "notWhen": [
+            {
+              "condition": "Many values",
+              "instead": "a panel's content"
+            },
+            {
+              "condition": "A part with nothing in it, and what to do",
+              "instead": "NOTICE_EMPTY"
+            },
+            {
+              "condition": "A state of the whole page that the person must read",
+              "instead": "NOTICE_DEFAULT"
+            }
+          ],
+          "rules": [
+            "RULE.SUPPORT.SURFACE.056"
+          ]
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSBadge, DSStatusActiveView",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "a panel's content, a row, a header"
+        },
+        "style": {
+          "rule": "RULE.SUPPORT.SURFACE.056 to 063: state"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "VALUE_ACTOR",
+        "title": "Value actor",
+        "description": "who did it, or who it is",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ],
+            "reason": "a person reading who acted"
+          },
+          "chooseWhen": "the person or the system behind a record or an event: an avatar with a name, or the kind's mark where the system did it",
+          "notWhen": [
+            {
+              "condition": "A person or a thing with its own logo, as a picture only",
+              "instead": "ICON_AVATAR"
+            },
+            {
+              "condition": "A state, as a badge",
+              "instead": "VALUE_STATE"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSActorView, DSAvatar",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "a panel's content, a row, a header"
+        },
+        "style": {},
+        "status": "BUILT"
+      },
+      {
+        "code": "BROWSE_FILTERS",
+        "title": "Browse filters",
+        "description": "Narrow it.",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ],
+            "reason": "a person finding"
+          },
+          "chooseWhen": "search and filters over a list",
+          "notWhen": [
+            {
+              "condition": "One filter",
+              "instead": "DSSelect in a header"
+            },
+            {
+              "condition": "A few states, about six, each a count a person also reads",
+              "instead": "CARD_STAT"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSFilterBar",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "the header of LISTING_TABLE",
+          "also": [
+            "SORT_CONTROL: a sort control in the bar when the list has no column headers (LIST and GRID layouts); a TABLE sorts in its column header, one column sorted by default"
+          ]
+        },
+        "style": {},
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "QUICK_PILLS",
+            "when": "one dimension of the records, about six values or fewer, each a pill with its count, All first and one chosen at a time, above the records: a kind, a category or a state",
+            "why": "the developer, 2026-11-25: 'also what about quick pills in filter?'; 'not like that we face filter bar widget'",
+            "units": [
+              {
+                "unit": "DSFilterBar",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "standsIn": "DSFilterBar pills: groups side by side in a row of their own above the controls",
+              "phone": "the pills stay in view; the other fields fold into the button that counts them",
+              "notes": [
+                {
+                  "on": "props",
+                  "value": "one group a dimension: options each with its count, allLabel, allCount, valueLink null for All; a bar may hold pills and no fields"
+                }
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "SAVED_VIEWS",
+            "when": "a person's usual cuts of a list kept by name, their own or shared, one press away, with the person's column set kept in the view beside its filters and its sort; a person may mark one view as their default, which the list opens on",
+            "why": "Q77 A, 2026-11-25 (RULE.SUPPORT.SURFACE.609)",
+            "units": [
+              {
+                "unit": "DSFilterBar",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSTabs",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSDropdownMenu",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "notes": [
+                {
+                  "on": "keeps",
+                  "value": "the filters, the sort and the column set, as one view"
+                }
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "APPLIED_CHIPS",
+            "when": "the filters in force shown under the bar as chips, each with an editable operator and value, and one Clear all",
+            "units": [],
+            "placement": {},
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "RANGE",
+            "when": "a filter over a number range, beside the date range",
+            "units": [
+              {
+                "unit": "DSFilterBar",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {},
+            "style": {},
+            "status": "PLANNED",
+            "missing": "DSFilterBar mtype has no number range: it holds TEXT, SELECT, SELECT_MULTI, AUTOCOMPLETE, AUTOCOMPLETE_MULTI, BOOLEAN, DATE and DATE_RANGE"
+          }
+        ]
+      },
+      {
+        "code": "BROWSE_SEARCH",
+        "title": "Browse search",
+        "description": "the search band",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ],
+            "reason": "a person looking for a record by its words"
+          },
+          "chooseWhen": "one search over a set, kept in view above the records",
+          "notWhen": [
+            {
+              "condition": "Search with filters over a list",
+              "instead": "BROWSE_FILTERS"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSAutocomplete",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "the top of a listing"
+        },
+        "style": {},
+        "status": "BUILT"
+      },
+      {
+        "code": "ACTION_JUMP",
+        "title": "Action jump",
+        "description": "Take me there.",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ],
+            "reason": "a person who knows what they want"
+          },
+          "chooseWhen": "a command palette that goes anywhere or does anything",
+          "notWhen": [
+            {
+              "condition": "The way is a menu",
+              "instead": "DSNavMenu"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSCommandPalette",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "the layout, opened by a key"
+        },
+        "style": {},
+        "status": "BUILT"
+      },
+      {
+        "code": "ACTION_CONFIRM",
+        "title": "Action confirm",
+        "description": "a confirm before an action that cannot be undone",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "an action that cannot be undone, asked once more before it runs, saying what the person loses",
+          "notWhen": [
+            {
+              "condition": "A refusal",
+              "instead": "COMMON_NO_ACCESS"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSConfirmDialog",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "RECORD_DANGER, a row action"
+        },
+        "style": {},
+        "status": "BUILT"
+      },
+      {
+        "code": "NOTICE_DEFAULT",
+        "title": "Notice default",
+        "description": "Something to know.",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ],
+            "reason": "a person on a page"
+          },
+          "chooseWhen": "a message about the whole page or a part",
+          "notWhen": [
+            {
+              "condition": "A refusal",
+              "instead": "COMMON_NO_ACCESS"
+            },
+            {
+              "condition": "A state of one thing, as a badge",
+              "instead": "VALUE_STATE"
+            },
+            {
+              "condition": "A part with nothing in it, and what to do",
+              "instead": "NOTICE_EMPTY"
+            },
+            {
+              "condition": "A note on a site's page",
+              "instead": "MARKETING CONTAINERS.READ_ARTICLE, a callout among its elements"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSAlert, DSLayout's sticky notice (IDSLayoutSticky)",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "the top of a page or a panel",
+          "also": [
+            "DISMISSIBLE: a notice about a feature or a promotion, not a problem, may be closed and stays closed"
+          ]
+        },
+        "style": {},
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "PAGE",
+            "when": "a message about the whole page, at its top, shown only while its condition holds",
+            "units": [
+              {
+                "unit": "DSAlert",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "standsIn": "the top of the page"
+            },
+            "style": {},
+            "status": "BUILT"
+          }
+        ]
+      },
+      {
+        "code": "NOTICE_EMPTY",
+        "title": "Notice empty",
+        "description": "What now?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ],
+            "reason": "a person at nothing"
+          },
+          "chooseWhen": "what is missing and the one thing to do",
+          "notWhen": [
+            {
+              "condition": "The list is loading",
+              "instead": "DSSkeleton"
+            },
+            {
+              "condition": "A state of one thing, as a badge",
+              "instead": "VALUE_STATE"
+            },
+            {
+              "condition": "A state of the whole page that the person must read",
+              "instead": "NOTICE_DEFAULT"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSEmpty",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "a panel's content",
+          "picture": "an icon in a plate over the words, DSEmpty's own; never a picture of its own kind"
+        },
+        "style": {},
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "FIRST_USE",
+            "when": "nothing has been added yet: says what will appear and offers the one action that adds it; the table is hidden",
+            "units": [],
+            "placement": {},
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "NO_RESULTS",
+            "when": "a search or filter matches nothing: says why, keeps the filters shown, offers Clear filters",
+            "units": [],
+            "placement": {},
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "ALL_DONE",
+            "when": "a queue cleared by the person: a short confirmation, no action needed",
+            "units": [],
+            "placement": {},
+            "style": {},
+            "status": "BUILT"
+          },
+          {
+            "code": "CONNECTION_LOST",
+            "when": "the part could not reach the service: what failed in one sentence and Try again, never a blank part",
+            "why": "the Apex reads, 2026-11-26 (notes/N017/work/apex-help-blog-pricing-1126.md); the developer: 'all approved'",
+            "units": [
+              {
+                "unit": "DSEmpty",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              },
+              {
+                "unit": "DSButton",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {},
+            "style": {},
+            "status": "PLANNED"
+          }
+        ]
+      },
+      {
+        "code": "PROGRESS_CHECKLIST",
+        "title": "Progress checklist",
+        "description": "What is left to get started?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "a new place with a few steps to finish: each step a row that opens, a count of steps done, a dismiss",
+          "notWhen": [
+            {
+              "condition": "The steps of a record, not of the person",
+              "instead": "PROGRESS_STEPS"
+            }
+          ],
+          "rules": [],
+          "sources": [
+            "https://shopify.dev/docs/api/app-home/patterns/templates/homepage"
+          ]
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSCardWidget, DSProgress, DSItem rows with a done mark, DSButton to dismiss",
+            "part": null,
+            "role": null,
+            "props": {}
+          }
+        ],
+        "placement": {},
+        "style": {},
+        "status": "BUILT"
+      },
+      {
+        "code": "PROGRESS_STEPS",
+        "title": "Progress steps",
+        "description": "Where is it in its steps?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "inside RECORD_STEPS: the steps of one record, the current one marked",
+          "notWhen": [
+            {
+              "condition": "The steps the person has left to finish in a new place",
+              "instead": "PROGRESS_CHECKLIST"
+            }
+          ],
+          "rules": [],
+          "sources": [
+            "https://www.lightningdesignsystem.com/2e1ef8501/p/3664ed-record-page",
+            "https://help.shopify.com/en/manual/fulfillment/managing-orders/order-details"
+          ]
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSStepper",
+            "part": "COMPONENT",
+            "role": null,
+            "props": {}
+          }
+        ],
+        "placement": {},
+        "style": {},
+        "status": "BUILT"
+      },
+      {
+        "code": "PROGRESS_METER",
+        "title": "Progress meter",
+        "description": "how far along, as a meter",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "one value against its limit, or one task part done, as a bar with its label",
+          "notWhen": [
+            {
+              "condition": "The steps a person has left to finish in a new place",
+              "instead": "PROGRESS_CHECKLIST"
+            },
+            {
+              "condition": "The steps of one record",
+              "instead": "PROGRESS_STEPS"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "WIDGETS"
+        },
+        "units": [
+          {
+            "unit": "DSProgress",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "MEASURE_PROGRESS, a card, a header"
+        },
+        "style": {},
+        "status": "BUILT"
+      }
+    ],
+    "THEME": [
+      {
+        "code": "LAYOUT_LOOK",
+        "title": "Layout look",
+        "description": "how the layout of a page is drawn, in three parts: the body, which is the whole window, the navigation, which holds the brand, the entries and the account, and the content, which is the area the page's children stand in",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "a layout's three parts, the body, the navigation and the content, are each drawn by it"
+        },
+        "config": {
+          "mtype": "THEME"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "sets",
+            "props": {
+              "value": "THEME"
+            }
+          }
+        ],
+        "placement": {},
+        "style": {
+          "values": "the defaults of THEME kind LAYOUT_LOOK are the theme keys its description names; density, radius and mode are APP_LOOK"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "PANEL_LOOK",
+        "title": "Panel look",
+        "description": "`container.panel`: `frames` and the five props of `IDSFrameSurface`, as the default for every panel container",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "the default for every panel container; only the panel reads it, and a card reads the card look alone"
+        },
+        "config": {
+          "mtype": "THEME"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "sets",
+            "props": {
+              "value": "THEME"
+            }
+          }
+        ],
+        "placement": {},
+        "style": {
+          "values": "the defaults of THEME kind PANEL_LOOK are the theme keys its description names; density, radius and mode are APP_LOOK"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "CARD_LOOK",
+        "title": "Card look",
+        "description": "`component.card`: the props of `IDSFrameSurface`, `color`, `strength`, `raised`, `bordered` and `rounded`, as the default for the surface of every card",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "the default for the surface of every card",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.128",
+            "RULE.SUPPORT.SURFACE.261"
+          ]
+        },
+        "config": {
+          "mtype": "THEME"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "sets",
+            "props": {
+              "value": "THEME"
+            }
+          }
+        ],
+        "placement": {},
+        "style": {
+          "values": "the defaults of THEME kind CARD_LOOK are the theme keys its description names; density, radius and mode are APP_LOOK"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "CARD_WIDGET_LOOK",
+        "title": "Card widget look",
+        "description": "`widget.card`: what `DSCardWidget` adds to a card: the lines between its head, its parts and its footer, and the lines and the hover of the rows of its parts",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "what a card widget adds to a card: the lines between its head, its parts and its footer, and the lines and the hover of the rows of its parts"
+        },
+        "config": {
+          "mtype": "THEME"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "sets",
+            "props": {
+              "value": "THEME"
+            }
+          }
+        ],
+        "placement": {},
+        "style": {
+          "values": "the defaults of THEME kind CARD_WIDGET_LOOK are the theme keys its description names; density, radius and mode are APP_LOOK"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "TABLE_LOOK",
+        "title": "Table look",
+        "description": "`component.table`: the props `striped` and `hoverable`, as the default for every table",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "the default for every table",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.126"
+          ]
+        },
+        "config": {
+          "mtype": "THEME"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "sets",
+            "props": {
+              "value": "THEME"
+            }
+          }
+        ],
+        "placement": {},
+        "style": {
+          "values": "the defaults of THEME kind TABLE_LOOK are the theme keys its description names; density, radius and mode are APP_LOOK"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "APP_LOOK",
+        "title": "App look",
+        "description": "How roomy is the whole app?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ],
+            "reason": "the app's author"
+          },
+          "chooseWhen": "the density, the corners and the mode of everything",
+          "notWhen": [
+            {
+              "condition": "One part differs",
+              "instead": "its own look"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "THEME"
+        },
+        "units": [
+          {
+            "unit": null,
+            "part": null,
+            "role": "sets",
+            "props": {
+              "value": "theme.app: size, radius, mode"
+            }
+          }
+        ],
+        "placement": {},
+        "style": {
+          "radius": "THE_DESIGN_SYSTEM_DEFAULT",
+          "notes": [
+            {
+              "on": "density",
+              "value": "DENSE for a Team, ROOMY for an Individual"
+            },
+            {
+              "on": "mode",
+              "value": "THE_PERSON_CHOOSES"
+            }
+          ]
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "OVERLAY_LOOK",
+        "title": "Overlay look",
+        "description": "How does an overlay stand over the page?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ],
+            "reason": "the app's author"
+          },
+          "chooseWhen": "the scrim and the surface of a dialog, a drawer and a sheet",
+          "notWhen": [
+            {
+              "condition": "A sheet that is not modal",
+              "instead": "no scrim"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "THEME"
+        },
+        "units": [
+          {
+            "unit": "DSDialog, DSDrawer, DSSheet, DSConfirmDialog",
+            "part": null,
+            "role": "sets",
+            "props": {}
+          }
+        ],
+        "placement": {},
+        "style": {
+          "notes": [
+            {
+              "on": "scrim",
+              "value": "ONE_FOR_ALL"
+            }
+          ]
+        },
+        "status": "PLANNED",
+        "missing": "theme.container.overlay: the theme holds no overlay look"
+      }
+    ],
+    "MEDIA": [
+      {
+        "code": "ICON_UI",
+        "title": "Icon ui",
+        "description": "an app's small and functional pictures: the Lucide set, an empty state's icon in a plate, and an avatar's initials or photo",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "an app's pictures, since an app's media are small and functional and a drawing belongs to a site",
+          "notWhen": [
+            {
+              "condition": "A person, an organization, or a thing with its own logo",
+              "instead": "ICON_AVATAR"
+            }
+          ]
+        },
+        "config": {
+          "mtype": "MEDIA"
+        },
+        "units": [
+          {
+            "unit": "DSIcon (Lucide), DSAvatar",
+            "part": null,
+            "role": "carrier",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "placedOn": "the control, the entry or the empty state"
+        },
+        "style": {
+          "avatars": "INITIALS_OR_PHOTO",
+          "notes": [
+            {
+              "on": "set",
+              "value": "LUCIDE"
+            },
+            {
+              "on": "emptyState",
+              "value": "ICON_IN_A_PLATE"
+            }
+          ]
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "ICON_AVATAR",
+        "title": "Icon avatar",
+        "description": "Who or which is this?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ],
+            "reason": "a person looking at a record that has a person or an actor"
+          },
+          "chooseWhen": "who or which: a person, a circle of initials or a photo; an organization or a thing with its own logo, rounded",
+          "notWhen": [
+            {
+              "condition": "What kind of thing, with no picture of its own",
+              "instead": "ICON_UI"
+            },
+            {
+              "condition": "A picture chosen by its look, such as a cover",
+              "instead": "FILE_ATTACHED"
+            }
+          ],
+          "rules": [
+            "RULE.SUPPORT.SURFACE.606",
+            "RULE.SUPPORT.SURFACE.615",
+            "RULE.SUPPORT.SURFACE.616"
+          ]
+        },
+        "config": {
+          "mtype": "MEDIA"
+        },
+        "units": [
+          {
+            "unit": "DSAvatar, DSAvatarGroup, DSActorView",
+            "part": null,
+            "role": "carrier",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "placedOn": "ITEM, ROW or HEADER"
+        },
+        "style": {
+          "avatars": "INITIALS_OR_PHOTO",
+          "notes": [
+            {
+              "on": "fallback",
+              "value": "the picture, else the initials on the entity's colour (color CUSTOM, customColor), else on the palette colour its id picks, which the page passes as color"
+            },
+            {
+              "on": "fields",
+              "value": "…AvatarUrl and …AvatarColor a person's circle; logoUrl and brandColor a rounded logo; wideLogoUrl a wordmark, never in a square slot; coverUrl or imageUrl a cover (FILE_ATTACHED)"
+            }
+          ]
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "FILE_ATTACHED",
+        "title": "File attached",
+        "description": "What did I attach?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ],
+            "reason": "a person who gave or reads a file"
+          },
+          "chooseWhen": "an uploaded file or image, previewed; or a record's cover, a picture chosen by its look",
+          "notWhen": [
+            {
+              "condition": "A product picture",
+              "instead": "not an app medium"
+            },
+            {
+              "condition": "A person, an organization or a thing with its own logo",
+              "instead": "ICON_AVATAR"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "MEDIA"
+        },
+        "units": [
+          {
+            "unit": "DSImage, DSAttachment, DSImagePicker",
+            "part": null,
+            "role": "carrier",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "placedOn": "a field or a record"
+        },
+        "style": {
+          "framing": "FLUSH_ROUNDED"
+        },
+        "status": "BUILT",
+        "cases": [
+          {
+            "code": "COVER",
+            "when": "a record's picture chosen by its look, from coverUrl or imageUrl: across the top of a card, or a small square in a list's or a table's lead",
+            "why": "the developer, 2026-11-25: 'scope is clear' (Q79 A)",
+            "units": [
+              {
+                "unit": "DSImage",
+                "part": "COMPONENT",
+                "role": null,
+                "props": {}
+              }
+            ],
+            "placement": {
+              "notes": [
+                {
+                  "on": "inGrid",
+                  "value": "ACROSS_THE_TOP"
+                },
+                {
+                  "on": "inListOrTable",
+                  "value": "SMALL_SQUARE_IN_THE_LEAD"
+                }
+              ]
+            },
+            "style": {},
+            "status": "BUILT"
+          }
+        ]
+      },
+      {
+        "code": "VIEW_CODE",
+        "title": "View code",
+        "description": "Show me the exact value.",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ],
+            "reason": "a Team member reading a payload, a config or a log"
+          },
+          "chooseWhen": "code or JSON, formatted, with a copy",
+          "notWhen": [
+            {
+              "condition": "A single value",
+              "instead": "DSDataUnit"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "MEDIA"
+        },
+        "units": [
+          {
+            "unit": "DSCodeBlockView, DSJSONView",
+            "part": null,
+            "role": "carrier",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "placedOn": "a panel's content"
+        },
+        "style": {
+          "framing": "CODE_FRAME_FLAT"
+        },
+        "status": "BUILT"
+      }
+    ],
+    "MOTION": [
+      {
+        "code": "OVERLAY_ARRIVAL",
+        "title": "Overlay arrival",
+        "description": "Something opened over the page.",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ],
+            "reason": "a person who opened a dialog, a drawer or a sheet"
+          },
+          "chooseWhen": "an overlay comes in at the design system's speed",
+          "notWhen": [
+            {
+              "condition": "A row changes",
+              "instead": "nothing moves"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "MOTION"
+        },
+        "units": [
+          {
+            "unit": "DSDialog, DSDrawer, DSSheet",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "on": "the page"
+        },
+        "style": {
+          "notes": [
+            {
+              "on": "overlays",
+              "value": "THE_DESIGN_SYSTEM_SPEED"
+            },
+            {
+              "on": "rows",
+              "value": "NONE"
+            }
+          ]
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "LOADING",
+        "title": "Loading",
+        "description": "Is it working?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ],
+            "reason": "a person who waited"
+          },
+          "chooseWhen": "a skeleton for a list, a spinner or a progress for a task",
+          "notWhen": [
+            {
+              "condition": "The wait is under a moment",
+              "instead": "nothing"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "MOTION"
+        },
+        "units": [
+          {
+            "unit": "DSSkeleton, DSSpinner, DSProgress",
+            "part": null,
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "on": "the part that waits"
+        },
+        "style": {
+          "speed": "the shared motion tokens"
+        },
+        "status": "BUILT"
+      }
+    ],
+    "WORDS": [
+      {
+        "code": "PARAGRAPH",
+        "title": "Paragraph",
+        "description": "a paragraph a person reads",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "standing the content of a page or of a part; the page writes the step",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.103"
+          ]
+        },
+        "config": {
+          "mtype": "WORDS"
+        },
+        "units": [
+          {
+            "unit": "DSText",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "text of a section, a feature, an item or a row; the page writes the step"
+        },
+        "style": {
+          "length": "not measured yet"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "ROW",
+        "title": "Row",
+        "description": "words a person scans down a list: a line of a row, a cell, a card's body",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "standing a row, a cell, a card; the page writes the step",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.103"
+          ]
+        },
+        "config": {
+          "mtype": "WORDS"
+        },
+        "units": [
+          {
+            "unit": "DSText",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "text of a section, a feature, an item or a row; the page writes the step"
+        },
+        "style": {
+          "length": "not measured yet"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "LABEL",
+        "title": "Label",
+        "description": "a label a person reads to learn what a value is, or a fact",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "standing beside its value, among facts; the page writes the step and the tone",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.166"
+          ]
+        },
+        "config": {
+          "mtype": "WORDS"
+        },
+        "units": [
+          {
+            "unit": "DSText",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "text of a section, a feature, an item or a row; the page writes the step",
+          "alsoStandsIn": [
+            "TABLE_HEAD"
+          ]
+        },
+        "style": {
+          "length": "not measured yet"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "DESCRIPTION",
+        "title": "Description",
+        "description": "a description that stands a step back under a title the page draws itself",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "standing under the title; the page writes the step and the tone",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.143"
+          ]
+        },
+        "config": {
+          "mtype": "WORDS"
+        },
+        "units": [
+          {
+            "unit": "DSText",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "text of a section, a feature, an item or a row; the page writes the step",
+          "alsoStandsIn": [
+            "FIELD"
+          ]
+        },
+        "style": {
+          "length": "not measured yet"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "NOTE",
+        "title": "Note",
+        "description": "a note that stands back from what it notes: a line under a list, the time or the person beside an entry, a site's fine print",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "standing under or beside what it notes; the page writes the step and the tone"
+        },
+        "config": {
+          "mtype": "WORDS"
+        },
+        "units": [
+          {
+            "unit": "DSText",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "text of a section, a feature, an item or a row; the page writes the step"
+        },
+        "style": {
+          "length": "not measured yet"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "TITLE",
+        "title": "Title",
+        "description": "a title the page draws itself, where no box gives one: a group of a form, a name in a step",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "standing over what it names; the page writes the step",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.103"
+          ]
+        },
+        "config": {
+          "mtype": "WORDS"
+        },
+        "units": [
+          {
+            "unit": "DSText",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "text of a section, a feature, an item or a row; the page writes the step"
+        },
+        "style": {
+          "length": "not measured yet"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "DISPLAY_HEADING",
+        "title": "Display heading",
+        "description": "a display heading: a site's band, a home's greeting",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "standing the head of a band; the page writes the step",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.103"
+          ]
+        },
+        "config": {
+          "mtype": "WORDS"
+        },
+        "units": [
+          {
+            "unit": "DSText",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "text of a section, a feature, an item or a row; the page writes the step"
+        },
+        "style": {
+          "length": "not measured yet"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "STATE_SENTENCE",
+        "title": "State sentence",
+        "description": "a sentence that reports a state: a count gone wrong, a check that passed",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "standing in the part it reports on; the page writes the step and the colour",
+          "rules": [
+            "RULE.SUPPORT.SURFACE.369"
+          ]
+        },
+        "config": {
+          "mtype": "WORDS"
+        },
+        "units": [
+          {
+            "unit": "DSText",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "text of a section, a feature, an item or a row; the page writes the step",
+          "alsoStandsIn": [
+            "FIELD_OR_ALERT"
+          ]
+        },
+        "style": {
+          "length": "not measured yet"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "TERM",
+        "title": "Term",
+        "description": "a word a tooltip explains: a term, an abbreviation",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ]
+          },
+          "chooseWhen": "standing in a line of words; the page writes the underline"
+        },
+        "config": {
+          "mtype": "WORDS"
+        },
+        "units": [
+          {
+            "unit": "DSText",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "text of a section, a feature, an item or a row; the page writes the step"
+        },
+        "style": {
+          "length": "not measured yet"
+        },
+        "status": "BUILT"
+      },
+      {
+        "code": "KEYS",
+        "title": "Keys",
+        "description": "Which key?",
+        "guidance": {
+          "for": {
+            "persons": [
+              "INDIVIDUAL"
+            ],
+            "reason": "a person doing a task with the keyboard"
+          },
+          "chooseWhen": "a key or a short command, as it is pressed",
+          "notWhen": [
+            {
+              "condition": "A command that is a line of code",
+              "instead": "code view"
+            }
+          ],
+          "rules": []
+        },
+        "config": {
+          "mtype": "WORDS"
+        },
+        "units": [
+          {
+            "unit": "DSKbd",
+            "part": "COMPONENT",
+            "role": "unit",
+            "props": {}
+          }
+        ],
+        "placement": {
+          "standsIn": "a row, a note, a tooltip"
+        },
+        "style": {
+          "typography": "CONTENT_XS",
+          "look": "keycap"
+        },
+        "status": "BUILT"
+      }
+    ]
+  }
+}

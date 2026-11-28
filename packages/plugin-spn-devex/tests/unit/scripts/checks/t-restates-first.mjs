@@ -24,6 +24,15 @@ ok("[MKT.HOOKS.139] another ref is not the copy",
 ok("[MKT.HOOKS.139] a Read is not a write",
   verdictOf(checkRestatesFirst({ tool_name: "Read", tool_input: { file_path: copy } })) === "silent");
 
+console.log("=== the surface specs mirror and the language list");
+const spec = "/repo/packages/plugin-spn-surface/src/refs/specs/surface/languages/base/spdl.json";
+const mirror = checkRestatesFirst(write(spec, "{}"));
+ok("[MKT.HOOKS.140] a hand write to spn-surface's copy of a book spec is refused, naming the book and the build",
+  verdictOf(mirror) === "deny" && (mirror?.deny ?? "").includes("docs/specs/surface") && (mirror?.deny ?? "").includes("build-plugins"), mirror?.deny);
+const list = checkRestatesFirst(write("/repo/packages/plugin-spn-surface/src/languages.json", "{}", "Edit"));
+ok("[MKT.HOOKS.140] a hand edit to the language list is refused, naming its source", verdictOf(list) === "deny" && (list?.deny ?? "").includes("surface-languages.json"), list?.deny);
+ok("[MKT.HOOKS.140] the source of the list is not guarded", verdictOf(checkRestatesFirst(write("/repo/scripts/surface-languages.json", "{}"))) === "silent");
+
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);
 

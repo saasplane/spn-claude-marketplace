@@ -1,0 +1,16 @@
+{
+ "type": "Invitation",
+ "records": [
+  {
+   "key": "zara-to-studio-mira",
+   "org": "studio-mira",
+   "person": "zara",
+   "email": "zara.mehta@example.com",
+   "role": "MEMBER",
+   "invitedBy": "mira@studio-mira",
+   "state": "SENT",
+   "sentAt": "2026-11-27",
+   "expiresAt": "2026-12-04"
+  }
+ ]
+}

@@ -1,0 +1,20 @@
+{
+ "type": "Bundle",
+ "records": [
+  {
+   "key": "designer-path",
+   "title": "The product designer's path",
+   "line": "Three courses that take you from your first screen to a portfolio review.",
+   "items": [
+    "product-design",
+    "figma-teams",
+    "portfolio-review"
+   ],
+   "price": 1599,
+   "cover": {
+    "caption": "Three course covers fanned out together",
+    "ratio": "16:9"
+   }
+  }
+ ]
+}

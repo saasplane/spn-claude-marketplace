@@ -105,8 +105,8 @@
       "goal": "The modules and their packages, the services and workloads, the stores, messaging and secrets, and an integration port per outside service, decided.",
       "tree": ["a module per domain: contract, service, entry and tests seats", "the service apps", "stores, messaging, secrets", "an integration port per outside service"] },
     { "id": "N005", "title": "Apps: web", "subject": "apps-web", "landsIn": "the platform repository",
-      "goal": "Each web app's route groups by page kind, its theme setting written from the surface category its row names, and the modules its pages draw on, decided.",
-      "tree": ["each web app: public pages under the site layout, signed-in pages under the app shell", "its theme setting, written from its row's surface category", "skeleton pages"] },
+      "goal": "Each web app's route groups by page kind, its surface categories with a theme of its own for each, and the modules its pages draw on, decided.",
+      "tree": ["each web app: public pages under the site layout, signed-in pages under the app shell", "its spsurface.json naming the language, and its own theme for each surface category in src/spn.surface.json", "skeleton pages"] },
     { "id": "N006", "title": "Infra", "subject": "infra", "landsIn": "the estate repository",
       "goal": "The organization, cloud, regions and environments, the platform and its app rows, teams and owners, released and pinned, decided.",
       "tree": ["the organization package", "the platform package", "CODEOWNERS, and the book repository if several teams", "the versions the platform repository pins"] }

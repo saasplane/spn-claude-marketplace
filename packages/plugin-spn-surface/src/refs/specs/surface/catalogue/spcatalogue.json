@@ -1,0 +1,640 @@
+{
+  "groups": [
+    {
+      "code": "SHARED",
+      "title": "Shared",
+      "description": "what a language keeps the same across every category; values only",
+      "parts": [
+        {
+          "code": "BRAND",
+          "title": "Brand",
+          "description": "the primary, the greys and the typefaces",
+          "holds": "VALUES",
+          "config": [],
+          "values": {
+            "ALL": [
+              "theBrand"
+            ]
+          }
+        },
+        {
+          "code": "DRAWING",
+          "title": "Drawing",
+          "description": "how every drawing is made: its line weights and styles, colour roles, characters, how blocks meet and its scale",
+          "holds": "VALUES",
+          "config": [],
+          "values": {
+            "ALL": [
+              "drawingStyle",
+              "colourAndStrength",
+              "characters",
+              "howTheBlocksMeet",
+              "drawingScale"
+            ]
+          }
+        },
+        {
+          "code": "MOTION",
+          "title": "Motion",
+          "description": "the speed and easing every surface moves with",
+          "holds": "VALUES",
+          "config": [],
+          "values": {
+            "ALL": [
+              "speedAndEasing"
+            ]
+          }
+        },
+        {
+          "code": "VOICE",
+          "title": "Voice",
+          "description": "how the language speaks",
+          "holds": "VALUES",
+          "config": [],
+          "values": {
+            "ALL": [
+              "howItSpeaks"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "code": "STRUCTURE",
+      "title": "Structure",
+      "description": "how a category's pages are built",
+      "parts": [
+        {
+          "code": "LAYOUTS",
+          "title": "Layouts",
+          "description": "the block that frames a page, chosen by the page's job",
+          "holds": "KINDS",
+          "config": [
+            "unit",
+            "navigation"
+          ],
+          "values": {
+            "SITE": [
+              "roomAndLayouts",
+              "tabletAndPhone"
+            ],
+            "APP": []
+          },
+          "ref": {
+            "SITE": [
+              {
+                "title": "Layouts",
+                "path": "10-architecture-layouts.md#the-types"
+              }
+            ],
+            "APP": [
+              {
+                "title": "Layouts",
+                "path": "10-architecture-layouts.md#the-types"
+              }
+            ]
+          }
+        },
+        {
+          "code": "PAGES",
+          "title": "Pages",
+          "description": "the page kinds, each with its sections in order on a site, or its arrangement of units in an app",
+          "holds": "KINDS",
+          "config": [
+            "level",
+            "sections",
+            "tree"
+          ],
+          "values": {
+            "SITE": [
+              "pageAndSections"
+            ],
+            "APP": []
+          },
+          "ref": {
+            "SITE": [
+              {
+                "title": "Site page kinds",
+                "path": "../../../04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/02-site-page-kinds.md"
+              }
+            ],
+            "APP": [
+              {
+                "title": "App page kinds",
+                "path": "../../../04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/03-app-page-kinds.md"
+              }
+            ]
+          }
+        },
+        {
+          "code": "CONTAINERS",
+          "title": "Containers",
+          "description": "the sections of a site's page, or the panels that frame a part of an app's page",
+          "holds": "KINDS",
+          "config": [
+            "unit",
+            "size",
+            "color"
+          ],
+          "values": {
+            "SITE": [
+              "grounds",
+              "sectionUnits",
+              "twoLayers",
+              "scene"
+            ],
+            "APP": [
+              "panels"
+            ]
+          },
+          "ref": {
+            "SITE": [
+              {
+                "title": "Site sections",
+                "path": "../../../04-capabilities/02-support/01-surface/03-standards-surface-catalogue/01-common/04-site-container-kinds.md#the-sections-by-name"
+              }
+            ],
+            "APP": [
+              {
+                "title": "Containers",
+                "path": "09-architecture-containers.md#the-parts"
+              }
+            ]
+          }
+        },
+        {
+          "code": "WIDGETS",
+          "title": "Widgets",
+          "description": "the units placed beside others",
+          "holds": "KINDS",
+          "config": [
+            "unit"
+          ],
+          "values": {
+            "SITE": [
+              "units",
+              "states",
+              "alignmentAndItems"
+            ],
+            "APP": [
+              "units"
+            ]
+          },
+          "ref": {
+            "SITE": [
+              {
+                "title": "Widgets",
+                "path": "08-architecture-widgets.md"
+              }
+            ],
+            "APP": [
+              {
+                "title": "Widgets",
+                "path": "08-architecture-widgets.md"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "code": "STYLE",
+      "title": "Style",
+      "description": "how a category's pages look and read",
+      "parts": [
+        {
+          "code": "THEME",
+          "title": "Theme",
+          "description": "the colours, corners and sizes the surface is drawn with: the app's own theme, set in its src/spn.surface.json by category; a design language holds no Theme part, and language check refuses one",
+          "holds": "KINDS_AND_VALUES",
+          "config": [],
+          "values": {
+            "SITE": [
+              "surfacesAndTones",
+              "emphasis",
+              "darkMode"
+            ],
+            "APP": [
+              "looks"
+            ]
+          },
+          "ref": {
+            "SITE": [
+              {
+                "title": "Settings and theme",
+                "path": "../../../04-capabilities/02-support/01-surface/11-architecture-app/01-common/02-settings-and-theme.md"
+              }
+            ],
+            "APP": [
+              {
+                "title": "Settings and theme",
+                "path": "../../../04-capabilities/02-support/01-surface/11-architecture-app/01-common/02-settings-and-theme.md"
+              }
+            ]
+          }
+        },
+        {
+          "code": "MEDIA",
+          "title": "Media",
+          "description": "the pictures, drawings and video it shows, and how each is framed",
+          "holds": "KINDS_AND_VALUES",
+          "config": [
+            "framing"
+          ],
+          "values": {
+            "SITE": [
+              "drawingKinds",
+              "icons",
+              "photosAndProductViews",
+              "whereMediaGo",
+              "sizeByPlacement"
+            ],
+            "APP": [
+              "icons"
+            ]
+          },
+          "ref": {
+            "SITE": [
+              {
+                "title": "the media kinds",
+                "path": "../../../04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md#the-media-kinds"
+              }
+            ],
+            "APP": [
+              {
+                "title": "DASHBOARD in Surface's language",
+                "path": "13-language-surface.md#the-spec"
+              }
+            ]
+          }
+        },
+        {
+          "code": "MOTION",
+          "title": "Motion",
+          "description": "what moves in this category, within the shared speed and easing",
+          "holds": "KINDS_AND_VALUES",
+          "config": [],
+          "values": {
+            "SITE": [
+              "whatMoves",
+              "arrival"
+            ],
+            "APP": [
+              "stateChanges"
+            ]
+          },
+          "ref": {
+            "SITE": [],
+            "APP": []
+          }
+        },
+        {
+          "code": "WORDS",
+          "title": "Words",
+          "description": "how the type writes: the kinds of its text",
+          "holds": "KINDS_AND_VALUES",
+          "config": [
+            "dsTextCase"
+          ],
+          "values": {
+            "SITE": [
+              "textUnits",
+              "pageText",
+              "wordLengths"
+            ],
+            "APP": [
+              "wordLengths"
+            ]
+          },
+          "ref": {
+            "SITE": [
+              {
+                "title": "DSText's choice table",
+                "path": "../../../04-capabilities/02-support/01-surface/07-architecture-components/01-common/01-components.md#the-choice-table-of-dstext"
+              }
+            ],
+            "APP": [
+              {
+                "title": "DSText's choice table",
+                "path": "../../../04-capabilities/02-support/01-surface/07-architecture-components/01-common/01-components.md#the-choice-table-of-dstext"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "categories": {
+    "MARKETING": {
+      "family": "SITE",
+      "person": "VISITOR",
+      "description": "a site for a Visitor, who is deciding whether a product is for them"
+    },
+    "MARKETPLACE": {
+      "family": "SITE",
+      "person": "SEEKER",
+      "description": "a site for a Seeker, who finds and chooses among records"
+    },
+    "RESOURCES": {
+      "family": "SITE",
+      "person": "LEARNER",
+      "description": "a site for a Learner, who came to learn or to get a thing working"
+    },
+    "DASHBOARD": {
+      "family": "APP",
+      "person": "TEAM",
+      "description": "an app for a Team, who use it as their job"
+    },
+    "PORTAL": {
+      "family": "APP",
+      "person": "INDIVIDUAL",
+      "description": "an app for an Individual, who uses it for themselves or for their family, and never as a company's team"
+    }
+  },
+  "partNotes": {
+    "MARKETING": {
+      "LAYOUTS": {
+        "code": "LAYOUTS",
+        "description": "`TOPNAV` for the site; `CANVAS` for a landing page that stands alone. Every site page is wrapped once in `DSSitePage`",
+        "definedIn": "[Layouts]"
+      },
+      "PAGES": {
+        "code": "PAGES",
+        "floor": [
+          "Text page",
+          "Not found",
+          "Server error",
+          "Maintenance"
+        ],
+        "flows": [
+          "From a site to the app",
+          "Sign up"
+        ],
+        "description": "the page kinds it holds, each with its sections in order",
+        "definedIn": "[Site page kinds], and the standard pages below"
+      },
+      "CONTAINERS": {
+        "code": "CONTAINERS",
+        "description": "the sections of a page, each built by `DSSectionContainer`, or by `DSFeatureGridSectionContainer` for a grid section",
+        "definedIn": "[Site sections]",
+        "layoutCases": "a section's content kind is chosen first, and its case second: BESIDE puts the picture at the end side of the words (SPLIT_END), UNDER under them (MEDIA_BOTTOM), HEAD_ACROSS the head across the top with the items under it; a kind's case states only what differs from that"
+      },
+      "WIDGETS": {
+        "code": "WIDGETS",
+        "description": "the units placed beside others; a widget that shows an item states its forms as its cases, by where it stands (GRID_CELL, LIST_ROW, SIDE_LIST, SLIDE) and what it holds (WITH_PICTURE, WORDS_ONLY), and a container's case names the form it takes",
+        "definedIn": "[Widgets]"
+      },
+      "THEME": {
+        "code": "THEME",
+        "description": "the colours, corners and sizes the site is drawn with: the app's own theme, never a design language's",
+        "definedIn": "[Settings and theme]",
+        "none": "none defined yet: a site takes the one default theme, and its surfaces, emphasis and dark mode are values"
+      },
+      "MEDIA": {
+        "code": "MEDIA",
+        "description": "the pictures, drawings and video it shows, and how each is framed",
+        "definedIn": "[the media kinds]"
+      },
+      "MOTION": {
+        "code": "MOTION",
+        "description": "how the type moves, within the shared motion tokens",
+        "none": "none defined yet"
+      },
+      "WORDS": {
+        "code": "WORDS",
+        "description": "how the type writes: the kinds of its text",
+        "definedIn": "[DSText's choice table]"
+      }
+    },
+    "RESOURCES": {
+      "LAYOUTS": {
+        "code": "LAYOUTS",
+        "description": "`RAIL` for guides and API docs, whose pages run in groups of several levels and whose rail stays open; `TOPNAV` for a help centre started from a search, of any depth. Every site page is wrapped once in `DSSitePage`",
+        "definedIn": "[Layouts]"
+      },
+      "PAGES": {
+        "code": "PAGES",
+        "floor": [
+          "Text page",
+          "Not found",
+          "Server error",
+          "Maintenance"
+        ],
+        "flows": [
+          "From a site to the app"
+        ],
+        "description": "the page kinds it holds, each with its sections in order",
+        "definedIn": "[Site page kinds] and [App page kinds], and the standard pages below"
+      },
+      "CONTAINERS": {
+        "code": "CONTAINERS",
+        "description": "the sections of a page, each built by `DSSectionContainer`, or by `DSFeatureGridSectionContainer` for a grid section; Hero is a doc page's head",
+        "definedIn": "[Site sections]",
+        "layoutCases": "a section's content kind is chosen first, and its case second: BESIDE puts the picture at the end side of the words (SPLIT_END), UNDER under them (MEDIA_BOTTOM), HEAD_ACROSS the head across the top with the items under it; a kind's case states only what differs from that"
+      },
+      "WIDGETS": {
+        "code": "WIDGETS",
+        "description": "the units placed beside others; a widget that shows an item states its forms as its cases, by where it stands (GRID_CELL, LIST_ROW, SIDE_LIST, SLIDE) and what it holds (WITH_PICTURE, WORDS_ONLY), and a container's case names the form it takes",
+        "definedIn": "[Widgets]"
+      },
+      "THEME": {
+        "code": "THEME",
+        "description": "the colours, corners and sizes the site is drawn with: the app's own theme, never a design language's",
+        "definedIn": "[Settings and theme]",
+        "none": "none defined yet: a site takes the one default theme, and its surfaces, emphasis and dark mode are values"
+      },
+      "MEDIA": {
+        "code": "MEDIA",
+        "description": "the pictures, drawings and video it shows, and how each is framed",
+        "definedIn": "[the media kinds]"
+      },
+      "MOTION": {
+        "code": "MOTION",
+        "description": "how the type moves, within the shared motion tokens",
+        "none": "none defined yet"
+      },
+      "WORDS": {
+        "code": "WORDS",
+        "description": "how the type writes: the kinds of its text",
+        "definedIn": "[DSText's choice table]"
+      }
+    },
+    "MARKETPLACE": {
+      "LAYOUTS": {
+        "code": "LAYOUTS",
+        "description": "`TOPNAV` for the site, a search in its bar and the categories in its menu. Every site page is wrapped once in `DSSitePage`",
+        "definedIn": "[Layouts]"
+      },
+      "PAGES": {
+        "code": "PAGES",
+        "floor": [
+          "Text page",
+          "Not found",
+          "Server error",
+          "Maintenance"
+        ],
+        "flows": [
+          "From a site to the app",
+          "Sign up",
+          "Sign in"
+        ],
+        "description": "the page kinds it holds, in three groups: Find, Choose and Act; what needs a person's account, such as orders, returns, addresses and payment methods, opens in PORTAL after sign-in",
+        "definedIn": "[Site page kinds], and the standard pages below"
+      },
+      "CONTAINERS": {
+        "code": "CONTAINERS",
+        "description": "the sections of a page, each built by `DSSectionContainer`, or by `DSFeatureGridSectionContainer` for a grid section; BROWSE_SEARCH is the home's and the search's first section",
+        "definedIn": "[Site sections]",
+        "layoutCases": "a section's content kind is chosen first, and its case second: BESIDE puts the picture at the end side of the words (SPLIT_END), UNDER under them (MEDIA_BOTTOM), HEAD_ACROSS the head across the top with the items under it; a kind's case states only what differs from that"
+      },
+      "WIDGETS": {
+        "code": "WIDGETS",
+        "description": "the units placed beside others; a widget that shows an item states its forms as its cases, by where it stands (GRID_CELL, LIST_ROW, SIDE_LIST, SLIDE) and what it holds (WITH_PICTURE, WORDS_ONLY), and a container's case names the form it takes",
+        "definedIn": "[Widgets]"
+      },
+      "THEME": {
+        "code": "THEME",
+        "description": "the colours, corners and sizes the site is drawn with: the app's own theme, never a design language's",
+        "definedIn": "[Settings and theme]",
+        "none": "none defined yet: a site takes the one default theme, and its surfaces, emphasis and dark mode are values"
+      },
+      "MEDIA": {
+        "code": "MEDIA",
+        "description": "the pictures of the records, the marks of their makers and the maps of where they are, and how each is framed",
+        "definedIn": "[the media kinds]"
+      },
+      "MOTION": {
+        "code": "MOTION",
+        "description": "how the type moves, within the shared motion tokens",
+        "none": "none defined yet"
+      },
+      "WORDS": {
+        "code": "WORDS",
+        "description": "how the type writes: the kinds of its text",
+        "definedIn": "[DSText's choice table]"
+      }
+    },
+    "DASHBOARD": {
+      "LAYOUTS": {
+        "code": "LAYOUTS",
+        "description": "`RAIL` for the app; `DOCK` for a person's or a thing's settings; `CANVAS` for sign-in, an app that cannot start, and a tool that fills the window",
+        "definedIn": "[Layouts]"
+      },
+      "PAGES": {
+        "code": "PAGES",
+        "floor": [
+          "Not found",
+          "No access",
+          "The sign-in page"
+        ],
+        "flows": [
+          "Sign up",
+          "Sign in",
+          "Get back in",
+          "Accept an invitation",
+          "First run",
+          "Open one and come back",
+          "Make or change one",
+          "Set up a way in and prove it",
+          "Leave or switch"
+        ],
+        "description": "the page kinds it holds, each an arrangement of units",
+        "definedIn": "[App page kinds]"
+      },
+      "CONTAINERS": {
+        "code": "CONTAINERS",
+        "description": "the panels that frame a part of a page; an app has no sections",
+        "definedIn": "[Containers]"
+      },
+      "WIDGETS": {
+        "code": "WIDGETS",
+        "description": "the units placed beside others; a widget that shows an item states its forms as its cases, by where it stands (GRID_CELL, LIST_ROW, SIDE_LIST, SLIDE) and what it holds (WITH_PICTURE, WORDS_ONLY), and a container's case names the form it takes",
+        "definedIn": "[Widgets]"
+      },
+      "THEME": {
+        "code": "THEME",
+        "description": "the colours, corners and sizes the app is drawn with: the app's own theme, never a design language's",
+        "definedIn": "[Settings and theme]"
+      },
+      "MEDIA": {
+        "code": "MEDIA",
+        "description": "the icons it shows",
+        "definedIn": "[DASHBOARD in Surface's language]"
+      },
+      "MOTION": {
+        "code": "MOTION",
+        "description": "how the type moves, within the shared motion tokens",
+        "none": "none defined yet"
+      },
+      "WORDS": {
+        "code": "WORDS",
+        "description": "how the type writes: the kinds of its text",
+        "definedIn": "[DSText's choice table]"
+      }
+    },
+    "PORTAL": {
+      "LAYOUTS": {
+        "code": "LAYOUTS",
+        "description": "`TOPNAV` for the app; `DOCK` for a person's own account; `CANVAS` for sign-in, an app that cannot start, and a tool that fills the window",
+        "definedIn": "[Layouts]"
+      },
+      "PAGES": {
+        "code": "PAGES",
+        "floor": [
+          "Not found",
+          "No access",
+          "The sign-in page"
+        ],
+        "flows": [
+          "Sign up",
+          "Sign in",
+          "Get back in",
+          "First run",
+          "Open one and come back",
+          "Make or change one",
+          "Set up a way in and prove it",
+          "Leave or switch"
+        ],
+        "description": "the page kinds it holds, the ones that serve Individuals",
+        "definedIn": "[App page kinds]"
+      },
+      "CONTAINERS": {
+        "code": "CONTAINERS",
+        "description": "the panels that frame a part of a page; an app has no sections",
+        "definedIn": "[Containers]"
+      },
+      "WIDGETS": {
+        "code": "WIDGETS",
+        "description": "the units placed beside others; a widget that shows an item states its forms as its cases, by where it stands (GRID_CELL, LIST_ROW, SIDE_LIST, SLIDE) and what it holds (WITH_PICTURE, WORDS_ONLY), and a container's case names the form it takes",
+        "definedIn": "[Widgets]"
+      },
+      "THEME": {
+        "code": "THEME",
+        "description": "the colours, corners and sizes the app is drawn with: the app's own theme, never a design language's",
+        "definedIn": "[Settings and theme]"
+      },
+      "MEDIA": {
+        "code": "MEDIA",
+        "description": "the icons it shows",
+        "definedIn": "[PORTAL in Surface's language]"
+      },
+      "MOTION": {
+        "code": "MOTION",
+        "description": "how the type moves, within the shared motion tokens",
+        "none": "none defined yet"
+      },
+      "WORDS": {
+        "code": "WORDS",
+        "description": "how the type writes: the kinds of its text",
+        "definedIn": "[DSText's choice table]"
+      }
+    }
+  },
+  "files": {
+    "MARKETING": "marketing.json",
+    "MARKETPLACE": "marketplace.json",
+    "RESOURCES": "resources.json",
+    "DASHBOARD": "dashboard.json",
+    "PORTAL": "portal.json"
+  }
+}

@@ -1,9 +1,11 @@
 // The surface catalogue and a design language as generated regions: the reader, the resolver's five states, the frame both blocks draw.
-import { resolve } from "node:path";
+import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const HERE = resolve(import.meta.dirname, "..", "..", "..", "..");
-const { checkCatalogue, checkSpec, resolve: resolveLanguage, renderCatalogue, renderLanguage } = await import(pathToFileURL(resolve(HERE, "src", "scripts", "lib", "surface-catalogue.ts")).href);
+const { checkCatalogue, checkSpec, readChain, resolve: resolveLanguage, renderCatalogue, renderLanguage } = await import(pathToFileURL(resolve(HERE, "src", "scripts", "lib", "surface-catalogue.ts")).href);
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -26,7 +28,7 @@ const outline = {
 const kind = (code, extra = {}) => ({ code, title: code[0] + code.slice(1).toLowerCase(), description: `the ${code}`, config: {}, ...extra });
 const raw = { version: "1.0.0", outline, categories: { MARKETING: { LAYOUTS: [kind("TOPNAV", { floor: true })], CONTAINERS: [kind("HERO"), kind("NUMBERS")], THEME: [] } } };
 const decision = (extra) => ({ source: "OWN", pick: "ALL", customise: [], add: [], notUsed: [], values: { mtype: "X" }, why: "", ...extra });
-const spec = (name, extendsRef, extra = {}) => ({ name, version: "1.0.0", extends: extendsRef, domain: { product: "p", records: [], reads: "r" }, references: [], shared: {}, categories: {}, gaps: { notInTheLanguage: [], designSystemGaps: [], whatTheAgentMustAsk: [] }, ...extra });
+const spec = (name, extendsRef, extra = {}) => ({ name, extends: extendsRef, domain: { product: "p", records: [], reads: "r" }, references: [], shared: {}, categories: {}, gaps: { notInTheLanguage: [], designSystemGaps: [], whatTheAgentMustAsk: [] }, ...extra });
 
 const { catalogue, problems } = checkCatalogue(raw);
 console.log("=== the catalogue reader");
@@ -90,7 +92,7 @@ ok("a child that customises a code the parents lack is a problem", resolveLangua
 
 console.log("=== a language's frame");
 const page = renderLanguage(catalogue, r, { specPath: "specs/design-languages/demo.spdl.json", parentPage: "13-language-surface.md" });
-ok("it opens with the language's panel and links the parent's page", page.startsWith("~~~group Language | demo 1.0.0") && page.includes("Extends: [surface@1](13-language-surface.md)"));
+ok("it opens with the language's panel and links the parent's page", page.startsWith("~~~group Language | demo\n") && page.includes("Extends: [surface@1](13-language-surface.md)"));
 ok("a kind's state stands as a tag beside its code", page.includes("  Code: [HERO] [CUSTOMISED]") && page.includes("  Code: [NUMBERS] [NOT_USED]") && page.includes("  Code: [PLANS] [NEW]"));
 ok("the part's source and its values stand in the tab", page.includes("Filled by: [OWN]") && page.includes("  Source: [OWN]"));
 ok("a value's key stands in words as its row's title, and its JSON is emitted for the writer to draw", !page.includes("\ntheBrand\n") && /\nThe brand\n  Source: \[(OWN|INHERITED)\]/.test(page) && /  Value: `\{"primary"/.test(page), page.slice(0, 900));
@@ -107,6 +109,23 @@ const factsBesideBadge = (md) => [...md.matchAll(/```catalog[^\n]*\n([\s\S]*?)``
 ok("[MKT.SCRIPTS.659] every list the language block writes names three keys or fewer beside its badge, across all its rows, a customised kind's config folded into one",
   Math.max(...factsBesideBadge(page)) <= 3 && page.includes("  Version") === false, JSON.stringify(factsBesideBadge(page)));
 ok("it ends with the gaps and the spec in a fold", page.includes("~~~group Gaps |") && page.endsWith("```json file=docs/specs/design-languages/demo.spdl.json fold\n```"));
+
+// A language is a folder, and `extends` may name the parent alone.
+{
+  const dir = mkdtempSync(join(tmpdir(), "spdl-folder-"));
+  const put = (file, value) => { mkdirSync(resolve(file, ".."), { recursive: true }); writeFileSync(file, JSON.stringify(value)); };
+  put(join(dir, "surface", "surface.spdl.json"), spec("surface", null));
+  put(join(dir, "kid", "kid.spdl.json"), spec("kid", "surface"));
+  put(join(dir, "old.spdl.json"), spec("old", "surface@1"));
+  const bare = readChain(join(dir, "kid", "kid.spdl.json"), outline, [dir]);
+  ok("a child that names its parent alone is read from the parent's folder", bare.problems.length === 0 && bare.chain.map((c) => c.name).join() === "surface,kid", bare.problems.join("; "));
+  put(join(dir, "base", "base.spdl.json"), spec("base", null));
+  put(join(dir, "kid2", "kid2.spdl.json"), spec("kid2", "surface@1"));
+  const alias = readChain(join(dir, "kid2", "kid2.spdl.json"), outline, [dir]);
+  ok("a child that still extends surface finds the language named base", alias.problems.length === 0 && alias.chain.map((c) => c.name).join() === "base,kid2", alias.problems.join("; "));
+  const flat = readChain(join(dir, "old.spdl.json"), outline, [dir]);
+  ok("a child that names surface@1 is still read", flat.problems.length === 0 && flat.chain.length === 2, flat.problems.join("; "));
+}
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-surface-catalogue` : `\n  all ${total} passed — t-surface-catalogue`);
 process.exit(failed ? 1 : 0);

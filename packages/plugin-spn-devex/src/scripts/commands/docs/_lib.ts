@@ -37,7 +37,7 @@ export type Grade = "RULE" | "SOFT";
  */
 export type Finding = { check: string; grade: Grade; file: string; message: string; about?: string[] };
 
-// THE SET IS OWNED BY `SPDocVariantType` in the CLI's contract, and this is a copy of it. Nothing
+// THE SET IS OWNED BY `SPDevExDocVariantType` in the CLI's contract, and this is a copy of it. Nothing
 // links the two, so a value added there and not here is silently refused, and one added here and
 // not there passes a check the contract would reject. Keeping them in step is manual until a check
 // reads the contract; that check is still owed.
@@ -2285,7 +2285,7 @@ const SURFACE_MARKER = /<!-- spn:generated (surface-catalogue|surface-design-lan
 
 /**
  * The surface blocks: each marker in a seat names what it draws, and a marker that cannot be resolved is a finding, never a skip.
- * `surface-catalogue` is drawn from `specs/surface/catalogue.json`, `surface-design-language` from the spec its `spec=` names.
+ * `surface-catalogue` is drawn from the folder `specs/surface/catalogue/`, `surface-design-language` from the spec its `spec=` names.
  */
 function surfaceBlocks(tree: string, write: boolean, scope: FaceScope, touched: string[], findings: Finding[]): void {
   const carriers: Array<{ file: string; src: string; markers: Array<{ block: string; what: string; spec: string | null }> }> = [];
@@ -2295,7 +2295,7 @@ function surfaceBlocks(tree: string, write: boolean, scope: FaceScope, touched: 
     const markers = [...src.matchAll(SURFACE_MARKER)].map((m) => ({ block: m[1], what: m[1] + m[2], spec: /(?:^| )spec=(\S+)/.exec(m[2])?.[1] ?? null }));
     if (markers.length) carriers.push({ file, src, markers });
   }
-  const catalogueFile = join(tree, "specs", "surface", "catalogue.json");
+  const catalogueFile = join(tree, "specs", "surface", "catalogue", "spcatalogue.json");
   const asked = (b: string): boolean => scope.blocks.includes(b);
   const problem = (file: string, message: string) => findings.push({ check: "face", grade: "RULE", file, message });
   const read = carriers.length ? readCatalogue(catalogueFile) : { catalogue: null, problems: [] };
@@ -2309,16 +2309,16 @@ function surfaceBlocks(tree: string, write: boolean, scope: FaceScope, touched: 
       let body: string;
       if (marker.block === "surface-catalogue") {
         if (marker.what !== "surface-catalogue") { problem(file, `\`${marker.what}\`: a surface-catalogue marker takes no parameter`); continue; }
-        body = renderCatalogue(read.catalogue, "docs/specs/surface/catalogue.json");
+        body = renderCatalogue(read.catalogue, "docs/specs/surface/catalogue/spcatalogue.json");
       } else {
         if (!marker.spec || marker.what !== `surface-design-language spec=${marker.spec}`) { problem(file, `\`${marker.what}\`: a surface-design-language marker names its spec as \`spec=<path from docs/>\` and nothing else`); continue; }
         const specFile = join(tree, marker.spec);
-        const { chain, problems } = readChain(specFile, read.catalogue.outline, [join(tree, "specs", "design-languages")]);
+        const { chain, problems } = readChain(specFile, read.catalogue.outline, [join(tree, "specs", "surface", "languages"), join(tree, "specs", "design-languages")]);
         if (problems.length) { problem(file, `\`${marker.what}\` cannot be drawn:\n         ${problems.join("\n         ")}`); continue; }
         const resolved = resolveLanguage(read.catalogue, chain);
         for (const m of resolved.problems) problem(file, `\`${marker.what}\`: ${m}`);
         const parentRef = chain.length > 1 ? chain[chain.length - 2].name : null;
-        const parentCarrier = parentRef ? carriers.find((c) => c.markers.some((m) => m.spec && m.spec.endsWith(`/${parentRef}.spdl.json`))) : undefined;
+        const parentCarrier = parentRef ? carriers.find((c) => c.markers.some((m) => m.spec && (m.spec.endsWith(`/${parentRef}/spdl.json`) || m.spec.endsWith(`/${parentRef}.spdl.json`)))) : undefined;
         if (parentRef && !parentCarrier) findings.push({ check: "face", grade: "SOFT", file, message: `\`${marker.what}\`: no seat draws ${parentRef}, so \`extends\` is not linked` });
         body = renderLanguage(read.catalogue, resolved, { specPath: marker.spec, parentPage: parentCarrier ? relative(dirname(file), parentCarrier.file) : undefined });
       }

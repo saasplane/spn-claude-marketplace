@@ -1,0 +1,13 @@
+{
+ "type": "SignUp",
+ "records": [
+  {
+   "key": "karan-pending",
+   "name": "Karan Iyer",
+   "email": "karan.iyer@example.com",
+   "state": "PENDING",
+   "sentAt": "2026-11-27",
+   "channel": "EMAIL"
+  }
+ ]
+}

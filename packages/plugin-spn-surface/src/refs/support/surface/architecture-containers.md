@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/09-architecture-containers.md",
-      "seen": "876c0fa8"
+      "seen": "fe34fe14"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-containers/",
@@ -27,7 +27,7 @@ Read this before you frame a part of a page, or before you draw or build the pan
 | Part | `DSPanelContainer.Header` · `DSPanelContainer.Content` · `DSPanelContainer.Footer` — a named place in a panel. It holds anything, and takes only `flush`; the footer also takes `sticky` |
 | Frame | `frames` — the drawn edge and fill of a panel. A frame is drawn once on any part of a page |
 | Part of a box | `DSBoxPartType` — the closed set of the three parts of any box (`HEADER`, `CONTENT`, `FOOTER`): a panel, a card, a dialog, a sheet, a drawer, a popover or the page's head. The parts a frame holds, the parts of a card, and the part a block stands in |
-| Surface | `IDSFrameSurface` — the paint of a frame in one prop: its `color`, `strength`, `raised`, `elevation`, `bordered` and `rounded`, each optional. A key left out takes the theme's |
+| Surface | `IDSFrameSurface` — the paint of a frame in one prop: its `color`, `strength`, `raised`, `elevation`, `bordered` and `rounded`, each optional. A key left out takes the theme's. The parts of a box, the colour and the strength are closed lists in the contract's theme state, so a theme can only name a part, a colour or a strength the design system draws |
 | Inset | the space a part keeps between the frame and what it holds |
 | Flush | `flush` — the one word on a part that turns its inset off, because its content reaches the edge of the frame |
 | Card | `DSCard` — the block that frames one thing, among others like it. It stays beside the panel |

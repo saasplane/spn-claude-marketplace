@@ -11,7 +11,7 @@ description: How a change reaches a running setup - what must be true before a r
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/07-deliver.md",
-      "seen": "be4e9978"
+      "seen": "8ac74c9d"
     }
   ]
 }

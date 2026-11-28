@@ -1,0 +1,59 @@
+{
+ "type": "OrgCategory",
+ "records": [
+  {
+   "code": "PLATFORM",
+   "label": "Platform",
+   "pluralLabel": "Platform",
+   "orgType": "PLATFORM",
+   "parentOrgCategoryCode": null,
+   "pool": "GLOBAL",
+   "line": "Atelier itself, the company that runs the platform"
+  },
+  {
+   "code": "ACCOUNT",
+   "label": "Account",
+   "pluralLabel": "Accounts",
+   "orgType": "ENTERPRISE",
+   "parentOrgCategoryCode": "PLATFORM",
+   "pool": "GLOBAL",
+   "line": "a business or a person that subscribes to Atelier: an academy with its own school, a company, a learner on Plus"
+  },
+  {
+   "code": "ACCOUNT_ENTERPRISE",
+   "label": "Account Enterprise",
+   "pluralLabel": "Account Enterprises",
+   "orgType": "ENTERPRISE",
+   "parentOrgCategoryCode": "ACCOUNT",
+   "pool": "ACCOUNT_ENTERPRISE",
+   "line": "a company an academy trains, under that academy"
+  },
+  {
+   "code": "ACCOUNT_CONSUMER",
+   "label": "Account Consumer",
+   "pluralLabel": "Account Consumers",
+   "orgType": "CONSUMER",
+   "parentOrgCategoryCode": "ACCOUNT",
+   "pool": "ACCOUNT_CONSUMER",
+   "line": "an academy's own learner, in that academy's school"
+  },
+  {
+   "code": "MERCHANT",
+   "label": "Merchant",
+   "pluralLabel": "Merchants",
+   "orgType": "ENTERPRISE",
+   "parentOrgCategoryCode": "PLATFORM",
+   "pool": "PLATFORM_ENTERPRISE",
+   "line": "a teacher's studio or an academy that sells its courses and workshops in Atelier's catalogue"
+  },
+  {
+   "code": "SHOPPER",
+   "label": "Shopper",
+   "pluralLabel": "Shoppers",
+   "orgType": "CONSUMER",
+   "parentOrgCategoryCode": "PLATFORM",
+   "pool": "PLATFORM_CONSUMER",
+   "line": "a learner who buys from every seller in the catalogue with one account"
+  }
+ ]
+}

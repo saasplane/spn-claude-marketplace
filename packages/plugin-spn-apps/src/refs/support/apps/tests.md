@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/06-tests.md",
-      "seen": "c3eae1f5"
+      "seen": "eb9b2c8d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/",
-      "seen": "a2481265"
+      "seen": "1b1011a8"
     }
   ]
 }
@@ -34,7 +34,7 @@ Five tiers, each buying something the others cannot. When you place a case, pick
 | `JOURNEY` | a person completing an outcome through a real entry | which rule failed when it fails | a quiesced running stack |
 
 ```text
-SPTestTierType      UNIT · INTEGRATION · CONTRACT · COMPONENT · JOURNEY
+SPAppsTestTierType      UNIT · INTEGRATION · CONTRACT · COMPONENT · JOURNEY
 SPTestNegativeType  REFUSAL · BAD_INPUT · ABSENT_ROW · CONFLICT · LIMIT
 ```
 

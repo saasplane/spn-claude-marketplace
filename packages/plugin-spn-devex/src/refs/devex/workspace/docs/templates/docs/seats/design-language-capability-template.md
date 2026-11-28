@@ -12,14 +12,14 @@
 
 `For: Agent · Web developer` · `Status: ✅ DONE` · `Realizes: Design Language`
 
-{{One paragraph: which language this app follows, by the construct's Model table, which version of it the app is pinned to, and where its data and drawings live.}}
+{{One paragraph: which language this app follows, by the construct's Model table, where its own theme lives, and where its data and drawings live.}}
 
 
 ## Where
 
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
-| The theme | the app's boot module, one exported typed setting | written by the agent from the design language's brand and this app's row, never by hand |
+| The theme | `src/spn.surface.json`; `spsurface.json`, at the package root, names the language | the app's own colours and theme settings, one theme for each category it serves, set by the app and never written from the language |
 | A page and its words | `src/modules/{{module}}/entry/ui/pages/<group>/<Name>Page.tsx` and `<Name>Page.data.ts` | the page, with its words beside it |
 | Each section's frame | `src/modules/{{module}}/entry/ui/containers/` | the module's containers, on the design system's section container |
 | The drawings | `src/modules/{{module}}/assets/drawings/<page>/<name>.svg` and `.css` | imported and drawn inline, tokens only |
@@ -34,11 +34,10 @@
 | Pin | Value |
 | --- | --- |
 | Language | {{the language's name, from the construct's Model table}} |
-| Language version | {{the version of the language this app is pinned to}} |
 | Template | {{2}} |
 | Reads references | {{the reference reads this app's choices were taken from, or none}} |
 
-The app's row in the construct names its kind of page, a site or an app, and its kind of surface, web or native. An app follows the language and never forks it.
+The app's `spsurface.json` names its language, and its `src/spn.surface.json` the categories it serves, so the construct holds no row for it. An app follows the language and never forks it.
 
 ## Parts this app fills
 

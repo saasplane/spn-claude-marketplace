@@ -63,7 +63,7 @@ console.log("=== styles on the design system — the docs classes read the produ
   ok("[MKT.SCRIPTS.589] the page script sets data-mode where a page names none", /setAttribute\('data-mode'/.test(readFileSync(join(STYLES, "docs-page.js"), "utf8")));
   const script = readFileSync(join(STYLES, "docs-page.js"), "utf8");
   ok("[MKT.SCRIPTS.589] the surface page builds its frame's document from the template named for the mode and the device, with design-system.css and the app's stylesheet linked, and sets the mode on the frame directly",
-    script.includes("'page-' + mode + '-' + device") && /frame\.srcdoc = pageDocument\(want\)/.test(script) && /design-system\.css/.test(script) && /surface-app-css/.test(script)
+    script.includes("prefix + mode + '-' + device") && /'page-' \+ chosen \+ '-'/.test(script) && /frame\.srcdoc = pageDocument\(want\)/.test(script) && /design-system\.css/.test(script) && /surface-app-css/.test(script)
       && /documentElement\.setAttribute\('data-mode', state\.mode\)/.test(script));
   ok("[MKT.SCRIPTS.589] the surface page sends no message and reads no preview-mode meta: the switches set the frame's own document",
     !/postMessage/.test(script) && !/preview-mode/.test(script) && !/surface-page-preview/.test(script));

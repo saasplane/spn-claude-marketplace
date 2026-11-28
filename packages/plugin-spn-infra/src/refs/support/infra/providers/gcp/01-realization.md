@@ -1,7 +1,10 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/gcp/01-realization.md", "seen": "6f0d6f45" }
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/gcp/01-realization.md",
+      "seen": "a7713e1c"
+    }
   ]
 }
 -->
@@ -17,7 +20,7 @@
 
 ## What is true today
 
-**The cloud vocabulary already admits this provider.** `SPEstateCloudType` names Google Cloud beside the other admitted clouds, so a declaration can say this provider fills the cloud port.
+**The cloud vocabulary already admits this provider.** `SPInfraEstateCloudType` names Google Cloud beside the other admitted clouds, so a declaration can say this provider fills the cloud port.
 
 **What a cloud provider binds is decided by the model, never by the provider.** The organization binds the account that pays and governs, and each platform binds its own container inside it. A Google Cloud realization would bind exactly those, at exactly those scopes.
 

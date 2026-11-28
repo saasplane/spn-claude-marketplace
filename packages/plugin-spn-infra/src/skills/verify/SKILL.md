@@ -11,7 +11,7 @@ description: Run the estate's gates - spnutils infra validate for the build, spn
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
-      "seen": "d9c3809f"
+      "seen": "bcf1ada3"
     }
   ]
 }

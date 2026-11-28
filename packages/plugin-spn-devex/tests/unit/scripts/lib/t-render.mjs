@@ -34,7 +34,7 @@ const SAMPLES = {
   yaml: "# one row\nsetup: dev",
   sql: "CREATE TABLE iam_identity (id CHAR(26) PRIMARY KEY); -- the row",
   sh: "# wire the agent\nspnutils repo agent-sync",
-  md: "| Estate | `SPEstate` |",
+  md: "| Estate | `SPInfraEstate` |",
   diff: "- what the file says today\n+ what it will say",
 };
 
@@ -61,17 +61,17 @@ const rowsOf = (html, head) => {
 };
 const table = (head, ...rows) => `| ${head.join(" | ")} |\n| ${head.map(() => "---").join(" | ")} |\n${rows.map((row) => `| ${row.join(" | ")} |`).join("\n")}\n`;
 const terms = rowsOf(produced(table(["Term", "Contract term", "What it means"],
-  ["Estate", "`SPEstate`", "everything a product runs on"], ["Ring", "—", "a set of estates"], ["—", "`SPRingType`", "the ring's kind"],
-  ["Kind", "`SPKind` — the closed set, stated in the tenancy chapter", "which of six a node is"])), "<thead>");
+  ["Estate", "`SPInfraEstate`", "everything a product runs on"], ["Ring", "—", "a set of estates"], ["—", "`SPRingType`", "the ring's kind"],
+  ["Kind", "`SPAppsKind` — the closed set, stated in the tenancy chapter", "which of six a node is"])), "<thead>");
 ok("Terms is three columns, Term · Contract term · Description", terms.startsWith("<thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>"), terms.slice(0, 120));
 ok("a term reads as its word in bold, the contract's spelling in code style, and the meaning in plain text",
-  terms.includes("<tr><td><strong>Estate</strong></td><td><code>SPEstate</code></td><td>everything a product runs on</td></tr>"), terms);
+  terms.includes("<tr><td><strong>Estate</strong></td><td><code>SPInfraEstate</code></td><td>everything a product runs on</td></tr>"), terms);
 ok("a term the contract does not spell has an empty Contract term cell", terms.includes("<tr><td><strong>Ring</strong></td><td></td><td>a set of estates</td></tr>"), terms);
 ok("a row with no consumer word is titled by the contract's spelling", terms.includes("<tr><td><code>SPRingType</code></td><td></td><td>the ring's kind</td></tr>"), terms);
 ok("a note the seat adds after the code is set under it in small type",
-  terms.includes("<td><code>SPKind</code><br><span class=\"sds-small\">the closed set, stated in the tenancy chapter</span></td>"), terms);
+  terms.includes("<td><code>SPAppsKind</code><br><span class=\"sds-small\">the closed set, stated in the tenancy chapter</span></td>"), terms);
 ok("and no Terms cell is an item cell any more", !terms.includes("<p>") && !terms.includes("Contract term:"), terms);
-const termsTable = produced(table(["Term", "Contract term", "What it means"], ["Estate", "`SPEstate`", "everything a product runs on"]));
+const termsTable = produced(table(["Term", "Contract term", "What it means"], ["Estate", "`SPInfraEstate`", "everything a product runs on"]));
 ok("the Terms table carries the class `sds-terms`, which gives the three columns their fixed shares",
   termsTable.includes('<div class="sds-scroll"><table class="sds-terms">'), termsTable);
 ok("a table that is not the Terms table carries no such class",
@@ -109,15 +109,15 @@ ok("a table that is not the Terms table carries no such class",
 const { cutVersions, integrityTable, newestVersion, linesFor } = await import(pathToFileURL(resolve(HERE, "..", "plugin-support-lib", "src", "lib", "page-styles.ts")).href);
 const { readFileSync } = await import("node:fs");
 const STYLES_HOME = resolve(HERE, "src", "styles");
-ok("the newest version of the shared styles is 1.17.4, which serves design-system-units.css and design-system.css, so every page writer links it",
-  newestVersion(Object.keys(cutVersions(STYLES_HOME))) === "1.17.4");
+ok("the newest version of the shared styles is 1.17.6, which serves design-system-units.css and design-system.css, so every page writer links it",
+  newestVersion(Object.keys(cutVersions(STYLES_HOME))) === "1.17.6");
 ok("and 1.10.0 serves the Terms shares: a fixed layout, and the stacked rows under 40rem",
   /table\.sds-terms\{table-layout:fixed\}|table\.sds-terms\s*\{[^}]*table-layout:\s*fixed/.test(readFileSync(resolve(HERE, "..", "..", "public", "assets", "docs", "1.10.0", "sds-docs.css"), "utf8"))
   && readFileSync(resolve(HERE, "..", "..", "public", "assets", "docs", "1.10.0", "sds-docs.css"), "utf8").includes("max-width:40rem"));
 for (const name of ["construct", "overview", "blocks"]) {
   const template = readFileSync(resolve(HERE, "src", "refs", "devex", "workspace", "docs", "templates", "docs", "pages", `${name}-template.html`), "utf8");
-  ok(`the ${name} template links 1.17.4, the version every page writer links, with its hash`,
-    template.includes(linesFor("1.17.4", undefined, integrityTable(STYLES_HOME)["1.17.4"]).stylesheet) && !template.includes("/1.15.0/"));
+  ok(`the ${name} template links 1.17.6, the version every page writer links, with its hash`,
+    template.includes(linesFor("1.17.6", undefined, integrityTable(STYLES_HOME)["1.17.6"]).stylesheet) && !template.includes("/1.15.0/"));
 }
 const binds = rowsOf(produced(table(["Rule", "What it decides", "Weight"], ["`RD.X.1`", "what every provider delivers", "MUST"])), "<thead>");
 ok("Binds keeps the Weight a reader compares down, and folds what a rule decides into the rule's cell",

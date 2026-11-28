@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/08-operate.md",
-      "seen": "d984dbf5"
+      "seen": "bcaed5d0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/08-operate/",
-      "seen": "fee040eb"
+      "seen": "18bb819a"
     }
   ]
 }
@@ -21,8 +21,8 @@ A running estate owes what a deployment must derive rather than have authored, w
 
 | Term | Contract term | What it means |
 | --- | --- | --- |
-| Trigger | `SPEstateDeploy` | what starts a deployment into one environment: a branch, an approved tag, or a person |
-| Promotion | `SPEstateDeployTagApproval.promotesFrom` | moving an already-proven artifact to the next environment, skipping no rung |
+| Trigger | `SPInfraEstateDeploy` | what starts a deployment into one environment: a branch, an approved tag, or a person |
+| Promotion | `SPInfraEstateDeployTagApproval.promotesFrom` | moving an already-proven artifact to the next environment, skipping no rung |
 | Health listener | — | the separate port a long-running process answers probes on, never the serving port |
 | Edge seam | — | the one door that makes a hostname serve: it issues the certificate, binds it at the edge and writes the host's route |
 | Web releases store | — | an environment's own store of immutable web releases |
@@ -83,7 +83,7 @@ A namespace is never an organizational boundary — teams do not get namespaces,
 
 **Exposure is declared on the deployment's own row, and the namespace is its ceiling — MUST, never derived from `(mtype, ns)`.**
 
-| `SPEstateExposeType` | Answers on |
+| `SPInfraEstateExposeType` | Answers on |
 | --- | --- |
 | `PUBLIC` | the internet — the product namespace only |
 | `PRIVATE` | the internal zone, reachable from the cluster and by an operator arriving through the platform's own ranges |
