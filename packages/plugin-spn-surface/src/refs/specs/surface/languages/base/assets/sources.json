@@ -1,174 +1,1019 @@
 {
  "brand": {
   "mark": {
-   "file": null,
-   "state": "AWAITED",
-   "drawn": "the BRUSH icon in the primary colour"
+   "file": "pictures/orgs/atelier-logo.svg",
+   "state": "HELD",
+   "drawn": "Atelier's brush mark in plum, white on a rounded square"
   }
  },
  "pictures": [
   {
-   "record": "subjects/design",
-   "field": "picture",
-   "file": null,
-   "caption": "A designer's desk: sketches beside a laptop showing a phone screen",
-   "state": "AWAITED"
+   "record": "orgs/atelier",
+   "field": "logo",
+   "file": "pictures/orgs/atelier-logo.svg",
+   "caption": "Atelier's brush mark in plum",
+   "state": "HELD"
   },
   {
-   "record": "subjects/development",
-   "field": "picture",
-   "file": null,
-   "caption": "Two screens of code and a terminal, warm desk light",
-   "state": "AWAITED"
+   "record": "orgs/atelier",
+   "field": "wide",
+   "file": "pictures/orgs/atelier-wide.svg",
+   "caption": "Atelier's wide logo: the brush mark and the name",
+   "state": "HELD"
   },
   {
-   "record": "subjects/business",
-   "field": "picture",
-   "file": null,
-   "caption": "A team at a whiteboard covered in sticky notes",
-   "state": "AWAITED"
+   "record": "orgs/atelier",
+   "field": "banner",
+   "file": "pictures/orgs/atelier-banner.svg",
+   "caption": "A bright studio: an easel, a potter's wheel and a phone on a tripod",
+   "state": "HELD"
   },
   {
-   "record": "subjects/photo-video",
-   "field": "picture",
-   "file": null,
-   "caption": "A camera on a strap against an evening street",
-   "state": "AWAITED"
+   "record": "orgs/studio-mira",
+   "field": "logo",
+   "file": "pictures/orgs/studio-mira-logo.svg",
+   "caption": "Studio Mira's pencil mark in terracotta",
+   "state": "HELD"
   },
   {
-   "record": "subjects/arts-crafts",
-   "field": "picture",
-   "file": null,
-   "caption": "Hands shaping clay on a potter's wheel",
-   "state": "AWAITED"
-  },
-  {
-   "record": "subjects/food-drink",
-   "field": "picture",
-   "file": null,
-   "caption": "A sourdough loaf cut open on a wooden board",
-   "state": "AWAITED"
-  },
-  {
-   "record": "items/product-design",
-   "field": "cover",
-   "file": null,
-   "caption": "Phone screens of a travel app laid out on a desk",
-   "state": "AWAITED"
-  },
-  {
-   "record": "items/figma-teams",
-   "field": "cover",
-   "file": null,
-   "caption": "A Figma library of buttons and colour swatches",
-   "state": "AWAITED"
-  },
-  {
-   "record": "items/python-data",
-   "field": "cover",
-   "file": null,
-   "caption": "A notebook of Python code beside a bar chart",
-   "state": "AWAITED"
-  },
-  {
-   "record": "items/first-ai-app",
-   "field": "cover",
-   "file": null,
-   "caption": "A chat window answering a question from a PDF",
-   "state": "AWAITED"
-  },
-  {
-   "record": "items/watercolour",
-   "field": "cover",
-   "file": null,
-   "caption": "A watercolour of a fishing boat on a Goan beach",
-   "state": "AWAITED"
-  },
-  {
-   "record": "items/lettering",
-   "field": "cover",
-   "file": null,
-   "caption": "A brush pen lettering the word Hello",
-   "state": "AWAITED"
-  },
-  {
-   "record": "items/sourdough",
-   "field": "cover",
-   "file": null,
-   "caption": "A sourdough loaf with a deep ear on a cooling rack",
-   "state": "AWAITED"
-  },
-  {
-   "record": "items/street-photo",
-   "field": "cover",
-   "file": null,
-   "caption": "A man crossing a Mumbai street through a beam of light",
-   "state": "AWAITED"
-  },
-  {
-   "record": "items/wheel-weekend",
-   "field": "cover",
-   "file": null,
-   "caption": "A row of freshly thrown bowls on a wooden board",
-   "state": "AWAITED"
-  },
-  {
-   "record": "items/portfolio-review",
-   "field": "cover",
-   "file": null,
-   "caption": "A video call with a portfolio shared on screen",
-   "state": "AWAITED"
-  },
-  {
-   "record": "items/coffee-brewing",
-   "field": "cover",
-   "file": null,
-   "caption": "Pour-over coffee dripping into a glass server",
-   "state": "AWAITED"
-  },
-  {
-   "record": "items/night-walk",
-   "field": "cover",
-   "file": null,
-   "caption": "Neon signs reflected in a wet Colaba street",
-   "state": "AWAITED"
+   "record": "orgs/studio-mira",
+   "field": "wide",
+   "file": "pictures/orgs/studio-mira-wide.svg",
+   "caption": "Studio Mira's wide logo",
+   "state": "HELD"
   },
   {
    "record": "orgs/studio-mira",
    "field": "banner",
-   "file": null,
+   "file": "pictures/orgs/studio-mira-banner.svg",
    "caption": "Studio Mira's team reviewing screens on a wall",
-   "state": "AWAITED"
+   "state": "HELD"
+  },
+  {
+   "record": "orgs/byte-school",
+   "field": "logo",
+   "file": "pictures/orgs/byte-school-logo.svg",
+   "caption": "Byte School's code brackets in indigo",
+   "state": "HELD"
+  },
+  {
+   "record": "orgs/byte-school",
+   "field": "wide",
+   "file": "pictures/orgs/byte-school-wide.svg",
+   "caption": "Byte School's wide logo",
+   "state": "HELD"
   },
   {
    "record": "orgs/byte-school",
    "field": "banner",
-   "file": null,
+   "file": "pictures/orgs/byte-school-banner.svg",
    "caption": "A classroom of laptops with charts on the screens",
-   "state": "AWAITED"
+   "state": "HELD"
+  },
+  {
+   "record": "orgs/northlight",
+   "field": "logo",
+   "file": "pictures/orgs/northlight-logo.svg",
+   "caption": "Northlight Academy's eye mark in amber",
+   "state": "HELD"
+  },
+  {
+   "record": "orgs/northlight",
+   "field": "wide",
+   "file": "pictures/orgs/northlight-wide.svg",
+   "caption": "Northlight Academy's wide logo",
+   "state": "HELD"
   },
   {
    "record": "orgs/northlight",
    "field": "banner",
-   "file": null,
+   "file": "pictures/orgs/northlight-banner.svg",
    "caption": "A photographer framing a street at dusk",
-   "state": "AWAITED"
+   "state": "HELD"
+  },
+  {
+   "record": "orgs/kiln-co",
+   "field": "logo",
+   "file": "pictures/orgs/kiln-co-logo.svg",
+   "caption": "Kiln & Co's bowl mark in clay",
+   "state": "HELD"
+  },
+  {
+   "record": "orgs/kiln-co",
+   "field": "wide",
+   "file": "pictures/orgs/kiln-co-wide.svg",
+   "caption": "Kiln & Co's wide logo",
+   "state": "HELD"
   },
   {
    "record": "orgs/kiln-co",
    "field": "banner",
-   "file": null,
+   "file": "pictures/orgs/kiln-co-banner.svg",
    "caption": "Shelves of glazed bowls in a sunlit studio",
-   "state": "AWAITED"
+   "state": "HELD"
+  },
+  {
+   "record": "orgs/crumb",
+   "field": "logo",
+   "file": "pictures/orgs/crumb-logo.svg",
+   "caption": "Crumb Collective's wheat mark in green",
+   "state": "HELD"
+  },
+  {
+   "record": "orgs/crumb",
+   "field": "wide",
+   "file": "pictures/orgs/crumb-wide.svg",
+   "caption": "Crumb Collective's wide logo",
+   "state": "HELD"
   },
   {
    "record": "orgs/crumb",
    "field": "banner",
-   "file": null,
-   "caption": "Loaves cooling on a rack in a small bakery",
-   "state": "AWAITED"
+   "file": "pictures/orgs/crumb-banner.svg",
+   "caption": "A bakery counter with loaves and a cup of tea",
+   "state": "HELD"
+  },
+  {
+   "record": "orgs/tomas-studio",
+   "field": "logo",
+   "file": "pictures/orgs/tomas-studio-logo.svg",
+   "caption": "Tomas Reyes Studio's wave mark in teal",
+   "state": "HELD"
+  },
+  {
+   "record": "orgs/tomas-studio",
+   "field": "wide",
+   "file": "pictures/orgs/tomas-studio-wide.svg",
+   "caption": "Tomas Reyes Studio's wide logo",
+   "state": "HELD"
+  },
+  {
+   "record": "orgs/tomas-studio",
+   "field": "banner",
+   "file": "pictures/orgs/tomas-studio-banner.svg",
+   "caption": "A watercolour coast with a sailboat at sunset",
+   "state": "HELD"
+  },
+  {
+   "record": "orgs/brightpath",
+   "field": "logo",
+   "file": "pictures/orgs/brightpath-logo.svg",
+   "caption": "Brightpath Learning's bar mark in blue",
+   "state": "HELD"
+  },
+  {
+   "record": "orgs/brightpath",
+   "field": "wide",
+   "file": "pictures/orgs/brightpath-wide.svg",
+   "caption": "Brightpath Learning's wide logo",
+   "state": "HELD"
+  },
+  {
+   "record": "orgs/brightpath",
+   "field": "banner",
+   "file": "pictures/orgs/brightpath-banner.svg",
+   "caption": "Charts, a laptop and code on a school's screens",
+   "state": "HELD"
+  },
+  {
+   "record": "orgs/kestrel",
+   "field": "logo",
+   "file": "pictures/orgs/kestrel-logo.svg",
+   "caption": "Kestrel Insurance's bird mark in navy",
+   "state": "HELD"
+  },
+  {
+   "record": "orgs/kestrel",
+   "field": "wide",
+   "file": "pictures/orgs/kestrel-wide.svg",
+   "caption": "Kestrel Insurance's wide logo",
+   "state": "HELD"
+  },
+  {
+   "record": "orgs/kestrel",
+   "field": "banner",
+   "file": "pictures/orgs/kestrel-banner.svg",
+   "caption": "An office tower and a claims chart",
+   "state": "HELD"
+  },
+  {
+   "record": "orgs/pinecone",
+   "field": "logo",
+   "file": "pictures/orgs/pinecone-logo.svg",
+   "caption": "Pinecone Labs' pine mark in green",
+   "state": "HELD"
+  },
+  {
+   "record": "orgs/pinecone",
+   "field": "wide",
+   "file": "pictures/orgs/pinecone-wide.svg",
+   "caption": "Pinecone Labs' wide logo",
+   "state": "HELD"
+  },
+  {
+   "record": "orgs/pinecone",
+   "field": "banner",
+   "file": "pictures/orgs/pinecone-banner.svg",
+   "caption": "A phone and a dashboard beside a plant in a design team's room",
+   "state": "HELD"
+  },
+  {
+   "record": "orgs/noor-studio",
+   "field": "logo",
+   "file": "pictures/orgs/noor-studio-logo.svg",
+   "caption": "Noor Clay Studio's bowl mark in plum",
+   "state": "HELD"
+  },
+  {
+   "record": "orgs/noor-studio",
+   "field": "wide",
+   "file": "pictures/orgs/noor-studio-wide.svg",
+   "caption": "Noor Clay Studio's wide logo",
+   "state": "HELD"
+  },
+  {
+   "record": "orgs/noor-studio",
+   "field": "banner",
+   "file": "pictures/orgs/noor-studio-banner.svg",
+   "caption": "Shelves of vases and a wheel in a warm clay studio",
+   "state": "HELD"
+  },
+  {
+   "record": "items/product-design",
+   "field": "cover",
+   "file": "pictures/items/product-design-cover.svg",
+   "caption": "Phone screens of a travel app laid out on a desk",
+   "state": "HELD"
+  },
+  {
+   "record": "items/product-design",
+   "field": "banner",
+   "file": "pictures/items/product-design-banner.svg",
+   "caption": "Phone screens of a travel app laid out on a desk",
+   "state": "HELD"
+  },
+  {
+   "record": "items/figma-teams",
+   "field": "cover",
+   "file": "pictures/items/figma-teams-cover.svg",
+   "caption": "A Figma library of buttons and colour swatches",
+   "state": "HELD"
+  },
+  {
+   "record": "items/figma-teams",
+   "field": "banner",
+   "file": "pictures/items/figma-teams-banner.svg",
+   "caption": "A Figma library of buttons and colour swatches",
+   "state": "HELD"
+  },
+  {
+   "record": "items/python-data",
+   "field": "cover",
+   "file": "pictures/items/python-data-cover.svg",
+   "caption": "A notebook of Python code beside a bar chart",
+   "state": "HELD"
+  },
+  {
+   "record": "items/python-data",
+   "field": "banner",
+   "file": "pictures/items/python-data-banner.svg",
+   "caption": "A notebook of Python code beside a bar chart",
+   "state": "HELD"
+  },
+  {
+   "record": "items/first-ai-app",
+   "field": "cover",
+   "file": "pictures/items/first-ai-app-cover.svg",
+   "caption": "A chat window answering a question from a PDF",
+   "state": "HELD"
+  },
+  {
+   "record": "items/first-ai-app",
+   "field": "banner",
+   "file": "pictures/items/first-ai-app-banner.svg",
+   "caption": "A chat window answering a question from a PDF",
+   "state": "HELD"
+  },
+  {
+   "record": "items/watercolour",
+   "field": "cover",
+   "file": "pictures/items/watercolour-cover.svg",
+   "caption": "A watercolour of a fishing boat on a Goan beach",
+   "state": "HELD"
+  },
+  {
+   "record": "items/watercolour",
+   "field": "banner",
+   "file": "pictures/items/watercolour-banner.svg",
+   "caption": "A watercolour of a fishing boat on a Goan beach",
+   "state": "HELD"
+  },
+  {
+   "record": "items/lettering",
+   "field": "cover",
+   "file": "pictures/items/lettering-cover.svg",
+   "caption": "A brush pen lettering the word Hello",
+   "state": "HELD"
+  },
+  {
+   "record": "items/lettering",
+   "field": "banner",
+   "file": "pictures/items/lettering-banner.svg",
+   "caption": "A brush pen lettering the word Hello",
+   "state": "HELD"
+  },
+  {
+   "record": "items/sourdough",
+   "field": "cover",
+   "file": "pictures/items/sourdough-cover.svg",
+   "caption": "A sourdough loaf with a deep ear on a cooling rack",
+   "state": "HELD"
+  },
+  {
+   "record": "items/sourdough",
+   "field": "banner",
+   "file": "pictures/items/sourdough-banner.svg",
+   "caption": "A sourdough loaf with a deep ear on a cooling rack",
+   "state": "HELD"
+  },
+  {
+   "record": "items/street-photo",
+   "field": "cover",
+   "file": "pictures/items/street-photo-cover.svg",
+   "caption": "A man crossing a Mumbai street through a beam of light",
+   "state": "HELD"
+  },
+  {
+   "record": "items/street-photo",
+   "field": "banner",
+   "file": "pictures/items/street-photo-banner.svg",
+   "caption": "A man crossing a Mumbai street through a beam of light",
+   "state": "HELD"
+  },
+  {
+   "record": "items/wheel-weekend",
+   "field": "cover",
+   "file": "pictures/items/wheel-weekend-cover.svg",
+   "caption": "A row of freshly thrown bowls on a wooden board",
+   "state": "HELD"
+  },
+  {
+   "record": "items/wheel-weekend",
+   "field": "banner",
+   "file": "pictures/items/wheel-weekend-banner.svg",
+   "caption": "A row of freshly thrown bowls on a wooden board",
+   "state": "HELD"
+  },
+  {
+   "record": "items/portfolio-review",
+   "field": "cover",
+   "file": "pictures/items/portfolio-review-cover.svg",
+   "caption": "A video call with a portfolio shared on screen",
+   "state": "HELD"
+  },
+  {
+   "record": "items/portfolio-review",
+   "field": "banner",
+   "file": "pictures/items/portfolio-review-banner.svg",
+   "caption": "A video call with a portfolio shared on screen",
+   "state": "HELD"
+  },
+  {
+   "record": "items/coffee-brewing",
+   "field": "cover",
+   "file": "pictures/items/coffee-brewing-cover.svg",
+   "caption": "Pour-over coffee dripping into a glass server",
+   "state": "HELD"
+  },
+  {
+   "record": "items/coffee-brewing",
+   "field": "banner",
+   "file": "pictures/items/coffee-brewing-banner.svg",
+   "caption": "Pour-over coffee dripping into a glass server",
+   "state": "HELD"
+  },
+  {
+   "record": "items/night-walk",
+   "field": "cover",
+   "file": "pictures/items/night-walk-cover.svg",
+   "caption": "Neon signs reflected in a wet Colaba street",
+   "state": "HELD"
+  },
+  {
+   "record": "items/night-walk",
+   "field": "banner",
+   "file": "pictures/items/night-walk-banner.svg",
+   "caption": "Neon signs reflected in a wet Colaba street",
+   "state": "HELD"
+  },
+  {
+   "record": "subjects/design",
+   "field": "picture",
+   "file": "pictures/subjects/design-picture.svg",
+   "caption": "A designer's desk: sketches beside a laptop showing a phone screen",
+   "state": "HELD"
+  },
+  {
+   "record": "subjects/development",
+   "field": "picture",
+   "file": "pictures/subjects/development-picture.svg",
+   "caption": "Two screens of code and a terminal, warm desk light",
+   "state": "HELD"
+  },
+  {
+   "record": "subjects/business",
+   "field": "picture",
+   "file": "pictures/subjects/business-picture.svg",
+   "caption": "A team at a whiteboard covered in sticky notes",
+   "state": "HELD"
+  },
+  {
+   "record": "subjects/photo-video",
+   "field": "picture",
+   "file": "pictures/subjects/photo-video-picture.svg",
+   "caption": "A camera on a strap against an evening street",
+   "state": "HELD"
+  },
+  {
+   "record": "subjects/arts-crafts",
+   "field": "picture",
+   "file": "pictures/subjects/arts-crafts-picture.svg",
+   "caption": "Hands shaping clay on a potter's wheel",
+   "state": "HELD"
+  },
+  {
+   "record": "subjects/food-drink",
+   "field": "picture",
+   "file": "pictures/subjects/food-drink-picture.svg",
+   "caption": "A sourdough loaf cut open on a wooden board",
+   "state": "HELD"
+  },
+  {
+   "record": "people/mira",
+   "field": "avatar",
+   "file": "pictures/people/mira-avatar.svg",
+   "caption": "Mira Okafor, a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "people/arjun",
+   "field": "avatar",
+   "file": "pictures/people/arjun-avatar.svg",
+   "caption": "Arjun Mehta, a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "people/leo",
+   "field": "avatar",
+   "file": "pictures/people/leo-avatar.svg",
+   "caption": "Leo Brandt, a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "people/hana",
+   "field": "avatar",
+   "file": "pictures/people/hana-avatar.svg",
+   "caption": "Hana Sato, a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "people/ines",
+   "field": "avatar",
+   "file": "pictures/people/ines-avatar.svg",
+   "caption": "Ines Varga, a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "people/tomas",
+   "field": "avatar",
+   "file": "pictures/people/tomas-avatar.svg",
+   "caption": "Tomas Reyes, a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "people/ananya",
+   "field": "avatar",
+   "file": "pictures/people/ananya-avatar.svg",
+   "caption": "Ananya Patel, a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "people/devika",
+   "field": "avatar",
+   "file": "pictures/people/devika-avatar.svg",
+   "caption": "Devika Rao, a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "people/sam",
+   "field": "avatar",
+   "file": "pictures/people/sam-avatar.svg",
+   "caption": "Sam Okoye, a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "people/priya",
+   "field": "avatar",
+   "file": "pictures/people/priya-avatar.svg",
+   "caption": "Priya Nair, a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "people/farid",
+   "field": "avatar",
+   "file": "pictures/people/farid-avatar.svg",
+   "caption": "Farid Khan, a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "people/rohan",
+   "field": "avatar",
+   "file": "pictures/people/rohan-avatar.svg",
+   "caption": "Rohan Iyer, a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "people/meera",
+   "field": "avatar",
+   "file": "pictures/people/meera-avatar.svg",
+   "caption": "Meera Joshi, a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "people/vikram",
+   "field": "avatar",
+   "file": "pictures/people/vikram-avatar.svg",
+   "caption": "Vikram Das, a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "people/lena",
+   "field": "avatar",
+   "file": "pictures/people/lena-avatar.svg",
+   "caption": "Lena Fischer, a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "people/omar",
+   "field": "avatar",
+   "file": "pictures/people/omar-avatar.svg",
+   "caption": "Omar Siddiqui, a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "people/kabir",
+   "field": "avatar",
+   "file": "pictures/people/kabir-avatar.svg",
+   "caption": "Kabir Shah, a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "people/noor",
+   "field": "avatar",
+   "file": "pictures/people/noor-avatar.svg",
+   "caption": "Noor Haddad, a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "people/zara",
+   "field": "avatar",
+   "file": "pictures/people/zara-avatar.svg",
+   "caption": "Zara Mehta, a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "people/nikhil",
+   "field": "avatar",
+   "file": "pictures/people/nikhil-avatar.svg",
+   "caption": "Nikhil Bose, a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "people/aisha",
+   "field": "avatar",
+   "file": "pictures/people/aisha-avatar.svg",
+   "caption": "Aisha Khan, a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "people/joao",
+   "field": "avatar",
+   "file": "pictures/people/joao-avatar.svg",
+   "caption": "Joao Costa, a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "people/mei",
+   "field": "avatar",
+   "file": "pictures/people/mei-avatar.svg",
+   "caption": "Mei Tan, a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "people/ravi",
+   "field": "avatar",
+   "file": "pictures/people/ravi-avatar.svg",
+   "caption": "Ravi Shah, a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "people/sofia",
+   "field": "avatar",
+   "file": "pictures/people/sofia-avatar.svg",
+   "caption": "Sofia Rossi, a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "reviews/product-design-ananya",
+   "field": "avatar",
+   "file": "pictures/reviews/product-design-ananya-avatar.svg",
+   "caption": "Ananya P., a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "reviews/product-design-marcus",
+   "field": "avatar",
+   "file": "pictures/reviews/product-design-marcus-avatar.svg",
+   "caption": "Marcus T., a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "reviews/product-design-lena",
+   "field": "avatar",
+   "file": "pictures/reviews/product-design-lena-avatar.svg",
+   "caption": "Lena K., a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "reviews/python-data-rohan",
+   "field": "avatar",
+   "file": "pictures/reviews/python-data-rohan-avatar.svg",
+   "caption": "Rohan S., a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "reviews/sourdough-priya",
+   "field": "avatar",
+   "file": "pictures/reviews/sourdough-priya-avatar.svg",
+   "caption": "Priya N., a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "reviews/wheel-weekend-kabir",
+   "field": "avatar",
+   "file": "pictures/reviews/wheel-weekend-kabir-avatar.svg",
+   "caption": "Kabir D., a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "reviews/watercolour-sara",
+   "field": "avatar",
+   "file": "pictures/reviews/watercolour-sara-avatar.svg",
+   "caption": "Sara M., a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "reviews/night-walk-dev",
+   "field": "avatar",
+   "file": "pictures/reviews/night-walk-dev-avatar.svg",
+   "caption": "Dev R., a head-and-shoulders drawing",
+   "state": "HELD"
+  },
+  {
+   "record": "posts/filled-a-workshop",
+   "field": "cover",
+   "file": "pictures/posts/filled-a-workshop-cover.svg",
+   "caption": "A shelf of bowls above a potter's wheel, the studio before a workshop",
+   "state": "HELD"
+  },
+  {
+   "record": "posts/pricing-first-course",
+   "field": "cover",
+   "file": "pictures/posts/pricing-first-course-cover.svg",
+   "caption": "A bar chart climbing step by step, one bar for each price tried",
+   "state": "HELD"
+  },
+  {
+   "record": "posts/filming-on-a-phone",
+   "field": "cover",
+   "file": "pictures/posts/filming-on-a-phone-cover.svg",
+   "caption": "A phone on a tripod beside a window",
+   "state": "HELD"
+  },
+  {
+   "record": "posts/workshop-online",
+   "field": "cover",
+   "file": "pictures/posts/workshop-online-cover.svg",
+   "caption": "A video call of four learners holding up what they made",
+   "state": "HELD"
+  },
+  {
+   "record": "posts/academy-pages",
+   "field": "cover",
+   "file": "pictures/posts/academy-pages-cover.svg",
+   "caption": "A school building beside a dashboard of its teachers' courses",
+   "state": "HELD"
+  },
+  {
+   "record": "posts/month-of-payouts",
+   "field": "cover",
+   "file": "pictures/posts/month-of-payouts-cover.svg",
+   "caption": "A payout statement with its sales and refunds",
+   "state": "HELD"
+  },
+  {
+   "record": "posts/teaching-in-the-room",
+   "field": "cover",
+   "file": "pictures/posts/teaching-in-the-room-cover.svg",
+   "caption": "A whiteboard covered in sticky notes about a class",
+   "state": "HELD"
+  },
+  {
+   "record": "posts/first-lesson-script",
+   "field": "cover",
+   "file": "pictures/posts/first-lesson-script-cover.svg",
+   "caption": "Two chat bubbles, a question and its answer",
+   "state": "HELD"
+  },
+  {
+   "record": "posts/refunds-explained",
+   "field": "cover",
+   "file": "pictures/posts/refunds-explained-cover.svg",
+   "caption": "A cup of tea beside a falling line of refunds",
+   "state": "HELD"
   }
  ],
- "drawings": [],
- "note": "No picture file stands here yet: each is drawn from its record caption until a file is added at pictures/<type>/<key>.webp with its source and licence."
+ "drawings": [
+  {
+   "file": "drawings/closing-studio.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "drawings/culture-demo.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "drawings/door-academies.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "drawings/door-courses.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "drawings/door-docs.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "drawings/door-guides.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "drawings/door-help.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "drawings/door-plus.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "drawings/door-teach.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "drawings/door-workshops.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "drawings/feature-embed.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "drawings/feature-pages.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "drawings/feature-payouts.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "drawings/feature-publish.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "drawings/feature-reviews.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "drawings/feature-seats.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "drawings/hero-studio.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "drawings/hero-wide.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "drawings/office-bengaluru.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "drawings/office-pune.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "drawings/proof-statement.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "drawings/screen-courses-list.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "drawings/screen-dashboard-home.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "drawings/screen-payout-statement.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "drawings/screen-workshop-booking.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "drawings/show-studio.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "drawings/story-founding.svg",
+   "state": "HELD",
+   "source": "drawn for this language, flat shapes in the warm palette",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "pictures/partners/chai-labs-logo.svg",
+   "state": "HELD",
+   "source": "an invented company, drawn for this language",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "pictures/partners/chai-labs-wide.svg",
+   "state": "HELD",
+   "source": "an invented company, drawn for this language",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "pictures/partners/craft-guild-logo.svg",
+   "state": "HELD",
+   "source": "an invented company, drawn for this language",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "pictures/partners/craft-guild-wide.svg",
+   "state": "HELD",
+   "source": "an invented company, drawn for this language",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "pictures/partners/daily-build-logo.svg",
+   "state": "HELD",
+   "source": "an invented company, drawn for this language",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "pictures/partners/daily-build-wide.svg",
+   "state": "HELD",
+   "source": "an invented company, drawn for this language",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "pictures/partners/learn-mint-logo.svg",
+   "state": "HELD",
+   "source": "an invented company, drawn for this language",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "pictures/partners/learn-mint-wide.svg",
+   "state": "HELD",
+   "source": "an invented company, drawn for this language",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "pictures/partners/northwind-pay-logo.svg",
+   "state": "HELD",
+   "source": "an invented company, drawn for this language",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "pictures/partners/northwind-pay-wide.svg",
+   "state": "HELD",
+   "source": "an invented company, drawn for this language",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "pictures/partners/payroll-hub-logo.svg",
+   "state": "HELD",
+   "source": "an invented company, drawn for this language",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "pictures/partners/payroll-hub-wide.svg",
+   "state": "HELD",
+   "source": "an invented company, drawn for this language",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "pictures/partners/pune-makers-logo.svg",
+   "state": "HELD",
+   "source": "an invented company, drawn for this language",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "pictures/partners/pune-makers-wide.svg",
+   "state": "HELD",
+   "source": "an invented company, drawn for this language",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "pictures/partners/ship-weekly-logo.svg",
+   "state": "HELD",
+   "source": "an invented company, drawn for this language",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "pictures/partners/ship-weekly-wide.svg",
+   "state": "HELD",
+   "source": "an invented company, drawn for this language",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "pictures/partners/stack-review-logo.svg",
+   "state": "HELD",
+   "source": "an invented company, drawn for this language",
+   "licence": "made for this repository"
+  },
+  {
+   "file": "pictures/partners/stack-review-wide.svg",
+   "state": "HELD",
+   "source": "an invented company, drawn for this language",
+   "licence": "made for this repository"
+  }
+ ],
+ "note": "Every file is held. Illustrations, banners, covers, logos and drawings were drawn for this language as SVG (flat shapes, one warm palette) and belong to this repository. Faces are DiceBear Notionists by Zoish, CC0 1.0, on a tinted ground (see LICENSES.md)."
 }

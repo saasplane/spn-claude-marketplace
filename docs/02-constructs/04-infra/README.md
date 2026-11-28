@@ -21,13 +21,13 @@ The estate domain is the smallest of the four domains, and the boundary is what 
 
 | Construct | What it is |
 | --- | --- |
-| [Plugin — spn-infra as a Delivery Unit](01-plugin.md) | This plugin carries this repository's estate standard — the rules for the infrastructure a product runs on — into a session that is working on one, in one folder. |
-| [Hooks — One Moment, Every Write](02-hooks.md) | This plugin wires exactly one moment of a session — the point just before a write happens — because every rule it holds is about what a file contains. |
-| [Skills — The Doors Infrastructure Is Changed Through](03-skills.md) | The skills here are how an estate — the infrastructure a product runs on — gets changed: by editing what it declares itself to be, then letting a tool render and apply that declaration. |
-| [Scripts — The Write-Time Gate and What Runs It](04-scripts.md) | Scripts holds the gate that catches what must never appear in an estate declaration — a credential, an identifier a tool should discover for itself, a cloud provider's own string outside the one entry allowed to hold it — before it is written. |
-| [Refs — This Domain's Vocabulary, Restated as Cards](05-refs.md) | Refs is where the estate's own vocabulary — the words for the infrastructure a product runs on — is restated in full, as cards, for a reader who may never open the foundation book. |
-| [Providers — One Folder per Cloud, Scripts Half Only](06-providers.md) | This plugin serves every cloud an estate can run on, and everything that varies between clouds sits in one folder per cloud under Providers. |
-| [Tests — How This Plugin Proves Its Own Gate](07-tests.md) | This plugin proves its own gate — the rules that refuse a file — in a Tests folder arranged so moving a source file moves its test with it. |
+| [Plugin](01-plugin.md) | This plugin carries this repository's estate standard — the rules for the infrastructure a product runs on — into a session that is working on one, in one folder. |
+| [Hooks](02-hooks.md) | This plugin wires exactly one moment of a session — the point just before a write happens — because every rule it holds is about what a file contains. |
+| [Skills](03-skills.md) | The skills here are how an estate — the infrastructure a product runs on — gets changed: by editing what it declares itself to be, then letting a tool render and apply that declaration. |
+| [Scripts](04-scripts.md) | Scripts holds the gate that catches what must never appear in an estate declaration — a credential, an identifier a tool should discover for itself, a cloud provider's own string outside the one entry allowed to hold it — before it is written. |
+| [Refs](05-refs.md) | Refs is where the estate's own vocabulary — the words for the infrastructure a product runs on — is restated in full, as cards, for a reader who may never open the foundation book. |
+| [Providers](06-providers.md) | This plugin serves every cloud an estate can run on, and everything that varies between clouds sits in one folder per cloud under Providers. |
+| [Tests](07-tests.md) | This plugin proves its own gate — the rules that refuse a file — in a Tests folder arranged so moving a source file moves its test with it. |
 <!-- /spn:generated -->
 
 <!-- spn:generated glossary — do not edit inside these markers; `docs.ts face` writes it -->

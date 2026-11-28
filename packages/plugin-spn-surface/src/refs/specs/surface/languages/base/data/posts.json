@@ -1,0 +1,122 @@
+{
+ "type": "Post",
+ "records": [
+  {
+   "key": "filled-a-workshop",
+   "title": "How Mira filled a weekend workshop in two days",
+   "line": "A waitlist, a reminder and a price that ended in nine: what worked, in her own words.",
+   "category": "Workshops",
+   "person": "mira",
+   "date": "2026-11-24",
+   "minutes": 6,
+   "cover": {
+    "caption": "A shelf of bowls above a potter's wheel, the studio before a workshop",
+    "ratio": "16:9"
+   }
+  },
+  {
+   "key": "pricing-first-course",
+   "title": "Pricing your first course",
+   "line": "What learners pay for, and what they skip: three prices tried on one course.",
+   "category": "Pricing",
+   "person": "devika",
+   "date": "2026-11-18",
+   "minutes": 5,
+   "cover": {
+    "caption": "A bar chart climbing step by step, one bar for each price tried",
+    "ratio": "16:9"
+   }
+  },
+  {
+   "key": "filming-on-a-phone",
+   "title": "Filming lessons on a phone",
+   "line": "Light, sound and one tripod: everything you need, and nothing you do not.",
+   "category": "Teaching",
+   "person": "leo",
+   "date": "2026-11-10",
+   "minutes": 7,
+   "cover": {
+    "caption": "A phone on a tripod beside a window",
+    "ratio": "16:9"
+   }
+  },
+  {
+   "key": "workshop-online",
+   "title": "Running a workshop online",
+   "line": "What to send before, during and after, with the messages teachers reuse.",
+   "category": "Workshops",
+   "person": "sam",
+   "date": "2026-11-02",
+   "minutes": 4,
+   "cover": {
+    "caption": "A video call of four learners holding up what they made",
+    "ratio": "16:9"
+   }
+  },
+  {
+   "key": "academy-pages",
+   "title": "Academy pages, explained",
+   "line": "One school, many teachers, one payout: how an academy page is put together.",
+   "category": "Academies",
+   "person": "priya",
+   "date": "2026-10-24",
+   "minutes": 6,
+   "cover": {
+    "caption": "A school building beside a dashboard of its teachers' courses",
+    "ratio": "16:9"
+   }
+  },
+  {
+   "key": "month-of-payouts",
+   "title": "A month of payouts",
+   "line": "How a statement reads, line by line, from the first sale to the fifth of the month.",
+   "category": "Payouts",
+   "person": "mei",
+   "date": "2026-10-15",
+   "minutes": 5,
+   "cover": {
+    "caption": "A payout statement with its sales and refunds",
+    "ratio": "16:9"
+   }
+  },
+  {
+   "key": "teaching-in-the-room",
+   "title": "Teaching in the room, selling online",
+   "line": "Teachers who run both say the room sells the course, and the course fills the room.",
+   "category": "Teaching",
+   "person": "hana",
+   "date": "2026-10-06",
+   "minutes": 8,
+   "cover": {
+    "caption": "A whiteboard covered in sticky notes about a class",
+    "ratio": "16:9"
+   }
+  },
+  {
+   "key": "first-lesson-script",
+   "title": "The script of a first lesson",
+   "line": "Four sentences that tell a learner they are in the right place.",
+   "category": "Teaching",
+   "person": "ines",
+   "date": "2026-09-28",
+   "minutes": 3,
+   "cover": {
+    "caption": "Two chat bubbles, a question and its answer",
+    "ratio": "16:9"
+   }
+  },
+  {
+   "key": "refunds-explained",
+   "title": "Refunds, explained",
+   "line": "Why a fair refund policy sells more courses than it costs.",
+   "category": "Payouts",
+   "person": "ananya",
+   "date": "2026-09-19",
+   "minutes": 4,
+   "cover": {
+    "caption": "A cup of tea beside a falling line of refunds",
+    "ratio": "16:9"
+   }
+  }
+ ]
+}

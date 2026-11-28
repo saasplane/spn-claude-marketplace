@@ -109,8 +109,8 @@
      [
       "teach",
       "Teach on Atelier",
-      "Publish a self-paced course with lessons, notes and previews.",
-      "BOOK"
+      "Publish a self-paced course with lessons, notes and free previews.",
+      "PENCIL"
      ],
      [
       "workshops",
@@ -130,19 +130,19 @@
       "p1",
       "Publish in an afternoon",
       "Upload lessons, mark previews and set a price. Learners can buy the same day.",
-      "UPLOAD"
+      "CLOUD_UPLOAD"
      ],
      [
       "p2",
       "Fill every seat",
       "A workshop page shows the seats left and opens a waitlist when it is full.",
-      "TICKET"
+      "TAG"
      ],
      [
       "p3",
       "Paid on the 5th",
       "Every sale of the month lands in your bank on the 5th, less Atelier’s share.",
-      "WALLET"
+      "CREDIT_CARD"
      ]
     ],
     "steps": [
@@ -150,25 +150,25 @@
       "s1",
       "Create your studio",
       "Your name, your craft and a photo of where you teach.",
-      ""
+      "USER"
      ],
      [
       "s2",
       "Add a workshop",
       "Pick a date, a place and the number of seats.",
-      ""
+      "CALENDAR"
      ],
      [
       "s3",
       "Open booking",
       "Share the page; each booking takes a seat and sends a ticket.",
-      ""
+      "TAG"
      ],
      [
       "s4",
       "Teach, then get paid",
-      "Mark the workshop done, and the payout joins the month’s.",
-      ""
+      "Mark the workshop done, and the payout joins the month's.",
+      "CREDIT_CARD"
      ]
     ],
     "qa": [
@@ -205,68 +205,107 @@
     "records": [
      [
       "How Mira filled a weekend workshop in two days",
-      "A waitlist, a reminder and a price that ended in nine.",
-      "24 November 2026"
+      "A waitlist, a reminder and a price that ended in nine: what worked, in her own words.",
+      "",
+      "filled-a-workshop"
      ],
      [
       "Pricing your first course",
-      "What learners pay for, and what they skip.",
-      "18 November 2026"
+      "What learners pay for, and what they skip: three prices tried on one course.",
+      "",
+      "pricing-first-course"
      ],
      [
       "Filming lessons on a phone",
-      "Light, sound and one tripod.",
-      "10 November 2026"
+      "Light, sound and one tripod: everything you need, and nothing you do not.",
+      "",
+      "filming-on-a-phone"
      ],
      [
       "Running a workshop online",
-      "What to send before, during and after.",
-      "2 November 2026"
+      "What to send before, during and after, with the messages teachers reuse.",
+      "",
+      "workshop-online"
      ],
      [
       "Academy pages, explained",
-      "One school, many teachers, one payout.",
-      "24 October 2026"
+      "One school, many teachers, one payout: how an academy page is put together.",
+      "",
+      "academy-pages"
      ],
      [
       "A month of payouts",
-      "How a statement reads, line by line.",
-      "15 October 2026"
+      "How a statement reads, line by line, from the first sale to the fifth of the month.",
+      "",
+      "month-of-payouts"
+     ],
+     [
+      "Teaching in the room, selling online",
+      "Teachers who run both say the room sells the course, and the course fills the room.",
+      "",
+      "teaching-in-the-room"
+     ],
+     [
+      "The script of a first lesson",
+      "Four sentences that tell a learner they are in the right place.",
+      "",
+      "first-lesson-script"
+     ],
+     [
+      "Refunds, explained",
+      "Why a fair refund policy sells more courses than it costs.",
+      "",
+      "refunds-explained"
      ]
     ],
     "quotes": [
      [
       "I sold out my first pottery weekend in two days, and the waitlist filled the next one.",
       "Hana Sato",
-      "Kiln & Co, Pune"
+      "Teacher, Kiln & Co"
      ],
      [
       "My course used to live in four tools. Now my learners see one page and I see one statement.",
       "Mira Okafor",
-      "Studio Mira, Bengaluru"
+      "Founder, Studio Mira"
      ],
      [
       "Our six teachers share one academy page and the payouts split themselves.",
       "Arjun Mehta",
-      "Byte School, Pune"
+      "Teacher, Byte School"
+     ],
+     [
+      "I film on my phone, add the lessons in the evening and the first sale came before I had told anyone.",
+      "Tomas Reyes",
+      "Teacher, Tomas Reyes Studio"
+     ],
+     [
+      "Seats, waitlist, reminders: the things I kept in a notebook are now just there.",
+      "Ines Varga",
+      "Teacher, Crumb Collective"
+     ],
+     [
+      "The walk sold out in a day, and every learner got the same ticket and the same map.",
+      "Leo Brandt",
+      "Teacher, Northlight Academy"
      ]
     ],
     "people": [
+     [
+      "Ravi Shah",
+      "Founder"
+     ],
      [
       "Devika Rao",
       "Head of learning"
      ],
      [
-      "Sam Okoye",
-      "Support"
-     ],
-     [
       "Nikhil Bose",
-      "Engineering"
+      "Engineering lead"
      ],
      [
       "Aisha Khan",
-      "Design"
+      "Head of design"
      ],
      [
       "Joao Costa",
@@ -274,15 +313,15 @@
      ],
      [
       "Mei Tan",
-      "Payments"
+      "Payments engineer"
      ],
      [
-      "Ravi Shah",
-      "Founder"
+      "Sam Okoye",
+      "Support lead"
      ],
      [
       "Sofia Rossi",
-      "Finance"
+      "Finance and operations"
      ]
     ],
     "plans": [
@@ -420,6 +459,10 @@
      [
       "₹3.1 crore",
       "paid out last month"
+     ],
+     [
+      "4.7",
+      "average course rating"
      ]
     ],
     "closing": {
@@ -450,17 +493,23 @@
      "Northlight Academy",
      "Kiln & Co",
      "Crumb Collective",
-     "Brightpath Learning"
+     "Brightpath Learning",
+     "Noor Clay Studio",
+     "Tomas Reyes Studio"
     ],
     "logosLine": "More than 1,200 teachers and 40 academies teach on Atelier, from home studios to schools of twenty.",
     "places": [
      [
       "Pune",
-      "Koregaon Park, 2nd floor"
+      "Koregaon Park, 2nd floor",
+      "+91 20 5550 0142",
+      "Monday to Friday, 9:00 to 18:00"
      ],
      [
       "Bengaluru",
-      "Indiranagar, 100 Feet Road"
+      "Indiranagar, 100 Feet Road",
+      "+91 80 5550 0177",
+      "Monday to Friday, 10:00 to 19:00"
      ]
     ],
     "picture": {
@@ -475,6 +524,39 @@
       "Academy pages",
       "Pricing",
       "Filming tips"
+     ],
+     "points": [
+      "Why teachers stay",
+      "Three things teachers do most, each done once in Atelier instead of once in every tool."
+     ],
+     "show": [
+      "Your whole studio in one place",
+      "Courses, seats and this month's payout sit on one screen, so you start the day knowing what needs you."
+     ],
+     "quotes": [
+      "Teachers say it best",
+      "Hear from the teachers who moved their classes onto Atelier, in their own words."
+     ],
+     "numbers": [
+      "Teachers already teach this way",
+      "Figures from Atelier's own records over the last twelve months.",
+      "Source: Atelier records, October 2026."
+     ],
+     "steps": [
+      "Four steps to your first workshop",
+      "Each step says why before it says what to press."
+     ],
+     "sample": [
+      "Put a course on your own site",
+      "One line of HTML puts your course, with its price and its booking button, on any page you own."
+     ],
+     "doors": [
+      "Where each part lives",
+      "Open the part you need, or start with the first and add the rest when you are ready."
+     ],
+     "records": [
+      "Everything written, newest first",
+      "Notes on pricing, filming, workshops and payouts, each written by the person who did the thing."
      ]
     },
     "pageHeroes": {
@@ -610,7 +692,236 @@
       "See status",
       "Contact support"
      ]
-    }
+    },
+    "features": [
+     [
+      "publish",
+      "Courses that sell themselves",
+      "Lessons, free previews, a certificate and a price page, ready in an afternoon.",
+      "FILE"
+     ],
+     [
+      "seats",
+      "Workshops with real seats",
+      "Dates, places, a waitlist and a ticket for every booking.",
+      "CALENDAR"
+     ],
+     [
+      "payouts",
+      "Paid on the 5th",
+      "Every sale of the month lands in your bank, with a statement of each line.",
+      "CREDIT_CARD"
+     ],
+     [
+      "pages",
+      "A page that is yours",
+      "Your studio, your courses and your reviews at one address.",
+      "GLOBE"
+     ],
+     [
+      "embed",
+      "Embed it anywhere",
+      "Put a course or a booking button on your own site with one line.",
+      "CODE"
+     ],
+     [
+      "reviews",
+      "Reviews that are real",
+      "Only learners who finished can review, and you can answer each one.",
+      "MESSAGE_CIRCLE"
+     ]
+    ],
+    "featuresHead": [
+     "Everything a teacher needs, in one studio",
+     "Six parts that every teacher starts with, so nobody builds a booking form or a payout sheet twice."
+    ],
+    "press": [
+     [
+      "daily-build",
+      "Daily Build",
+      "A studio for teachers that ends the five-tool spreadsheet",
+      "12 November 2026"
+     ],
+     [
+      "stack-review",
+      "Stack Review",
+      "Sign-in for learners, payouts for teachers: how Atelier runs both",
+      "29 October 2026"
+     ],
+     [
+      "ship-weekly",
+      "Ship Weekly",
+      "The base every course platform was missing",
+      "3 October 2026"
+     ]
+    ],
+    "partners": [
+     [
+      "learn-mint",
+      "LearnMint"
+     ],
+     [
+      "payroll-hub",
+      "Payroll Hub"
+     ],
+     [
+      "northwind-pay",
+      "Northwind Pay"
+     ],
+     [
+      "craft-guild",
+      "Craft Guild"
+     ],
+     [
+      "pune-makers",
+      "Pune Makers"
+     ],
+     [
+      "chai-labs",
+      "Chai Labs"
+     ]
+    ],
+    "jobs": [
+     [
+      "Senior engineer, payouts",
+      "Engineering",
+      "Pune",
+      "Full time"
+     ],
+     [
+      "Product designer",
+      "Design",
+      "Bengaluru",
+      "Full time"
+     ],
+     [
+      "Teacher success lead",
+      "Teacher success",
+      "Pune",
+      "Full time"
+     ],
+     [
+      "Support specialist",
+      "Support",
+      "Bengaluru",
+      "Full time"
+     ],
+     [
+      "Finance analyst",
+      "Finance",
+      "Pune",
+      "Full time"
+     ],
+     [
+      "Content editor",
+      "Learning",
+      "Remote",
+      "Part time"
+     ]
+    ],
+    "story": [
+     [
+      "2022",
+      "Two teachers, one spreadsheet",
+      "Ravi Shah and Devika Rao start Atelier in Pune after running their own classes from a sheet of who paid."
+     ],
+     [
+      "2023",
+      "The first hundred teachers",
+      "Workshops open, with seats and waitlists. The first monthly payout goes out on the 5th."
+     ],
+     [
+      "2024",
+      "Academies join",
+      "Schools put their teachers under one page, and payouts split between them by themselves."
+     ],
+     [
+      "2025",
+      "Bengaluru opens",
+      "A second office, a support team in two cities and a teacher-success team that answers within a day."
+     ],
+     [
+      "2026",
+      "48,000 learners",
+      "Atelier crosses 1,200 teachers and pays out more than three crore rupees in a single month."
+     ]
+    ],
+    "contact": {
+     "sales": [
+      "Teachers and academies",
+      "teach@atelier.example",
+      "MAIL_OPEN"
+     ],
+     "support": [
+      "Learners and teachers",
+      "support@atelier.example",
+      "MESSAGE_CIRCLE"
+     ],
+     "press": [
+      "Press and talks",
+      "press@atelier.example",
+      "GLOBE"
+     ],
+     "careers": [
+      "Open roles",
+      "jobs@atelier.example",
+      "USERS"
+     ]
+    },
+    "pictures": {
+     "hero": "drawings/hero-studio.svg",
+     "scene": "drawings/hero-wide.svg",
+     "show": "drawings/show-studio.svg",
+     "proof": "drawings/proof-statement.svg",
+     "closing": "drawings/closing-studio.svg",
+     "culture": "drawings/culture-demo.svg",
+     "story": "drawings/story-founding.svg",
+     "doors": {
+      "teach": "drawings/door-teach.svg",
+      "workshops": "drawings/door-workshops.svg",
+      "academies": "drawings/door-academies.svg"
+     },
+     "features": {
+      "publish": "drawings/feature-publish.svg",
+      "seats": "drawings/feature-seats.svg",
+      "payouts": "drawings/feature-payouts.svg",
+      "pages": "drawings/feature-pages.svg",
+      "embed": "drawings/feature-embed.svg",
+      "reviews": "drawings/feature-reviews.svg"
+     },
+     "showcase": {
+      "dashboard-home": "drawings/screen-dashboard-home.svg",
+      "courses-list": "drawings/screen-courses-list.svg",
+      "payout-statement": "drawings/screen-payout-statement.svg",
+      "workshop-booking": "drawings/screen-workshop-booking.svg"
+     },
+     "places": {
+      "Pune": "drawings/office-pune.svg",
+      "Bengaluru": "drawings/office-bengaluru.svg"
+     }
+    },
+    "showcase": [
+     [
+      "dashboard-home",
+      "Your studio, at a glance",
+      "Today's bookings, this month's sales and the courses that need you."
+     ],
+     [
+      "courses-list",
+      "Every course in one list",
+      "Drafts, published and sold, each with its learners and its rating."
+     ],
+     [
+      "payout-statement",
+      "A statement you can read",
+      "Every sale and refund of the month, line by line."
+     ],
+     [
+      "workshop-booking",
+      "A booking on a phone",
+      "A learner picks a seat, pays and gets a ticket in under a minute."
+     ]
+    ]
    },
    "pages": [
     {
@@ -843,7 +1154,7 @@
       "courses",
       "Self-paced courses",
       "Lessons you take at your own pace, yours for life.",
-      "PLAY"
+      "APP_WINDOW"
      ],
      [
       "workshops",
@@ -855,7 +1166,7 @@
       "plus",
       "Atelier Plus",
       "Every self-paced course for one monthly price.",
-      "STAR"
+      "ZAP"
      ]
     ],
     "points": [
@@ -869,13 +1180,13 @@
       "p2",
       "Refunds in 14 days",
       "If a course is not for you, get your money back.",
-      "REFRESH"
+      "CIRCLE_CHECK"
      ],
      [
       "p3",
       "A certificate when you finish",
       "Each course ends with a certificate you can share.",
-      "AWARD"
+      "SHIELD"
      ]
     ],
     "steps": [
@@ -939,32 +1250,38 @@
      [
       "Product design, from brief to handoff",
       "Mira Okafor · 6 hours · Intermediate",
-      "21 November 2026"
+      "21 November 2026",
+      "product-design"
      ],
      [
       "Python for data, the first steps",
       "Arjun Mehta · 8 hours · Beginner",
-      "18 November 2026"
+      "18 November 2026",
+      "python-data"
      ],
      [
       "Wheel-throwing weekend",
       "Hana Sato · Pune · 6 and 7 December",
-      "15 November 2026"
+      "15 November 2026",
+      "wheel-weekend"
      ],
      [
       "Sourdough at home",
       "Ines Varga · 3 hours · All levels",
-      "12 November 2026"
+      "12 November 2026",
+      "sourdough"
      ],
      [
       "Street photography walk",
       "Leo Brandt · Mumbai · 13 December",
-      "8 November 2026"
+      "8 November 2026",
+      "night-walk"
      ],
      [
       "Watercolour landscapes",
       "Tomas Reyes · 5 hours · Beginner",
-      "1 November 2026"
+      "1 November 2026",
+      "watercolour"
      ]
     ],
     "quotes": [
@@ -1201,8 +1518,8 @@
       "Courses and workshops added by teachers in the last four weeks, each with its first lessons free to preview."
      ],
      "points": [
-      "Why learners choose Atelier",
-      "A preview before you pay, a refund if it is not for you, and a certificate when you finish."
+      "Why learners buy here",
+      "Three promises on every course, so you can choose with confidence."
      ],
      "doors": [
       "Learn your way",
@@ -1219,6 +1536,27 @@
      "shelves": [
       "Most bought this month",
       "Workshops this month"
+     ],
+     "show": [
+      "See a course before you buy it",
+      "Every course shows its lessons, its teacher's page and its reviews, and opens its first lessons free."
+     ],
+     "quotes": [
+      "Learners say it best",
+      "Hear from learners who found a teacher here, in their own words."
+     ],
+     "numbers": [
+      "The catalogue in numbers",
+      "Counted from Atelier's catalogue this month.",
+      "Source: Atelier catalogue, November 2026."
+     ],
+     "steps": [
+      "Four steps from search to first lesson",
+      "Each step says why before it says what to press."
+     ],
+     "sample": [
+      "What an order holds",
+      "An order names the learner, the lines and the total, and nothing else."
      ]
     },
     "pageHeroes": {
@@ -1276,6 +1614,14 @@
       "See status",
       "Contact support"
      ]
+    },
+    "pictures": {
+     "doors": {
+      "courses": "drawings/door-courses.svg",
+      "workshops": "drawings/door-workshops.svg",
+      "plus": "drawings/door-plus.svg"
+     },
+     "hero": "drawings/hero-studio.svg"
     }
    },
    "pages": [
@@ -1468,13 +1814,13 @@
       "help",
       "Help centre",
       "Answers on buying, booking, refunds and payouts.",
-      "HELP"
+      "MESSAGE_CIRCLE"
      ],
      [
       "guides",
       "Teacher guides",
       "Step-by-step guides for your first course and workshop.",
-      "BOOK"
+      "PENCIL"
      ],
      [
       "docs",
@@ -1488,7 +1834,7 @@
       "p1",
       "Publish your first course",
       "Lessons, previews and a price in under an hour.",
-      "UPLOAD"
+      "CLOUD_UPLOAD"
      ],
      [
       "p2",
@@ -1772,8 +2118,8 @@
       "Step-by-step guides for teachers, each checked against Atelier as it is today."
      ],
      "points": [
-      "Three things to do in your first week",
-      "Publish a course, add a workshop and read your first statement. Each takes under an hour."
+      "Start here",
+      "Three guides that take a teacher from nothing to a first sale."
      ],
      "doors": [
       "Start with what you need",
@@ -1786,7 +2132,28 @@
       "Embed a course",
       "Waitlists"
      ],
-     "heroTag": "Updated 26 November 2026"
+     "heroTag": "Updated 26 November 2026",
+     "show": [
+      "Find the guide for the task in front of you",
+      "Every guide is checked against Atelier as it is today, with the screen it talks about beside it."
+     ],
+     "quotes": [
+      "What readers say",
+      "Learners and teachers on the help they found."
+     ],
+     "numbers": [
+      "The help centre in numbers",
+      "Counted from Atelier's help centre this month.",
+      "Source: Atelier support, November 2026."
+     ],
+     "steps": [
+      "Four steps to your first payout",
+      "Each step says why before it says what to press."
+     ],
+     "sample": [
+      "Embed a course on your site",
+      "One script tag puts a course on any page you own."
+     ]
     },
     "pageHeroes": {
      "DOCS_HOME": [
@@ -1867,6 +2234,14 @@
       "See status",
       "Contact support"
      ]
+    },
+    "pictures": {
+     "doors": {
+      "help": "drawings/door-help.svg",
+      "guides": "drawings/door-guides.svg",
+      "docs": "drawings/door-docs.svg"
+     },
+     "hero": "drawings/hero-studio.svg"
     }
    },
    "pages": [

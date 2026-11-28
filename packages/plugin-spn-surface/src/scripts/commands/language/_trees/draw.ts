@@ -8,7 +8,8 @@ import { dataPages } from "./data.ts";
 import type { LanguageData } from "../_folder.ts";
 import { categoryValuePages, sharedPages } from "./values.ts";
 import { type AssetFile, type DrawnCase, type PageOptions, indexHtml, pageHtml, treeOf } from "./files.ts";
-import { plannedPanel, plannedSection, setDs } from "./kit.ts";
+import { plannedPanel, plannedSection, setDs, unknownIcons } from "./kit.ts";
+import { memberOf, setMedia } from "./media.ts";
 import { appLayout } from "./layouts.ts";
 import { slugOf } from "./notes.ts";
 import { DEVICES, type Device, type Drawn, MODES, type Mode, type ThemeChoice, drawSections } from "./render.ts";
@@ -97,7 +98,8 @@ function probe(pages: Array<Page & { family: string }>, options: Options): numbe
       for (const [at, set] of units) {
         const { entry, page } = part[at];
         const need = [...set].join(", ");
-        entry.note = `Planned: needs ${need}, which the design system has not built.`;
+        const icons = unknownIcons(entry.node);
+        entry.note = icons.length ? `Planned: ${need} would not draw, because the design system holds no icon ${icons.join(", ")}.` : `Planned: needs ${need}, which the design system has not built.`;
         entry.planned = true;
         entry.node = page.family === "site" ? plannedSection(entry.kind, `${entry.kind}${entry.case ? `, ${entry.case}` : ""}: a section a visitor would meet, drawn once the unit is built.`, `${entry.kind}${entry.case ? `, ${entry.case}` : ""}`) : plannedPanel(entry.kind, `${entry.kind}${entry.case ? `, ${entry.case}` : ""}`);
         planned += 1;
@@ -118,12 +120,28 @@ export const titleOf = (segment: string): string => {
   return TITLES[name] ?? name.split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
 };
 
+/** The words an app sample was written with, said again in the language's own: the product's name and the person who is signed in. */
+function localize<T>(node: T, from: Array<[string, string]>): T {
+  if (typeof node === "string") return from.reduce((text, [a, b]) => (b ? text.split(a).join(b) : text), node as string) as T;
+  if (Array.isArray(node)) return node.map((one) => localize(one, from)) as T;
+  if (node && typeof node === "object") return Object.fromEntries(Object.entries(node as Record<string, unknown>).map(([key, value]) => [key, localize(value, from)])) as T;
+  return node;
+}
+
 export function run(options: Options): { pages: number; entries: number; planned: number; byCategory: Record<string, Record<string, number>>; files: string[] } {
   setDs(options.ds);
+  setMedia(options.language, options.languageFolder, options.data ?? null);
   useWords(options.samples);
   const pages = pagesOf(options);
   const name = options.spec.name.charAt(0).toUpperCase() + options.spec.name.slice(1);
   if (!pages.length) throw new Error("the language serves no page the catalogue draws.");
+  for (const page of pages) {
+    if (page.family !== "app") continue;
+    const org = APP_WORDS[page.category]?.org ?? "";
+    const person = memberOf(org);
+    const from: Array<[string, string]> = [["Lumen Labs", org], ["lumenlabs.example", `${org.toLowerCase().replace(/[^a-z0-9]+/g, "")}.example`], ["Dana Lee", person], ["Dana", person.split(" ")[0] ?? ""]];
+    for (const screen of screensOf(page)) for (const entry of screen.entries) entry.node = localize(entry.node, from);
+  }
   probe(pages, options);
   const planned = pages.reduce((sum, page) => sum + screensOf(page).reduce((inner, screen) => inner + screen.entries.filter((entry) => entry.planned).length, 0), 0);
   const pageOptions: PageOptions = { template: options.template, ds: options.ds, appCss: "", assets: options.assets, out: options.out, assetFile: options.assetFile, log: options.log };

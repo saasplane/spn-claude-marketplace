@@ -7,7 +7,12 @@
    "initials": "AP",
    "rating": 5,
    "date": "2026-11-21",
-   "words": "The handoff module alone changed how my team works with engineering. Worth every rupee."
+   "words": "The handoff module alone changed how my team works with engineering. Worth every rupee.",
+   "key": "product-design-ananya",
+   "avatar": {
+    "caption": "Ananya P., a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   },
   {
    "item": "product-design",
@@ -15,7 +20,12 @@
    "initials": "MT",
    "rating": 5,
    "date": "2026-11-09",
-   "words": "Clear, practical and kind. Mira shows the messy middle, not just the polished end."
+   "words": "Clear, practical and kind. Mira shows the messy middle, not just the polished end.",
+   "key": "product-design-marcus",
+   "avatar": {
+    "caption": "Marcus T., a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   },
   {
    "item": "product-design",
@@ -23,7 +33,12 @@
    "initials": "LK",
    "rating": 4,
    "date": "2026-10-28",
-   "words": "Great course. I wanted one more lesson on design tokens."
+   "words": "Great course. I wanted one more lesson on design tokens.",
+   "key": "product-design-lena",
+   "avatar": {
+    "caption": "Lena K., a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   },
   {
    "item": "python-data",
@@ -31,7 +46,12 @@
    "initials": "RS",
    "rating": 5,
    "date": "2026-11-15",
-   "words": "I had never coded before. Two weeks later I cleaned our sales data myself."
+   "words": "I had never coded before. Two weeks later I cleaned our sales data myself.",
+   "key": "python-data-rohan",
+   "avatar": {
+    "caption": "Rohan S., a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   },
   {
    "item": "sourdough",
@@ -39,7 +59,12 @@
    "initials": "PN",
    "rating": 5,
    "date": "2026-11-11",
-   "words": "My first loaf had an ear. My family thinks I bought it."
+   "words": "My first loaf had an ear. My family thinks I bought it.",
+   "key": "sourdough-priya",
+   "avatar": {
+    "caption": "Priya N., a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   },
   {
    "item": "wheel-weekend",
@@ -47,7 +72,12 @@
    "initials": "KD",
    "rating": 5,
    "date": "2026-11-02",
-   "words": "Hana is patient and funny. I came home with four bowls and a new hobby."
+   "words": "Hana is patient and funny. I came home with four bowls and a new hobby.",
+   "key": "wheel-weekend-kabir",
+   "avatar": {
+    "caption": "Kabir D., a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   },
   {
    "item": "watercolour",
@@ -55,7 +85,12 @@
    "initials": "SM",
    "rating": 4,
    "date": "2026-10-19",
-   "words": "Lovely short lessons. I paint every morning now."
+   "words": "Lovely short lessons. I paint every morning now.",
+   "key": "watercolour-sara",
+   "avatar": {
+    "caption": "Sara M., a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   },
   {
    "item": "night-walk",
@@ -63,7 +98,12 @@
    "initials": "DR",
    "rating": 5,
    "date": "2026-11-23",
-   "words": "Leo found shots I would have walked past. My phone pictures look like film."
+   "words": "Leo found shots I would have walked past. My phone pictures look like film.",
+   "key": "night-walk-dev",
+   "avatar": {
+    "caption": "Dev R., a head-and-shoulders drawing",
+    "ratio": "1:1"
+   }
   }
  ]
 }
