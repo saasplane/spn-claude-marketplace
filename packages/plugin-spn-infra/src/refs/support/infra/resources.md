@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/04-resources.md",
-      "seen": "5fc58846"
+      "seen": "bdab51de"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/04-resources/",
@@ -23,7 +23,7 @@ A resource is a backing service that holds state: a database, a cache, a queue, 
 
 **A platform declares which engine fills each family, and at what version — that is the whole ask.** The four engine families are the **platform baseline, total by contract**: every family is present, and no application selects among them (decision `DEC.SUPPORT.INFRA.050`). Declaring an engine buys its **baseline interior** — the invariant SaaS Plane ships with the blueprint: the role architecture and its per-application factory, the access model, the disabled default users, the naming policy. That interior versions with the blueprint pin and is identical on a laptop and in the cloud.
 
-| Type (`SPEstateResourceType`, one family per key on `SPEstateResourcesPlatform`) | The estate supplies | The app's derived share |
+| Type (`SPEstateResourceType`, one family per key on `SPInfraEstateResourcesPlatform`) | The estate supplies | The app's derived share |
 | --- | --- | --- |
 | `DATABASE` | the server; the platform, product and migration schemas; the default role groups | a role set at its own coordinate; its migrations own its DDL |
 | `CACHE` | one instance, one logical database, read-write and read-only groups | a key prefix at its own coordinate |
@@ -40,7 +40,7 @@ A resource is a backing service that holds state: a database, a cache, a queue, 
 
 Roles come from the baseline's factory in four purposes and only four. **Grants are fixed per purpose and never authored.**
 
-| Purpose (`SPEstateDataRoleType`) | Grants | Held by |
+| Purpose (`SPInfraEstateDataRoleType`) | Grants | Held by |
 | --- | --- | --- |
 | `ADM` | owns the schema — grant, revoke, alter ownership | the blueprint; published to no application |
 | `MIG` | schema changes | migrations only |
@@ -54,7 +54,7 @@ Roles come from the baseline's factory in four purposes and only four. **Grants 
 ## A platform may name a schema; an application never may
 
 ```ts
-export interface SPEstateResourceSchemaSpec {
+export interface SPInfraEstateResourceSchemaSpec {
   name: CDTString;        // recorded exactly as written — the migrations own this identifier
   dedicated: CDTBoolean;  // always written, never inferred from an absent key
 }
@@ -67,12 +67,12 @@ A shared schema joins the default group. **A `dedicated` schema mints its own se
 Beside the platform resources, a platform may declare named per-need data worlds:
 
 ```ts
-export interface SPEstateSpace {
+export interface SPInfraEstateSpace {
   code: CDTString;                                 // names the space; the platform's code goes in front of it in every published name
-  database: SPEstateSpaceResourceDatabase | null;   // a family left out is simply not stood
-  cache: SPEstateResourceCache | null;
-  queue: SPEstateResourceQueue | null;
-  storage: SPEstateResourceStorage | null;
+  database: SPInfraEstateSpaceResourceDatabase | null;   // a family left out is simply not stood
+  cache: SPInfraEstateResourceCache | null;
+  queue: SPInfraEstateResourceQueue | null;
+  storage: SPInfraEstateResourceStorage | null;
 }
 ```
 

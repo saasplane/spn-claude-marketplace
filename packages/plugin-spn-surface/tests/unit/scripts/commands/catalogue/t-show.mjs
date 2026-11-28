@@ -5,14 +5,14 @@
 // every refusal. Against the plugin's own copy it proves the copy is the book's catalogue byte for
 // byte where the book sits beside the checkout, and that it reads whole for every category.
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
 const PLUGIN_SRC = resolve(import.meta.dirname, "..", "..", "..", "..", "..", "src");
 const CLI = join(PLUGIN_SRC, "scripts", "cli.ts");
-const COPY = join(PLUGIN_SRC, "refs", "support", "surface", "catalogue.json");
-const BOOK = resolve(PLUGIN_SRC, "..", "..", "..", "..", "spn-foundation", "docs", "specs", "surface", "catalogue.json");
+const COPY = join(PLUGIN_SRC, "refs", "specs", "surface", "catalogue", "spcatalogue.json");
+const BOOK = resolve(PLUGIN_SRC, "..", "..", "..", "..", "spn-foundation", "docs", "specs", "surface", "catalogue", "spcatalogue.json");
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -30,31 +30,32 @@ function run(root, ...args) {
 
 const root = mkdtempSync(join(tmpdir(), "t-catalogue-show-"));
 process.on("exit", () => rmSync(root, { recursive: true, force: true }));
-const kind = (code, extra = {}) => ({ code, title: code.toLowerCase(), description: `what ${code} is`, guidance: { for: { persons: ["SEEKER"] }, chooseWhen: `when ${code}`, rules: ["RULE.SUPPORT.SURFACE.221"] }, config: { mtype: "WIDGETS" }, units: { unit: "DSFeature" }, placement: { text: "START" }, style: {}, status: "BUILT", ...extra });
-writeFileSync(join(root, "catalogue.json"), JSON.stringify({
-  version: "9.9.9",
-  outline: {
-    categories: { MARKETPLACE: { family: "SITE", person: "SEEKER", description: "a site for a Seeker" } },
-    partNotes: { MARKETPLACE: { WIDGETS: { code: "WIDGETS", description: "the units placed beside others" } } },
-  },
-  categories: { MARKETPLACE: {
-    LAYOUTS: [kind("TOPNAV")],
-    WIDGETS: [kind("RECORD_CARD", { status: "PLANNED", defaultCase: "GRID_CELL", cases: [
-      { code: "GRID_CELL", when: "a cell of a grid", units: ["DSFeature"], placement: { standsIn: "GRID_CELL" }, style: {}, status: "BUILT" },
-      { code: "SIDE_LIST", when: "a row of a side list", units: ["DSFeature"], placement: { standsIn: "SIDE_LIST" }, style: {}, status: "PLANNED", why: "Q76 A" },
-    ] })],
-  } },
+const kind = (code, extra = {}) => ({ code, title: code.toLowerCase(), description: `what ${code} is`, guidance: { for: { persons: ["SEEKER"] }, chooseWhen: `when ${code}`, rules: ["RULE.SUPPORT.SURFACE.221"] }, config: { mtype: "WIDGETS" }, units: [{ unit: "DSFeature", part: "COMPONENT", role: "card", props: {} }], placement: { standsIn: "GRID_CELL" }, style: {}, status: "BUILT", ...extra });
+// The catalogue as the book keeps it: a folder holding its outline and the file of each category.
+mkdirSync(join(root, "catalogue"), { recursive: true });
+writeFileSync(join(root, "catalogue", "spcatalogue.json"), JSON.stringify({
+  groups: [],
+  categories: { MARKETPLACE: { family: "SITE", person: "SEEKER", description: "a site for a Seeker" } },
+  partNotes: { MARKETPLACE: { WIDGETS: { code: "WIDGETS", description: "the units placed beside others" } } },
+  files: { MARKETPLACE: "marketplace.json" },
 }));
+writeFileSync(join(root, "catalogue", "marketplace.json"), JSON.stringify({ category: "MARKETPLACE", parts: {
+  LAYOUTS: [kind("TOPNAV")],
+  WIDGETS: [kind("RECORD_CARD", { status: "PLANNED", defaultCase: "GRID_CELL", cases: [
+    { code: "GRID_CELL", when: "a cell of a grid", units: [], placement: { standsIn: "GRID_CELL" }, style: {}, status: "BUILT" },
+    { code: "SIDE_LIST", when: "a row of a side list", units: [], placement: { standsIn: "SIDE_LIST" }, style: {}, status: "PLANNED", why: "Q76 A" },
+  ] })],
+} }));
 
 {
   const { out, code } = run(root, "marketplace");
-  ok("[MKT.SCRIPTS.672] a category, typed in any case, gives its head and the catalogue's version", code === 0 && out.startsWith("MARKETPLACE · SITE · SEEKER — a site for a Seeker (catalogue 9.9.9)"), out);
+  ok("[MKT.SCRIPTS.672] a category, typed in any case, gives its head", code === 0 && out.startsWith("MARKETPLACE · SITE · SEEKER — a site for a Seeker\n"), out);
   ok("[MKT.SCRIPTS.672] then each part with its count and note, and a line per kind", out.includes("WIDGETS (1) — the units placed beside others") && out.includes("  RECORD_CARD · record_card · PLANNED — what RECORD_CARD is") && out.includes("LAYOUTS (1)"), out);
   ok("[MKT.SCRIPTS.672] and no kind's facts or cases", !out.includes("choose when") && !out.includes("GRID_CELL"), out);
 }
 {
   const { out, code } = run(root, "MARKETPLACE", "widgets");
-  ok("[MKT.SCRIPTS.672] a part gives each kind whole, its cases by code with the default marked", code === 0 && out.includes("choose when: when RECORD_CARD") && out.includes("rules: RULE.SUPPORT.SURFACE.221") && out.includes('units: {"unit":"DSFeature"}') && out.includes("cases: GRID_CELL (default) · SIDE_LIST"), out);
+  ok("[MKT.SCRIPTS.672] a part gives each kind whole, its cases by code with the default marked", code === 0 && out.includes("choose when: when RECORD_CARD") && out.includes("rules: RULE.SUPPORT.SURFACE.221") && out.includes('units: [{"unit":"DSFeature","part":"COMPONENT","role":"card","props":{}}]') && out.includes("cases: GRID_CELL (default) · SIDE_LIST"), out);
   ok("[MKT.SCRIPTS.672] and no case's own facts", !out.includes("a row of a side list"), out);
 }
 {
@@ -63,7 +64,7 @@ writeFileSync(join(root, "catalogue.json"), JSON.stringify({
   const one = run(root, "MARKETPLACE", "WIDGETS", "RECORD_CARD", "--case", "side_list").out;
   ok("[MKT.SCRIPTS.672] `--case` narrows to one case", one.includes("case SIDE_LIST") && !one.includes("case GRID_CELL"), one);
   const json = JSON.parse(run(root, "MARKETPLACE", "WIDGETS", "RECORD_CARD", "--case", "SIDE_LIST", "--json").out);
-  ok("[MKT.SCRIPTS.672] `--json` gives the same slice as data", json.version === "9.9.9" && json.category === "MARKETPLACE" && json.part === "WIDGETS" && json.kind.code === "RECORD_CARD" && json.kind.cases.length === 1 && json.kind.cases[0].code === "SIDE_LIST", JSON.stringify(json));
+  ok("[MKT.SCRIPTS.672] `--json` gives the same slice as data", json.category === "MARKETPLACE" && json.part === "WIDGETS" && json.kind.code === "RECORD_CARD" && json.kind.cases.length === 1 && json.kind.cases[0].code === "SIDE_LIST", JSON.stringify(json));
   const part = JSON.parse(run(root, "MARKETPLACE", "WIDGETS", "--json").out);
   ok("[MKT.SCRIPTS.672] a part as JSON names its kinds' cases by code", part.kinds[0].cases.join() === "GRID_CELL,SIDE_LIST" && part.note.description === "the units placed beside others", JSON.stringify(part));
   const category = JSON.parse(run(root, "MARKETPLACE", "--json").out);
@@ -85,12 +86,12 @@ writeFileSync(join(root, "catalogue.json"), JSON.stringify({
   const empty = mkdtempSync(join(tmpdir(), "t-catalogue-none-"));
   const missing = run(empty, "MARKETPLACE");
   rmSync(empty, { recursive: true, force: true });
-  ok("[MKT.SCRIPTS.673] a release with no copy says so and exits 1", missing.code === 1 && missing.out.includes("carries no catalogue.json"), missing.out);
+  ok("[MKT.SCRIPTS.673] a release with no copy says so and exits 1", missing.code === 1 && missing.out.includes("carries no catalogue/"), missing.out);
 }
 {
   ok("[MKT.SCRIPTS.674] the plugin carries its copy of the catalogue", existsSync(COPY));
-  if (existsSync(BOOK)) ok("[MKT.SCRIPTS.674] and with the book beside the checkout it is the book's catalogue byte for byte", readFileSync(COPY).equals(readFileSync(BOOK)));
-  const categories = Object.keys(JSON.parse(readFileSync(COPY, "utf8")).categories);
+  if (existsSync(BOOK)) ok("[MKT.SCRIPTS.674] and with the book beside the checkout its outline is the book's byte for byte", readFileSync(COPY).equals(readFileSync(BOOK)));
+  const categories = Object.keys(JSON.parse(readFileSync(COPY, "utf8")).files);
   const read = categories.map((category) => run(null, category));
   ok("[MKT.SCRIPTS.674] the real copy reads whole for every category", categories.length >= 5 && read.every((one) => one.code === 0 && one.out.includes("PAGES (")), read.map((one) => one.out.slice(0, 80)).join(" | "));
 }

@@ -11,7 +11,7 @@ description: What proves a behaviour, at which tier, and what a passing suite do
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
-      "seen": "d9c3809f"
+      "seen": "bcf1ada3"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",

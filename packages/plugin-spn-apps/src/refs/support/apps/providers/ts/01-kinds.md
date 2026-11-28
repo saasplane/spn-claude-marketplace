@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/01-kinds.md",
-      "seen": "f919fbf3"
+      "seen": "a71519c3"
     }
   ]
 }
@@ -50,6 +50,7 @@
 
 - **Write `config` as `null` where a kind adds nothing** — `TOOLCHAIN`, every `SUPPORT_*` kind and `CLIENT_API`. Never an empty object.
 - **A module kind carries its mnemonic; an app kind carries its app code.** Declare nothing else, because nothing else is underivable — not the runtime, the folder, the publish shape, the barrel, the tiers or the stack.
+- **A web node names its design language in `spsurface.json`, and a web app keeps its themes in `src/spn.surface.json`** (`RULE.SUPPORT.SURFACE.586` · MUST · skill:spn-surface/design). The kind profile requires both of an `APP_WEB` and `spsurface.json` of a `MODULE_WEB`, and `apps validate` refuses a missing one or an `mtype` that differs from `spkind.json`'s. An app-owned module has neither.
 - **The manifest replaces any `saasplane` key in `package.json`.** Two places declaring one fact will drift, and a module living inside an app has no package file at all.
 - **Name and folder are checked against the declaration, never used to infer it.** A `MODULE_SERVER` named `service-…`, or sitting in `apps/`, is a visible defect.
 

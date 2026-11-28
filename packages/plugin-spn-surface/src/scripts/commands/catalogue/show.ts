@@ -9,18 +9,18 @@
 //     spn-surface catalogue show <CATEGORY> <PART> <KIND>        one kind whole, with every case
 //     … [--case <CASE>] [--json]                                  one case of the kind; the same slice as JSON
 //
-// THE COPY IS `refs/support/surface/catalogue.json`, which `scripts/build-plugins.mjs` copies from
-// the book's `docs/specs/surface/catalogue.json` at every build. A restate keeps the catalogue's rules
+// THE COPY IS `refs/specs/surface/catalogue/`, which `scripts/build-plugins.mjs` copies from the book's
+// `docs/specs/surface/catalogue/` at every build and validates against the contract's catalogue state. A restate keeps the catalogue's rules
 // and none of its kinds, so a second copy of the kinds never drifts from the catalogue: a step that
 // needs a kind runs this command.
-import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { FLAG, UsageFault, VALUE, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
+import { CATALOGUE_FOLDER, legacyCatalogue, readCatalogueFolder } from "../../../../../plugin-support-lib/src/lib/surface-catalogue-folder.ts";
 
 export const describe = "Print one slice of the surface catalogue this plugin carries: a category, one part of it, or one kind with its cases";
 export const usage = "<CATEGORY> [<PART>] [<KIND>] [--case <CASE>] [--json]";
 
-export const CATALOGUE = "catalogue.json";
+export const CATALOGUE = CATALOGUE_FOLDER;
 
 type Case = { code: string; when?: string; units?: unknown; placement?: unknown; style?: unknown; status?: string; why?: string };
 type Kind = {
@@ -32,14 +32,28 @@ type Kind = {
 type CategoryInfo = { family: string; person: string; description: string };
 type PartNote = { code: string; description?: string; definedIn?: string };
 export type Catalogue = {
-  version: string;
   outline: { categories: Record<string, CategoryInfo>; partNotes?: Record<string, Record<string, PartNote>> };
   categories: Record<string, Record<string, Kind[]>>;
 };
 
-/** The folder the copy sits in: the plugin's own refs, three folders above both `scripts/commands/catalogue/` and `dist/commands/catalogue/`, unless a test names another. */
+/** The folder the plugin's own surface refs sit in (the icons, the patterns), three folders above both `scripts/commands/catalogue/` and `dist/commands/catalogue/`. */
 export function root(): string {
-  return process.env.SPN_SURFACE_CATALOGUE_ROOT ?? resolve(import.meta.dirname, "..", "..", "..", "refs", "support", "surface");
+  return resolve(import.meta.dirname, "..", "..", "..", "refs", "support", "surface");
+}
+
+/** The folder the copies of the book's specs sit in, `refs/specs/surface/` (the catalogue and base), unless a test names another. */
+export function specsRoot(): string {
+  return process.env.SPN_SURFACE_CATALOGUE_ROOT ?? resolve(import.meta.dirname, "..", "..", "..", "refs", "specs", "surface");
+}
+
+/**
+ * The catalogue the plugin carries. As the book writes it (units as one list, placement and style in their typed fields
+ * with notes) for `catalogue show`; or, for the drawing, in the older shape it reads a kind by: units by role, notes by key.
+ */
+export function readCarriedCatalogue(folder: string = join(specsRoot(), CATALOGUE), legacy = true): Catalogue | null {
+  const read = readCatalogueFolder(folder);
+  if (!read.catalogue) return null;
+  return (legacy ? legacyCatalogue(read.catalogue) : { outline: read.catalogue.outline, categories: read.catalogue.categories }) as unknown as Catalogue;
 }
 
 /** A value of the catalogue matched as it is spelled there, whatever case of letters was typed. */
@@ -83,22 +97,21 @@ export function run(args: string[]): number {
   const caseWord = words.value("case");
   if (caseWord && !kindWord) throw new UsageFault("`--case` narrows one kind: name the category, the part and the kind first.");
 
-  const file = join(root(), CATALOGUE);
-  if (!existsSync(file)) {
-    process.stderr.write(`catalogue show: this release carries no ${CATALOGUE}\n`);
+  const catalogue = readCarriedCatalogue(undefined, false);
+  if (!catalogue) {
+    process.stderr.write(`catalogue show: this release carries no ${CATALOGUE}/ under refs/specs/surface/\n`);
     return 1;
   }
-  const catalogue = JSON.parse(readFileSync(file, "utf8")) as Catalogue;
   const category = pick(categoryWord, Object.keys(catalogue.categories), "category", "");
   const info = catalogue.outline.categories[category];
   const parts = catalogue.categories[category];
   const notes = catalogue.outline.partNotes?.[category] ?? {};
 
   if (!partWord) {
-    const slice = { version: catalogue.version, category, ...info, parts: Object.fromEntries(Object.entries(parts).map(([part, kinds]) =>
+    const slice = { category, ...info, parts: Object.fromEntries(Object.entries(parts).map(([part, kinds]) =>
       [part, { description: notes[part]?.description ?? null, kinds: kinds.map((kind) => ({ code: kind.code, title: kind.title, status: kind.status, description: kind.description })) }])) };
     if (words.given("json")) { console.log(JSON.stringify(slice, null, 2)); return 0; }
-    console.log(`${category} · ${info.family} · ${info.person} — ${info.description} (catalogue ${catalogue.version})`);
+    console.log(`${category} · ${info.family} · ${info.person} — ${info.description}`);
     for (const [part, kinds] of Object.entries(parts)) {
       console.log(`\n${part} (${kinds.length})${notes[part]?.description ? ` — ${notes[part].description}` : ""}`);
       for (const kind of kinds) console.log(`  ${kind.code} · ${kind.title} · ${kind.status} — ${kind.description}`);
@@ -109,7 +122,7 @@ export function run(args: string[]): number {
   const part = pick(partWord, Object.keys(parts), "part", ` in ${category}`);
   const kinds = parts[part];
   if (!kindWord) {
-    if (words.given("json")) { console.log(JSON.stringify({ version: catalogue.version, category, part, note: notes[part] ?? null, kinds: kinds.map(({ cases, ...kind }) => ({ ...kind, cases: (cases ?? []).map((one) => one.code) })) }, null, 2)); return 0; }
+    if (words.given("json")) { console.log(JSON.stringify({ category, part, note: notes[part] ?? null, kinds: kinds.map(({ cases, ...kind }) => ({ ...kind, cases: (cases ?? []).map((one) => one.code) })) }, null, 2)); return 0; }
     console.log(`${category} ${part} (${kinds.length})${notes[part]?.description ? ` — ${notes[part].description}` : ""}`);
     for (const kind of kinds) console.log(["", ...kindLines(kind, "codes")].join("\n"));
     return 0;
@@ -119,7 +132,7 @@ export function run(args: string[]): number {
   const kind = kinds.find((one) => one.code === code)!;
   const cases = kind.cases ?? [];
   const chosen = caseWord ? [cases.find((one) => one.code === pick(caseWord, cases.map((c) => c.code), "case", ` of ${code}`))!] : cases;
-  if (words.given("json")) { console.log(JSON.stringify({ version: catalogue.version, category, part, kind: { ...kind, cases: chosen } }, null, 2)); return 0; }
+  if (words.given("json")) { console.log(JSON.stringify({ category, part, kind: { ...kind, cases: chosen } }, null, 2)); return 0; }
   console.log(`${category} ${part}`);
   console.log(kindLines(kind, chosen).join("\n"));
   return 0;

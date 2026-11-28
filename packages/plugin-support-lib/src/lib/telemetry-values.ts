@@ -111,23 +111,23 @@ export const SPDevExStageType = Object.freeze({
 });
 export type SPDevExStageType = (typeof SPDevExStageType)[keyof typeof SPDevExStageType];
 
-export const SPTestTierType = Object.freeze({
+export const SPAppsTestTierType = Object.freeze({
   UNIT: 'UNIT',
   INTEGRATION: 'INTEGRATION',
   CONTRACT: 'CONTRACT',
   COMPONENT: 'COMPONENT',
   JOURNEY: 'JOURNEY',
 });
-export type SPTestTierType = (typeof SPTestTierType)[keyof typeof SPTestTierType];
+export type SPAppsTestTierType = (typeof SPAppsTestTierType)[keyof typeof SPAppsTestTierType];
 
-export const SPDocBehaviourStatusType = Object.freeze({
+export const SPAppsTestBehaviourStatusType = Object.freeze({
   PLANNED: 'PLANNED',
   PENDING: 'PENDING',
   SUCCESS: 'SUCCESS',
   FAILED: 'FAILED',
   MANUAL: 'MANUAL',
 });
-export type SPDocBehaviourStatusType = (typeof SPDocBehaviourStatusType)[keyof typeof SPDocBehaviourStatusType];
+export type SPAppsTestBehaviourStatusType = (typeof SPAppsTestBehaviourStatusType)[keyof typeof SPAppsTestBehaviourStatusType];
 
 export const SPDevExWorkspaceTelemetryRowType = Object.freeze({
   TURN: 'TURN',
@@ -218,6 +218,6 @@ export function stageOf(skill: string | null | undefined, work: string | null | 
 /** Every enum the copy holds, by the contract's name, for a reader that looks one up. */
 export const TELEMETRY_VALUES = Object.freeze({
   SPDevExWorkstreamWorkType, SPDevExAgentHookVerdictType, SPDevExWorkspaceTelemetryEventType, SPDevExAgentSkillType,
-  SPDevExAgentLensType, SPDevExAgentPanelVerdictType, SPDevExStageType, SPTestTierType, SPDocBehaviourStatusType,
+  SPDevExAgentLensType, SPDevExAgentPanelVerdictType, SPDevExStageType, SPAppsTestTierType, SPAppsTestBehaviourStatusType,
   SPDevExWorkspaceTelemetryRowType, SPDevExWorkspaceTelemetryToolType, SPDevExWorkspaceTelemetryVersionType,
 });

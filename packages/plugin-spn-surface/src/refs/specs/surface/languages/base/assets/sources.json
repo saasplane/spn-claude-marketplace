@@ -1,0 +1,174 @@
+{
+ "brand": {
+  "mark": {
+   "file": null,
+   "state": "AWAITED",
+   "drawn": "the BRUSH icon in the primary colour"
+  }
+ },
+ "pictures": [
+  {
+   "record": "subjects/design",
+   "field": "picture",
+   "file": null,
+   "caption": "A designer's desk: sketches beside a laptop showing a phone screen",
+   "state": "AWAITED"
+  },
+  {
+   "record": "subjects/development",
+   "field": "picture",
+   "file": null,
+   "caption": "Two screens of code and a terminal, warm desk light",
+   "state": "AWAITED"
+  },
+  {
+   "record": "subjects/business",
+   "field": "picture",
+   "file": null,
+   "caption": "A team at a whiteboard covered in sticky notes",
+   "state": "AWAITED"
+  },
+  {
+   "record": "subjects/photo-video",
+   "field": "picture",
+   "file": null,
+   "caption": "A camera on a strap against an evening street",
+   "state": "AWAITED"
+  },
+  {
+   "record": "subjects/arts-crafts",
+   "field": "picture",
+   "file": null,
+   "caption": "Hands shaping clay on a potter's wheel",
+   "state": "AWAITED"
+  },
+  {
+   "record": "subjects/food-drink",
+   "field": "picture",
+   "file": null,
+   "caption": "A sourdough loaf cut open on a wooden board",
+   "state": "AWAITED"
+  },
+  {
+   "record": "items/product-design",
+   "field": "cover",
+   "file": null,
+   "caption": "Phone screens of a travel app laid out on a desk",
+   "state": "AWAITED"
+  },
+  {
+   "record": "items/figma-teams",
+   "field": "cover",
+   "file": null,
+   "caption": "A Figma library of buttons and colour swatches",
+   "state": "AWAITED"
+  },
+  {
+   "record": "items/python-data",
+   "field": "cover",
+   "file": null,
+   "caption": "A notebook of Python code beside a bar chart",
+   "state": "AWAITED"
+  },
+  {
+   "record": "items/first-ai-app",
+   "field": "cover",
+   "file": null,
+   "caption": "A chat window answering a question from a PDF",
+   "state": "AWAITED"
+  },
+  {
+   "record": "items/watercolour",
+   "field": "cover",
+   "file": null,
+   "caption": "A watercolour of a fishing boat on a Goan beach",
+   "state": "AWAITED"
+  },
+  {
+   "record": "items/lettering",
+   "field": "cover",
+   "file": null,
+   "caption": "A brush pen lettering the word Hello",
+   "state": "AWAITED"
+  },
+  {
+   "record": "items/sourdough",
+   "field": "cover",
+   "file": null,
+   "caption": "A sourdough loaf with a deep ear on a cooling rack",
+   "state": "AWAITED"
+  },
+  {
+   "record": "items/street-photo",
+   "field": "cover",
+   "file": null,
+   "caption": "A man crossing a Mumbai street through a beam of light",
+   "state": "AWAITED"
+  },
+  {
+   "record": "items/wheel-weekend",
+   "field": "cover",
+   "file": null,
+   "caption": "A row of freshly thrown bowls on a wooden board",
+   "state": "AWAITED"
+  },
+  {
+   "record": "items/portfolio-review",
+   "field": "cover",
+   "file": null,
+   "caption": "A video call with a portfolio shared on screen",
+   "state": "AWAITED"
+  },
+  {
+   "record": "items/coffee-brewing",
+   "field": "cover",
+   "file": null,
+   "caption": "Pour-over coffee dripping into a glass server",
+   "state": "AWAITED"
+  },
+  {
+   "record": "items/night-walk",
+   "field": "cover",
+   "file": null,
+   "caption": "Neon signs reflected in a wet Colaba street",
+   "state": "AWAITED"
+  },
+  {
+   "record": "orgs/studio-mira",
+   "field": "banner",
+   "file": null,
+   "caption": "Studio Mira's team reviewing screens on a wall",
+   "state": "AWAITED"
+  },
+  {
+   "record": "orgs/byte-school",
+   "field": "banner",
+   "file": null,
+   "caption": "A classroom of laptops with charts on the screens",
+   "state": "AWAITED"
+  },
+  {
+   "record": "orgs/northlight",
+   "field": "banner",
+   "file": null,
+   "caption": "A photographer framing a street at dusk",
+   "state": "AWAITED"
+  },
+  {
+   "record": "orgs/kiln-co",
+   "field": "banner",
+   "file": null,
+   "caption": "Shelves of glazed bowls in a sunlit studio",
+   "state": "AWAITED"
+  },
+  {
+   "record": "orgs/crumb",
+   "field": "banner",
+   "file": null,
+   "caption": "Loaves cooling on a rack in a small bakery",
+   "state": "AWAITED"
+  }
+ ],
+ "drawings": [],
+ "note": "No picture file stands here yet: each is drawn from its record caption until a file is added at pictures/<type>/<key>.webp with its source and licence."
+}

@@ -1,0 +1,4 @@
+{
+  "$comment": "The languages a published package ships, which spn-surface lists for a partner before any repository installs them: { name, package, version }. The plugins build writes src/languages.json from this list and base. platform joins once spn-platform-ts publishes support-web-ui-ts with shippedLanguages [platform].",
+  "languages": []
+}

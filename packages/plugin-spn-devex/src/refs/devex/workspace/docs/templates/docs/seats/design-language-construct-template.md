@@ -29,60 +29,36 @@
 
 {{WHY ONE LANGUAGE. What drifts without it: each page and each drawing chooses for itself, and the site reads as many hands.}}
 
-{{WHAT IT CHANGES. Every page and drawing reads one answer, written here, the brand once and a row for each app, and each app's theme is written from it.}}
+{{WHAT IT CHANGES. Every page and drawing reads one answer about how pages are built, look and move, written here, while each app keeps its own colours in its own theme.}}
 
 ## Terms
 
 | Term | Contract term | What it means |
 | --- | --- | --- |
-| Design language | `DesignLanguage` | the one look a site or an app follows, as words and values here, and as one typed theme setting in each app's code |
+| Design language | `SPSurfaceLanguage` | how a site's or an app's pages are built, look and move, as words here and values in `spdl.json`; it holds no colour |
 | Ground | `DesignGround` | what stands behind a section or a drawing: the section's fill, dots, or a scene's own land |
 | Plate | `DrawingPlate` | a group in a drawing: the section's other fill under the units that belong together |
 | {{Term}} | `{{ContractTerm}}` | {{one plain sentence}} |
 
 ## Model
 
-{{The whole shape before any part: one brand for the platform, a language per app that needs its own, and the design system's own look for the apps that do not.}}
+{{The whole shape before any part: one language for the platform's pages, each app naming it and keeping its own theme, and the design system's own look for an app that sets no colour.}}
 
 ### Which app follows what
 
-| App | Kind of person | Surface categories (main first) | Surface | Language | Layout | Looks (body, navigation, frames, size, motion) |
-| --- | --- | --- | --- | --- | --- | --- |
-| `{{web-www-ts}}` | Visitor | {{MARKETING · RESOURCES}} | {{WEB}} | {{its own: saasplane-site}} | {{the app's layout setting}} | {{each category's Theme part}} |
-| `{{web-account-ts}}` | {{Individual}} | {{PORTAL · MARKETING}} | {{WEB}} | {{the app's own, with the MARKETING looks for its public pages}} | {{the app's layout setting}} | {{each category's Theme part}} |
-| `{{web-platform-ts}}` | Team | {{DASHBOARD}} | {{WEB}} | the design system's | {{the app's layout setting}} | {{the DASHBOARD Theme part}} |
+{{A language holds no row for an app. Each web app names this language in its `spsurface.json`, `{ "mtype": "APP_WEB", "language": "{{name}}", "shippedLanguages": [] }`, and keeps its own theme in `src/spn.surface.json`, `{ "themes": { "main", "categories" } }`, set by the app and never written from the language. A web module names the language its pages are designed in the same way, and the SUPPORT_WEB package its modules depend on lists the language in `shippedLanguages`. The list below is read from the repository's nodes, never kept here.}}
 
-{{Each app's row lists the surface categories its pages serve, the main one first, each one of `MARKETING`, `RESOURCES`, `MARKETPLACE`, `DASHBOARD` or `PORTAL`, read from the person the app is for, as a Seeker who finds and chooses among records is `MARKETPLACE`. A page takes the looks of its own category, from the route group the app's router puts it in: a website's MARKETING pages and its RESOURCES docs section, or a console's DASHBOARD pages and a person's own PORTAL pages.}}
+| App | Its person | The categories it serves | Its `spsurface.json` |
+| --- | --- | --- | --- |
+| `{{web-www-ts}}` | Visitor | {{MARKETING · RESOURCES}} | `{ "mtype": "APP_WEB", "language": "{{name}}", "shippedLanguages": [] }` |
 
-Each app's row is also written as one fenced `json` block, keyed by the app's code, which `spnutils apps surface render --app` and `spnutils apps surface theme` read. It holds the layout as the app's own setting, the surface categories in `categories` and the main one in `main`, the kind of surface, and the values where the app departs from the language, part by part, in `overrides`. Each category's looks are read from its Theme part and the brand from Shared, so the row holds no theme of its own. The scaffold writes the app's one theme setting from the row, `APP_THEMES` in `src/theme.ts`. An app follows the language and never forks it. The table above is for the reader, the block for the commands, and the two never differ.
+### The brand's marks
 
-```json
-{ "app": "{{www}}",
-  "ds": "{{the design system version the app pins}}",
-  "language": "{{saasplane-site}}",
-  "layout": { "type": "{{TOPNAV}}", "nav": [] },
-  "categories": ["{{MARKETING}}", "{{RESOURCES}}"],
-  "main": "{{MARKETING}}",
-  "surface": "{{WEB}}",
-  "overrides": {} }
-```
+{{How the brand's marks are used: the logo and the wordmark, where each stands, and how much room they keep. The language holds no colour, grey or typeface value: those are each app's own theme, in its `src/spn.surface.json`. A partner's colours are asked in the foundation workstream's surface round, and a value not chosen yet reads "not yet", which means the design system's own value.}}
 
-### The brand
-
-{{The platform's one brand, as values: the primary colour, the greys and the typefaces, set once. The radius, like every other look, is each app's, in its row. An app changes only its looks over it, never the brand itself. A partner's brand is asked in the foundation workstream's surface round, and a value not chosen yet reads "not yet", which means the design system's own value.}}
-
-| Brand value | Value |
+| Mark | Where it stands |
 | --- | --- |
-| Primary | {{the primary colour}} |
-| Greys | {{the neutral temperature and its steps}} |
-| Typefaces | {{the heading, body and mono faces}} |
-
-The brand is also one fenced `json` block, in the theme's own keys, which the commands read with every row.
-
-```json
-{ "brand": { "app": { "primary": "{{#084A75}}", "neutralTemperature": {{0}} },
-             "typefaces": { "text": "{{…}}", "display": "{{…}}", "code": "{{…}}" } } }
-```
+| {{the logo}} | {{the top bar's start, the footer}} |
 
 ### Voice and claims
 
@@ -94,21 +70,7 @@ The brand is also one fenced `json` block, in the theme's own keys, which the co
 
 ### The language as data
 
-{{The language's own choices, as the construct's last data block: the pages it is for, how its sections, interactions and media are styled and how dense it is. `spn-surface language write` fills the construct's figures from this block, and it is never a separate file.}}
-
-Its keys are the five parts' ids, and each part holds its subsections by id in camel case. A table the construct marks as filled is written from this block and never by hand. The `template` key names the version of this template the construct follows, and `version` the version of the language.
-
-```json
-{ "language": { "template": 2,
-                "name": "{{saasplane-site}}",
-                "version": "{{1}}",
-                "for": "{{Visitor}}",
-                "pageTemplates": { "templatesByCategory": [{ "category": "{{…}}" }] },
-                "sectionStyle": { "grounds": [{ "ground": "{{…}}" }] },
-                "mediaStyle": { "drawingStyle": [{ "element": "{{…}}" }] },
-                "interactionStyle": { "motion": [{ "kind": "{{…}}" }] },
-                "density": { "pageText": [{ "role": "{{…}}" }] } } }
-```
+{{The language's choices are its spec, `docs/specs/surface/languages/{{name}}/spdl.json`, and this page draws the whole spec as one generated section, written by `docs face write --block surface-design-language` and never by hand. The spec carries no version: it only grows.}}
 
 ### The references
 
@@ -499,15 +461,15 @@ Start-aligned is the default. A section's words centre only where they frame som
 
 ## Boundary
 
-{{This page answers what the platform's look is. It owns each app's looks and the platform's brand values. It does not own the design system's units, which are [Support's]({{path}}.md), or an app's layout, which is the app's own layout setting.}}
+{{This page answers how the platform's pages are built, look and move. It does not own an app's colours, which are the app's own theme, the design system's units, which are [Support's]({{path}}.md), or an app's layout, which is the app's own layout setting.}}
 
 ## Binds
 
 | Rule | What it decides | Weight |
 | --- | --- | --- |
 | `{{RULE.SUPPORT.SURFACE.440}}` | a site or an app follows one design language | GUIDE |
-| `{{RULE.SUPPORT.SURFACE.577}}` | an app whose theme setting is out of step with its row is refused by the theme check | MUST |
-| `{{RULE.SUPPORT.SURFACE.578}}` | the brand and each app's row are also written as one data block each, which the commands read | MUST |
+| `{{RULE.SUPPORT.SURFACE.578}}` | the language's choices are one spec file, `spdl.json`, drawn whole as one generated section | MUST |
+| `{{RULE.SUPPORT.SURFACE.642}}` | a category holds seven parts and no Theme part | MUST |
 | `{{RULE.SUPPORT.SURFACE.536}}` | a language fills one drawing scale, and each medium takes the parts that apply to its kind | MUST |
 | `{{RULE.SUPPORT.SURFACE.557}}` | a section's background and its feature's media are two layers, used together or apart | MUST |
 | `{{RULE.SUPPORT.SURFACE.558}}` | a medium takes the layer the three questions give it | MUST |

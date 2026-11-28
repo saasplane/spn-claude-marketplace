@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/02-support.md",
-      "seen": "8704cb52"
+      "seen": "0019dbe6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/02-support/",
@@ -23,7 +23,7 @@ When you are deciding whether code belongs in a support package, test it against
 | --- | --- | --- |
 | Support package | `SUPPORT_UNIVERSAL` · `SUPPORT_SERVER` · `SUPPORT_WEB` | a capability with no business domain, embedded in whatever composes it |
 | Capability group | — | one published folder, named for what it does, that a consumer reaches through an interface rather than through an implementation |
-| Provider seam | `SPKindSymbolSeam` | the arrangement that lets the engine behind a capability group change without a consumer noticing |
+| Provider seam | `SPAppsSymbolSeam` | the arrangement that lets the engine behind a capability group change without a consumer noticing |
 | Engine | — | one concrete answer behind a capability — a vendor, a product, a mode |
 | Selection | `{CODE}_{GROUP}_PROVIDER` | the one configuration value, from a closed vocabulary, that decides which implementation a capability group runs |
 | Execution context | `traceId` | what a call carries without being passed — identity, scope, and the one identifier every log, event and span is indexed by |

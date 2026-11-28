@@ -4,7 +4,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
       "section": "How one is made",
-      "seen": "470e575e"
+      "seen": "475032c1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
@@ -19,7 +19,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
       "section": "One source for the platform's look",
-      "seen": "828e9d73"
+      "seen": "d27705a4"
     }
   ]
 }
@@ -69,28 +69,43 @@
 - **A list of doors stands beside the group's picture** (`RULE.SUPPORT.SURFACE.568` · MUST · skill:spn-surface/design)
 - **A grid of peers takes no drawing beside it** (`RULE.SUPPORT.SURFACE.569` · MUST · skill:spn-surface/design)
 - **A dotted line comes in two strengths: a guide, at weight 0.75 in the accent at 24%, and a boundary that holds parts, at weight 1 with round ends in the accent at 45% in light and 55% in dark, the token `--draw-dot-strong-color`; a line's style sets its pattern, its weight its thickness (a dotted line's dot size) and its role its colour, and a dotted line that must be seen is never below weight 1** (`RULE.SUPPORT.SURFACE.570` · MUST · skill:spn-surface/design)
-- **The repository's design language is the one source of its platform's look, and it holds the brand once and the decisions of each surface category, and it names no app** (`RULE.SUPPORT.SURFACE.571` · MUST · skill:spn-surface/design)
-- **Each app keeps its theme as one exported typed setting in its code, and the agent writes it from the book in the same arc as any change to the design language** (`RULE.SUPPORT.SURFACE.572` · MUST · skill:spn-surface/design)
-- **A theme is layered in one order: the defaults, then the brand, then the looks of the page's surface category, then an account's branding** (`RULE.SUPPORT.SURFACE.575` · MUST · skill:spn-surface/design)
-- **`spnutils apps surface theme <app>` refuses an app whose theme setting is out of step with the language it names** (`RULE.SUPPORT.SURFACE.577` · MUST · skill:spn-surface/design)
-- **A language is written as one spec file, and its page draws the whole spec as one generated section** (`RULE.SUPPORT.SURFACE.578` · MUST · skill:spn-surface/design)
-- **An app keeps one theme setting, `APP_THEMES` in `src/theme.ts`, holding its language and version, the brand once, the looks of each surface category it serves and `main`, the category of a page whose route group names none; the scaffold writes it from the app's row** (`RULE.SUPPORT.SURFACE.586` · MUST · skill:spn-surface/design)
+- **The repository's design language is the one source of how its pages are built, look and move, and it holds no colour or theme value and names no app** (`RULE.SUPPORT.SURFACE.571` · MUST · skill:spn-surface/design)
+- **Each web app keeps its theme as data in `src/spn.surface.json`, set by the app and never written from its language** (`RULE.SUPPORT.SURFACE.572` · MUST · skill:spn-surface/design)
+- **A theme is layered in one order: the design system's defaults, then the theme of the page's surface category, then an account's branding** (`RULE.SUPPORT.SURFACE.575` · MUST · skill:spn-surface/design)
+- **A language is written as one spec file, `spdl.json`, and its page draws the whole spec as one generated section** (`RULE.SUPPORT.SURFACE.578` · MUST · skill:spn-surface/design)
+- **Every web package declares `spsurface.json` beside `spkind.json`: the language it is designed in, and the languages it ships** (`RULE.SUPPORT.SURFACE.586` · MUST · skill:spn-surface/design)
 - **A drawing beside the words stays legible at the narrowest column it stands in, which is the column at 1024 px** (`RULE.SUPPORT.SURFACE.589` · MUST · skill:spn-surface/design)
 - **No part holds a pointer in place of its rule, and a part with nothing of the app's own names the design system's default it follows** (`RULE.SUPPORT.SURFACE.590` · MUST · skill:spn-surface/design)
 - **A sample page draws each drawing in a frame that scales it whole and carries the app's own tokens** (`RULE.SUPPORT.SURFACE.591` · MUST · skill:spn-surface/design)
 - **A review of a site, and an arc's final re-check of a site, walks every page of the live site at a phone, a tablet and a desktop width, in light and in dark, and reads computed values** (`RULE.SUPPORT.SURFACE.592` · MUST · skill:spn-surface/design)
-- **A page that shows a render links the design system's stylesheet and the theme config generated from a resolved language, and an app's own stylesheet only where the app gives one** (`RULE.SUPPORT.SURFACE.595` · MUST · skill:spn-surface/design)
+- **A page that shows a render links the design system's stylesheet, and the render carries the theme it was drawn in** (`RULE.SUPPORT.SURFACE.595` · MUST · skill:spn-surface/design)
+- **A design language is one folder, `docs/specs/surface/languages/<name>/`, holding `spdl.json`, `types.json`, `samples.json`, `data/` and `assets/`** (`RULE.SUPPORT.SURFACE.628` · MUST · skill:spn-surface/design)
+- **`data/` holds one JSON file for each kind of record, and `types.json` says what each kind is** (`RULE.SUPPORT.SURFACE.629` · MUST · skill:spn-surface/design)
+- **A design language, its data and the catalogue are never versioned; they only grow** (`RULE.SUPPORT.SURFACE.630` · MUST · skill:spn-surface/design)
+- **A child names its parent alone, `extends: "base"`, and what it inherits is the vocabulary** (`RULE.SUPPORT.SURFACE.631` · MUST · skill:spn-surface/design)
+- **Specs sit under the domain that states them: `docs/specs/<domain>/`, and Surface's are `docs/specs/surface/catalogue/` and `docs/specs/surface/languages/<name>/`** (`RULE.SUPPORT.SURFACE.632` · MUST · skill:spn-surface/design)
+- **Each category of `samples.json` names the person its samples are drawn for** (`RULE.SUPPORT.SURFACE.633` · MUST · skill:spn-surface/design)
+- **`samples.json` holds what the samples show, category by category** (`RULE.SUPPORT.SURFACE.634` · MUST · skill:spn-surface/design)
+- **`assets/` holds what the language's pictures are made from, and `sources.json` says where each came from** (`RULE.SUPPORT.SURFACE.635` · MUST · skill:spn-surface/design)
+- **A language's samples draw the tenancy, so one language shows B2C, B2B, B2B2B, B2B2C and a marketplace** (`RULE.SUPPORT.SURFACE.636` · MUST · skill:spn-surface/design)
+- **A web module's pages keep the structure their owner designed, and the host app gives them its frame, menu, theme, words and records** (`RULE.SUPPORT.SURFACE.637` · MUST · skill:spn-surface/design)
+- **A design comes before its build, and the repository is where it is made** (`RULE.SUPPORT.SURFACE.638` · MUST · skill:spn-surface/design)
+- **Every design starts from the node's language, in any tool** (`RULE.SUPPORT.SURFACE.639` · MUST · skill:spn-surface/design)
+- **A language is resolved live, in one order: the repository's own, then an installed package's, then a language the plugin lists, then the plugin's `base`** (`RULE.SUPPORT.SURFACE.640` · MUST · skill:spn-surface/design)
+- **A web package says what it ships: `shippedLanguages` in its `spsurface.json` names each language its build carries for whoever installs it** (`RULE.SUPPORT.SURFACE.641` · MUST · skill:spn-surface/design)
+- **A language is described for each surface category it states, in the same seven parts, in the groups Structure and Style, beside one Shared group** (`RULE.SUPPORT.SURFACE.642` · MUST · skill:spn-surface/design)
+- **A language's samples home is laid out in one shape for every language: Shared, then each category's Layouts, Pages, Containers, Widgets, Media, Motion and Words** (`RULE.SUPPORT.SURFACE.643` · MUST · skill:spn-surface/design)
 
 Read this before a page of a site or an app is drawn, and while a partner's design language is being made. 
 
-A language is kept as the repository's design language, a construct, and each app's capability chapter says how that app fills it. The construct holds the brand once, the primary colour, the greys and the typefaces, and the decisions of each surface category: the layouts the category picks, as pointers to the app's layout setting, and its looks, mode, size, motion, radius, body, navigation, frames, card and table. It names no app; an app names its language and version in its own theme setting. It is the one source of the platform's look, for the apps and for the agent. The construct records only the decisions. The rounds that led to them are kept beside it, so the next partner's language is made the same way.
+A language is kept as the repository's design language, a construct over its `spdl.json`, and each app's capability chapter says how that app fills it. The construct holds how the brand's marks are used and the decisions of each surface category in seven parts: the layouts the category picks, as pointers to the app's layout setting, its pages, containers and widgets, and its media, motion and words. It holds no colour, mode, size or radius: those are each app's own theme, in `src/spn.surface.json`. It names no app; an app names its language in its `spsurface.json`. It is the one source of how the platform's pages are built, look and move, for the apps and for the agent. The construct records only the decisions. The rounds that led to them are kept beside it, so the next partner's language is made the same way.
 
 ## Before any page
 
 **Before drawing, read the language's drawing scale, pick the step from the placement (S in a card, M in a section and a docs figure, L in a hero), and use only the tokens of the parts that apply to the medium's kind. A stack's floors stand 12 apart, a row's tiles share their plate's width, a caption under a plate is a detail line 8 below it, an illustration's lines take the ink at full, a dashed line takes `--draw-dash-color` and a dotted line `--draw-dot-color`, and a drawing is never cut.**
 
-1. **Read the repository's design language, the construct, and the app's capability chapter.** The construct holds the brand once and each category's decisions, with its looks; the chapter names where the app's drawings live. Read the construct and never a data file.
-2. **Find a choice by its part and subsection.** A language is the book's Shared, Structure and Style model: Shared holds Brand, Drawing, Motion and Voice, and each of the four categories (MARKETING, RESOURCES, DASHBOARD, PORTAL) the language sets holds eight parts, Layouts, Pages, Containers and Widgets (Structure), Theme, Media, Motion and Words (Style). Find a choice at its category and part, and read the category's row for the page: a site page reads its category's Pages for its page kind, and DASHBOARD and PORTAL Pages state no kinds, so an app page's shape comes from the skill's patterns. A part is OWN, INHERITED or NONE, and a choice the language does not make is listed under its Gaps, where the agent asks and never invents it. A language holds its own samples in a samples home, `docs/artifacts/public/surface/<language>/`, and a language built from a reference is a spec that picks, customises and adds kinds of the catalogue, never a free list of choices.
+1. **Read the repository's design language, the construct, and the app's capability chapter.** The construct holds how the brand's marks are used and each category's decisions, and no colour or theme value; the chapter names where the app's drawings live. Read the construct and never a data file.
+2. **Find a choice by its part and subsection.** A language is the book's Shared, Structure and Style model: Shared holds Brand, Drawing, Motion and Voice, and each of the four categories (MARKETING, RESOURCES, DASHBOARD, PORTAL) the language sets holds seven parts, Layouts, Pages, Containers and Widgets (Structure), Media, Motion and Words (Style). Find a choice at its category and part, and read the category's row for the page: a site page reads its category's Pages for its page kind, and DASHBOARD and PORTAL Pages state no kinds, so an app page's shape comes from the skill's patterns. A part is OWN, INHERITED or NONE, and a choice the language does not make is listed under its Gaps, where the agent asks and never invents it. A language holds its own samples in a samples home, `docs/artifacts/public/surface/<language>/`, and a language built from a reference is a spec that picks, customises and adds kinds of the catalogue, never a free list of choices.
 3. **Where the app has no language yet, start with intake below.** A page is drawn only after the language says how.
 
 ## Intake
@@ -98,7 +113,7 @@ A language is kept as the repository's design language, a construct, and each ap
 Record each thing the partner shares, each with where it came from and the day:
 
 - **Each reference**, by address and date, read with the reference template (`design-language-reference-template.md`): one read for each site, with its viewport and the kind of person it serves, then the five parts, and for each subsection what the site does, the values measured, our choice, and MAPPED, GAP or NOT_TAKEN. Never its words, pictures or branding.
-- **Each brand file**, with the tokens it sets. One brand serves the platform; an app changes only its looks over it.
+- **Each brand file**, with the marks it gives and where they stand. The brand's colours are the app's own theme's, never the language's.
 - **Each media kind** the partner wants: line drawings, illustration, product views (drawn or captured), photography, icons and marks, data and numbers, motion and video, 3D. For each, where it comes from (made, supplied, licensed, captured), its treatment, the tokens it reads, where it goes, its tablet and phone forms, its files, and its rights and alt text.
 
 ## Options on real pages
@@ -110,8 +125,8 @@ Record each thing the partner shares, each with where it came from and the day:
 
 1. **Show a round**: the options, each with what it chose and why.
 2. **Record the pick** in the round's own file beside the construct, with what the partner said, the day, and what was dropped.
-3. **Fold the decisions into the construct**, each at its part and subsection id: the brand once, and each category's decisions for its looks, the layout as a pointer to the app's layout setting and never copied into a look. Where the construct marks figures to be filled, run `spn-surface language write <app>` so they follow.
-4. **Write each app's theme setting in the same arc**: after any change to the design language, write the one exported typed setting, `APP_THEMES` in `src/theme.ts`, in each affected app's code from the brand and the decisions of each category its row lists, with `main`, in the language and version the setting names, named as the design system's theme type names its values (`DSThemeModeType`, `DSSizeType`, `DSMotionSpeedType`, `DSThemeRadiusType`, the layout, panel, card and table looks). The setting is the copy and the construct is the source, so the two move together and never apart. An app that keeps its theme in code and has not adopted the design language is left as it is, and no app is changed only to match. A page's category comes from its route group and never from the page: a route names the surface category its page serves, and the app's router wraps each category's group once in `DSPageCategory` (`RULE.SUPPORT.APPS.270` · MUST · skill:spn-apps/implement). Then run `spnutils apps surface theme <app>` for each app whose setting you wrote: it refuses a setting out of step with the language it names, names each value that differs with the app's side and the book's side by side, category by category, and writes no file (`RULE.SUPPORT.SURFACE.577` · MUST · skill:spn-surface/design). Write the language as one spec file, the brand in Shared and each category's values, and its page draws the whole spec as one generated section; the theme check and the page render read that spec (`RULE.SUPPORT.SURFACE.578` · MUST · skill:spn-surface/design), and no separate data file is made.
+3. **Fold the decisions into the construct**, each at its part and subsection id: how the brand's marks are used, and each category's decisions in its seven parts, the layout as a pointer to the app's layout setting and never copied into a theme. Where the construct marks figures to be filled, run `spn-surface language write <app>` so they follow.
+4. **Keep each web app's theme apart**: an app's colours and theme settings are set in its own `src/spn.surface.json`, `{ themes: { main, categories } }`, one whole theme for each category it serves, when the developer sets them, and never written from the language; `spnutils apps validate` holds the file to its contract state.
 5. **Run `spn-surface check page` on every spec** and `spn-surface check module` on every module's folders. Tokens only: a drawing takes its colours from the theme's tokens or mixes of them.
 
 ## When a section's container kind is picked

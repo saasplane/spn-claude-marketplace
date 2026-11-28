@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "4c13451a"
+    "commit": "e5a43d0d"
   },
   "rules": [
     {
@@ -3684,7 +3684,7 @@
         "skill": "spn-devex/bootstrap"
       },
       "class": "stated in a skill",
-      "sentence": "Each app's design language row names the app's surface category, `MARKETING`, `RESOURCES`, `MARKETPLACE`, `DASHBOARD` or `PORTAL`, and never only `SITE` or `APP`",
+      "sentence": "Each web app's surface categories are named, `MARKETING`, `RESOURCES`, `MARKETPLACE`, `DASHBOARD` or `PORTAL`, and never only `SITE` or `APP`",
       "chapter": "04-capabilities/01-devex/01-function/01-bootstrap.md",
       "heading": "The foundation workstream",
       "decision": null,
@@ -14525,6 +14525,30 @@
       ]
     },
     {
+      "id": "RULE.DEVEX.WORKSPACE.583",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/develop"
+      },
+      "class": "stated in a skill",
+      "sentence": "A construct declares the contract it names, as code copied from the contract",
+      "chapter": "04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
+      "heading": "The five seats",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "refs/devex/workspace/docs/doc-sets.md",
+          "heading": "What each seat holds"
+        },
+        {
+          "plugin": "spn-devex",
+          "path": "skills/develop/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
       "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",
       "level": "MUST",
       "params": {
@@ -18377,6 +18401,11 @@
       "restated": [
         {
           "plugin": "spn-apps",
+          "path": "refs/support/apps/agent-surface.md",
+          "heading": "Labels: the index of what a surface says"
+        },
+        {
+          "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
           "heading": "The rules this step holds"
         }
@@ -21548,16 +21577,6 @@
           "plugin": "spn-apps",
           "path": "skills/implement/SKILL.md",
           "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/SKILL.md",
-          "heading": "design — a page, from its layout down to its blocks"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/steps/design-language.md",
-          "heading": "Rounds"
         }
       ]
     },
@@ -38353,7 +38372,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "The repository's design language is the one source of its platform's look, and it holds the brand once and the decisions of each surface category, and it names no app",
+      "sentence": "The repository's design language is the one source of how its pages are built, look and move, and it holds no colour or theme value and names no app",
       "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
       "heading": "One source for the platform's look",
       "decision": null,
@@ -38382,7 +38401,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "Each app keeps its theme as one exported typed setting in its code, and the agent writes it from the book in the same arc as any change to the design language",
+      "sentence": "Each web app keeps its theme as data in `src/spn.surface.json`, set by the app and never written from its language",
       "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
       "heading": "One source for the platform's look",
       "decision": null,
@@ -38405,42 +38424,15 @@
       ]
     },
     {
-      "id": "RULE.SUPPORT.SURFACE.573",
-      "level": "GUIDE",
-      "params": {},
-      "class": "guidance",
-      "sentence": "An app's theme and the language it names agree",
-      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
-      "heading": "One source for the platform's look",
-      "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-apps",
-          "path": "skills/verify/SKILL.md",
-          "heading": "Mode: app — health checks on what is running"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "refs/support/surface/design-languages.md",
-          "heading": "One source for the platform's look — 🔮"
-        }
-      ]
-    },
-    {
       "id": "RULE.SUPPORT.SURFACE.574",
       "level": "GUIDE",
       "params": {},
       "class": "guidance",
-      "sentence": "An app with its theme in code keeps it until it adopts the design language",
+      "sentence": "An app with its theme in code keeps it until it moves to `src/spn.surface.json`",
       "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
       "heading": "One source for the platform's look",
       "decision": null,
       "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "refs/support/surface/design-languages.md",
-          "heading": "One source for the platform's look — 🔮"
-        },
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
@@ -38455,7 +38447,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "A theme is layered in one order: the defaults, then the brand, then the looks of the page's surface category, then an account's branding",
+      "sentence": "A theme is layered in one order: the design system's defaults, then the theme of the page's surface category, then an account's branding",
       "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
       "heading": "One source for the platform's look",
       "decision": null,
@@ -38477,7 +38469,7 @@
       "level": "GUIDE",
       "params": {},
       "class": "guidance",
-      "sentence": "A design language stands beside the theme: it holds a platform's looks and never the brand of another platform",
+      "sentence": "A design language and an app's theme are disconnected",
       "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
       "heading": "One source for the platform's look",
       "decision": null,
@@ -38486,40 +38478,6 @@
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
           "heading": "One source for the platform's look — 🔮"
-        }
-      ]
-    },
-    {
-      "id": "RULE.SUPPORT.SURFACE.577",
-      "level": "MUST",
-      "params": {
-        "skill": "spn-surface/design"
-      },
-      "class": "stated in a skill",
-      "sentence": "`spnutils apps surface theme <app>` refuses an app whose theme setting is out of step with the language it names",
-      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
-      "heading": "One source for the platform's look",
-      "decision": null,
-      "restated": [
-        {
-          "plugin": "spn-surface",
-          "path": "refs/support/surface/design-languages.md",
-          "heading": "One source for the platform's look — 🔮"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "refs/support/surface/design-languages.md",
-          "heading": "What is not checked yet"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/steps/design-language.md",
-          "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/steps/design-language.md",
-          "heading": "Rounds"
         }
       ]
     },
@@ -38530,7 +38488,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "A language is written as one spec file, and its page draws the whole spec as one generated section",
+      "sentence": "A language is written as one spec file, `spdl.json`, and its page draws the whole spec as one generated section",
       "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
       "heading": "One source for the platform's look",
       "decision": null,
@@ -38544,11 +38502,6 @@
           "plugin": "spn-surface",
           "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
-        },
-        {
-          "plugin": "spn-surface",
-          "path": "skills/design/steps/design-language.md",
-          "heading": "Rounds"
         }
       ]
     },
@@ -38559,7 +38512,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "`spnutils apps surface render` draws a tree in an app's design language, and its three choices are always given",
+      "sentence": "`spnutils apps surface render` draws a tree in the theme it is given, and its modes and devices are always given",
       "chapter": "04-capabilities/02-support/01-surface/14-delivery-library/01-common/02-render.md",
       "heading": "The command",
       "decision": null,
@@ -38578,9 +38531,9 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "The app's theme setting is the one source of the look, and no field of the look is written in a tree file",
+      "sentence": "The theme comes from the call, and no field of the look is written in a tree file",
       "chapter": "04-capabilities/02-support/01-surface/14-delivery-library/01-common/02-render.md",
-      "heading": "The app",
+      "heading": "The theme",
       "decision": null,
       "restated": [
         {
@@ -38597,7 +38550,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "A tree has `treeVersion` at its top, and a version the render does not read is refused",
+      "sentence": "A tree carries its surface category, and a tree with none is refused",
       "chapter": "04-capabilities/02-support/01-surface/14-delivery-library/01-common/02-render.md",
       "heading": "The tree",
       "decision": null,
@@ -38692,11 +38645,16 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "An app keeps one theme setting, `APP_THEMES` in `src/theme.ts`, holding its language and version, the brand once, the looks of each surface category it serves and `main`, the category of a page whose route group names none; the scaffold writes it from the app's row",
+      "sentence": "Every web package declares `spsurface.json` beside `spkind.json`: the language it is designed in, and the languages it ships",
       "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
       "heading": "One source for the platform's look",
       "decision": null,
       "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "refs/support/apps/providers/ts/01-kinds.md",
+          "heading": "What the manifest carries"
+        },
         {
           "plugin": "spn-surface",
           "path": "refs/support/surface/design-languages.md",
@@ -38904,7 +38862,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "A page that shows a render links the design system's stylesheet and the theme config generated from a resolved language, and an app's own stylesheet only where the app gives one",
+      "sentence": "A page that shows a render links the design system's stylesheet, and the render carries the theme it was drawn in",
       "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
       "heading": "One source for the platform's look",
       "decision": null,
@@ -39039,7 +38997,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "`DSApp` takes the app's theme setting as `dsContext.themes`, applies the main category's theme at the root, and holds the setting for the pages below",
+      "sentence": "`DSApp` takes the app's themes, `src/spn.surface.json`'s `themes`, as `dsContext.themes`, applies the main category's theme at the root, and holds the setting for the pages below",
       "chapter": "04-capabilities/02-support/01-surface/11-architecture-app/01-common/02-settings-and-theme.md",
       "heading": "The category's theme",
       "decision": null,
@@ -39640,6 +39598,349 @@
           "path": "skills/design/SKILL.md",
           "heading": "5. Then the blocks"
         },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.628",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A design language is one folder, `docs/specs/surface/languages/<name>/`, holding `spdl.json`, `types.json`, `samples.json`, `data/` and `assets/`",
+      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
+      "heading": "The parts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The language folder — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.629",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "`data/` holds one JSON file for each kind of record, and `types.json` says what each kind is",
+      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
+      "heading": "The parts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.630",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A design language, its data and the catalogue are never versioned; they only grow",
+      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
+      "heading": "The parts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.631",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A child names its parent alone, `extends: \"base\"`, and what it inherits is the vocabulary",
+      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
+      "heading": "The parts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.632",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "Specs sit under the domain that states them: `docs/specs/<domain>/`, and Surface's are `docs/specs/surface/catalogue/` and `docs/specs/surface/languages/<name>/`",
+      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
+      "heading": "The parts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.633",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "Each category of `samples.json` names the person its samples are drawn for",
+      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
+      "heading": "The parts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.634",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "`samples.json` holds what the samples show, category by category",
+      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
+      "heading": "The parts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.635",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "`assets/` holds what the language's pictures are made from, and `sources.json` says where each came from",
+      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
+      "heading": "The parts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.636",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A language's samples draw the tenancy, so one language shows B2C, B2B, B2B2B, B2B2C and a marketplace",
+      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
+      "heading": "The parts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.637",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A web module's pages keep the structure their owner designed, and the host app gives them its frame, menu, theme, words and records",
+      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
+      "heading": "The parts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.638",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A design comes before its build, and the repository is where it is made",
+      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
+      "heading": "The parts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.639",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "Every design starts from the node's language, in any tool",
+      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
+      "heading": "The parts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.640",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A language is resolved live, in one order: the repository's own, then an installed package's, then a language the plugin lists, then the plugin's `base`",
+      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
+      "heading": "The parts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The language folder — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.641",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A web package says what it ships: `shippedLanguages` in its `spsurface.json` names each language its build carries for whoever installs it",
+      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
+      "heading": "The parts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.642",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A language is described for each surface category it states, in the same seven parts, in the groups Structure and Style, beside one Shared group",
+      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
+      "heading": "The parts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The parts — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.643",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A language's samples home is laid out in one shape for every language: Shared, then each category's Layouts, Pages, Containers, Widgets, Media, Motion and Words",
+      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
+      "heading": "The parts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/page-preview.md",
+          "heading": "A group of pages"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.644",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A slot names its picture by the language and the path in that language's `assets/`, and the render writes it unchanged",
+      "chapter": "04-capabilities/02-support/01-surface/14-delivery-library/01-common/02-render.md",
+      "heading": "The tree",
+      "decision": null,
+      "restated": [
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",

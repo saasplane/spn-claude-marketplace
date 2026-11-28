@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/03-repos.md",
-      "seen": "98af8234"
+      "seen": "09e06159"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/03-repos/01-repos.md",
@@ -22,18 +22,18 @@ What a repository declares about itself, which manifests carry identity, how a p
 **A repository carries one manifest at its root, `sprepo.json`, and that manifest names its world.** The world is not a label for humans to read — it decides which kinds of node may exist below the root, which command families work inside it, and which rules you apply to a file you open there. The same command can be correct in one world and refused by name in another.
 
 ```ts
-export enum SPRepoType {
+export enum SPDevExRepoType {
   FOUNDATION = 'FOUNDATION',  // states the standards — the book and the providers, no runtime
   APPS = 'APPS',              // realizes them — its nodes declare a kind, and `apps` commands act
   INFRA = 'INFRA',            // provisions for them — its nodes declare an estate type
   GENERAL = 'GENERAL',        // no nodes and one docs tree; `apps` and `infra` refuse it by name
 }
 
-export interface SPRepo {
-  type: SPRepoType;             // the world, and the whole of what a tool dispatches on
+export interface SPDevExRepo {
+  type: SPDevExRepoType;             // the world, and the whole of what a tool dispatches on
   name: CDTString;              // what a person calls this repository — declared, never taken
                                  //   from the folder a checkout happens to sit in
-  config: SPRepoConfig | null;  // the claims; null in every world but APPS
+  config: SPDevExRepoConfig | null;  // the claims; null in every world but APPS
 }
 ```
 
@@ -103,7 +103,7 @@ Two different things sit in that configuration, and confusing them is the common
 ## One grammar for every package reference
 
 ```ts
-export interface SPRepoPackageRef {
+export interface SPDevExRepoPackageRef {
   package: CDTString;          // starting with `@` means published; anything else is a path
   version: CDTString | null;   // the semantic version when published, null for a path
 }

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/10-architecture-layouts.md",
-      "seen": "58891ced"
+      "seen": "f7351507"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-layouts/",
@@ -36,6 +36,8 @@ Read this before you choose a layout for an app, or before you build or draw a l
 | Bar width | `barWidth` — how wide the bar's items stand in a top nav and a dock: the body's width where it is left out, and wider where it says so |
 | Place of a section | the element a section reaches the edges of, which the layout marks: the window, the header, the footer or the content part |
 | Entry kind | `DSNavEntryType` — `SOLID` · `QUIET` · `SUBTLE` · `LINE` · `PLAIN` |
+
+The layout look of a theme reads the layout width, the entry kind and the opacity of the navigation, and nothing else. They are typed in the contract's theme state, so a theme can never hand a layout a pixel width or a blur: it picks a step, and the layout decides what the step measures.
 
 ## The types — 🔮
 

@@ -436,7 +436,7 @@ console.log(`  one that names the plan  node ${tsPlan.toFixed(1)} ms   — the s
   console.log(`  ${ok ? "PASS" : "FAIL"}  the fast path changes the cost and not the verdict (${v})`);
 }
 
-// THE GATE MUST ACCEPT THE BOOK'S OWN FINISHED WORD. `SPDocStatusType` is DONE · IMPLEMENTING ·
+// THE GATE MUST ACCEPT THE BOOK'S OWN FINISHED WORD. `SPDevExDocStatusType` is DONE · IMPLEMENTING ·
 // PLANNING, and the gate listed closed, landed and complete — so closing a workstream correctly
 // meant stamping its masthead with a word no other page in the corpus uses.
 one("a masthead reading DONE closes", "close",

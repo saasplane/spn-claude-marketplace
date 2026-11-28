@@ -11,7 +11,7 @@ description: Open the door of an empty workspace and lay a partner's whole found
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/01-bootstrap.md",
-      "seen": "a114f40a"
+      "seen": "8ebca29b"
     }
   ]
 }
@@ -127,7 +127,7 @@ Name every section the answer fills, across rounds and arcs, so it is cited wher
 
 **The foundation decides the shape and leaves each module's inside to the next workstreams.** Round 2 settles high-level domains and subdomains; a module's states, contract, schema and journeys are its own workstream's, which the follow-ups arc names.
 
-**The brand is asked in section 4.4**, colour, greys, typefaces, references and media kinds, and every answer may be *not yet*. The read-back then names the brand, or *the design system's own look until you have one*. Each app's design language row names the app's surface category, `MARKETING`, `RESOURCES`, `MARKETPLACE`, `DASHBOARD` or `PORTAL`, read from the person the app is for (no new question is asked), and the scaffold writes the app's theme setting from it.
+**The brand is asked in section 4.4**, colour, greys, typefaces, references and media kinds, and every answer may be *not yet*. The read-back then names each app's colours, or *the design system's own look until you have one*. Each web app's surface categories, `MARKETING`, `RESOURCES`, `MARKETPLACE`, `DASHBOARD` or `PORTAL`, are read from the person the app is for (no new question is asked); the scaffold writes its `spsurface.json` naming the partner's language, and its `src/spn.surface.json` with a theme for each category, the app's own and never written from the language.
 
 ## Round 6 and round 3 — the estate and product questions
 
@@ -374,7 +374,7 @@ That is the door a partner meets: they ran `spnutils workspace init <name>` befo
 - **The accounts and sign-ins no tool can create are the foundation workstream's Ground section, each item with the check that says it is already done; the agent checks the ground and never decides it, an item turns Done only when its check passes, and a check that reads a cloud account runs only with the developer's approval at that step** (`RULE.DEVEX.FUNCTION.106` · MUST · skill:spn-devex/bootstrap)
 - **The joining path asks one question, where the team lives — its GitHub organization or its estate repository — then mints the workspace, clones and wires the repositories the estate declares, walks the sign-ins and the team's provider keys, runs the local stack from the pinned versions, and closes on an onboarding read; it asks no estate question and creates nothing beyond the local workspace** (`RULE.DEVEX.FUNCTION.107` · MUST · skill:spn-devex/bootstrap)
 - **A new platform's first workstream is written whole from bootstrap's layout data after a few questions in chat — the path, the workspace's name, who the platform is for and the product in one sentence — so every round, section and arc is on the page from the first minute, each section Pending with what it knows, needs and waits on** (`RULE.DEVEX.FUNCTION.108` · MUST · skill:spn-devex/bootstrap)
-- **Each app's design language row names the app's surface category, `MARKETING`, `RESOURCES`, `MARKETPLACE`, `DASHBOARD` or `PORTAL`, and never only `SITE` or `APP`** (`RULE.DEVEX.FUNCTION.109` · MUST · skill:spn-devex/bootstrap)
+- **Each web app's surface categories are named, `MARKETING`, `RESOURCES`, `MARKETPLACE`, `DASHBOARD` or `PORTAL`, and never only `SITE` or `APP`** (`RULE.DEVEX.FUNCTION.109` · MUST · skill:spn-devex/bootstrap)
 - **A session opens on generated orientation read from the workspace and never typed, and an empty workspace is asked the estate questions instead of being read** (`RULE.DEVEX.WORKSPACE.045` · MUST · skill:spn-devex/bootstrap)
 - **An arc is created when its work starts, or with every one of its sections naming what it waits on; a workstream written from a layout opens all its arcs at once, and none of them is empty, because each section says what it still needs and what it waits for** (`RULE.DEVEX.WORKSPACE.539` · MUST · skill:spn-devex/bootstrap)
 - **The layout data is the workstream's structure, kept in the plugin as data and read-only: its rounds, each round's sections and subsections, the views that start a round and the views that join it, the arcs, and the tree of where each arc lands; a change to it is a change to the book and the plugins, never to one workstream** (`RULE.DEVEX.WORKSPACE.540` · MUST · skill:spn-devex/bootstrap)

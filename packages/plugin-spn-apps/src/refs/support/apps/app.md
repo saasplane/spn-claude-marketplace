@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/05-app.md",
-      "seen": "714ca862"
+      "seen": "8f105eaa"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/05-app/",
-      "seen": "a1422729"
+      "seen": "eb1fcf8f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/02-web/03-entry/01-pages.md",
@@ -235,7 +235,7 @@ Never build a second variant of the application for a second deployment shape. A
 **Contract**
 
 ```text
-SPKindAppModeType  ALL · API · QUEUE · MIGRATE · CLI
+SPAppsKindAppModeType  ALL · API · QUEUE · MIGRATE · CLI
 ```
 
 Declare the full entry set in code regardless of how the application is deployed — a serving mode never changes what was composed; the mode filters only which entries phase 3 starts. Choose which entries a deployment activates with configuration, never with a code change. The same build ships as, for example, the `api` and `processor` deployments of the `{app}-{stype}` pattern, each scaled and sized for its own workload:

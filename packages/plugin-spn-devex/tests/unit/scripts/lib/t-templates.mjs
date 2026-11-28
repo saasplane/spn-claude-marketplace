@@ -88,7 +88,10 @@ console.log("\n=== the templates are laid out by where the made file lives, and 
   ok("[MKT.SCRIPTS.407] a note is words only: the template's notes list has no href, and the script draws no link, no <a>, and never \"in the catalogue\"",
     !/"href"/.test(/<script type="application\/json" id="sample-notes">([\s\S]*?)<\/script>/.exec(frameOnly)?.[1] ?? "") && !/note\.href|linkText|linkTitle|in the catalogue|<a href=/.test(script.slice(script.indexOf("THE SURFACE PAGE:"), script.indexOf("// TABS (N017)"))));
   ok("[MKT.SCRIPTS.407] the template's own links are the published stylesheet and script, each with its integrity; a local copy drops it",
-    (frameOnly.match(/<link rel="stylesheet" href="https:[^>]*integrity="sha384-[^"]*"/g) ?? []).length === 1 && (frameOnly.match(/<script src="https:[^>]*integrity="sha384-[^"]*"/g) ?? []).length === 1 && surface.length < 15000);
+    (frameOnly.match(/<link rel="stylesheet" href="https:[^>]*integrity="sha384-[^"]*"/g) ?? []).length === 1 && (frameOnly.match(/<script src="https:[^>]*integrity="sha384-[^"]*"/g) ?? []).length === 1
+      // one example page of two sections and the placeholders' notes; the page itself is stamped once per case, mode
+      // and device by the writer (RULE.SUPPORT.SURFACE.643), so the template stays one example (Q128 A, 2026-11-28)
+      && surface.length < 20000);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — templates` : `\n  all ${total} passed — templates`);

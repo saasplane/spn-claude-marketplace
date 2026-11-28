@@ -1,0 +1,167 @@
+{
+ "type": "Member",
+ "records": [
+  {
+   "key": "mira@studio-mira",
+   "person": "mira",
+   "org": "studio-mira",
+   "role": "OWNER",
+   "since": "2023-02-14"
+  },
+  {
+   "key": "arjun@byte-school",
+   "person": "arjun",
+   "org": "byte-school",
+   "role": "TEACHER",
+   "since": "2022-09-01"
+  },
+  {
+   "key": "leo@northlight",
+   "person": "leo",
+   "org": "northlight",
+   "role": "TEACHER",
+   "since": "2023-06-20"
+  },
+  {
+   "key": "hana@kiln-co",
+   "person": "hana",
+   "org": "kiln-co",
+   "role": "TEACHER",
+   "since": "2024-01-10"
+  },
+  {
+   "key": "ines@crumb",
+   "person": "ines",
+   "org": "crumb",
+   "role": "TEACHER",
+   "since": "2024-03-05"
+  },
+  {
+   "key": "tomas@tomas-studio",
+   "person": "tomas",
+   "org": "tomas-studio",
+   "role": "OWNER",
+   "since": "2023-11-02"
+  },
+  {
+   "key": "ananya@ananya",
+   "person": "ananya",
+   "org": "ananya",
+   "role": "OWNER",
+   "since": "2025-04-18",
+   "learning": [
+    {
+     "item": "python-data",
+     "done": 6,
+     "lastOpened": "2026-11-26"
+    },
+    {
+     "item": "watercolour",
+     "done": 7,
+     "lastOpened": "2026-11-24"
+    },
+    {
+     "item": "street-photo",
+     "done": 5,
+     "lastOpened": "2026-11-10"
+    }
+   ],
+   "bookings": [
+    {
+     "item": "portfolio-review",
+     "seats": 1,
+     "booked": "2026-11-20"
+    },
+    {
+     "item": "wheel-weekend",
+     "seats": 1,
+     "booked": "2026-11-27"
+    }
+   ],
+   "certificates": [
+    {
+     "item": "street-photo",
+     "issued": "2026-11-12",
+     "number": "ATL-C-7731"
+    }
+   ]
+  },
+  {
+   "key": "devika@atelier",
+   "person": "devika",
+   "org": "atelier",
+   "role": "ADMIN",
+   "since": "2022-06-01"
+  },
+  {
+   "key": "sam@atelier",
+   "person": "sam",
+   "org": "atelier",
+   "role": "MEMBER",
+   "since": "2023-01-09"
+  },
+  {
+   "key": "priya@brightpath",
+   "person": "priya",
+   "org": "brightpath",
+   "role": "OWNER",
+   "since": "2024-08-12"
+  },
+  {
+   "key": "farid@brightpath",
+   "person": "farid",
+   "org": "brightpath",
+   "role": "TEACHER",
+   "since": "2024-09-01"
+  },
+  {
+   "key": "rohan@rohan",
+   "person": "rohan",
+   "org": "rohan",
+   "role": "OWNER",
+   "since": "2025-10-02"
+  },
+  {
+   "key": "meera@kestrel",
+   "person": "meera",
+   "org": "kestrel",
+   "role": "OWNER",
+   "since": "2025-06-30"
+  },
+  {
+   "key": "vikram@kestrel",
+   "person": "vikram",
+   "org": "kestrel",
+   "role": "MEMBER",
+   "since": "2025-07-04"
+  },
+  {
+   "key": "lena@pinecone",
+   "person": "lena",
+   "org": "pinecone",
+   "role": "OWNER",
+   "since": "2025-01-20"
+  },
+  {
+   "key": "omar@pinecone",
+   "person": "omar",
+   "org": "pinecone",
+   "role": "MEMBER",
+   "since": "2025-02-03"
+  },
+  {
+   "key": "kabir@kabir",
+   "person": "kabir",
+   "org": "kabir",
+   "role": "OWNER",
+   "since": "2025-09-14"
+  },
+  {
+   "key": "noor@noor-studio",
+   "person": "noor",
+   "org": "noor-studio",
+   "role": "OWNER",
+   "since": "2026-11-26"
+  }
+ ]
+}
