@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "e5a43d0d"
+    "commit": "dcd3bb13"
   },
   "rules": [
     {
@@ -39944,6 +39944,106 @@
         {
           "plugin": "spn-surface",
           "path": "skills/design/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.645",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A record carries the media its type has, as pictures listed in `assets/sources.json`, and a proof strip draws a logo image or a wide logo alone",
+      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
+      "heading": "The parts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.646",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A language's samples carry the record counts that make a page read as real",
+      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
+      "heading": "The parts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.647",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A language's samples carry the marketing words by section, each item with its icon, picture and link",
+      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
+      "heading": "The parts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.648",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A samples home's pages, containers and widgets draw from the language's data and never from placeholder words, and a section is composed from design-system components where no one unit fits",
+      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
+      "heading": "The parts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "refs/support/surface/design-languages.md",
+          "heading": "The parts — 🔮"
+        },
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.SUPPORT.SURFACE.649",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-surface/design"
+      },
+      "class": "stated in a skill",
+      "sentence": "A language's samples show none of the gaps of a thin page",
+      "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
+      "heading": "The parts",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-surface",
+          "path": "skills/design/steps/design-language.md",
           "heading": "The rules this step holds"
         }
       ]
