@@ -71,10 +71,10 @@ Each construct here is the Surface form of one in the core domain, so read its c
 
 | Construct | What it is |
 | --- | --- |
-| [The Plugin — What spn-surface Is, and When a Session Loads It](01-plugin.md) | This plugin is the one folder everything in the Surface domain ships from, and the folder an install copies whole. |
-| [Hooks — One Moment, For the Connector's Script](02-hooks.md) | This plugin wires exactly one moment of a session, the point where the Figma connector is about to run a script, and one tool, because its one rule is about what that script says. |
-| [Skills — The Command a Surface Question Answers To](03-skills.md) | A skill belongs to this domain when it describes work on what a person sees and touches before any code is written, which today is one skill: design. |
-| [Scripts — The Code This Plugin Runs](04-scripts.md) | Scripts holds everything this plugin executes, divided by what calls each file: the entry the wiring names, the check it asks, the command line a person types, and the libraries the others read from the shared support folder. |
-| [Refs — The Surface Book, Restated Inside the Plugin](05-refs.md) | Refs carries, inside this plugin, the Surface rules a partner needs but has no checkout to read: the standards, the patterns, the architecture of the design system, its library and its delivery, and the specs a page starts from. |
-| [Tests — The Plugin's Own Folders, Without a Framework](06-tests.md) | This plugin ships a rule that runs on a person's design file, so it owes proof of its own: one tier, mirrored on its source, behind a runner that walks and judges on an exit code. |
+| [The Plugin](01-plugin.md) | This plugin is the one folder everything in the Surface domain ships from, and the folder an install copies whole. |
+| [Hooks](02-hooks.md) | This plugin wires exactly one moment of a session, the point where the Figma connector is about to run a script, and one tool, because its one rule is about what that script says. |
+| [Skills](03-skills.md) | A skill belongs to this domain when it describes work on what a person sees and touches before any code is written, which today is one skill: design. |
+| [Scripts](04-scripts.md) | Scripts holds everything this plugin executes, divided by what calls each file: the entry the wiring names, the check it asks, the command line a person types, and the libraries the others read from the shared support folder. |
+| [Refs](05-refs.md) | Refs carries, inside this plugin, the Surface rules a partner needs but has no checkout to read: the standards, the patterns, the architecture of the design system, its library and its delivery, and the specs a page starts from. |
+| [Tests](06-tests.md) | This plugin ships a rule that runs on a person's design file, so it owes proof of its own: one tier, mirrored on its source, behind a runner that walks and judges on an exit code. |
 <!-- /spn:generated -->
