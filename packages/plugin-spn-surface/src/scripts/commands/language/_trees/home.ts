@@ -1,15 +1,15 @@
-// The shape of a samples home (RULE.SUPPORT.SURFACE.643), one for every language: under each category, Overview, Layouts as
+// The shape of a samples home (RULE.SUPPORT.SURFACE.643), one for every language: under each category, Layouts as
 // one page with a tab for each layout and case, Pages as a folder for each page-kind family with a page for each kind and
 // its cases on a Case switch, Common as one page with a tab for each screen, Containers and Widgets as a folder each with a
 // page for each family drawing every kind and case at once, and then Media, Motion and Words.
-import { col, feat, sec, table, txt } from "./kit.ts";
+import { col, sec, txt } from "./kit.ts";
 import { sentence, slugOf, words } from "./notes.ts";
 import type { CatKind, Entry, Page, PageCase, Tree } from "./types.ts";
 
 const num = (n: number): string => String(n).padStart(2, "0");
 
 /** The parts of a category, in the order its folder numbers them. */
-export const CATEGORY_PARTS = ["OVERVIEW", "LAYOUTS", "PAGES", "CONTAINERS", "WIDGETS", "MEDIA", "MOTION", "WORDS"] as const;
+export const CATEGORY_PARTS = ["LAYOUTS", "PAGES", "CONTAINERS", "WIDGETS", "MEDIA", "MOTION", "WORDS"] as const;
 
 /** A category's folder for a part: `02-site/01-marketing/04-containers`, or the file of a one-page part, `…/02-layouts.html`. */
 export const partPath = (base: string, part: (typeof CATEGORY_PARTS)[number]): string =>
@@ -59,54 +59,6 @@ export const appHeading = (label: string): Tree => txt(label, "TITLE_SM", { tone
 /** One page that shows several whole screens, a tab for each: the first case is what the page draws at first. */
 export function pageWithCases(base: Omit<Page, "entries" | "layout" | "cases">, cases: PageCase[]): Page {
   return { ...base, entries: cases[0]?.entries ?? [], layout: cases[0]?.layout ?? "CANVAS", cases: cases.length > 1 ? cases : undefined };
-}
-
-type Samples = { categories?: Record<string, { person?: Record<string, unknown>; flows?: Array<{ key?: string; pages?: string[] }> }> };
-
-/** A category's Overview: the person its samples are drawn for, the families the language picks in each part, and its flows. */
-export function overviewPage(
-  category: string,
-  base: string,
-  samples: unknown,
-  parts: Record<string, CatKind[]>,
-  wrap: (children: Tree[]) => Tree[]
-): Page {
-  const entry = ((samples ?? {}) as Samples).categories?.[category];
-  const person = entry?.person ?? {};
-  const say = (key: string): string => (typeof person[key] === "string" ? (person[key] as string) : "");
-  const who = say("who") || `The person a ${category.toLowerCase()} page is for.`;
-  const entries: Entry[] = [];
-  const personRows = [["Who", who], ["Comes", say("comes")], ["Asks", say("asks")], ["Sees", say("sees")]].filter(([, value]) => value !== "");
-  entries.push({
-    kind: "Person",
-    case: "",
-    note: sentence(who),
-    node: wrap([feat({ title: `Who ${words(category)} is for`, description: sentence(who) }), table(["", ""], personRows)])[0],
-    planned: false,
-  });
-  const familyRows = (["LAYOUTS", "PAGES", "CONTAINERS", "WIDGETS"] as const).map((part) => [
-    familyTitle(part),
-    part === "LAYOUTS" ? (parts[part] ?? []).map((kind) => kind.title).join(" · ") : familiesOf(parts[part] ?? []).map((one) => familyTitle(one.family)).join(" · "),
-  ]);
-  entries.push({
-    kind: "Families",
-    case: "",
-    note: "The families of each part this language picks.",
-    node: wrap([feat({ title: "What this language picks", description: "Each part's families, in the catalogue's order." }), table(["Part", "Families"], familyRows)])[0],
-    planned: false,
-  });
-  const flows = entry?.flows ?? [];
-  entries.push({
-    kind: "Flows",
-    case: "",
-    note: flows.length ? "The pages a person walks, in order." : "This category draws no flow yet.",
-    node: wrap([
-      feat({ title: "The flows", description: flows.length ? "Each flow is the pages a person walks, in order." : "The language names no flow for this category yet." }),
-      ...(flows.length ? [table(["Flow", "Pages"], flows.map((flow) => [words(String(flow.key ?? "")), (flow.pages ?? []).map((page) => words(page)).join(" → ")]))] : []),
-    ])[0],
-    planned: false,
-  });
-  return { file: `${partPath(base, "OVERVIEW")}.html`, title: "Overview", category, part: "OVERVIEW", kinds: [], entries, ask: sentence(who), layout: "CANVAS" };
 }
 
 /** The file of a page kind in its family's folder, and the Common page's file. */

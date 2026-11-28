@@ -5,7 +5,7 @@
 //
 // It reads the language's folder (`docs/specs/surface/languages/<language>/` of the repository: `spdl.json`, `samples.json` and `data/`; the older
 // names for one release; `surface` is read as `base`) and the surface catalogue's folder, and for each
-// category the language serves it draws the samples home's shape (RULE.SUPPORT.SURFACE.643): an Overview, the Layouts as one page of tabs, each
+// category the language serves it draws the samples home's shape (RULE.SUPPORT.SURFACE.643): the Layouts as one page of tabs, each
 // page kind in its family's folder with its cases on the Case switch, each container and widget family as one page drawing every kind and case
 // at once, and Media, Motion and Words. Each screen is a tree of the design system's units, carrying its category, with the language's own
 // words from its samples.json, drawn by `spnutils apps surface render` for light and dark and for a desktop, a tablet and a phone, in the design
@@ -20,12 +20,13 @@ import { type Action, FLAG, UsageFault, VALUE, readWords } from "../../../../../
 import { readCarriedCatalogue, specsRoot } from "../catalogue/show.ts";
 import { templateBeside } from "../page/copy.ts";
 import { bookFrom, findLanguage, loadData, parentName } from "./_folder.ts";
+import { unnamedTypes } from "./_trees/data.ts";
 import { INDEX_SHELL } from "./_trees/index-shell.ts";
 import { type Catalogue, type Spec, run as draw } from "./_trees/draw.ts";
 import { installedVersion } from "./_trees/render.ts";
 import { installedNodes, resolveLanguage } from "./resolve.ts";
 
-export const describe = "Draw a design language's samples home: Shared, then each category's overview, layouts, pages, containers, widgets, media, motion and words, in the surface page template";
+export const describe = "Draw a design language's samples home: Shared, then each category's layouts, pages, containers, widgets, media, motion and words, in the surface page template";
 export const usage = "<language> [--out <dir>] [--book <folder>] [--spec <file>] [--catalogue <folder>] [--template <file>] [--assets <folder>] [--ds <version>] [--app <package> | --theme <file>] [--only <text>]";
 
 /**
@@ -79,6 +80,8 @@ function write(args: string[]): number {
   const result = draw(options);
   console.log(`OK ${out}: ${result.pages} pages, ${result.entries} sections, ${result.planned} planned`);
   for (const [category, parts] of Object.entries(result.byCategory)) console.log(`  ${category}: ${Object.entries(parts).map(([part, count]) => `${part.toLowerCase()} ${count}`).join(", ")}`);
+  const unnamed = unnamedTypes(options.data ?? null);
+  if (unnamed.length) console.log(`  unnamed: ${unnamed.join(", ")} (no catalogue widget; drawn as a table)`);
   return 0;
 }
 

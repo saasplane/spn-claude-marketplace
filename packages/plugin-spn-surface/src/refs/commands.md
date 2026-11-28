@@ -16,7 +16,7 @@ spn-surface language diff <old.json> <new.json> | <language> [--against <git-ref
 
 spn-surface language resolve <language> [--book <folder>] [--json] — Find a design language live: the repository's own, then an installed package's, then one this plugin lists, then the base it carries
 
-spn-surface language samples write <language> [--out <dir>] [--book <folder>] [--spec <file>] [--catalogue <folder>] [--template <file>] [--assets <folder>] [--ds <version>] [--app <package> | --theme <file>] [--only <text>] — Draw a design language's samples home: Shared, then each category's overview, layouts, pages, containers, widgets, media, motion and words, in the surface page template
+spn-surface language samples write <language> [--out <dir>] [--book <folder>] [--spec <file>] [--catalogue <folder>] [--template <file>] [--assets <folder>] [--ds <version>] [--app <package> | --theme <file>] [--only <text>] — Draw a design language's samples home: Shared, then each category's layouts, pages, containers, widgets, media, motion and words, in the surface page template
 
 spn-surface language write <app> [--construct <construct.md>] — Fill a design-language construct's figures (drawing style, characters and building blocks, grounds, drawing kinds) from the `language` block of its own construct
 

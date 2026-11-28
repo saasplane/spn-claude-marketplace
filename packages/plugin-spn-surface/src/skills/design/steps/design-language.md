@@ -94,7 +94,7 @@
 - **A language is resolved live, in one order: the repository's own, then an installed package's, then a language the plugin lists, then the plugin's `base`** (`RULE.SUPPORT.SURFACE.640` · MUST · skill:spn-surface/design)
 - **A web package says what it ships: `shippedLanguages` in its `spsurface.json` names each language its build carries for whoever installs it** (`RULE.SUPPORT.SURFACE.641` · MUST · skill:spn-surface/design)
 - **A language is described for each surface category it states, in the same seven parts, in the groups Structure and Style, beside one Shared group** (`RULE.SUPPORT.SURFACE.642` · MUST · skill:spn-surface/design)
-- **A language's samples home is laid out in one shape for every language: Shared, then each category's Overview, Layouts, Pages, Containers, Widgets, Media, Motion and Words** (`RULE.SUPPORT.SURFACE.643` · MUST · skill:spn-surface/design)
+- **A language's samples home is laid out in one shape for every language: Shared, then each category's Layouts, Pages, Containers, Widgets, Media, Motion and Words** (`RULE.SUPPORT.SURFACE.643` · MUST · skill:spn-surface/design)
 
 Read this before a page of a site or an app is drawn, and while a partner's design language is being made. 
 

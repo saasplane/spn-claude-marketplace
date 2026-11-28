@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "11e440e3"
+    "commit": "e5a43d0d"
   },
   "rules": [
     {
@@ -39912,7 +39912,7 @@
         "skill": "spn-surface/design"
       },
       "class": "stated in a skill",
-      "sentence": "A language's samples home is laid out in one shape for every language: Shared, then each category's Overview, Layouts, Pages, Containers, Widgets, Media, Motion and Words",
+      "sentence": "A language's samples home is laid out in one shape for every language: Shared, then each category's Layouts, Pages, Containers, Widgets, Media, Motion and Words",
       "chapter": "04-capabilities/02-support/01-surface/12-language-design-language/01-common/01-design-language.md",
       "heading": "The parts",
       "decision": null,

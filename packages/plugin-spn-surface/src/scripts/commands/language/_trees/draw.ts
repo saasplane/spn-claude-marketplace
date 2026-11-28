@@ -4,10 +4,11 @@ import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "
 import { basename, dirname, join } from "node:path";
 import { appPages } from "./draw-app.ts";
 import { type Folders, sitePages, wrapSite } from "./draw-site.ts";
+import { dataPages } from "./data.ts";
+import type { LanguageData } from "../_folder.ts";
 import { categoryValuePages, sharedPages } from "./values.ts";
 import { type AssetFile, type DrawnCase, type PageOptions, indexHtml, pageHtml, treeOf } from "./files.ts";
-import { overviewPage } from "./home.ts";
-import { plannedPanel, plannedSection, sec, setDs } from "./kit.ts";
+import { plannedPanel, plannedSection, setDs } from "./kit.ts";
 import { appLayout } from "./layouts.ts";
 import { slugOf } from "./notes.ts";
 import { DEVICES, type Device, type Drawn, MODES, type Mode, type ThemeChoice, drawSections } from "./render.ts";
@@ -19,10 +20,10 @@ export type OutlinePart = { code: string; title: string; description: string; va
 export type Catalogue = { version: string; outline: { groups?: Array<{ code: string; parts: OutlinePart[] }>; categories: Record<string, { family: string; person: string; description: string }> }; categories: Record<string, Record<string, CatKind[]>> };
 export type PartSetting = { source?: string; pick?: string | string[]; notUsed?: unknown[]; add?: unknown[] };
 export type Spec = { name: string; shared?: Record<string, Record<string, unknown>>; categories: Record<string, Record<string, PartSetting>> };
-export type Options = { indexShell: string; language: string; catalogue: Catalogue; spec: Spec; out: string; template: string; ds: string; theme: ThemeChoice; assets: string | null; place: string; only: string | null; log: (line: string) => void; samples: unknown; languageFolder: string | null; assetFile?: AssetFile };
+export type Options = { indexShell: string; language: string; catalogue: Catalogue; spec: Spec; out: string; template: string; ds: string; theme: ThemeChoice; assets: string | null; place: string; only: string | null; log: (line: string) => void; samples: unknown; languageFolder: string | null; assetFile?: AssetFile; data?: LanguageData | null };
 
 const PARTS = ["LAYOUTS", "PAGES", "CONTAINERS", "WIDGETS"] as const;
-const ALL_PARTS = ["OVERVIEW", ...PARTS, "THEME", "MEDIA", "MOTION", "WORDS", "BRAND", "DRAWING", "VOICE"];
+const ALL_PARTS = ["OVERVIEW", ...PARTS, "THEME", "MEDIA", "MOTION", "WORDS", "BRAND", "DRAWING", "VOICE", "DATA"];
 const TITLES: Record<string, string> = { site: "Site", app: "App", shared: "Shared" };
 const num = (n: number): string => String(n).padStart(2, "0");
 
@@ -56,13 +57,12 @@ export function pagesOf(options: Options): Array<Page & { family: string }> {
   const titles: Record<string, string> = {};
   for (const part of outline) { titles[part.code] = part.title; titles[`${part.code}-ask`] = part.description; }
   for (const page of sharedPages(sharedParts, spec.shared)) out.push({ ...page, family: "site" });
+  for (const page of dataPages(options.data ?? null)) out.push({ ...page, family: "site" });
   for (const { code, family, folder } of categoriesOf(catalogue, spec)) {
     const folders: Folders = { base: folder, part: (part) => `${folder}/${num(PARTS.indexOf(part as (typeof PARTS)[number]) + 1)}-${part.toLowerCase()}` };
     const picked = (part: string): CatKind[] => pickKinds(catalogue, spec, code, part);
     const pages = family === "site" ? sitePages(code, catalogue.categories[code], BRIEFS[code] ?? BRIEFS.MARKETING, folders, picked) : appPages(code, folders, picked);
-    const parts = Object.fromEntries(PARTS.map((part) => [part, picked(part)]));
-    const overview = overviewPage(code, folder, options.samples, parts, (children) => [sec(children, "MD")]);
-    for (const page of [overview, ...pages, ...categoryValuePages(code, folder, catalogue.categories[code], spec.categories[code] as never, titles)]) out.push({ ...page, family });
+        for (const page of [...pages, ...categoryValuePages(code, folder, catalogue.categories[code], spec.categories[code] as never, titles)]) out.push({ ...page, family });
   }
   return options.only ? out.filter((page) => page.file.includes(options.only as string)) : out;
 }
@@ -170,7 +170,7 @@ export function run(options: Options): { pages: number; entries: number; planned
   }
   writeFileSync(dataFile, `${JSON.stringify({ language: options.language, name, home: "index.html", samples }, null, 1)}\n`);
   const tree = treeOf(pages.map((page) => ({ file: page.file, title: page.title, label: label(page) })), titleOf);
-  writeFileSync(join(options.out, "index.html"), indexHtml(options.indexShell, name, options.place, `${name}'s samples: Shared, then each category's overview, layouts, pages, containers, widgets, media, motion and words.`, tree, "", options.assets, options.out));
+  writeFileSync(join(options.out, "index.html"), indexHtml(options.indexShell, name, options.place, `${name}'s samples: Shared, then each category's layouts, pages, containers, widgets, media, motion and words.`, tree, "", options.assets, options.out));
   const byCategory: Record<string, Record<string, number>> = {};
   for (const page of pages) { const cat = (byCategory[page.category] ??= {}); cat[page.part] = (cat[page.part] ?? 0) + 1; }
   return { pages: pages.length, entries: pages.reduce((sum, page) => sum + screensOf(page).reduce((inner, screen) => inner + screen.entries.filter((entry) => !entry.heading).length, 0), 0), planned, byCategory, files: written };
